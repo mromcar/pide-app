@@ -1,0 +1,34 @@
+import prisma from '@/lib/prisma'
+
+export default async function EstadoPedidoPage(props: { params: { id: string } }) {
+  const { id } = props.params
+  const pedidoId = Number(id)
+  const pedido = await prisma.pedido.findUnique({
+    where: { id_pedido: pedidoId },
+    include: {
+      detalles: {
+        include: { producto: true },
+      },
+    },
+  })
+
+  if (!pedido) {
+    return <div>Pedido no encontrado.</div>
+  }
+
+  return (
+    <main>
+      <h1 className="text-2xl font-bold mb-4">Estado de tu pedido</h1>
+      <div className="mb-4">
+        Estado actual: <b>{pedido.estado}</b>
+      </div>
+      <ul>
+        {pedido.detalles.map((det) => (
+          <li key={det.id_detalle_pedido}>
+            {det.cantidad} x {det.producto.nombre}
+          </li>
+        ))}
+      </ul>
+    </main>
+  )
+}

@@ -1,0 +1,148 @@
+// Archivo: prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- ENUMs ---
+
+enum RolUsuario {
+  cliente
+  camarero
+  cocinero
+  establishment_admin
+  general_admin
+}
+
+enum EstadoPedidoGeneral {
+  PENDIENTE
+  EN_PREPARACION
+  LISTO // ej: listo para recoger por camarero (cocina) o listo para servir (barra)
+  ENTREGADO // ej: servido al cliente
+  COMPLETADO // ej: finalizado y/o pagado
+  CANCELADO
+}
+
+// Opcional: Enum para el estado a nivel de ítem, si decides mantener esa granularidad.
+// Si no lo usas, puedes eliminar este enum y el campo 'estado' en DetallePedido.
+enum EstadoItemPedido {
+  PENDIENTE
+  EN_PREPARACION
+  LISTO
+  ENTREGADO
+  CANCELADO // Por si un item específico se cancela
+}
+
+
+// --- MODELOS ---
+
+model Usuario {
+  id_usuario         Int      @id @default(autoincrement())
+  rol                RolUsuario
+  nombre             String?
+  email              String?  @unique
+  contrasena         String? // Recuerda hashear las contraseñas antes de guardarlas
+  id_establecimiento Int?
+  establecimiento    Establecimiento? @relation("UsuarioEstablecimiento", fields: [id_establecimiento], references: [id_establecimiento], onDelete: SetNull) // Si se borra el establecimiento, el usuario queda sin asignar
+
+  administra         Establecimiento[] @relation("AdminEstablecimiento") // Relación para el admin del establecimiento
+
+  // Relaciones inversas
+  pedidos            Pedido[]       @relation("ClientePedidos") // Pedidos hechos por este usuario como cliente
+  estadosPedido      EstadoPedido[] // Cambios de estado realizados por este usuario
+
+  @@map("usuarios")
+}
+
+model Establecimiento {
+  id_establecimiento           Int      @id @default(autoincrement())
+  nombre                       String
+  direccion                    String?
+  contacto                     String?
+  id_administrador_establecimiento Int?     @unique // Un establecimiento tiene un solo admin (clave única aquí)
+  administrador                Usuario? @relation("AdminEstablecimiento", fields: [id_administrador_establecimiento], references: [id_usuario], onDelete: SetNull) // Si se borra el usuario admin, el establecimiento queda sin admin asignado
+
+  // Relaciones inversas
+  empleados                    Usuario[]    @relation("UsuarioEstablecimiento") // Empleados de este establecimiento
+  categorias                   Categoria[]  // Categorías de menú
+  productos                    Producto[]   // Productos del menú
+  pedidos                      Pedido[]     // Pedidos realizados en este establecimiento
+
+  @@map("establecimientos")
+}
+
+model Categoria {
+  id_categoria       Int      @id @default(autoincrement())
+  nombre             String
+  id_establecimiento Int
+  establecimiento    Establecimiento @relation(fields: [id_establecimiento], references: [id_establecimiento], onDelete: Cascade) // Si se borra el establecimiento, se borran sus categorías
+
+  // Relaciones inversas
+  productos          Producto[]
+
+  @@map("categorias")
+}
+
+model Producto {
+  id_producto        Int      @id @default(autoincrement())
+  nombre             String
+  descripcion        String?
+  precio             Decimal // Asegúrate que el tipo Decimal de Prisma se mapea bien al DECIMAL(10, 2) de PG
+  id_categoria       Int
+  id_establecimiento Int
+  categoria          Categoria     @relation(fields: [id_categoria], references: [id_categoria], onDelete: Restrict) // No permitir borrar categoría si tiene productos
+  establecimiento    Establecimiento @relation(fields: [id_establecimiento], references: [id_establecimiento], onDelete: Cascade) // Si se borra el establecimiento, se borran sus productos
+
+  // Relaciones inversas
+  detallesPedido     DetallePedido[]
+
+  @@map("productos")
+}
+
+model Pedido {
+  id_pedido          Int      @id @default(autoincrement())
+  id_cliente         Int?
+  id_establecimiento Int
+  fecha_hora         DateTime @default(now())
+  estado             EstadoPedidoGeneral @default(PENDIENTE) // Usando el Enum
+  total              Decimal?
+  metodo_pago        String?
+  cliente            Usuario? @relation("ClientePedidos", fields: [id_cliente], references: [id_usuario], onDelete: SetNull) // Si se borra el cliente, el pedido permanece anónimo
+  establecimiento    Establecimiento @relation(fields: [id_establecimiento], references: [id_establecimiento], onDelete: Restrict) // No permitir borrar establecimiento si tiene pedidos
+
+  // Relaciones inversas
+  detalles           DetallePedido[] // Se borrarán en cascada por la relación en DetallePedido
+  estadosPedido      EstadoPedido[]  // Se borrarán en cascada por la relación en EstadoPedido
+
+  @@map("pedidos")
+}
+
+model DetallePedido {
+  id_detalle_pedido Int      @id @default(autoincrement())
+  id_pedido         Int
+  id_producto       Int
+  cantidad          Int      @default(1)
+  especialidades    String?
+  estado            EstadoItemPedido? // Usando el Enum opcional para items
+  pedido            Pedido   @relation(fields: [id_pedido], references: [id_pedido], onDelete: Cascade) // Si se borra el pedido, se borran sus detalles
+  producto          Producto @relation(fields: [id_producto], references: [id_producto], onDelete: Restrict) // No permitir borrar producto si está en un detalle de pedido
+
+  @@map("detallespedido")
+}
+
+model EstadoPedido {
+  id_estado_pedido  Int      @id @default(autoincrement())
+  id_pedido         Int
+  id_usuario        Int?      // Quién hizo el cambio (puede ser null si es automático/sistema)
+  estado            EstadoPedidoGeneral // Usando el Enum. El estado que se registró.
+  fecha_hora        DateTime @default(now())
+  pedido            Pedido   @relation(fields: [id_pedido], references: [id_pedido], onDelete: Cascade) // Si se borra el pedido, se borra su historial de estados
+  usuario           Usuario? @relation(fields: [id_usuario], references: [id_usuario], onDelete: SetNull) // Si se borra el usuario, el registro de estado permanece anónimo
+
+  @@map("estadospedido")
+}

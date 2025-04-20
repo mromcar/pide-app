@@ -1,7 +1,10 @@
-import type { NextConfig } from "next";
+process.env.NODE_NO_WARNINGS = '1'
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
+const nextConfig = {
+  env: {
+    DATABASE_URL: process.env.DATABASE_URL,
+  },
+  // ...otras opciones si las tienes...
+}
 
-export default nextConfig;
+export default nextConfig
