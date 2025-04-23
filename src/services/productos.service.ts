@@ -1,42 +1,58 @@
 import prisma from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 
-export async function obtenerCategoriasConProductos(restauranteId: number, idioma: string) {
-    return prisma.categoria.findMany({
-        where: { id_establecimiento: restauranteId },
+export async function obtenerCategoriasConProductos(
+  restauranteId: number,
+  idioma: string
+): Promise<
+  Prisma.CategoriaGetPayload<{
+    include: {
+      productos: {
         include: {
-            productos: {
-                include: {
-                    traducciones: {
-                        where: { idioma },
-                    },
-                },
-            },
+          ProductoTraduccion: true
+        }
+      }
+    }
+  }>[]
+> {
+  return prisma.categoria.findMany({
+    where: { id_establecimiento: restauranteId },
+    include: {
+      productos: {
+        include: {
+          ProductoTraduccion: {
+            where: { idioma },
+          },
         },
-        orderBy: { id_categoria: 'asc' },
-    })
+        orderBy: { orden: 'asc' },
+      },
+    },
+    orderBy: { orden: 'asc' },
+  })
 }
 
 export async function obtenerEstablecimientoPorId(restauranteId: number) {
-    return prisma.establecimiento.findUnique({
-        where: { id_establecimiento: restauranteId },
-    })
+  return prisma.establecimiento.findUnique({
+    where: { id_establecimiento: restauranteId },
+  })
 }
 
 export type ProductoTraduccion = {
     nombre: string
     descripcion: string | null
+    idioma: string
 }
 
-export type ProductoConTraducciones = {
+export type ProductoConTraduccion = {
     id_producto: number
     nombre: string
     descripcion: string | null
-    precio: any
-    traducciones: ProductoTraduccion[]
+    precio: string | number
+    ProductoTraduccion: ProductoTraduccion[]
 }
 
 export type CategoriaConProductos = {
     id_categoria: number
     nombre: string
-    productos: ProductoConTraducciones[]
+    productos: ProductoConTraduccion[]
 }
