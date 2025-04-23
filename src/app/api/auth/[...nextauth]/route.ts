@@ -29,13 +29,16 @@ export const authOptions = {
   ],
   callbacks: {
     async session({ session, token }) {
-      session.user.id = token.sub
-      session.user.rol = token.rol
-      session.user.id_establecimiento = token.id_establecimiento
+      if (session.user) {
+        session.user.id = token.id || token.sub
+        session.user.rol = token.rol
+        session.user.id_establecimiento = token.id_establecimiento
+      }
       return session
     },
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id
         token.rol = user.rol
         token.id_establecimiento = user.id_establecimiento
       }
@@ -50,7 +53,3 @@ export const authOptions = {
 const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST }
 
-export default async function EstadoPedidoPage({ params }: { params: { id: string } }) {
-  const { id } = params
-  // ...resto igual...
-}

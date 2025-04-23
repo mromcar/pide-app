@@ -1,7 +1,8 @@
+import '@/app/globals.css'
 import prisma from '@/lib/prisma'
 import PedidoForm from '@/components/PedidoForm'
 
-export default async function CartaRestaurante({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: { id: string } }) {
   const restauranteId = Number(params.id)
 
   const restaurante = await prisma.establecimiento.findUnique({

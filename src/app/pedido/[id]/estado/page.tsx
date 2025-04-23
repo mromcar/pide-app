@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma'
+import PedidoResumen from '@/components/PedidoResumen'
 
 export default async function EstadoPedidoPage(props: { params: { id: string } }) {
   const { id } = props.params
@@ -22,13 +23,7 @@ export default async function EstadoPedidoPage(props: { params: { id: string } }
       <div className="mb-4">
         Estado actual: <b>{pedido.estado}</b>
       </div>
-      <ul>
-        {pedido.detalles.map((det) => (
-          <li key={det.id_detalle_pedido}>
-            {det.cantidad} x {det.producto.nombre}
-          </li>
-        ))}
-      </ul>
+      <PedidoResumen detalles={pedido.detalles} />
     </main>
   )
 }

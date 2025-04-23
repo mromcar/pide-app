@@ -32,6 +32,17 @@ export default function PedidoForm({
     setCantidades((prev) => ({ ...prev, [id]: value }))
   }
 
+  // Calcular el total del pedido
+  const total = categorias.reduce(
+    (acc, cat) =>
+      acc +
+      cat.productos.reduce(
+        (accProd, prod) => accProd + (cantidades[prod.id_producto] || 0) * parseFloat(prod.precio),
+        0
+      ),
+    0
+  )
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setEnviando(true)
@@ -74,25 +85,33 @@ export default function PedidoForm({
         <section key={cat.id_categoria} className="mb-6">
           <h2 className="font-semibold mb-2">{cat.nombre}</h2>
           <ul>
-            {cat.productos.map((prod) => (
-              <li key={prod.id_producto} className="flex items-center gap-2 mb-2">
-                <span className="flex-1">
-                  {prod.nombre}{' '}
-                  <span className="text-gray-500">({Number(prod.precio).toFixed(2)} €)</span>
-                </span>
-                <input
-                  type="number"
-                  min={0}
-                  value={cantidades[prod.id_producto] || ''}
-                  onChange={(e) => handleCantidad(prod.id_producto, Number(e.target.value))}
-                  className="w-16 border rounded px-2 py-1"
-                  placeholder="0"
-                />
-              </li>
-            ))}
+            {cat.productos.map((prod) => {
+              const cantidad = cantidades[prod.id_producto] || 0
+              const subtotal = cantidad * parseFloat(prod.precio)
+              return (
+                <li key={prod.id_producto} className="flex items-center gap-2 mb-2">
+                  <span className="flex-1">
+                    {prod.nombre}{' '}
+                    <span className="text-gray-500">({Number(prod.precio).toFixed(2)} €)</span>
+                  </span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={cantidad || ''}
+                    onChange={(e) => handleCantidad(prod.id_producto, Number(e.target.value))}
+                    className="w-16 border rounded px-2 py-1"
+                    placeholder="0"
+                  />
+                  <span className="w-24 text-right">
+                    {cantidad > 0 && <span>= {subtotal.toFixed(2)} €</span>}
+                  </span>
+                </li>
+              )
+            })}
           </ul>
         </section>
       ))}
+      <div className="font-bold text-lg mb-4">Total: {total.toFixed(2)} €</div>
       <button
         type="submit"
         className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"

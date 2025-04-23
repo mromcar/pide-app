@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import SessionWrapper from '@/components/SessionWrapper'
-import AdminMenu from '@/components/AdminMenu'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -23,10 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SessionWrapper>
-          <AdminMenu />
-          {children}
-        </SessionWrapper>
+        <SessionWrapper>{children}</SessionWrapper>
       </body>
     </html>
   )

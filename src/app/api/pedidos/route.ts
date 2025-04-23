@@ -7,7 +7,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 // Cambiar estado de un pedido (solo admin)
 export async function PUT(request: Request) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.rol !== 'establishment_admin') {
+  console.log('SESSION:', session)
+
+  if (!session || !['establishment_admin', 'camarero', 'cocinero'].includes(session.user.rol)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 })
   }
   const { id_pedido, estado } = await request.json()
@@ -46,7 +48,11 @@ export async function GET(request: Request) {
   const where: any = {
     id_establecimiento: session.user.id_establecimiento,
   }
-  if (estado && Object.values(EstadoPedidoGeneral).includes(estado)) {
+
+  // Si es camarero o cocinero, excluye COMPLETADO y CANCELADO
+  if (['camarero', 'cocinero'].includes(session.user.rol)) {
+    where.estado = { notIn: [EstadoPedidoGeneral.COMPLETADO, EstadoPedidoGeneral.CANCELADO] }
+  } else if (estado && Object.values(EstadoPedidoGeneral).includes(estado)) {
     where.estado = estado
   } else {
     where.estado = { not: EstadoPedidoGeneral.COMPLETADO }
