@@ -1,17 +1,10 @@
-import prisma from '@/lib/prisma'
+import { obtenerPedidoPorId } from '@/services/pedidos.service'
 import PedidoResumen from '@/components/PedidoResumen'
 
 export default async function EstadoPedidoPage(props: { params: { id: string } }) {
   const { id } = props.params
   const pedidoId = Number(id)
-  const pedido = await prisma.pedido.findUnique({
-    where: { id_pedido: pedidoId },
-    include: {
-      detalles: {
-        include: { producto: true },
-      },
-    },
-  })
+  const pedido = await obtenerPedidoPorId(pedidoId)
 
   if (!pedido) {
     return <div>Pedido no encontrado.</div>

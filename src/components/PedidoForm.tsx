@@ -19,9 +19,11 @@ type Categoria = {
 export default function PedidoForm({
   categorias,
   idEstablecimiento,
+  idioma, // <--- Añade esto
 }: {
   categorias: Categoria[]
   idEstablecimiento: number
+  idioma: string // <--- Añade esto
 }) {
   const [cantidades, setCantidades] = useState<{ [id: number]: number }>({})
   const [enviando, setEnviando] = useState(false)
@@ -72,7 +74,7 @@ export default function PedidoForm({
 
     if (res.ok) {
       const data = await res.json()
-      router.push(`/pedido/${data.id_pedido}/estado`)
+      router.push(`/pedido/${data.id_pedido}/estado?lang=${idioma}`)
     } else {
       setMensaje('Error al enviar el pedido.')
     }

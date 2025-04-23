@@ -104,6 +104,19 @@ model Producto {
   @@map("productos")
 }
 
+model ProductoTraduccion {
+  id_traduccion   Int      @id @default(autoincrement())
+  id_producto     Int
+  idioma          String   // 'es', 'en', 'fr', etc.
+  nombre          String
+  descripcion     String?
+
+  producto        Producto @relation(fields: [id_producto], references: [id_producto], onDelete: Cascade)
+
+  @@unique([id_producto, idioma])
+  @@map("productos_traducciones")
+}
+
 model Pedido {
   id_pedido          Int      @id @default(autoincrement())
   id_cliente         Int?

@@ -1,0 +1,22 @@
+{
+  "welcome": "Bienvenido",
+  "goodbye": "Adiós",
+  "thank_you": "Gracias",
+  "please": "Por favor",
+  "yes": "Sí",
+  "no": "No",
+  "error": {
+    "not_found": "No encontrado",
+    "server_error": "Error del servidor"
+  },
+  "user": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse"
+  },
+  "menu": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "contact": "Contacto"
+  }
+}
