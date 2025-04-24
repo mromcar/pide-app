@@ -33,3 +33,41 @@ export const resumenPedidoFijoClasses =
 
 export const fondoAppClasses =
   "bg-gray-50 min-h-screen pb-32";
+
+export const appContainerClasses =
+  "max-w-4xl mx-auto px-4 sm:px-8 py-8 " +
+  "font-sans bg-gray-50 min-h-screen";
+
+export const idiomaSelectorClasses =
+  "flex justify-center gap-2 py-6";
+
+export const idiomaBtnClasses = (active: boolean) =>
+  `px-4 py-1 rounded-full transition-all duration-150 border
+   ${active
+    ? "bg-blue-600 text-white font-bold border-blue-600"
+    : "bg-white text-gray-700 border-gray-300 hover:bg-blue-50"
+  }`;
+
+export const productoImgWrapperClasses =
+  "w-full h-40 mb-2 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center";
+
+export const productoImgClasses =
+  "object-cover w-full h-full";
+
+export const resumenPedidoBarraLateralClasses =
+  "fixed right-0 top-0 h-full w-80 bg-white shadow-lg p-6 flex flex-col z-50 border-l border-gray-200";
+
+export const resumenPedidoTituloClasses =
+  "text-lg font-bold mb-4 text-gray-900";
+
+export const resumenPedidoProductoClasses =
+  "flex justify-between items-center mb-2 text-gray-700";
+
+export const resumenPedidoTotalClasses =
+  "mt-4 text-xl font-extrabold text-blue-700";
+
+export const btnCantidadCompactoClasses =
+  "w-8 h-8 rounded-full flex items-center justify-center bg-gray-200 text-gray-700 text-xl font-bold hover:bg-blue-100 transition";
+
+export const indicadorCantidadClasses =
+  "w-6 text-center font-semibold text-gray-900";
