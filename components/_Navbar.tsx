@@ -1,23 +1,26 @@
 // components/Navbar.tsx
 import Link from 'next/link'
+import {
+  navbarClasses,
+  navbarContainerClasses,
+  navbarLogoClasses,
+  navbarLinkClasses,
+  navbarCartBtnClasses,
+} from '@/utils/tailwind'
 
 const Navbar = () => {
   return (
-    <nav className="bg-green-500 text-white p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        {/* Logo o nombre del establecimiento */}
+    <nav className={navbarClasses}>
+      <div className={navbarContainerClasses}>
         <Link href="/">
-          <a className="text-2xl font-bold">Mi Restaurante</a>
+          <span className={navbarLogoClasses}>Mi Restaurante</span>
         </Link>
-
-        {/* Enlaces de navegación */}
         <div>
           <Link href="/carta">
-            <a className="text-lg mx-4 hover:text-green-300">Carta</a>
+            <span className={navbarLinkClasses}>Carta</span>
           </Link>
-          {/* Enlace al carrito */}
           <Link href="/carrito">
-            <a className="bg-green-500 text-white py-2 px-4 rounded">Ver Carrito</a>
+            <span className={navbarCartBtnClasses}>Ver Carrito</span>
           </Link>
         </div>
       </div>

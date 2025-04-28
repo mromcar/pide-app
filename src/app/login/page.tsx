@@ -3,6 +3,14 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import {
+  loginMainClasses,
+  loginTitleClasses,
+  loginFormClasses,
+  loginInputClasses,
+  loginBtnClasses,
+  loginErrorClasses,
+} from '@/utils/tailwind'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -26,27 +34,27 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="max-w-sm mx-auto mt-20">
-      <h1 className="text-2xl font-bold mb-4">Login empleados</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <main className={loginMainClasses}>
+      <h1 className={loginTitleClasses}>Login empleados</h1>
+      <form onSubmit={handleSubmit} className={loginFormClasses}>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border px-2 py-1 rounded"
+          className={loginInputClasses}
         />
         <input
           type="password"
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border px-2 py-1 rounded"
+          className={loginInputClasses}
         />
-        <button className="bg-blue-600 text-white px-4 py-2 rounded" type="submit">
+        <button className={loginBtnClasses} type="submit">
           Entrar
         </button>
-        {error && <div className="text-red-600">{error}</div>}
+        {error && <div className={loginErrorClasses}>{error}</div>}
       </form>
     </main>
   )
