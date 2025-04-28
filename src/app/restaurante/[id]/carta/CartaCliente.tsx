@@ -2,6 +2,9 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import {
+  appContainerClasses,
+  idiomaSelectorClasses,
+  idiomaBtnClasses,
   cardProductoClasses,
   categoriaSectionClasses,
   categoriaTituloClasses,
@@ -9,7 +12,8 @@ import {
   productoDescripcionClasses,
   productoPrecioClasses,
   contadorClasses,
-  contadorBtnClasses,
+  btnCantidadCompactoClasses,
+  indicadorCantidadClasses,
   btnFinalizarPedidoClasses,
   resumenPedidoFijoClasses,
   fondoAppClasses,
@@ -55,24 +59,25 @@ export default function CartaCliente({
     .reduce((sum, prod) => sum + (pedido[prod.id_producto] || 0) * (prod.precio || 0), 0)
 
   return (
-    <main className={fondoAppClasses}>
-      <div className="mb-4 flex gap-2 justify-center">
+    <main className={appContainerClasses}>
+      {/* Selector de idioma */}
+      <div className={idiomaSelectorClasses}>
         {idiomasDisponibles.map(({ code, label }) => (
           <Link
             key={code}
             href={`?lang=${code}`}
-            className={`px-3 py-1 rounded-xl transition-all duration-150 ${
-              code === idioma ? 'bg-blue-600 text-white font-bold' : 'bg-white text-gray-700 border'
-            }`}
+            className={idiomaBtnClasses(code === idioma)}
             scroll={false}
           >
             {label}
           </Link>
         ))}
       </div>
+      {/* Título */}
       <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">
         {restaurante?.nombre ?? 'Carta del Restaurante'}
       </h1>
+      {/* Categorías y productos */}
       {categoriasSerializadas.map((categoria) => (
         <section key={categoria.id_categoria} className={categoriaSectionClasses}>
           <h2 className={categoriaTituloClasses}>{categoria.nombre}</h2>
@@ -88,14 +93,14 @@ export default function CartaCliente({
                 </div>
                 <div className={contadorClasses}>
                   <button
-                    className={contadorBtnClasses}
+                    className={btnCantidadCompactoClasses}
                     onClick={() => handleChange(producto.id_producto, -1)}
                   >
                     −
                   </button>
-                  <span>{pedido[producto.id_producto] || 0}</span>
+                  <span className={indicadorCantidadClasses}>{pedido[producto.id_producto] || 0}</span>
                   <button
-                    className={contadorBtnClasses}
+                    className={btnCantidadCompactoClasses}
                     onClick={() => handleChange(producto.id_producto, 1)}
                   >
                     +
@@ -106,6 +111,7 @@ export default function CartaCliente({
           </div>
         </section>
       ))}
+      {/* Resumen del pedido */}
       <div className={resumenPedidoFijoClasses}>
         <span className="font-semibold text-lg">Total: {total.toFixed(2)} €</span>
         <button
