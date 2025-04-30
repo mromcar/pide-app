@@ -14,9 +14,8 @@ import {
   contadorClasses,
   btnCantidadCompactoClasses,
   indicadorCantidadClasses,
-  btnFinalizarPedidoClasses,
+  btnFinalizarPedidoClasses, // Ensure this is defined in '@/utils/tailwind'
   resumenPedidoFijoClasses,
-  fondoAppClasses,
 } from '@/utils/tailwind'
 
 const idiomasDisponibles = [
@@ -31,19 +30,37 @@ export default function CartaCliente({
   idioma,
 }: {
   restaurante: { nombre: string } | null
-  categorias: any[]
+  categorias: {
+    id_categoria: number
+    nombre: string
+    productos: {
+      id_producto: number
+      nombre: string
+      descripcion?: string
+      precio: number
+      ProductoTraduccion: { nombre: string; descripcion?: string }[]
+    }[]
+  }[]
   idioma: string
 }) {
   const [pedido, setPedido] = useState<{ [id: number]: number }>({})
 
   const categoriasSerializadas = categorias.map((categoria) => ({
     ...categoria,
-    productos: (categoria.productos ?? []).map((producto: any) => ({
-      ...producto,
-      nombre: producto.ProductoTraduccion[0]?.nombre ?? producto.nombre,
-      descripcion: producto.ProductoTraduccion[0]?.descripcion ?? producto.descripcion,
-      precio: Number(producto.precio) || 0,
-    })),
+    productos: (categoria.productos ?? []).map(
+      (producto: {
+        id_producto: number
+        nombre: string
+        descripcion?: string
+        precio: number
+        ProductoTraduccion: { nombre: string; descripcion?: string }[]
+      }) => ({
+        ...producto,
+        nombre: producto.ProductoTraduccion[0]?.nombre ?? producto.nombre,
+        descripcion: producto.ProductoTraduccion[0]?.descripcion ?? producto.descripcion,
+        precio: Number(producto.precio) || 0,
+      })
+    ),
   }))
 
   const handleChange = (id: number, delta: number) => {
@@ -59,59 +76,70 @@ export default function CartaCliente({
     .reduce((sum, prod) => sum + (pedido[prod.id_producto] || 0) * (prod.precio || 0), 0)
 
   return (
-    <main className={appContainerClasses}>
-      {/* Selector de idioma */}
-      <div className={idiomaSelectorClasses}>
-        {idiomasDisponibles.map(({ code, label }) => (
-          <Link
-            key={code}
-            href={`?lang=${code}`}
-            className={idiomaBtnClasses(code === idioma)}
-            scroll={false}
-          >
-            {label}
-          </Link>
+    <>
+      <main className={appContainerClasses /* ahora con pb-32 */}>
+        {/* Selector de idioma */}
+        <div className={idiomaSelectorClasses}>
+          {idiomasDisponibles.map(({ code, label }) => (
+            <Link
+              key={code}
+              href={`?lang=${code}`}
+              className={idiomaBtnClasses(code === idioma)}
+              scroll={false}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+        {/* Título */}
+        <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">
+          {restaurante?.nombre ?? 'Carta del Restaurante'}
+        </h1>
+        <div className="bg-red-500 text-white p-4">¿Ves este fondo rojo?</div>
+        {/* Categorías y productos */}
+        {categoriasSerializadas.map((categoria) => (
+          <section key={categoria.id_categoria} className={categoriaSectionClasses}>
+            <h2 className={categoriaTituloClasses}>{categoria.nombre}</h2>
+            <div className="flex flex-col gap-4">
+              {categoria.productos.map(
+                (producto: {
+                  id_producto: number
+                  nombre: string
+                  descripcion?: string
+                  precio: number
+                }) => (
+                  <div key={producto.id_producto} className={cardProductoClasses}>
+                    <div>
+                      <p className={productoNombreClasses}>{producto.nombre}</p>
+                      {producto.descripcion && (
+                        <p className={productoDescripcionClasses}>{producto.descripcion}</p>
+                      )}
+                      <p className={productoPrecioClasses}>{producto.precio} €</p>
+                    </div>
+                    <div className={contadorClasses}>
+                      <button
+                        className={btnCantidadCompactoClasses}
+                        onClick={() => handleChange(producto.id_producto, -1)}
+                      >
+                        −
+                      </button>
+                      <span className={indicadorCantidadClasses}>
+                        {pedido[producto.id_producto] || 0}
+                      </span>
+                      <button
+                        className={btnCantidadCompactoClasses}
+                        onClick={() => handleChange(producto.id_producto, 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          </section>
         ))}
-      </div>
-      {/* Título */}
-      <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">
-        {restaurante?.nombre ?? 'Carta del Restaurante'}
-      </h1>
-      {/* Categorías y productos */}
-      {categoriasSerializadas.map((categoria) => (
-        <section key={categoria.id_categoria} className={categoriaSectionClasses}>
-          <h2 className={categoriaTituloClasses}>{categoria.nombre}</h2>
-          <div className="flex flex-col gap-4">
-            {categoria.productos.map((producto: any) => (
-              <div key={producto.id_producto} className={cardProductoClasses}>
-                <div>
-                  <p className={productoNombreClasses}>{producto.nombre}</p>
-                  {producto.descripcion && (
-                    <p className={productoDescripcionClasses}>{producto.descripcion}</p>
-                  )}
-                  <p className={productoPrecioClasses}>{producto.precio} €</p>
-                </div>
-                <div className={contadorClasses}>
-                  <button
-                    className={btnCantidadCompactoClasses}
-                    onClick={() => handleChange(producto.id_producto, -1)}
-                  >
-                    −
-                  </button>
-                  <span className={indicadorCantidadClasses}>{pedido[producto.id_producto] || 0}</span>
-                  <button
-                    className={btnCantidadCompactoClasses}
-                    onClick={() => handleChange(producto.id_producto, 1)}
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      ))}
-      {/* Resumen del pedido */}
+      </main>
       <div className={resumenPedidoFijoClasses}>
         <span className="font-semibold text-lg">Total: {total.toFixed(2)} €</span>
         <button
@@ -122,6 +150,6 @@ export default function CartaCliente({
           Finalizar
         </button>
       </div>
-    </main>
+    </>
   )
 }
