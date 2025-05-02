@@ -47,6 +47,7 @@ model Establecimiento {
 model Categoria {
   id_categoria        Int                   @id @default(autoincrement())
   nombre              String                @db.VarChar(255)
+  imagen_url          String?               @db.VarChar(255) // <--- Añadido para imagen de categoría
   id_establecimiento  Int
   orden               Int?                  @default(0)
   establecimiento     Establecimiento       @relation(fields: [id_establecimiento], references: [id_establecimiento], onDelete: Cascade, onUpdate: NoAction, map: "fk_categoria_establecimiento")
@@ -61,6 +62,7 @@ model Producto {
   nombre             String               @db.VarChar(255)
   descripcion        String?
   precio             Decimal              @db.Decimal(10, 2)
+  imagen_url         String?              @db.VarChar(255) // <--- Añadido para imagen de producto
   id_categoria       Int
   id_establecimiento Int
   orden              Int?                 @default(0)
