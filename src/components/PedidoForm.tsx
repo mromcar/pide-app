@@ -13,6 +13,7 @@ type Producto = {
 type Categoria = {
   id_categoria: number
   nombre: string
+  imagen_url?: string
   productos: Producto[]
 }
 

@@ -15,6 +15,7 @@ import {
   indicadorCantidadClasses,
   btnFinalizarPedidoClasses,
   resumenPedidoFijoClasses,
+  categoriaSectionClasses,
 } from '@/utils/tailwind'
 
 const idiomasDisponibles = [
@@ -68,10 +69,10 @@ export default function CartaCliente({
   const [pedidoEnviado, setPedidoEnviado] = useState(false)
   const [comentario, setComentario] = useState('')
   const [historialPedidos, setHistorialPedidos] = useState<PedidoHistorial[]>([])
-  const [editandoComentario, setEditandoComentario] = useState<{ idx: number, texto: string } | null>(null)
-
-
-
+  const [editandoComentario, setEditandoComentario] = useState<{
+    idx: number
+    texto: string
+  } | null>(null)
 
   // Traducción y serialización
   const categoriasSerializadas = categorias.map((categoria) => ({
@@ -101,13 +102,20 @@ export default function CartaCliente({
     const productosPedido = Object.entries(pedido)
       .map(([id, cantidad]) => {
         const prod = categoriasSerializadas
-          .flatMap(cat => cat.productos)
-          .find(p => p.id_producto === Number(id))
-        return prod ? { id_producto: prod.id_producto, nombre: prod.nombre, cantidad, precio: prod.precio } : null
+          .flatMap((cat) => cat.productos)
+          .find((p) => p.id_producto === Number(id))
+        return prod
+          ? { id_producto: prod.id_producto, nombre: prod.nombre, cantidad, precio: prod.precio }
+          : null
       })
-      .filter(Boolean) as { id_producto: number; nombre: string; cantidad: number; precio?: number }[]
+      .filter(Boolean) as {
+      id_producto: number
+      nombre: string
+      cantidad: number
+      precio?: number
+    }[]
 
-    setHistorialPedidos(prev => [
+    setHistorialPedidos((prev) => [
       ...prev,
       {
         codigo: generarCodigoPedido(),
@@ -128,11 +136,9 @@ export default function CartaCliente({
   // Modificar comentario de un pedido pendiente
   const guardarComentarioEditado = () => {
     if (editandoComentario) {
-      setHistorialPedidos(prev =>
+      setHistorialPedidos((prev) =>
         prev.map((p, idx) =>
-          idx === editandoComentario.idx
-            ? { ...p, comentario: editandoComentario.texto }
-            : p
+          idx === editandoComentario.idx ? { ...p, comentario: editandoComentario.texto } : p
         )
       )
       setEditandoComentario(null)
@@ -141,10 +147,8 @@ export default function CartaCliente({
 
   // Cancelar pedido pendiente
   const cancelarPedido = (idx: number) => {
-    setHistorialPedidos(prev =>
-      prev.map((p, i) =>
-        i === idx ? { ...p, estado: 'Cancelado' } : p
-      )
+    setHistorialPedidos((prev) =>
+      prev.map((p, i) => (i === idx ? { ...p, estado: 'Cancelado' } : p))
     )
   }
 
@@ -152,16 +156,11 @@ export default function CartaCliente({
   if (pedidoEnviado) {
     return (
       <main className={appContainerClasses}>
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">
-          ¡Pedido realizado!
-        </h1>
+        <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">¡Pedido realizado!</h1>
         <p className="mb-4 text-center text-gray-700">
           Estado: <span className="font-semibold text-green-600">Pendiente</span>
         </p>
-        <button
-          className={btnFinalizarPedidoClasses}
-          onClick={() => setPedidoEnviado(false)}
-        >
+        <button className={btnFinalizarPedidoClasses} onClick={() => setPedidoEnviado(false)}>
           Volver a pedir
         </button>
         <h2 className="text-xl font-bold mt-8 mb-2">Tus pedidos enviados</h2>
@@ -187,7 +186,7 @@ export default function CartaCliente({
                     <input
                       type="text"
                       value={editandoComentario.texto}
-                      onChange={e =>
+                      onChange={(e) =>
                         setEditandoComentario({ ...editandoComentario, texto: e.target.value })
                       }
                       className="border px-2 py-1 rounded mr-2"
@@ -198,10 +197,7 @@ export default function CartaCliente({
                     >
                       Guardar
                     </button>
-                    <button
-                      className="text-gray-500"
-                      onClick={() => setEditandoComentario(null)}
-                    >
+                    <button className="text-gray-500" onClick={() => setEditandoComentario(null)}>
                       Cancelar
                     </button>
                   </>
@@ -211,9 +207,7 @@ export default function CartaCliente({
                     {p.estado === 'Pendiente' && (
                       <button
                         className="ml-2 text-blue-600 underline"
-                        onClick={() =>
-                          setEditandoComentario({ idx, texto: p.comentario || '' })
-                        }
+                        onClick={() => setEditandoComentario({ idx, texto: p.comentario || '' })}
                       >
                         Editar
                       </button>
@@ -231,7 +225,9 @@ export default function CartaCliente({
                       </span>
                       <span>
                         {prod.precio?.toFixed(2) ?? ''} € x {prod.cantidad} ={' '}
-                        <span className="font-semibold">{((prod.precio ?? 0) * prod.cantidad).toFixed(2)} €</span>
+                        <span className="font-semibold">
+                          {((prod.precio ?? 0) * prod.cantidad).toFixed(2)} €
+                        </span>
                       </span>
                     </li>
                   ))}
@@ -243,10 +239,7 @@ export default function CartaCliente({
                 </span>
               </div>
               {p.estado === 'Pendiente' && (
-                <button
-                  className="mt-2 text-red-600 underline"
-                  onClick={() => cancelarPedido(idx)}
-                >
+                <button className="mt-2 text-red-600 underline" onClick={() => cancelarPedido(idx)}>
                   Cancelar pedido
                 </button>
               )}
@@ -267,7 +260,7 @@ export default function CartaCliente({
         <div className="max-w-md mx-auto bg-white rounded-2xl shadow p-6">
           {productoSeleccionado.imagen_url && (
             <img
-              src={productoSeleccionado.imagen_url}
+              src={`/images/${productoSeleccionado.imagen_url}`}
               alt={productoSeleccionado.nombre}
               className="w-full h-48 object-cover rounded-xl mb-4"
             />
@@ -315,25 +308,22 @@ export default function CartaCliente({
     const categoria = categoriasSerializadas.find(
       (cat) => cat.id_categoria === categoriaSeleccionada
     )
-    console.log('categoria:', categoria)
     return (
       <main className={appContainerClasses}>
         <button className="mb-4 text-blue-600" onClick={() => setCategoriaSeleccionada(null)}>
           ← Volver a categorías
         </button>
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">
-          {categoria?.nombre}
-        </h1>
+        <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">{categoria?.nombre}</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {categoria?.productos.map((producto) => (
             <div
               key={producto.id_producto}
-              className={cardProductoClasses + " cursor-pointer"}
+              className={cardProductoClasses + ' cursor-pointer'}
               onClick={() => setProductoSeleccionado(producto)}
             >
               {producto.imagen_url && (
                 <img
-                  src={producto.imagen_url}
+                  src={`/images/${producto.imagen_url}`}
                   alt={producto.nombre}
                   className="w-full h-32 object-cover rounded-xl mb-2"
                 />
@@ -405,29 +395,21 @@ export default function CartaCliente({
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {categoriasSerializadas.map((categoria) => (
-
-          <div
+          <section
             key={categoria.id_categoria}
-            className={cardProductoClasses + " cursor-pointer relative overflow-hidden"}
+            className={categoriaSectionClasses + ' cursor-pointer'}
             onClick={() => setCategoriaSeleccionada(categoria.id_categoria)}
           >
+            <h2 className={categoriaTituloClasses + ' mb-2 text-center'}>{categoria.nombre}</h2>
             {categoria.imagen_url && (
-              <>
-                {console.log('imagen_url:', categoria.imagen_url)}
-                <img
-                  src={categoria.imagen_url.startsWith('/') ? categoria.imagen_url : `/images/${categoria.imagen_url}`}
-                  alt={categoria.nombre}
-                  className="absolute inset-0 w-full h-full object-cover opacity-40"
-                  style={{ zIndex: 0 }}
-                />
-              </>
+              <img
+                src={`/images/${categoria.imagen_url}`}
+                alt={categoria.nombre}
+                className="w-full h-48 object-cover rounded-xl mb-4"
+                style={{ objectFit: 'cover', width: '100%', height: '192px' }} // h-48 = 12rem = 192px
+              />
             )}
-            <div className="relative z-10 flex items-center justify-center h-32">
-              <p className={categoriaTituloClasses + " text-white drop-shadow-lg text-center"}>
-                {categoria.nombre}
-              </p>
-            </div>
-          </div>
+          </section>
         ))}
       </div>
       <div className={resumenPedidoFijoClasses}>
@@ -436,7 +418,7 @@ export default function CartaCliente({
           type="text"
           placeholder="Comentario para el pedido (opcional)"
           value={comentario}
-          onChange={e => setComentario(e.target.value)}
+          onChange={(e) => setComentario(e.target.value)}
           className="ml-4 border px-2 py-1 rounded w-64"
         />
         <button

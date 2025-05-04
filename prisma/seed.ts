@@ -124,8 +124,6 @@ async function main() {
       estado: 'pendiente',
     },
   });
-
-  console.log('¡Datos de prueba creados!');
 }
 
 main()

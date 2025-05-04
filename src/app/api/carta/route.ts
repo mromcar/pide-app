@@ -17,7 +17,27 @@ export async function GET() {
     const session = await requireSession()
     const categorias = await prisma.categoria.findMany({
       where: { id_establecimiento: session.user.id_establecimiento },
-      include: { productos: true },
+      select: {
+        id_categoria: true,
+        nombre: true,
+        imagen_url: true, // <-- Añadido
+        productos: {
+          select: {
+            id_producto: true,
+            nombre: true,
+            descripcion: true,
+            precio: true,
+            imagen_url: true, // <-- Añadido
+            ProductoTraduccion: {
+              select: {
+                id_traduccion: true,
+                nombre: true,
+                descripcion: true,
+              },
+            },
+          },
+        },
+      },
       orderBy: { id_categoria: 'asc' },
     })
     return jsonOk({ categorias })

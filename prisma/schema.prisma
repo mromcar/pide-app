@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "./node_modules/.prisma/client"
 }
 
 datasource db {
@@ -47,7 +48,7 @@ model Establecimiento {
 model Categoria {
   id_categoria        Int                   @id @default(autoincrement())
   nombre              String                @db.VarChar(255)
-  imagen_url          String?               @db.VarChar(255) // <--- Añadido para imagen de categoría
+  imagen_url          String?               @db.VarChar(255)
   id_establecimiento  Int
   orden               Int?                  @default(0)
   establecimiento     Establecimiento       @relation(fields: [id_establecimiento], references: [id_establecimiento], onDelete: Cascade, onUpdate: NoAction, map: "fk_categoria_establecimiento")
@@ -57,12 +58,23 @@ model Categoria {
   @@map("categorias")
 }
 
+model CategoriaTraduccion {
+  id_traduccion Int       @id @default(autoincrement())
+  id_categoria  Int
+  idioma        String    @db.VarChar(10)
+  nombre        String    @db.VarChar(255)
+  categoria     Categoria @relation(fields: [id_categoria], references: [id_categoria], onDelete: Cascade, onUpdate: NoAction, map: "fk_traduccion_categoria")
+
+  @@unique([id_categoria, idioma], map: "unique_categoria_idioma")
+  @@map("categorias_traducciones")
+}
+
 model Producto {
   id_producto        Int                  @id @default(autoincrement())
   nombre             String               @db.VarChar(255)
   descripcion        String?
   precio             Decimal              @db.Decimal(10, 2)
-  imagen_url         String?              @db.VarChar(255) // <--- Añadido para imagen de producto
+  imagen_url         String?              @db.VarChar(255)
   id_categoria       Int
   id_establecimiento Int
   orden              Int?                 @default(0)
@@ -84,17 +96,6 @@ model ProductoTraduccion {
 
   @@unique([id_producto, idioma], map: "unique_producto_idioma")
   @@map("productos_traducciones")
-}
-
-model CategoriaTraduccion {
-  id_traduccion Int       @id @default(autoincrement())
-  id_categoria  Int
-  idioma        String    @db.VarChar(10)
-  nombre        String    @db.VarChar(255)
-  categoria     Categoria @relation(fields: [id_categoria], references: [id_categoria], onDelete: Cascade, onUpdate: NoAction, map: "fk_traduccion_categoria")
-
-  @@unique([id_categoria, idioma], map: "unique_categoria_idioma")
-  @@map("categorias_traducciones")
 }
 
 model Pedido {
