@@ -1,37 +1,44 @@
+import { Category } from '@/types/carta'
 import { categoriaSectionClasses, categoriaTituloClasses } from '@/utils/tailwind'
 
-type Categoria = {
-  id_categoria: number
-  nombre: string
-  imagen_url?: string
+interface CategoryListProps {
+  categories: Category[]
+  onSelectCategory: (id: number) => void
+  language: string
 }
 
-export default function ListaCategorias({
-  categorias,
-  onSelectCategoria,
-}: {
-  categorias: Categoria[]
-  onSelectCategoria: (id: number) => void
-}) {
+export default function CategoryList({
+  categories,
+  onSelectCategory,
+  language,
+}: CategoryListProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      {categorias.map((categoria) => (
-        <section
-          key={categoria.id_categoria}
-          className={categoriaSectionClasses}
-          onClick={() => onSelectCategoria(categoria.id_categoria)}
-        >
-          <h2 className={categoriaTituloClasses}>{categoria.nombre}</h2>
-          {categoria.imagen_url && (
-            <img
-              src={`/images/${categoria.imagen_url}`}
-              alt={categoria.nombre}
-              className="w-full h-48 object-cover rounded-xl mb-4"
-              onError={(e) => (e.currentTarget.style.display = 'none')}
-            />
-          )}
-        </section>
-      ))}
+      {categories.map((category) => {
+        const translation = category.translations?.find(
+          (t) => t.language_code === language
+        )
+        const name = translation?.name || category.name
+
+        return (
+          <section
+            key={category.category_id}
+            className={categoriaSectionClasses}
+            onClick={() => onSelectCategory(category.category_id)}
+          >
+            <h2 className={categoriaTituloClasses}>{name}</h2>
+            {category.image_url && (
+              <img
+                src={`/images/${category.image_url}`}
+                alt={name}
+                className="w-full h-48 object-cover rounded-xl mb-4"
+                onError={(e) => (e.currentTarget.style.display = 'none')}
+              />
+            )}
+          </section>
+        )
+      }
+      )}
     </div>
   )
 }

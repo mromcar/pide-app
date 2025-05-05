@@ -1,30 +1,38 @@
 import { resumenPedidoFijoClasses, btnFinalizarPedidoClasses } from '@/utils/tailwind'
 
-export default function ResumenPedido({
-  total,
-  comentario,
-  setComentario,
-  finalizarPedido,
-  disabled,
-}: {
+interface OrderSummaryProps {
   total: number
-  comentario: string
-  setComentario: (v: string) => void
-  finalizarPedido: () => void
+  notes: string
+  setNotes: (value: string) => void
+  finishOrder: () => void
   disabled: boolean
-}) {
+}
+
+export default function OrderSummary({
+  total,
+  notes,
+  setNotes,
+  finishOrder,
+  disabled,
+}: OrderSummaryProps) {
   return (
     <div className={resumenPedidoFijoClasses}>
-      <span className="font-semibold text-lg">Total: {total.toFixed(2)} €</span>
+      <span className="font-semibold text-lg">
+        Total: {total.toFixed(2)} €
+      </span>
       <input
         type="text"
-        placeholder="Comentario para el pedido (opcional)"
-        value={comentario}
-        onChange={(e) => setComentario(e.target.value)}
+        placeholder="Order notes (optional)"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
         className="border px-2 py-1 rounded w-64"
       />
-      <button className={btnFinalizarPedidoClasses} disabled={disabled} onClick={finalizarPedido}>
-        Finalizar
+      <button
+        className={btnFinalizarPedidoClasses}
+        disabled={disabled}
+        onClick={finishOrder}
+      >
+        Finish Order
       </button>
     </div>
   )

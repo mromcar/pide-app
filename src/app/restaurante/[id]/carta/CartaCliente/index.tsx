@@ -7,232 +7,245 @@ import ModalProducto from './ModalProducto'
 import ResumenPedido from './ResumenPedido'
 import HistorialPedidos from './HistorialPedidos'
 import { appContainerClasses } from '@/utils/tailwind'
-import { Producto, Categoria } from '@/types/carta'
+import { Category, Product, OrderStatus } from '@/types/carta'
 
-const idiomasDisponibles = [
+const availableLanguages = [
   { code: 'es', label: 'Español' },
   { code: 'en', label: 'English' },
   { code: 'fr', label: 'Français' },
 ]
 
-type PedidoHistorial = {
-  codigo: string
-  productos: { id_producto: number; nombre: string; cantidad: number; precio?: number }[]
-  total: number
-  fecha: string
-  estado: string
-  comentario: string
+type OrderHistory = {
+  code: string
+  items: {
+    variant_id: number
+    variant_description: string
+    quantity: number
+    unit_price: number
+  }[]
+  total_amount: number
+  date: string
+  status: OrderStatus
+  notes: string
 }
 
-function generarCodigoPedido() {
-  return `PED-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`
+function generateOrderCode() {
+  return `ORD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`
 }
 
 export default function CartaCliente({
-  restaurante,
-  categorias,
-  idioma,
-  mostrarProductosDeCategoriaId,
+  establishment,
+  categories,
+  language,
+  showProductsFromCategoryId,
 }: {
-  restaurante: { nombre: string } | null
-  categorias: Categoria[]
-  idioma: string
-  mostrarProductosDeCategoriaId?: number
+  establishment: { name: string } | null
+  categories: Category[]
+  language: string
+  showProductsFromCategoryId?: number
 }) {
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | null>(
-    mostrarProductosDeCategoriaId ?? null
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(
+    showProductsFromCategoryId ?? null
   )
-  const [productoSeleccionado, setProductoSeleccionado] = useState<Producto | null>(null)
-  const [pedido, setPedido] = useState<{ [id: number]: number }>({})
-  const [pedidoEnviado, setPedidoEnviado] = useState(false)
-  const [comentario, setComentario] = useState('')
-  const [historialPedidos, setHistorialPedidos] = useState<PedidoHistorial[]>([])
-  const [editandoComentario, setEditandoComentario] = useState<{
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [order, setOrder] = useState<{ [variantId: number]: number }>({})
+  const [orderSent, setOrderSent] = useState(false)
+  const [notes, setNotes] = useState('')
+  const [orderHistory, setOrderHistory] = useState<OrderHistory[]>([])
+  const [editingNote, setEditingNote] = useState<{
     idx: number
-    texto: string
+    text: string
   } | null>(null)
 
-  // Traducción y serialización
-  const categoriasSerializadas = categorias.map((categoria) => ({
-    ...categoria,
-    productos: (categoria.productos ?? []).map((producto: Producto) => {
-      const traduccion = producto.ProductoTraduccion?.find((t) => t.idioma === idioma)
-      const nombre = traduccion?.nombre ?? producto.nombre
-      const descripcion = traduccion?.descripcion ?? producto.descripcion
+  // Translation and serialization
+  const serializedCategories = categories.map((category) => ({
+    ...category,
+    products: (category.products ?? []).map((product: Product) => {
+      const translation = product.translations?.find((t) => t.language_code === language)
+      const variantTranslations = product.variants?.map(variant => ({
+        ...variant,
+        translation: variant.translations?.find(t => t.language_code === language)
+      }))
+
       return {
-        ...producto,
-        nombre,
-        descripcion,
-        precio: Number(producto.precio) || 0,
-        ProductoTraduccion: producto.ProductoTraduccion ?? [],
+        ...product,
+        name: translation?.name ?? product.name,
+        description: translation?.description ?? product.description,
+        variants: variantTranslations ?? [],
+        translations: product.translations ?? [],
       }
     }),
   }))
 
-  const handleChange = (id: number, delta: number) => {
-    setPedido((prev) => {
-      const next = { ...prev, [id]: Math.max(0, (prev[id] || 0) + delta) }
-      if (next[id] === 0) delete next[id]
+  const handleChange = (variantId: number, delta: number) => {
+    setOrder((prev) => {
+      const next = { ...prev, [variantId]: Math.max(0, (prev[variantId] || 0) + delta) }
+      if (next[variantId] === 0) delete next[variantId]
       return next
     })
   }
 
-  const calcularTotal = useCallback(
+  const calculateTotal = useCallback(
     () =>
-      categoriasSerializadas
-        .flatMap((cat) => cat.productos)
-        .reduce((sum, prod) => sum + (pedido[prod.id_producto] || 0) * (prod.precio || 0), 0),
-    [categoriasSerializadas, pedido]
+      serializedCategories
+        .flatMap((cat) => cat.products)
+        .flatMap((prod) => prod.variants)
+        .reduce((sum, variant) => sum + (order[variant.variant_id] || 0) * variant.price, 0),
+    [serializedCategories, order]
   )
 
-  const total = useMemo(calcularTotal, [calcularTotal])
+  const total = useMemo(calculateTotal, [calculateTotal])
 
-  // Finalizar pedido y guardar en historial
-  const finalizarPedido = () => {
-    const productosPedido = Object.entries(pedido)
-      .map(([id, cantidad]) => {
-        const prod = categoriasSerializadas
-          .flatMap((cat) => cat.productos)
-          .find((p) => p.id_producto === Number(id))
-        return prod
-          ? { id_producto: prod.id_producto, nombre: prod.nombre, cantidad, precio: prod.precio }
+  // Finish order and save to history
+  const finishOrder = () => {
+    const orderItems = Object.entries(order)
+      .map(([variantId, quantity]) => {
+        const variant = serializedCategories
+          .flatMap((cat) => cat.products)
+          .flatMap((prod) => prod.variants)
+          .find((v) => v.variant_id === Number(variantId))
+
+        return variant
+          ? {
+            variant_id: variant.variant_id,
+            variant_description: variant.translation?.variant_description ?? variant.variant_description,
+            quantity,
+            unit_price: variant.price
+          }
           : null
       })
-      .filter(Boolean) as {
-      id_producto: number
-      nombre: string
-      cantidad: number
-      precio?: number
-    }[]
+      .filter(Boolean) as OrderHistory['items']
 
-    setHistorialPedidos((prev) => [
+    setOrderHistory((prev) => [
       ...prev,
       {
-        codigo: generarCodigoPedido(),
-        productos: productosPedido,
-        total,
-        fecha: new Date().toLocaleString(),
-        estado: 'Pendiente',
-        comentario,
+        code: generateOrderCode(),
+        items: orderItems,
+        total_amount: total,
+        date: new Date().toLocaleString(),
+        status: OrderStatus.PENDING,
+        notes,
       },
     ])
-    setPedido({})
-    setComentario('')
-    setPedidoEnviado(true)
-    setCategoriaSeleccionada(null)
-    setProductoSeleccionado(null)
+
+    // Reset state
+    setOrder({})
+    setNotes('')
+    setOrderSent(true)
+    setSelectedCategory(null)
+    setSelectedProduct(null)
   }
 
-  // Modificar comentario de un pedido pendiente
-  const guardarComentarioEditado = () => {
-    if (editandoComentario) {
-      setHistorialPedidos((prev) =>
+  // Modify note of a pending order
+  const saveEditedNote = () => {
+    if (editingNote) {
+      setOrderHistory((prev) =>
         prev.map((p, idx) =>
-          idx === editandoComentario.idx ? { ...p, comentario: editandoComentario.texto } : p
+          idx === editingNote.idx ? { ...p, notes: editingNote.text } : p
         )
       )
-      setEditandoComentario(null)
+      setEditingNote(null)
     }
   }
 
-  // Cancelar pedido pendiente
-  const cancelarPedido = (idx: number) => {
-    setHistorialPedidos((prev) =>
-      prev.map((p, i) => (i === idx ? { ...p, estado: 'Cancelado' } : p))
+  // Cancel pending order
+  const cancelOrder = (idx: number) => {
+    setOrderHistory((prev) =>
+      prev.map((p, i) => (i === idx ? { ...p, status: OrderStatus.CANCELLED } : p))
     )
   }
 
-  // VISTA DE PEDIDO ENVIADO + HISTORIAL
-  if (pedidoEnviado) {
+  // VIEW OF SENT ORDER + HISTORY
+  if (orderSent) {
     return (
       <main className={appContainerClasses}>
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">¡Pedido realizado!</h1>
+        <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">Order placed!</h1>
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded mb-4"
-          onClick={() => setPedidoEnviado(false)}
+          onClick={() => setOrderSent(false)}
         >
-          Volver a pedir
+          Place another order
         </button>
         <HistorialPedidos
-          historialPedidos={historialPedidos}
-          cancelarPedido={cancelarPedido}
-          editandoComentario={editandoComentario}
-          setEditandoComentario={setEditandoComentario}
-          guardarComentarioEditado={guardarComentarioEditado}
+          orderHistory={orderHistory}
+          cancelOrder={cancelOrder}
+          editingNote={editingNote}
+          setEditingNote={setEditingNote}
+          saveEditedNote={saveEditedNote}
         />
       </main>
     )
   }
 
-  // VISTA DE MODAL DE PRODUCTO
-  if (productoSeleccionado) {
+  // VIEW OF PRODUCT MODAL
+  if (selectedProduct) {
     return (
       <ModalProducto
-        producto={productoSeleccionado}
-        onClose={() => setProductoSeleccionado(null)}
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
         handleChange={handleChange}
-        cantidad={pedido[productoSeleccionado.id_producto] || 0}
-        finalizarPedido={finalizarPedido}
+        quantity={order[selectedProduct.id_producto] || 0}
+        finishOrder={finishOrder}
         total={total}
       />
     )
   }
 
-  // VISTA DE PRODUCTOS DE UNA CATEGORÍA
-  if (categoriaSeleccionada !== null) {
-    const categoria = categoriasSerializadas.find(
-      (cat) => cat.id_categoria === categoriaSeleccionada
+  // VIEW OF PRODUCTS IN A CATEGORY
+  if (selectedCategory !== null) {
+    const category = serializedCategories.find(
+      (cat) => cat.id_categoria === selectedCategory
     )
-    const mostrarVolver = !mostrarProductosDeCategoriaId
-    const titulo =
-      categorias.length === 1 && mostrarProductosDeCategoriaId
-        ? restaurante?.nombre
-        : categoria?.nombre
+    const showBackButton = !showProductsFromCategoryId
+    const title =
+      categories.length === 1 && showProductsFromCategoryId
+        ? establishment?.name
+        : category?.name
 
     return (
       <main className={appContainerClasses}>
-        <SelectorDeIdioma idioma={idioma} idiomasDisponibles={idiomasDisponibles} />
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">{restaurante?.nombre}</h1>
-        {mostrarVolver && (
-          <button className="mb-4 text-blue-600" onClick={() => setCategoriaSeleccionada(null)}>
-            ← Volver a categorías
+        <SelectorDeIdioma language={language} availableLanguages={availableLanguages} />
+        <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">{establishment?.name}</h1>
+        {showBackButton && (
+          <button className="mb-4 text-blue-600" onClick={() => setSelectedCategory(null)}>
+            ← Back to categories
           </button>
         )}
-        <h2 className="text-xl font-bold mb-4 text-center text-gray-900">{titulo}</h2>
+        <h2 className="text-xl font-bold mb-4 text-center text-gray-900">{title}</h2>
         <ListaProductos
-          productos={categoria?.productos ?? []}
-          onSelectProducto={(producto) => setProductoSeleccionado(producto)}
+          products={category?.products ?? []}
+          onSelectProduct={(product) => setSelectedProduct(product)}
           handleChange={handleChange}
-          pedido={pedido}
-          idioma={idioma}
+          order={order}
+          language={language}
         />
         <ResumenPedido
           total={total}
-          comentario={comentario}
-          setComentario={setComentario}
-          finalizarPedido={finalizarPedido}
+          notes={notes}
+          setNotes={setNotes}
+          finishOrder={finishOrder}
           disabled={total === 0}
         />
       </main>
     )
   }
 
-  // VISTA DE CATEGORÍAS
+  // VIEW OF CATEGORIES
   return (
     <main className={appContainerClasses}>
-      <SelectorDeIdioma idioma={idioma} idiomasDisponibles={idiomasDisponibles} />
+      <SelectorDeIdioma language={language} availableLanguages={availableLanguages} />
       <h1 className="text-2xl font-bold mb-2 text-center text-gray-900">
-        {restaurante?.nombre ?? 'Carta del Restaurante'}
+        {establishment?.name ?? 'Restaurant Menu'}
       </h1>
       <ListaCategorias
-        categorias={categoriasSerializadas}
-        onSelectCategoria={setCategoriaSeleccionada}
+        categories={serializedCategories}
+        onSelectCategory={setSelectedCategory}
       />
       <ResumenPedido
         total={total}
-        comentario={comentario}
-        setComentario={setComentario}
-        finalizarPedido={finalizarPedido}
+        notes={notes}
+        setNotes={setNotes}
+        finishOrder={finishOrder}
         disabled={total === 0}
       />
     </main>

@@ -1,4 +1,4 @@
-import { Producto } from '@/types/carta'
+import { Product, ProductVariant } from '@/types/carta'
 import {
   cardProductoClasses,
   productoNombreClasses,
@@ -8,68 +8,99 @@ import {
   btnCantidadCompactoClasses,
   indicadorCantidadClasses,
   productoImgClasses,
+  varianteClasses,
 } from '@/utils/tailwind'
 
 type ListaProductosProps = {
-  productos: Producto[]
-  onSelectProducto: (producto: Producto) => void
-  handleChange: (id: number, delta: number) => void
-  pedido: { [id: number]: number }
-  idioma: string
+  products: Product[]
+  onSelectProduct: (product: Product) => void
+  handleChange: (variantId: number, delta: number) => void
+  order: { [variantId: number]: number }
+  language: string
 }
 
 export default function ListaProductos({
-  productos,
-  onSelectProducto,
+  products,
+  onSelectProduct,
   handleChange,
-  pedido,
-  idioma,
+  order,
+  language,
 }: ListaProductosProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-40">
-      {productos.map((producto) => {
-        const traduccion = producto.ProductoTraduccion?.find((t) => t.idioma === idioma)
-        const nombre = traduccion?.nombre || producto.nombre
-        const descripcion = traduccion?.descripcion || producto.descripcion
+      {products.map((product) => {
+        const translation = product.translations?.find((t) => t.language_code === language)
+        const name = translation?.name || product.name
+        const description = translation?.description || product.description
 
         return (
           <div
-            key={producto.id_producto}
+            key={product.product_id}
             className={cardProductoClasses}
-            onClick={() => onSelectProducto(producto)}
+            onClick={() => onSelectProduct(product)}
           >
-            {producto.imagen_url && (
+            {product.image_url && (
               <img
-                src={`/images/${producto.imagen_url}`}
-                alt={nombre}
+                src={`/images/${product.image_url}`}
+                alt={name}
                 className={productoImgClasses}
               />
             )}
             <div>
-              <p className={productoNombreClasses}>{nombre}</p>
-              {descripcion && <p className={productoDescripcionClasses}>{descripcion}</p>}
-              <p className={productoPrecioClasses}>{producto.precio} €</p>
-            </div>
-            <div className={contadorClasses}>
-              <button
-                className={btnCantidadCompactoClasses}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleChange(producto.id_producto, -1)
-                }}
-              >
-                −
-              </button>
-              <span className={indicadorCantidadClasses}>{pedido[producto.id_producto] || 0}</span>
-              <button
-                className={btnCantidadCompactoClasses}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleChange(producto.id_producto, 1)
-                }}
-              >
-                +
-              </button>
+              <p className={productoNombreClasses}>{name}</p>
+              {description && <p className={productoDescripcionClasses}>{description}</p>}
+
+              {/* Variants section */}
+              <div className="mt-3 space-y-2">
+                {product.variants.map((variant) => {
+                  const variantTranslation = variant.translations?.find(
+                    (t) => t.language_code === language
+                  )
+                  const variantDesc = variantTranslation?.variant_description || variant.variant_description
+                  const quantity = order[variant.variant_id] || 0
+
+                  return (
+                    <div
+                      key={variant.variant_id}
+                      className={varianteClasses}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                      }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className="text-sm font-medium">{variantDesc}</span>
+                          <span className={productoPrecioClasses}>{variant.price} €</span>
+                        </div>
+                        <div className={contadorClasses}>
+                          <button
+                            className={btnCantidadCompactoClasses}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleChange(variant.variant_id, -1)
+                            }}
+                            disabled={quantity === 0}
+                          >
+                            −
+                          </button>
+                          <span className={indicadorCantidadClasses}>
+                            {quantity}
+                          </span>
+                          <button
+                            className={btnCantidadCompactoClasses}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleChange(variant.variant_id, 1)
+                            }}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
         )

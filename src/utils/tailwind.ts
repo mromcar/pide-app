@@ -58,10 +58,9 @@ export const idiomaSelectorClasses =
   'mb-2 flex gap-1 justify-center items-center text-sm pr-2';
 
 export const idiomaBtnClasses = (active: boolean) =>
-  `px-2 py-0.5 rounded text-xs transition-colors duration-200 ${
-    active
-      ? 'bg-blue-600 text-white'
-      : 'bg-gray-200 text-gray-800 hover:bg-blue-100'
+  `px-2 py-0.5 rounded text-xs transition-colors duration-200 ${active
+    ? 'bg-blue-600 text-white'
+    : 'bg-gray-200 text-gray-800 hover:bg-blue-100'
   }`;
 
 export const productoImgWrapperClasses =
@@ -93,3 +92,5 @@ export const modalOverlayClasses =
 
 export const modalContentClasses =
   'bg-white rounded-2xl shadow p-6 max-w-md w-full';
+
+export const varianteClasses = "p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors";
