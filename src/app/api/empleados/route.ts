@@ -7,19 +7,19 @@ import bcrypt from 'bcryptjs'
 // Obtener todos los empleados del establecimiento
 export async function GET() {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.rol !== 'establishment_admin') {
+  if (!session || session.user.role !== 'establishment_admin') {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 })
   }
-  const empleados = await prisma.usuario.findMany({
+  const empleados = await prisma.user.findMany({
     where: {
-      id_establecimiento: session.user.id_establecimiento,
-      rol: { in: ['camarero', 'cocinero'] }
+      establishment_id: session.user.establishment_id,
+      role: { in: ['waiter', 'cook'] }
     },
     select: {
-      id_usuario: true,
-      nombre: true,
+      user_id: true,
+      name: true,
       email: true,
-      rol: true
+      role: true
     }
   })
   return NextResponse.json({ empleados })
@@ -28,32 +28,32 @@ export async function GET() {
 // Crear un nuevo empleado
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.rol !== 'establishment_admin') {
+  if (!session || session.user.role !== 'establishment_admin') {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 })
   }
-  const { nombre, email, password, rol } = await request.json()
-  if (!nombre || !email || !password || !rol) {
+  const { name, email, password, role } = await request.json()
+  if (!name || !email || !password || !role) {
     return NextResponse.json({ error: "Datos incompletos" }, { status: 400 })
   }
-  if (!['camarero', 'cocinero'].includes(rol)) {
+  if (!['waiter', 'cook'].includes(role)) {
     return NextResponse.json({ error: "Rol no permitido" }, { status: 400 })
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email)) {
     return NextResponse.json({ error: "Email no válido" }, { status: 400 })
   }
-  const existe = await prisma.usuario.findUnique({ where: { email } })
+  const existe = await prisma.user.findUnique({ where: { email } })
   if (existe) {
     return NextResponse.json({ error: "El email ya está registrado" }, { status: 400 })
   }
   const hashed = await bcrypt.hash(password, 10)
-  const empleado = await prisma.usuario.create({
+  const empleado = await prisma.user.create({
     data: {
-      nombre,
+      name,
       email,
-      contrasena: hashed,
-      rol,
-      id_establecimiento: session.user.id_establecimiento,
+      password_hash: hashed,
+      role,
+      establishment_id: session.user.establishment_id,
     }
   })
   return NextResponse.json({ empleado })
@@ -62,20 +62,20 @@ export async function POST(request: Request) {
 // Editar empleado (solo nombre y rol)
 export async function PUT(request: Request) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.rol !== 'establishment_admin') {
+  if (!session || session.user.role !== 'establishment_admin') {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 })
   }
-  const { id_usuario, nombre, rol } = await request.json()
-  if (!id_usuario || !nombre || !rol) {
+  const { user_id, name, role } = await request.json()
+  if (!user_id || !name || !role) {
     return NextResponse.json({ error: "Datos incompletos" }, { status: 400 })
   }
-  const empleado = await prisma.usuario.findUnique({ where: { id_usuario } })
-  if (!empleado || empleado.id_establecimiento !== session.user.id_establecimiento) {
+  const empleado = await prisma.user.findUnique({ where: { user_id } })
+  if (!empleado || empleado.establishment_id !== session.user.establishment_id) {
     return NextResponse.json({ error: "Empleado no encontrado" }, { status: 404 })
   }
-  const updatedEmpleado = await prisma.usuario.update({
-    where: { id_usuario },
-    data: { nombre, rol }
+  const updatedEmpleado = await prisma.user.update({
+    where: { user_id },
+    data: { name, role }
   })
   return NextResponse.json({ updatedEmpleado })
 }
@@ -83,22 +83,22 @@ export async function PUT(request: Request) {
 // Eliminar empleado
 export async function DELETE(request: Request) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.rol !== 'establishment_admin') {
+  if (!session || session.user.role !== 'establishment_admin') {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 })
   }
-  const { id_usuario } = await request.json()
-  if (!id_usuario) {
-    return NextResponse.json({ error: "Falta id_usuario" }, { status: 400 })
+  const { user_id } = await request.json()
+  if (!user_id) {
+    return NextResponse.json({ error: "Falta user_id" }, { status: 400 })
   }
-  if (id_usuario === session.user.id) {
+  if (user_id === session.user.user_id) {
     return NextResponse.json({ error: "No puedes eliminar tu propia cuenta" }, { status: 400 })
   }
-  const empleado = await prisma.usuario.findUnique({ where: { id_usuario } })
-  if (!empleado || empleado.id_establecimiento !== session.user.id_establecimiento) {
+  const empleado = await prisma.user.findUnique({ where: { user_id } })
+  if (!empleado || empleado.establishment_id !== session.user.establishment_id) {
     return NextResponse.json({ error: "Empleado no encontrado" }, { status: 404 })
   }
-  await prisma.usuario.delete({
-    where: { id_usuario }
+  await prisma.user.delete({
+    where: { user_id }
   })
   return NextResponse.json({ ok: true })
 }

@@ -12,15 +12,15 @@ export const authOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        const user = await prisma.usuario.findUnique({
+        const user = await prisma.user.findUnique({
           where: { email: credentials!.email }
         })
-        if (user && user.contrasena && await compare(credentials!.password, user.contrasena)) {
+        if (user && user.password_hash && await compare(credentials!.password, user.password_hash)) {
           return {
-            id: user.id_usuario,
+            id: user.user_id,
             email: user.email,
-            rol: user.rol,
-            id_establecimiento: user.id_establecimiento
+            role: user.role,
+            establishment_id: user.establishment_id
           }
         }
         return null
@@ -31,16 +31,16 @@ export const authOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id || token.sub
-        session.user.rol = token.rol
-        session.user.id_establecimiento = token.id_establecimiento
+        session.user.role = token.role
+        session.user.establishment_id = token.establishment_id
       }
       return session
     },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.rol = user.rol
-        token.id_establecimiento = user.id_establecimiento
+        token.role = user.role
+        token.establishment_id = user.establishment_id
       }
       return token
     }

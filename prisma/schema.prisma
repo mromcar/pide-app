@@ -41,16 +41,16 @@ model Establishment {
   payment_bank_details String?
   contact_person       String?          @db.VarChar(255)
   admin_user_id        Int?             @unique
-  description          String?
-  website              String?          @db.VarChar(255)
-  is_active            Boolean?         @default(true)
-  accepts_orders       Boolean          @default(true)
   categories           Category[]
   administrator        User?            @relation("AdminEstablishment", fields: [admin_user_id], references: [user_id], onUpdate: NoAction, map: "fk_establishment_admin")
   orders               Order[]
-  variants             ProductVariant[]
   products             Product[]
+  variants             ProductVariant[]
   employees            User[]           @relation("UserEstablishment")
+  description          String?
+  website              String?          @db.VarChar(255)
+  is_active            Boolean          @default(true)
+  accepts_orders       Boolean          @default(true)
 
   @@map("establishments")
 }

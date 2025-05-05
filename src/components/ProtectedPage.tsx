@@ -16,7 +16,7 @@ export default function ProtectedPage({
   }, [status])
 
   if (status === 'loading') return <div>Cargando...</div>
-  if (!session || !allowedRoles.includes(session.user.rol)) return <div>No autorizado</div>
+  if (!session || !allowedRoles.includes(session.user.role)) return <div>No autorizado</div>
 
   return <>{children}</>
 }
