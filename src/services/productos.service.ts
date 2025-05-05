@@ -1,12 +1,15 @@
+import { PrismaClient } from '@prisma/client'
 import prisma from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
 
 export async function obtenerCategoriasConProductos(
   establishmentId: number,
   languageCode: string
 ) {
   return prisma.category.findMany({
-    where: { establishment_id: establishmentId, is_active: true },
+    where: {
+      establishment_id: establishmentId,
+      is_active: true
+    },
     select: {
       category_id: true,
       name: true,
@@ -41,9 +44,13 @@ export async function obtenerCategoriasConProductos(
 export async function obtenerEstablecimientoPorId(establishmentId: number) {
   return prisma.establishment.findUnique({
     where: {
-      establishment_id: establishmentId,
-      is_active: true,
+      establishment_id: establishmentId
     },
+    select: {
+      establishment_id: true,
+      name: true,
+      is_active: true
+    }
   })
 }
 
