@@ -6,14 +6,13 @@ import {
   varianteClasses,
 } from '@/utils/tailwind'
 
-interface ModalProductoProps {
+type ModalProductoProps = {
   product: Product
   onClose: () => void
   handleChange: (variantId: number, delta: number) => void
-  order: { [variantId: number]: number }
+  order: { [variantId: number]: number } // Changed from quantity: number
   finishOrder: () => void
   total: number
-  language: string
 }
 
 export default function ModalProducto({
@@ -25,7 +24,7 @@ export default function ModalProducto({
   total,
   language,
 }: ModalProductoProps) {
-  const translation = product.translations?.find(t => t.language_code === language)
+  const translation = product.translations?.find((t) => t.language_code === language)
   const name = translation?.name || product.name
   const description = translation?.description || product.description
 
@@ -49,9 +48,10 @@ export default function ModalProducto({
         <div className="space-y-4 mb-6">
           {product.variants.map((variant) => {
             const variantTranslation = variant.translations?.find(
-              t => t.language_code === language
+              (t) => t.language_code === language
             )
-            const variantDesc = variantTranslation?.variant_description || variant.variant_description
+            const variantDesc =
+              variantTranslation?.variant_description || variant.variant_description
             const quantity = order[variant.variant_id] || 0
 
             return (

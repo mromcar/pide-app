@@ -1,4 +1,4 @@
-import { Product, ProductVariant } from '@/types/carta'
+import { Product } from '@/types/carta'
 import {
   cardProductoClasses,
   productoNombreClasses,
@@ -26,6 +26,17 @@ export default function ListaProductos({
   order,
   language,
 }: ListaProductosProps) {
+  console.log('ListaProductos debug:', {
+    productsCount: products.length,
+    productsDetails: products.map((p) => ({
+      id: p.product_id,
+      name: p.name,
+      variantsCount: p.variants.length,
+    })),
+    language,
+    orderKeys: Object.keys(order),
+  })
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pb-40">
       {products.map((product) => {
@@ -40,11 +51,7 @@ export default function ListaProductos({
             onClick={() => onSelectProduct(product)}
           >
             {product.image_url && (
-              <img
-                src={`/images/${product.image_url}`}
-                alt={name}
-                className={productoImgClasses}
-              />
+              <img src={`/images/${product.image_url}`} alt={name} className={productoImgClasses} />
             )}
             <div>
               <p className={productoNombreClasses}>{name}</p>
@@ -56,7 +63,8 @@ export default function ListaProductos({
                   const variantTranslation = variant.translations?.find(
                     (t) => t.language_code === language
                   )
-                  const variantDesc = variantTranslation?.variant_description || variant.variant_description
+                  const variantDesc =
+                    variantTranslation?.variant_description || variant.variant_description
                   const quantity = order[variant.variant_id] || 0
 
                   return (
@@ -83,9 +91,7 @@ export default function ListaProductos({
                           >
                             −
                           </button>
-                          <span className={indicadorCantidadClasses}>
-                            {quantity}
-                          </span>
+                          <span className={indicadorCantidadClasses}>{quantity}</span>
                           <button
                             className={btnCantidadCompactoClasses}
                             onClick={(e) => {

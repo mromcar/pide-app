@@ -8,12 +8,7 @@ import ResumenPedido from './ResumenPedido'
 import HistorialPedidos from './HistorialPedidos'
 import { appContainerClasses } from '@/utils/tailwind'
 import { Category, Product, OrderStatus } from '@/types/carta'
-
-const availableLanguages = [
-  { code: 'es', label: 'Español' },
-  { code: 'en', label: 'English' },
-  { code: 'fr', label: 'Français' },
-]
+import { AVAILABLE_LANGUAGES } from '@/constants/languages'
 
 type OrderHistory = {
   code: string
@@ -58,24 +53,28 @@ export default function CartaCliente({
   } | null>(null)
 
   // Translation and serialization
-  const serializedCategories = categories.map((category) => ({
-    ...category,
-    products: (category.products ?? []).map((product: Product) => {
-      const translation = product.translations?.find((t) => t.language_code === language)
-      const variantTranslations = product.variants?.map(variant => ({
-        ...variant,
-        translation: variant.translations?.find(t => t.language_code === language)
-      }))
+  const serializedCategories = categories.map((category) => {
+    const categoryTranslation = category.translations?.find((t) => t.language_code === language)
 
-      return {
-        ...product,
-        name: translation?.name ?? product.name,
-        description: translation?.description ?? product.description,
-        variants: variantTranslations ?? [],
-        translations: product.translations ?? [],
-      }
-    }),
-  }))
+    return {
+      ...category,
+      name: categoryTranslation?.name ?? category.name,
+      products: (category.products ?? []).map((product) => {
+        const translation = product.translations?.find((t) => t.language_code === language)
+        const variantTranslations = product.variants?.map((variant) => ({
+          ...variant,
+          translation: variant.translations?.find((t) => t.language_code === language),
+        }))
+
+        return {
+          ...product,
+          name: translation?.name ?? product.name,
+          description: translation?.description ?? product.description,
+          variants: variantTranslations ?? [],
+        }
+      }),
+    }
+  })
 
   const handleChange = (variantId: number, delta: number) => {
     setOrder((prev) => {
@@ -107,11 +106,12 @@ export default function CartaCliente({
 
         return variant
           ? {
-            variant_id: variant.variant_id,
-            variant_description: variant.translation?.variant_description ?? variant.variant_description,
-            quantity,
-            unit_price: variant.price
-          }
+              variant_id: variant.variant_id,
+              variant_description:
+                variant.translation?.variant_description ?? variant.variant_description,
+              quantity,
+              unit_price: variant.price,
+            }
           : null
       })
       .filter(Boolean) as OrderHistory['items']
@@ -140,9 +140,7 @@ export default function CartaCliente({
   const saveEditedNote = () => {
     if (editingNote) {
       setOrderHistory((prev) =>
-        prev.map((p, idx) =>
-          idx === editingNote.idx ? { ...p, notes: editingNote.text } : p
-        )
+        prev.map((p, idx) => (idx === editingNote.idx ? { ...p, notes: editingNote.text } : p))
       )
       setEditingNote(null)
     }
@@ -184,7 +182,7 @@ export default function CartaCliente({
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
         handleChange={handleChange}
-        quantity={order[selectedProduct.id_producto] || 0}
+        order={order} // Pass the entire order object instead of a single quantity
         finishOrder={finishOrder}
         total={total}
       />
@@ -193,18 +191,14 @@ export default function CartaCliente({
 
   // VIEW OF PRODUCTS IN A CATEGORY
   if (selectedCategory !== null) {
-    const category = serializedCategories.find(
-      (cat) => cat.id_categoria === selectedCategory
-    )
+    const category = serializedCategories.find((cat) => cat.category_id === selectedCategory)
     const showBackButton = !showProductsFromCategoryId
     const title =
-      categories.length === 1 && showProductsFromCategoryId
-        ? establishment?.name
-        : category?.name
+      categories.length === 1 && showProductsFromCategoryId ? establishment?.name : category?.name
 
     return (
       <main className={appContainerClasses}>
-        <SelectorDeIdioma language={language} availableLanguages={availableLanguages} />
+        <SelectorDeIdioma language={language} availableLanguages={AVAILABLE_LANGUAGES} />
         <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">{establishment?.name}</h1>
         {showBackButton && (
           <button className="mb-4 text-blue-600" onClick={() => setSelectedCategory(null)}>
@@ -233,13 +227,14 @@ export default function CartaCliente({
   // VIEW OF CATEGORIES
   return (
     <main className={appContainerClasses}>
-      <SelectorDeIdioma language={language} availableLanguages={availableLanguages} />
+      <SelectorDeIdioma language={language} availableLanguages={AVAILABLE_LANGUAGES} />
       <h1 className="text-2xl font-bold mb-2 text-center text-gray-900">
         {establishment?.name ?? 'Restaurant Menu'}
       </h1>
       <ListaCategorias
         categories={serializedCategories}
         onSelectCategory={setSelectedCategory}
+        language={language}
       />
       <ResumenPedido
         total={total}

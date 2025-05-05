@@ -1,5 +1,5 @@
 export const cardProductoClasses =
-  'bg-white rounded-xl shadow p-4 flex flex-col items-center transition-transform hover:scale-105';
+  'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer';
 
 export const categoriaSectionClasses =
   'cursor-pointer bg-white rounded-xl shadow p-4 flex flex-col items-center transition-transform hover:scale-105';
@@ -8,10 +8,10 @@ export const categoriaTituloClasses =
   'text-lg font-bold mb-2 text-center text-gray-900';
 
 export const productoNombreClasses =
-  'font-bold text-center text-gray-900';
+  'text-lg font-semibold mb-1';
 
 export const productoDescripcionClasses =
-  'text-gray-600 text-center mb-1';
+  'text-gray-600 text-sm mb-2';
 
 export const productoPrecioClasses =
   'font-semibold text-blue-700 text-center mb-2';
@@ -26,7 +26,7 @@ export const btnPrincipalClasses =
   'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl shadow transition-all duration-150';
 
 export const btnFinalizarPedidoClasses =
-  'bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition-colors';
+  'bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors';
 
 export const resumenPedidoFijoClasses =
   'fixed bottom-0 left-0 right-0 bg-white shadow p-4 flex flex-col sm:flex-row items-center gap-4 z-20 justify-between border-t';
@@ -67,7 +67,7 @@ export const productoImgWrapperClasses =
   'w-full h-40 mb-2 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center';
 
 export const productoImgClasses =
-  'object-cover w-full h-full';
+  'w-full h-48 object-cover';
 
 export const resumenPedidoBarraLateralClasses =
   'fixed right-0 top-0 h-full w-80 bg-white shadow-lg p-6 flex flex-col z-50 border-l border-gray-200';
@@ -88,9 +88,10 @@ export const indicadorCantidadClasses =
   'font-semibold text-lg w-8 text-center';
 
 export const modalOverlayClasses =
-  'fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50';
+  'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4';
 
 export const modalContentClasses =
-  'bg-white rounded-2xl shadow p-6 max-w-md w-full';
+  'bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto';
 
-export const varianteClasses = "p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors";
+export const varianteClasses =
+  'p-4 bg-gray-50 rounded-lg';

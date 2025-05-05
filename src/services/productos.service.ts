@@ -1,13 +1,13 @@
 import { PrismaClient } from '@prisma/client'
-import { type Establishment } from '@prisma/client'
+import type { DBCategory, EstablishmentBasic } from '@/types/carta'
 
-export async function getCategoriesWithProducts(establishmentId: number, languageCode: string) {
+export async function getCategoriesWithProducts(establishmentId: number, languageCode: string): Promise<DBCategory[]> {
   const db = new PrismaClient({
     log: ['query', 'error', 'warn'],
   })
 
   try {
-    const categories = await db.category.findMany({
+    return await db.category.findMany({
       where: {
         establishment_id: establishmentId,
         is_active: true,
@@ -80,7 +80,7 @@ export async function getCategoriesWithProducts(establishmentId: number, languag
   }
 }
 
-export async function getEstablishmentById(establishmentId: number): Promise<Establishment | null> {
+export async function getEstablishmentById(establishmentId: number): Promise<EstablishmentBasic | null> {
   const db = new PrismaClient({
     log: ['query', 'error', 'warn'],
   })
@@ -99,6 +99,7 @@ export async function getEstablishmentById(establishmentId: number): Promise<Est
         accepts_orders: true,
       }
     })
+
     return result
   } catch (error) {
     console.error('Error:', error)

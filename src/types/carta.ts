@@ -1,3 +1,5 @@
+import type { Prisma } from '@prisma/client'
+
 // Enums
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -22,27 +24,36 @@ export type Translation = {
   language_code: string
 }
 
-export type CategoryTranslation = Translation & {
+export type CategoryTranslation = {
+  translation_id: number
+  category_id: number
+  language_code: string
   name: string
 }
 
-export type ProductTranslation = Translation & {
+export type ProductTranslation = {
+  translation_id: number
+  product_id: number
+  language_code: string
   name: string
-  description?: string
+  description: string | null
 }
 
-export type ProductVariantTranslation = Translation & {
+export type ProductVariantTranslation = {
+  translation_id: number
+  variant_id: number
+  language_code: string
   variant_description: string
 }
 
-// Main types
+// Frontend types (after serialization)
 export type ProductVariant = {
   variant_id: number
   product_id: number
   establishment_id: number
   variant_description: string
-  price: number
-  sku?: string
+  price: number // Note: number instead of Decimal
+  sku: string | null
   sort_order: number
   is_active: boolean
   translations: ProductVariantTranslation[]
@@ -50,22 +61,24 @@ export type ProductVariant = {
 
 export type Product = {
   product_id: number
-  name: string
-  description?: string
-  image_url?: string
-  category_id: number
   establishment_id: number
+  category_id: number
+  name: string
+  description: string | null
+  image_url: string | null
   sort_order: number
+  is_active: boolean
   translations: ProductTranslation[]
   variants: ProductVariant[]
 }
 
 export type Category = {
   category_id: number
-  name: string
-  image_url?: string
   establishment_id: number
-  sort_order: number
+  name: string
+  image_url: string | null
+  sort_order: number | null
+  is_active: boolean
   translations: CategoryTranslation[]
   products: Product[]
 }
@@ -106,4 +119,109 @@ export type OrderStatusHistory = {
   changed_by_user_id?: number
   changed_at: Date
   notes?: string
+}
+
+// Raw types from database
+export type RawCategory = {
+  category_id: number
+  establishment_id: number
+  name: string
+  image_url: string | null
+  sort_order: number | null
+  is_active: boolean | null
+  products: RawProduct[]
+  CategoryTranslation?: CategoryTranslation[]
+}
+
+export type RawProduct = {
+  product_id: number
+  establishment_id: number
+  category_id: number
+  name: string
+  description: string | null
+  image_url: string | null
+  sort_order: number | null
+  is_active: boolean | null
+  ProductTranslation?: ProductTranslation[]
+  variants: RawProductVariant[]
+}
+
+export type RawProductVariant = {
+  variant_id: number
+  product_id: number
+  establishment_id: number
+  variant_description: string
+  price: Prisma.Decimal
+  sku: string | null
+  sort_order: number | null
+  is_active: boolean | null
+  translations: ProductVariantTranslation[]
+}
+
+// Database types (exactly as returned by Prisma)
+export type DBProductVariantTranslation = {
+  translation_id: number
+  variant_id: number
+  language_code: string
+  variant_description: string
+}
+
+export type DBProductVariant = {
+  variant_id: number
+  product_id: number
+  establishment_id: number
+  variant_description: string
+  price: Prisma.Decimal
+  sku: string | null
+  sort_order: number | null
+  is_active: boolean | null
+  translations: DBProductVariantTranslation[]
+}
+
+export type DBProductTranslation = {
+  translation_id: number
+  product_id: number
+  language_code: string
+  name: string
+  description: string | null
+}
+
+export type DBProduct = {
+  product_id: number
+  establishment_id: number
+  category_id: number
+  name: string
+  description: string | null
+  image_url: string | null
+  sort_order: number | null
+  is_active: boolean | null
+  ProductTranslation: DBProductTranslation[]
+  variants: DBProductVariant[]
+}
+
+export type DBCategoryTranslation = {
+  translation_id: number
+  category_id: number
+  language_code: string
+  name: string
+}
+
+export type DBCategory = {
+  category_id: number
+  establishment_id: number
+  name: string
+  image_url: string | null
+  sort_order: number | null
+  is_active: boolean | null
+  products: DBProduct[]
+  CategoryTranslation: DBCategoryTranslation[]
+}
+
+export type EstablishmentBasic = {
+  establishment_id: number
+  name: string
+  description: string | null
+  website: string | null
+  is_active: boolean
+  accepts_orders: boolean
 }
