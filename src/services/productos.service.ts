@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
 
 export async function obtenerCategoriasConProductos(
@@ -25,7 +25,7 @@ export async function obtenerCategoriasConProductos(
           image_url: true,
           sort_order: true,
           ProductTranslation: {
-            where: { language_code },
+            where: { language_code: languageCode },
             select: {
               translation_id: true,
               name: true,
