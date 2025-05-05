@@ -75,18 +75,6 @@ export async function getCategoriesWithProducts(establishmentId: number, languag
         },
       },
     })
-
-    // Transform Decimal to number
-    return categories.map(category => ({
-      ...category,
-      products: category.products.map(product => ({
-        ...product,
-        variants: product.variants.map(variant => ({
-          ...variant,
-          price: variant.price.toNumber() // Convert Decimal to number
-        }))
-      }))
-    }))
   } finally {
     await db.$disconnect()
   }
@@ -120,69 +108,3 @@ export async function getEstablishmentById(establishmentId: number): Promise<Est
   }
 }
 
-// Add type for better TypeScript support
-export type Establishment = {
-  establishment_id: number
-  name: string
-  is_active: boolean
-  description?: string
-}
-
-// Updated types to match the new schema
-export type ProductVariantTranslation = {
-  translation_id: number
-  variant_id: number
-  language_code: string
-  variant_description: string
-}
-
-export type ProductVariant = {
-  variant_id: number
-  product_id: number
-  establishment_id: number
-  variant_description: string
-  price: number
-  sku: string
-  sort_order: number | null
-  is_active: boolean
-  translations: ProductVariantTranslation[]
-}
-
-export type ProductTranslation = {
-  translation_id: number
-  product_id: number
-  language_code: string
-  name: string
-  description: string | null
-}
-
-export type Product = {
-  product_id: number
-  establishment_id: number
-  category_id: number
-  name: string
-  description: string | null
-  image_url: string | null
-  sort_order: number | null
-  is_active: boolean
-  translations: ProductTranslation[]
-  variants: ProductVariant[]
-}
-
-export type CategoryTranslation = {
-  translation_id: number
-  category_id: number
-  language_code: string
-  name: string
-}
-
-export type Category = {
-  category_id: number
-  establishment_id: number
-  name: string
-  image_url: string | null
-  sort_order: number | null
-  is_active: boolean
-  translations: CategoryTranslation[]
-  products: Product[]
-}
