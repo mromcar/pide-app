@@ -2,66 +2,72 @@ import prisma from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 
 export async function obtenerCategoriasConProductos(
-  restauranteId: number,
-  idioma: string
+  establishmentId: number,
+  languageCode: string
 ) {
-  return prisma.categoria.findMany({
-    where: { id_establecimiento: restauranteId },
+  return prisma.category.findMany({
+    where: { establishment_id: establishmentId, is_active: true },
     select: {
-      id_categoria: true,
-      nombre: true,
-      imagen_url: true,
-      productos: {
+      category_id: true,
+      name: true,
+      image_url: true,
+      sort_order: true,
+      products: {
+        where: { is_active: true },
         select: {
-          id_producto: true,
-          nombre: true,
-          descripcion: true,
-          precio: true,
-          imagen_url: true,
-          orden: true,
-          ProductoTraduccion: {
-            where: { idioma },
+          product_id: true,
+          name: true,
+          description: true,
+          price: true,
+          image_url: true,
+          sort_order: true,
+          ProductTranslation: {
+            where: { language_code },
             select: {
-              id_traduccion: true,
-              nombre: true,
-              descripcion: true,
-              idioma: true,
+              translation_id: true,
+              name: true,
+              description: true,
+              language_code: true,
             },
           },
         },
-        orderBy: { orden: 'asc' },
+        orderBy: { sort_order: 'asc' },
       },
     },
-    orderBy: { orden: 'asc' },
+    orderBy: { sort_order: 'asc' },
   })
 }
 
-export async function obtenerEstablecimientoPorId(restauranteId: number) {
-  return prisma.establecimiento.findUnique({
-    where: { id_establecimiento: restauranteId },
+export async function obtenerEstablecimientoPorId(establishmentId: number) {
+  return prisma.establishment.findUnique({
+    where: {
+      establishment_id: establishmentId,
+      is_active: true,
+    },
   })
 }
 
-export type ProductoTraduccion = {
-  nombre: string
-  descripcion: string | null
-  idioma: string
-  id_traduccion: number
+export type ProductTranslation = {
+  name: string
+  description: string | null
+  language_code: string
+  translation_id: number
 }
 
-export type ProductoConTraduccion = {
-  id_producto: number
-  nombre: string
-  descripcion: string | null
-  precio: string | number
-  imagen_url?: string // <-- Añadido
-  orden?: number
-  ProductoTraduccion: ProductoTraduccion[]
+export type ProductWithTranslation = {
+  product_id: number
+  name: string
+  description: string | null
+  price: Prisma.Decimal
+  image_url?: string
+  sort_order?: number
+  ProductTranslation: ProductTranslation[]
 }
 
-export type CategoriaConProductos = {
-  id_categoria: number
-  nombre: string
-  imagen_url?: string // <-- Añadido
-  productos: ProductoConTraduccion[]
+export type CategoryWithProducts = {
+  category_id: number
+  name: string
+  image_url?: string
+  sort_order?: number
+  products: ProductWithTranslation[]
 }
