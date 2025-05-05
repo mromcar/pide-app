@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import prisma from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 
 export async function obtenerCategoriasConProductos(
   establishmentId: number,
@@ -21,7 +21,6 @@ export async function obtenerCategoriasConProductos(
           product_id: true,
           name: true,
           description: true,
-          price: true,
           image_url: true,
           sort_order: true,
           ProductTranslation: {
