@@ -1,4 +1,4 @@
-import { Product } from '@/types/carta'
+import { Product, Allergen, ProductVariant } from '@/types/carta'
 import {
   cardProductoClasses,
   productoNombreClasses,
@@ -11,7 +11,7 @@ import {
   varianteClasses,
 } from '@/utils/tailwind'
 
-type ListaProductosProps = {
+interface ListaProductosProps {
   products: Product[]
   onSelectProduct: (product: Product) => void
   handleChange: (variantId: number, delta: number) => void
@@ -57,6 +57,38 @@ export default function ListaProductos({
               <p className={productoNombreClasses}>{name}</p>
               {description && <p className={productoDescripcionClasses}>{description}</p>}
 
+              {/* Alérgenos section */}
+              {product.allergens && (
+                <div className="mt-2">
+                  <p className="text-sm font-medium text-gray-500">Alérgenos:</p>
+                  <div className="flex gap-2">
+                    {product.allergens.map((productAllergen) => {
+                      const allergen = productAllergen.allergen
+                      const translation = allergen.translations?.find(
+                        (t) => t.language_code === language
+                      )
+                      const allergenName = translation?.name || allergen.name
+
+                      return (
+                        <div
+                          key={allergen.allergen_id}
+                          className="flex items-center gap-1 text-xs bg-yellow-100 px-2 py-1 rounded"
+                        >
+                          {allergen.icon_url && (
+                            <img
+                              src={allergen.icon_url}
+                              alt={allergenName}
+                              className="w-4 h-4"
+                            />
+                          )}
+                          <span>{allergenName}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Variants section */}
               <div className="mt-3 space-y-2">
                 {product.variants.map((variant) => {
@@ -78,7 +110,7 @@ export default function ListaProductos({
                       <div className="flex justify-between items-center">
                         <div>
                           <span className="text-sm font-medium">{variantDesc}</span>
-                          <span className={productoPrecioClasses}>{variant.price} €</span>
+                          <span className={productoPrecioClasses}>{variant.price.toString()} €</span>
                         </div>
                         <div className={contadorClasses}>
                           <button

@@ -41,16 +41,16 @@ model Establishment {
   payment_bank_details String?
   contact_person       String?          @db.VarChar(255)
   admin_user_id        Int?             @unique
+  description          String?
+  website              String?          @db.VarChar(255)
+  is_active            Boolean?         @default(true)
+  accepts_orders       Boolean          @default(true)
   categories           Category[]
   administrator        User?            @relation("AdminEstablishment", fields: [admin_user_id], references: [user_id], onUpdate: NoAction, map: "fk_establishment_admin")
   orders               Order[]
-  products             Product[]
   variants             ProductVariant[]
+  products             Product[]
   employees            User[]           @relation("UserEstablishment")
-  description          String?
-  website              String?          @db.VarChar(255)
-  is_active            Boolean          @default(true)
-  accepts_orders       Boolean          @default(true)
 
   @@map("establishments")
 }
@@ -92,6 +92,7 @@ model Product {
   image_url          String?              @db.VarChar(255)
   sort_order         Int?                 @default(0)
   is_active          Boolean?             @default(true)
+  allergens          ProductAllergen[]
   ProductTranslation ProductTranslation[]
   variants           ProductVariant[]
   category           Category             @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "fk_product_category")
@@ -207,6 +208,46 @@ model OrderStatusHistory {
   @@index([changed_at], map: "idx_order_status_history_changed_at")
   @@index([order_id], map: "idx_order_status_history_order_id")
   @@map("order_status_history")
+}
+
+model Allergen {
+  allergen_id       Int                   @id @default(autoincrement())
+  code              String                @unique @db.VarChar(20)
+  name              String                @db.VarChar(100)
+  description       String?
+  icon_url          String?               @db.VarChar(255)
+  is_major_allergen Boolean?              @default(true)
+  translations      AllergenTranslation[]
+  products          ProductAllergen[]
+
+  @@index([code], map: "idx_allergens_code")
+  @@map("allergens")
+}
+
+model AllergenTranslation {
+  translation_id Int      @id @default(autoincrement())
+  allergen_id    Int
+  language_code  String   @db.VarChar(10)
+  name           String   @db.VarChar(100)
+  description    String?
+  allergen       Allergen @relation(fields: [allergen_id], references: [allergen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_allergen")
+
+  @@unique([allergen_id, language_code], map: "unique_allergen_language")
+  @@index([allergen_id], map: "idx_allergen_translations_allergen_id")
+  @@index([language_code], map: "idx_allergen_translations_language_code")
+  @@map("allergen_translations")
+}
+
+model ProductAllergen {
+  product_id  Int
+  allergen_id Int
+  allergen    Allergen @relation(fields: [allergen_id], references: [allergen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_allergen")
+  product     Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_product")
+
+  @@id([product_id, allergen_id], map: "pk_product_allergen")
+  @@index([allergen_id], map: "idx_product_allergens_allergen_id")
+  @@index([product_id], map: "idx_product_allergens_product_id")
+  @@map("product_allergens")
 }
 
 enum UserRole {

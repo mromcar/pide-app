@@ -1,6 +1,6 @@
 'use client'
 import { useState, useCallback, useMemo } from 'react'
-import SelectorDeIdioma from './SelectorDeIdioma'
+import LanguageSelector from './SelectorDeIdioma'
 import ListaCategorias from './ListaCategorias'
 import ListaProductos from './ListaProductos'
 import ModalProducto from './ModalProducto'
@@ -39,6 +39,7 @@ export default function CartaCliente({
   language: string
   showProductsFromCategoryId?: number
 }) {
+  // Initialize state variables at the top of the component
   const [selectedCategory, setSelectedCategory] = useState<number | null>(
     showProductsFromCategoryId ?? null
   )
@@ -59,7 +60,7 @@ export default function CartaCliente({
     return {
       ...category,
       name: categoryTranslation?.name ?? category.name,
-      products: (category.products ?? []).map((product) => {
+      products: (category.products ?? []).map((product: Product) => {
         const translation = product.translations?.find((t) => t.language_code === language)
         const variantTranslations = product.variants?.map((variant) => ({
           ...variant,
@@ -69,9 +70,10 @@ export default function CartaCliente({
         return {
           ...product,
           name: translation?.name ?? product.name,
-          description: translation?.description ?? product.description,
+          description: translation?.description ?? product.description ?? null, // Handle null case
           variants: variantTranslations ?? [],
-        }
+          translations: product.translations ?? [],
+        } as Product // Type assertion to ensure compatibility
       }),
     }
   })
@@ -89,11 +91,9 @@ export default function CartaCliente({
       serializedCategories
         .flatMap((cat) => cat.products)
         .flatMap((prod) => prod.variants)
-        .reduce((sum, variant) => sum + (order[variant.variant_id] || 0) * variant.price, 0),
+        .reduce((sum, variant) => sum + (order[variant.variant_id] || 0) * Number(variant.price), 0),
     [serializedCategories, order]
   )
-
-  const total = useMemo(calculateTotal, [calculateTotal])
 
   // Finish order and save to history
   const finishOrder = () => {
@@ -104,15 +104,18 @@ export default function CartaCliente({
           .flatMap((prod) => prod.variants)
           .find((v) => v.variant_id === Number(variantId))
 
-        return variant
-          ? {
-              variant_id: variant.variant_id,
-              variant_description:
-                variant.translation?.variant_description ?? variant.variant_description,
-              quantity,
-              unit_price: variant.price,
-            }
-          : null
+        if (!variant) return null
+
+        const variantTranslation = variant.translations.find(
+          t => t.language_code === language
+        )
+
+        return {
+          variant_id: variant.variant_id,
+          variant_description: variantTranslation?.variant_description ?? variant.variant_description,
+          quantity,
+          unit_price: Number(variant.price) // Convert Decimal to number
+        }
       })
       .filter(Boolean) as OrderHistory['items']
 
@@ -121,7 +124,7 @@ export default function CartaCliente({
       {
         code: generateOrderCode(),
         items: orderItems,
-        total_amount: total,
+        total_amount: calculateTotal(),
         date: new Date().toLocaleString(),
         status: OrderStatus.PENDING,
         notes,
@@ -176,15 +179,17 @@ export default function CartaCliente({
   }
 
   // VIEW OF PRODUCT MODAL
-  if (selectedProduct) {
+  // Only render ModalProducto if selectedProduct exists
+  if (selectedProduct !== null) {
     return (
       <ModalProducto
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
         handleChange={handleChange}
-        order={order} // Pass the entire order object instead of a single quantity
+        order={order}
         finishOrder={finishOrder}
-        total={total}
+        total={calculateTotal()}
+        language={language}
       />
     )
   }
@@ -198,7 +203,7 @@ export default function CartaCliente({
 
     return (
       <main className={appContainerClasses}>
-        <SelectorDeIdioma language={language} availableLanguages={AVAILABLE_LANGUAGES} />
+        <LanguageSelector language={language} availableLanguages={AVAILABLE_LANGUAGES} />
         <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">{establishment?.name}</h1>
         {showBackButton && (
           <button className="mb-4 text-blue-600" onClick={() => setSelectedCategory(null)}>
@@ -214,11 +219,11 @@ export default function CartaCliente({
           language={language}
         />
         <ResumenPedido
-          total={total}
+          total={calculateTotal()}
           notes={notes}
           setNotes={setNotes}
           finishOrder={finishOrder}
-          disabled={total === 0}
+          disabled={calculateTotal() === 0}
         />
       </main>
     )
@@ -227,7 +232,7 @@ export default function CartaCliente({
   // VIEW OF CATEGORIES
   return (
     <main className={appContainerClasses}>
-      <SelectorDeIdioma language={language} availableLanguages={AVAILABLE_LANGUAGES} />
+      <LanguageSelector language={language} availableLanguages={AVAILABLE_LANGUAGES} />
       <h1 className="text-2xl font-bold mb-2 text-center text-gray-900">
         {establishment?.name ?? 'Restaurant Menu'}
       </h1>
@@ -237,11 +242,11 @@ export default function CartaCliente({
         language={language}
       />
       <ResumenPedido
-        total={total}
+        total={calculateTotal()}
         notes={notes}
         setNotes={setNotes}
         finishOrder={finishOrder}
-        disabled={total === 0}
+        disabled={calculateTotal() === 0}
       />
     </main>
   )

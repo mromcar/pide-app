@@ -1,27 +1,31 @@
-import Link from 'next/link'
-import { idiomaSelectorClasses, idiomaBtnClasses } from '@/utils/tailwind'
+import { AvailableLanguage } from '@/constants/languages'
 
-export default function SelectorDeIdioma({
-  idioma,
-  idiomasDisponibles = [], // Add default empty array
-}: {
-  idioma: string
-  idiomasDisponibles: { code: string; label: string }[]
-}) {
-  if (!idiomasDisponibles?.length) return null // Add safety check
+interface LanguageSelectorProps {
+  language: string
+  availableLanguages: readonly AvailableLanguage[]
+}
 
+export default function LanguageSelector({
+  language,
+  availableLanguages
+}: LanguageSelectorProps) {
   return (
-    <div className={idiomaSelectorClasses}>
-      {idiomasDisponibles.map(({ code, label }) => (
-        <Link
-          key={code}
-          href={`?lang=${code}`}
-          className={idiomaBtnClasses(code === idioma)}
-          scroll={false}
-        >
-          {label}
-        </Link>
-      ))}
+    <div className="flex justify-end mb-4">
+      <select
+        value={language}
+        onChange={(e) => {
+          const url = new URL(window.location.href)
+          url.searchParams.set('lang', e.target.value)
+          window.location.href = url.toString()
+        }}
+        className="border rounded px-2 py-1"
+      >
+        {availableLanguages.map((lang) => (
+          <option key={lang.code} value={lang.code}>
+            {lang.label}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }

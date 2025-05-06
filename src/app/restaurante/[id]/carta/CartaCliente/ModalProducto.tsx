@@ -6,13 +6,14 @@ import {
   varianteClasses,
 } from '@/utils/tailwind'
 
-type ModalProductoProps = {
+interface ModalProductoProps {
   product: Product
   onClose: () => void
   handleChange: (variantId: number, delta: number) => void
-  order: { [variantId: number]: number } // Changed from quantity: number
+  order: { [variantId: number]: number }
   finishOrder: () => void
   total: number
+  language: string
 }
 
 export default function ModalProducto({
@@ -58,7 +59,7 @@ export default function ModalProducto({
               <div key={variant.variant_id} className={varianteClasses}>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-700">{variantDesc}</span>
-                  <span className="font-semibold">{variant.price} €</span>
+                  <span className="font-semibold">{variant.price.toString()} €</span>
                 </div>
                 <div className="flex items-center justify-end gap-2">
                   <button
@@ -94,3 +95,4 @@ export default function ModalProducto({
     </div>
   )
 }
+

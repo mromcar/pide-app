@@ -41,7 +41,7 @@ export default function HistorialPedidos({
           </div>
           <div>
             <span className="font-semibold">Estado:</span>{' '}
-            <span className={order.status === 'Cancelled' ? 'text-red-600' : 'text-green-600'}>
+            <span className={order.status === OrderStatus.CANCELLED ? 'text-red-600' : 'text-green-600'}>
               {order.status}
             </span>
           </div>
@@ -67,7 +67,7 @@ export default function HistorialPedidos({
             ) : (
               <>
                 {order.notes || <span className="italic text-gray-400">Sin notas</span>}
-                {order.status === 'Pending' && (
+                {order.status === OrderStatus.PENDING && (
                   <button
                     className="ml-2 text-blue-600 underline"
                     onClick={() => setEditingNote({ idx, text: order.notes || '' })}
@@ -101,9 +101,9 @@ export default function HistorialPedidos({
               Total pedido: {order.total_amount.toFixed(2)} €
             </span>
           </div>
-          {order.status === 'Pending' && (
+          {order.status === OrderStatus.PENDING && (
             <button className="mt-2 text-red-600 underline" onClick={() => cancelOrder(idx)}>
-              Cancelar pedido
+              Cancel order
             </button>
           )}
         </li>
