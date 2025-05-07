@@ -1,5 +1,4 @@
-export const cardProductoClasses =
-  'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer';
+export const cardProductoClasses = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow';
 
 export const categoriaSectionClasses =
   'cursor-pointer bg-white rounded-xl shadow p-4 flex flex-col items-center transition-transform hover:scale-105';
@@ -7,17 +6,13 @@ export const categoriaSectionClasses =
 export const categoriaTituloClasses =
   'text-lg font-bold mb-2 text-center text-gray-900';
 
-export const productoNombreClasses =
-  'text-lg font-semibold mb-1';
+export const productoNombreClasses = 'text-lg font-semibold mb-1';
 
-export const productoDescripcionClasses =
-  'text-gray-600 text-sm mb-2';
+export const productoDescripcionClasses = 'text-gray-600 text-sm mb-2';
 
-export const productoPrecioClasses =
-  'font-semibold text-blue-700 text-center mb-2';
+export const productoPrecioClasses = 'text-gray-900 font-medium';
 
-export const contadorClasses =
-  'flex items-center gap-2 justify-center mt-2';
+export const contadorClasses = 'flex items-center gap-2';
 
 export const contadorBtnClasses =
   'px-2 py-1 rounded bg-gray-200 text-lg font-bold transition-all duration-150 hover:bg-gray-300';
@@ -66,8 +61,7 @@ export const idiomaBtnClasses = (active: boolean) =>
 export const productoImgWrapperClasses =
   'w-full h-40 mb-2 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center';
 
-export const productoImgClasses =
-  'w-full h-48 object-cover';
+export const productoImgClasses = 'w-full h-48 object-cover';
 
 export const resumenPedidoBarraLateralClasses =
   'fixed right-0 top-0 h-full w-80 bg-white shadow-lg p-6 flex flex-col z-50 border-l border-gray-200';
@@ -81,11 +75,9 @@ export const resumenPedidoProductoClasses =
 export const resumenPedidoTotalClasses =
   'mt-4 text-xl font-extrabold text-blue-700';
 
-export const btnCantidadCompactoClasses =
-  'bg-gray-200 hover:bg-blue-200 text-lg px-2 rounded transition-colors';
+export const btnCantidadCompactoClasses = 'w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 font-medium text-lg transition-colors';
 
-export const indicadorCantidadClasses =
-  'font-semibold text-lg w-8 text-center';
+export const indicadorCantidadClasses = 'w-6 text-center font-medium';
 
 export const modalOverlayClasses =
   'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4';
@@ -93,5 +85,7 @@ export const modalOverlayClasses =
 export const modalContentClasses =
   'bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto';
 
-export const varianteClasses =
-  'p-4 bg-gray-50 rounded-lg';
+export const varianteClasses = 'p-4 bg-gray-50 rounded-lg';
+
+export const allergenContainerClasses = 'mt-2 flex flex-wrap gap-1';
+export const allergenItemClasses = 'inline-flex items-center gap-1 px-2 py-1 bg-yellow-50 rounded-full text-xs';

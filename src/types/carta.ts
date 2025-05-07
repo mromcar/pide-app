@@ -80,9 +80,10 @@ export type Product = {
   is_active: boolean | null
   translations: ProductTranslation[]
   variants: ProductVariant[]
-  allergens: (ProductAllergen & {
+  allergens?: {
     allergen: Allergen
-  })[]
+    allergen_id: number
+  }[]
 }
 
 export type ProductVariant = {
@@ -99,12 +100,9 @@ export type ProductVariant = {
 
 export type Allergen = {
   allergen_id: number
-  code: string
   name: string
-  description: string | null
   icon_url: string | null
-  is_major_allergen: boolean
-  translations: AllergenTranslation[]
+  translations?: AllergenTranslation[]
 }
 
 export type ProductAllergen = {

@@ -91,7 +91,10 @@ export default function CartaCliente({
       serializedCategories
         .flatMap((cat) => cat.products)
         .flatMap((prod) => prod.variants)
-        .reduce((sum, variant) => sum + (order[variant.variant_id] || 0) * Number(variant.price), 0),
+        .reduce(
+          (sum, variant) => sum + (order[variant.variant_id] || 0) * Number(variant.price),
+          0
+        ),
     [serializedCategories, order]
   )
 
@@ -106,15 +109,14 @@ export default function CartaCliente({
 
         if (!variant) return null
 
-        const variantTranslation = variant.translations.find(
-          t => t.language_code === language
-        )
+        const variantTranslation = variant.translations.find((t) => t.language_code === language)
 
         return {
           variant_id: variant.variant_id,
-          variant_description: variantTranslation?.variant_description ?? variant.variant_description,
+          variant_description:
+            variantTranslation?.variant_description ?? variant.variant_description,
           quantity,
-          unit_price: Number(variant.price) // Convert Decimal to number
+          unit_price: Number(variant.price), // Convert Decimal to number
         }
       })
       .filter(Boolean) as OrderHistory['items']
@@ -221,8 +223,9 @@ export default function CartaCliente({
         <ResumenPedido
           total={calculateTotal()}
           notes={notes}
-          setNotes={setNotes}
-          finishOrder={finishOrder}
+          onNotesChange={setNotes}
+          onFinishOrder={finishOrder}
+          language={language}
           disabled={calculateTotal() === 0}
         />
       </main>
@@ -244,8 +247,9 @@ export default function CartaCliente({
       <ResumenPedido
         total={calculateTotal()}
         notes={notes}
-        setNotes={setNotes}
-        finishOrder={finishOrder}
+        onNotesChange={setNotes}
+        onFinishOrder={finishOrder}
+        language={language}
         disabled={calculateTotal() === 0}
       />
     </main>

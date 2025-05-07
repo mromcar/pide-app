@@ -10,6 +10,7 @@ import {
   productoImgClasses,
   varianteClasses,
 } from '@/utils/tailwind'
+import ListaAlergenos from './ListaAlergenos'
 
 interface ListaProductosProps {
   products: Product[]
@@ -17,6 +18,11 @@ interface ListaProductosProps {
   handleChange: (variantId: number, delta: number) => void
   order: { [variantId: number]: number }
   language: string
+}
+
+const getAllergenDisplay = (allergen: Allergen, language: string) => {
+  const translation = allergen.translations?.find((t) => t.language_code === language)
+  return translation?.name || allergen.name
 }
 
 export default function ListaProductos({
@@ -53,42 +59,12 @@ export default function ListaProductos({
             {product.image_url && (
               <img src={`/images/${product.image_url}`} alt={name} className={productoImgClasses} />
             )}
-            <div>
-              <p className={productoNombreClasses}>{name}</p>
+            <div className="p-4">
+              {' '}
+              {/* Añadir padding */}
+              <h3 className={productoNombreClasses}>{name}</h3>
               {description && <p className={productoDescripcionClasses}>{description}</p>}
-
-              {/* Alérgenos section */}
-              {product.allergens && (
-                <div className="mt-2">
-                  <p className="text-sm font-medium text-gray-500">Alérgenos:</p>
-                  <div className="flex gap-2">
-                    {product.allergens.map((productAllergen) => {
-                      const allergen = productAllergen.allergen
-                      const translation = allergen.translations?.find(
-                        (t) => t.language_code === language
-                      )
-                      const allergenName = translation?.name || allergen.name
-
-                      return (
-                        <div
-                          key={allergen.allergen_id}
-                          className="flex items-center gap-1 text-xs bg-yellow-100 px-2 py-1 rounded"
-                        >
-                          {allergen.icon_url && (
-                            <img
-                              src={allergen.icon_url}
-                              alt={allergenName}
-                              className="w-4 h-4"
-                            />
-                          )}
-                          <span>{allergenName}</span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-
+              <ListaAlergenos allergens={product.allergens} language={language} />
               {/* Variants section */}
               <div className="mt-3 space-y-2">
                 {product.variants.map((variant) => {
@@ -103,33 +79,29 @@ export default function ListaProductos({
                     <div
                       key={variant.variant_id}
                       className={varianteClasses}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                      }}
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex justify-between items-center">
-                        <div>
+                        <div className="flex flex-col">
                           <span className="text-sm font-medium">{variantDesc}</span>
-                          <span className={productoPrecioClasses}>{variant.price.toString()} €</span>
+                          <span className={productoPrecioClasses}>
+                            {variant.price.toFixed(2)} €
+                          </span>
                         </div>
                         <div className={contadorClasses}>
                           <button
+                            type="button"
                             className={btnCantidadCompactoClasses}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleChange(variant.variant_id, -1)
-                            }}
+                            onClick={() => handleChange(variant.variant_id, -1)}
                             disabled={quantity === 0}
                           >
                             −
                           </button>
                           <span className={indicadorCantidadClasses}>{quantity}</span>
                           <button
+                            type="button"
                             className={btnCantidadCompactoClasses}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleChange(variant.variant_id, 1)
-                            }}
+                            onClick={() => handleChange(variant.variant_id, 1)}
                           >
                             +
                           </button>

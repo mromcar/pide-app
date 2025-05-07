@@ -1,38 +1,38 @@
+import { orderMessages } from '@/constants/translations'
 import { resumenPedidoFijoClasses, btnFinalizarPedidoClasses } from '@/utils/tailwind'
 
-interface OrderSummaryProps {
+interface ResumenPedidoProps {
   total: number
   notes: string
-  setNotes: (value: string) => void
-  finishOrder: () => void
-  disabled: boolean
+  onNotesChange: (notes: string) => void
+  onFinishOrder: () => void
+  language: string
 }
 
-export default function OrderSummary({
+export default function ResumenPedido({
   total,
   notes,
-  setNotes,
-  finishOrder,
-  disabled,
-}: OrderSummaryProps) {
+  onNotesChange,
+  onFinishOrder,
+  language,
+}: ResumenPedidoProps) {
+  // Default to 'es' if language is not found
+  const currentLang = language in orderMessages ? language : 'es'
+  const messages = orderMessages[currentLang as keyof typeof orderMessages]
+
   return (
     <div className={resumenPedidoFijoClasses}>
-      <span className="font-semibold text-lg">
-        Total: {total.toFixed(2)} €
-      </span>
+      <h2>{messages.orderTotal}</h2>
+      <span className="font-semibold text-lg">{total.toFixed(2)} €</span>
       <input
         type="text"
-        placeholder="Order notes (optional)"
         value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-        className="border px-2 py-1 rounded w-64"
+        onChange={(e) => onNotesChange(e.target.value)}
+        placeholder={messages.notesPlaceholder}
+        className="w-full p-2 border rounded"
       />
-      <button
-        className={btnFinalizarPedidoClasses}
-        disabled={disabled}
-        onClick={finishOrder}
-      >
-        Finish Order
+      <button onClick={onFinishOrder} className={btnFinalizarPedidoClasses} disabled={total === 0}>
+        {messages.placeOrder}
       </button>
     </div>
   )
