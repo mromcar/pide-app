@@ -1,7 +1,7 @@
 import '@/app/globals.css'
-import type { Category, DBCategory } from '@/types/carta'
-import { getCategoriesWithProducts, getEstablishmentById } from '@/services/productos.service'
-import CartaCliente from './CartaCliente'
+import type { Category, DBCategory } from '@/types/menu'
+import { getCategoriesWithProducts, getEstablishmentById } from '@/services/menu-services'
+import RestaurantMenu from './components/RestaurantMenu'
 
 function serializeCategories(categories: DBCategory[]): Category[] {
   return categories.map((cat) => ({
@@ -37,15 +37,15 @@ function serializeCategories(categories: DBCategory[]): Category[] {
   }))
 }
 
-export default async function Page({
+export default async function MenuPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ id: string }>
-  searchParams: Promise<{ lang?: string }>
+  params: { id: string }
+  searchParams: { lang?: string }
 }) {
-  const { id } = await params
-  const { lang } = await searchParams
+  const { id } = params
+  const { lang } = searchParams
   const establishmentId = Number(id)
   const languageCode = lang || 'es'
 
@@ -55,19 +55,8 @@ export default async function Page({
   const categories = serializeCategories(categoriesRaw)
   const categoriesWithProducts = categories.filter((cat) => cat.products && cat.products.length > 0)
 
-  if (categoriesWithProducts.length === 1) {
-    return (
-      <CartaCliente
-        establishment={establishment}
-        categories={categoriesWithProducts}
-        language={languageCode}
-        showProductsFromCategoryId={categoriesWithProducts[0].category_id}
-      />
-    )
-  }
-
   return (
-    <CartaCliente
+    <RestaurantMenu
       establishment={establishment}
       categories={categoriesWithProducts}
       language={languageCode}

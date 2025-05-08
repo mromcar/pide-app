@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import type { OrderStatus } from '@/types/carta'
+import type { OrderStatus } from '@/types/menu'
 
 export function useOrder() {
   const [order, setOrder] = useState<{ [variantId: number]: number }>({})

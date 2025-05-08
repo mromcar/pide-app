@@ -1,14 +1,16 @@
 'use client'
 import { useState, useCallback, useMemo } from 'react'
-import LanguageSelector from './SelectorDeIdioma'
-import ListaCategorias from './ListaCategorias'
-import ListaProductos from './ListaProductos'
-import ModalProducto from './ModalProducto'
-import ResumenPedido from './ResumenPedido'
-import HistorialPedidos from './HistorialPedidos'
+import LanguageSelector from './LanguageSelector'
+import CategoryList from './CategoryList'
+import ProductList from './ProductList'
+import { ProductModal } from './ProductModal'
+import OrderSummary from './OrderSummary'
+import OrderHistory from './OrderHistory'
 import { appContainerClasses } from '@/utils/tailwind'
-import { Category, Product, OrderStatus } from '@/types/carta'
-import { AVAILABLE_LANGUAGES } from '@/constants/languages'
+import { Category, Product, OrderStatus } from '@/types/menu'
+import { AvailableLanguage, AVAILABLE_LANGUAGES } from '@/constants/languages'
+import { uiTranslations } from '@/translations/ui'
+
 
 type OrderHistory = {
   code: string
@@ -28,7 +30,7 @@ function generateOrderCode() {
   return `ORD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`
 }
 
-export default function CartaCliente({
+export default function MenuClient({
   establishment,
   categories,
   language,
@@ -36,10 +38,11 @@ export default function CartaCliente({
 }: {
   establishment: { name: string } | null
   categories: Category[]
-  language: string
+  language: AvailableLanguage
   showProductsFromCategoryId?: number
 }) {
   // Initialize state variables at the top of the component
+  const t = uiTranslations[language.code]
   const [selectedCategory, setSelectedCategory] = useState<number | null>(
     showProductsFromCategoryId ?? null
   )
@@ -55,16 +58,16 @@ export default function CartaCliente({
 
   // Translation and serialization
   const serializedCategories = categories.map((category) => {
-    const categoryTranslation = category.translations?.find((t) => t.language_code === language)
+    const categoryTranslation = category.translations?.find((t) => t.language_code === language.code)
 
     return {
       ...category,
       name: categoryTranslation?.name ?? category.name,
       products: (category.products ?? []).map((product: Product) => {
-        const translation = product.translations?.find((t) => t.language_code === language)
+        const translation = product.translations?.find((t) => t.language_code === language.code)
         const variantTranslations = product.variants?.map((variant) => ({
           ...variant,
-          translation: variant.translations?.find((t) => t.language_code === language),
+          translation: variant.translations?.find((t) => t.language_code === language.code),
         }))
 
         return {
@@ -109,7 +112,13 @@ export default function CartaCliente({
 
         if (!variant) return null
 
+<<<<<<< HEAD:src/app/restaurante/[id]/carta/CartaCliente/index.tsx
         const variantTranslation = variant.translations.find((t) => t.language_code === language)
+=======
+        const variantTranslation = variant.translations.find(
+          t => t.language_code === language.code
+        )
+>>>>>>> 044dfeb (Actualiza estilos: nuevo esquema de color azul minimalista):src/app/restaurant/[id]/menu/components/index.tsx
 
         return {
           variant_id: variant.variant_id,
@@ -161,15 +170,15 @@ export default function CartaCliente({
   // VIEW OF SENT ORDER + HISTORY
   if (orderSent) {
     return (
-      <main className={appContainerClasses}>
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">Order placed!</h1>
+      <main className="appContainer">
+        <h1 className="title">{t.orderPlaced}</h1>
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded mb-4"
+          className="btnMinimalista"
           onClick={() => setOrderSent(false)}
         >
-          Place another order
+          {t.placeAnotherOrder}
         </button>
-        <HistorialPedidos
+        <OrderHistory
           orderHistory={orderHistory}
           cancelOrder={cancelOrder}
           editingNote={editingNote}
@@ -181,17 +190,17 @@ export default function CartaCliente({
   }
 
   // VIEW OF PRODUCT MODAL
-  // Only render ModalProducto if selectedProduct exists
+  // Only render ProductModal if selectedProduct exists
   if (selectedProduct !== null) {
     return (
-      <ModalProducto
+      <ProductModal
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
         handleChange={handleChange}
         order={order}
         finishOrder={finishOrder}
         total={calculateTotal()}
-        language={language}
+        language={language.code}
       />
     )
   }
@@ -205,22 +214,22 @@ export default function CartaCliente({
 
     return (
       <main className={appContainerClasses}>
-        <LanguageSelector language={language} availableLanguages={AVAILABLE_LANGUAGES} />
+        <LanguageSelector language={language.code} availableLanguages={AVAILABLE_LANGUAGES} />
         <h1 className="text-2xl font-bold mb-4 text-center text-gray-900">{establishment?.name}</h1>
         {showBackButton && (
           <button className="mb-4 text-blue-600" onClick={() => setSelectedCategory(null)}>
-            ← Back to categories
+            ← {t.backToCategories}
           </button>
         )}
         <h2 className="text-xl font-bold mb-4 text-center text-gray-900">{title}</h2>
-        <ListaProductos
+        <ProductList
           products={category?.products ?? []}
           onSelectProduct={(product) => setSelectedProduct(product)}
           handleChange={handleChange}
           order={order}
-          language={language}
+          language={language.code}
         />
-        <ResumenPedido
+        <OrderSummary
           total={calculateTotal()}
           notes={notes}
           onNotesChange={setNotes}
@@ -235,16 +244,16 @@ export default function CartaCliente({
   // VIEW OF CATEGORIES
   return (
     <main className={appContainerClasses}>
-      <LanguageSelector language={language} availableLanguages={AVAILABLE_LANGUAGES} />
+      <LanguageSelector language={language.code} availableLanguages={AVAILABLE_LANGUAGES} />
       <h1 className="text-2xl font-bold mb-2 text-center text-gray-900">
         {establishment?.name ?? 'Restaurant Menu'}
       </h1>
-      <ListaCategorias
+      <CategoryList
         categories={serializedCategories}
         onSelectCategory={setSelectedCategory}
-        language={language}
+        language={language.code}
       />
-      <ResumenPedido
+      <OrderSummary
         total={calculateTotal()}
         notes={notes}
         onNotesChange={setNotes}

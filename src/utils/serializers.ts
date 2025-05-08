@@ -1,4 +1,4 @@
-import type { DBCategory, Category } from '@/types/carta'
+import type { DBCategory, Category } from '@/types/menu'
 
 export function serializeCategories(categories: DBCategory[]): Category[] {
   return categories.map((cat) => ({

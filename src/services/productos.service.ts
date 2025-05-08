@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import type { DBCategory, EstablishmentBasic } from '@/types/carta'
+import type { DBCategory, EstablishmentBasic } from '@/types/menu'
 
 export async function getCategoriesWithProducts(establishmentId: number, languageCode: string): Promise<DBCategory[]> {
   const db = new PrismaClient({

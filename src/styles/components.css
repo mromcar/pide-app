@@ -1,0 +1,114 @@
+.cardMinimalista {
+    background-color: var(--background);
+    border-radius: 12px;
+    /* Bordes ligeramente redondeados */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* Sombra suave */
+    padding: 20px;
+    margin: 10px;
+    max-width: 300px;
+    min-width: 250px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cardMinimalista:hover {
+    transform: translateY(-4px);
+    /* Desplazamiento sutil hacia arriba al pasar el cursor */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.cardMinimalista .cardTitle {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.cardMinimalista .cardDescription {
+    font-size: 14px;
+    color: var(--foreground);
+    margin-bottom: 16px;
+}
+
+.cardMinimalista .cardPrice {
+    font-size: 16px;
+    font-weight: 500;
+    color: #4CAF50;
+}
+
+.btnMinimalista {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 9999px;
+    /* Bordes completamente redondeados */
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btnMinimalista:hover {
+    background-color: #45a049;
+    /* Sombra al pasar el ratón */
+    transform: scale(1.05);
+    /* Ligera ampliación del botón al pasar el ratón */
+}
+
+.idiomaSelector {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.idiomaBtn {
+    background-color: #f0f0f0;
+    color: #171717;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.idiomaBtn:hover {
+    background-color: #e0e0e0;
+}
+
+.idiomaBtn.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.iconoMinimalista {
+    font-size: 18px;
+    color: var(--foreground);
+    transition: transform 0.3s ease;
+}
+
+.iconoMinimalista:hover {
+    transform: scale(1.2);
+    /* Aumento sutil al pasar el ratón */
+}
+
+.appContainer {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background-color: var(--background);
+}
+
+.appContainer .title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--foreground);
+}
