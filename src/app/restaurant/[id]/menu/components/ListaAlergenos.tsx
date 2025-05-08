@@ -1,4 +1,4 @@
-import { Allergen } from '@/types/carta'
+import { Allergen } from '@/types/menu'
 import { allergenContainerClasses, allergenItemClasses } from '@/utils/tailwind'
 
 interface ListaAlergenosProps {
@@ -18,11 +18,11 @@ export default function ListaAlergenos({ allergens, language }: ListaAlergenosPr
   if (!allergens || allergens.length === 0) return null
 
   return (
-    <div className="mt-2 flex flex-wrap gap-1">
+    <div className={allergenContainerClasses}>
       {allergens.map(({ allergen }) => (
         <div
           key={allergen.allergen_id}
-          className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-50 rounded-full text-xs"
+          className={allergenItemClasses}
           title={getAllergenDisplay(allergen, language)}
         >
           {allergen.icon_url && (

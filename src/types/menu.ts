@@ -180,3 +180,12 @@ export type Establishment = {
     is_active: boolean | null
     accepts_orders: boolean
 }
+
+export type EstablishmentBasic = {
+    establishment_id: number
+    name: string
+    description: string | null
+    website: string | null
+    is_active: boolean | null
+    accepts_orders: boolean
+  }

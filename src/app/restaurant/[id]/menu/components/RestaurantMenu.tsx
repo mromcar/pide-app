@@ -3,7 +3,7 @@ import { useState, useCallback, useMemo } from 'react'
 import LanguageSelector from './LanguageSelector'
 import CategoryList from './CategoryList'
 import ProductList from './ProductList'
-import ProductModal from './ProductModal'
+import { ProductModal } from './ProductModal'
 import OrderSummary from './OrderSummary'
 import OrderHistory from './OrderHistory'
 import { appContainerClasses } from '@/utils/tailwind'
@@ -91,7 +91,10 @@ export default function MenuClient({
       serializedCategories
         .flatMap((cat) => cat.products)
         .flatMap((prod) => prod.variants)
-        .reduce((sum, variant) => sum + (order[variant.variant_id] || 0) * Number(variant.price), 0),
+        .reduce(
+          (sum, variant) => sum + (order[variant.variant_id] || 0) * Number(variant.price),
+          0
+        ),
     [serializedCategories, order]
   )
 
@@ -106,15 +109,14 @@ export default function MenuClient({
 
         if (!variant) return null
 
-        const variantTranslation = variant.translations.find(
-          t => t.language_code === language
-        )
+        const variantTranslation = variant.translations.find((t) => t.language_code === language)
 
         return {
           variant_id: variant.variant_id,
-          variant_description: variantTranslation?.variant_description ?? variant.variant_description,
+          variant_description:
+            variantTranslation?.variant_description ?? variant.variant_description,
           quantity,
-          unit_price: Number(variant.price) // Convert Decimal to number
+          unit_price: Number(variant.price), // Convert Decimal to number
         }
       })
       .filter(Boolean) as OrderHistory['items']
