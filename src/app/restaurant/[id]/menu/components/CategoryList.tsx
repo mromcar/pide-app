@@ -1,7 +1,7 @@
-import { CategoryWithTranslations } from '@/services/menu-services'
+import { Category } from '@/services/menu-services'
 
 interface CategoryListProps {
-  categories: CategoryWithTranslations[]
+  categories: Category[]
   onSelectCategory: (id: number) => void
   language: string
 }
@@ -10,7 +10,7 @@ export default function CategoryList({ categories, onSelectCategory }: CategoryL
   return (
     <div className="flex flex-wrap justify-center gap-4">
       {categories.map((category) => {
-        const translation = category.CategoryTranslation[0]
+        const translation = category.translations[0]
         const translatedName = translation?.name || category.name
 
         return (

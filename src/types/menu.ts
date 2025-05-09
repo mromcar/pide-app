@@ -188,4 +188,4 @@ export type EstablishmentBasic = {
     website: string | null
     is_active: boolean | null
     accepts_orders: boolean
-  }
+}
