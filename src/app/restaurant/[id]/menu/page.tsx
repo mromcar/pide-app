@@ -67,9 +67,10 @@ export default async function MenuPage({
   const establishmentId = Number(id)
   const languageCode = lang || 'es'
 
-  const establishment = await getEstablishmentById(establishmentId)
   const categoriesRaw = await getCategoriesWithProducts(establishmentId, languageCode)
   const categories = serializeCategories(categoriesRaw, languageCode)
+
+  const establishment = await getEstablishmentById(establishmentId)
   const categoriesWithProducts = categories.filter((cat) => cat.products && cat.products.length > 0)
 
   return (
