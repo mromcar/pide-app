@@ -1,12 +1,13 @@
 import { Category } from '@/services/menu-services'
+import { SerializedCategory } from '@/types/menu'
 
 interface CategoryListProps {
-  categories: Category[]
-  onSelectCategory: (id: number) => void
+  categories: SerializedCategory[]
+  onSelectCategory: (categoryId: number) => void
   language: string
 }
 
-export default function CategoryList({ categories, onSelectCategory }: CategoryListProps) {
+export default function CategoryList({ categories, onSelectCategory, language }: CategoryListProps) {
   return (
     <div className="flex flex-wrap justify-center gap-4">
       {categories.map((category) => {

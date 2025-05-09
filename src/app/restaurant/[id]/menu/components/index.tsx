@@ -37,7 +37,7 @@ export default function MenuClient({
   showProductsFromCategoryId,
 }: {
   establishment: { name: string } | null
-  categories: Category[]
+  categories: SerializedCategory[]
   language: AvailableLanguage
   showProductsFromCategoryId?: number
 }) {
@@ -46,7 +46,7 @@ export default function MenuClient({
   const [selectedCategory, setSelectedCategory] = useState<number | null>(
     showProductsFromCategoryId ?? null
   )
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<SerializedProduct | null>(null)
   const [order, setOrder] = useState<{ [variantId: number]: number }>({})
   const [orderSent, setOrderSent] = useState(false)
   const [notes, setNotes] = useState('')

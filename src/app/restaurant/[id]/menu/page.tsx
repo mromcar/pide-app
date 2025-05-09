@@ -1,8 +1,8 @@
 import '@/app/globals.css'
-import type { Category } from '@/types/menu'
+import type { Category, SerializedCategory } from '@/types/menu'
 import { getCategoriesWithProducts, getEstablishmentById } from '@/services/menu-services'
 import { getTranslation } from '@/utils/translations'
-import RestaurantMenu from './components/RestaurantMenu'
+import MenuClient from './components/MenuClient'
 
 function serializeCategories(categories: Category[], languageCode: string): Category[] {
   return categories.map((cat) => ({
@@ -55,7 +55,7 @@ function serializeCategories(categories: Category[], languageCode: string): Cate
   }))
 }
 
-export default async function MenuPage({
+export default async function Page({
   params,
   searchParams,
 }: {
@@ -72,11 +72,29 @@ export default async function MenuPage({
   const categories = serializeCategories(categoriesRaw, languageCode)
   const categoriesWithProducts = categories.filter((cat) => cat.products && cat.products.length > 0)
 
+  const serializedCategories = categoriesWithProducts.map((category) => {
+    const categoryTranslation = category.translations?.find(
+      (t) => t.language_code === languageCode
+    )
+
+    return {
+      ...category,
+      name: categoryTranslation?.name ?? category.name,
+      products: (category.products ?? []).map((product) => ({
+        ...product,
+        translations: product.translations ?? [],
+        variants: product.variants ?? [],
+        allergens: product.allergens ?? [],
+      })),
+    } as SerializedCategory
+  })
+
   return (
-    <RestaurantMenu
+    <MenuClient
       establishment={establishment}
-      categories={categoriesWithProducts}
+      categories={serializedCategories}
       language={languageCode}
+      showProductsFromCategoryId={undefined}
     />
   )
 }
