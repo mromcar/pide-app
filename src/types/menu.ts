@@ -39,7 +39,7 @@ export type ProductTranslation = {
     product_id: number
     language_code: string
     name: string
-    description?: string | null
+    description: string | null  
 }
 
 export type ProductVariantTranslation = {
@@ -110,6 +110,60 @@ export type Allergen = {
 export type ProductAllergen = {
     product_id: number
     allergen_id: number
+}
+
+// Serialized Types
+export type SerializedCategory = {
+    category_id: number
+    establishment_id: number
+    name: string
+    image_url: string | null
+    sort_order: number | null
+    is_active: boolean | null
+    translations: CategoryTranslation[]
+    products: SerializedProduct[]
+}
+
+export type SerializedProduct = {
+    product_id: number
+    establishment_id: number
+    category_id: number
+    name: string
+    description: string | null
+    image_url: string | null
+    sort_order: number | null
+    is_active: boolean | null
+    translations: ProductTranslation[]
+    variants: SerializedProductVariant[]
+    allergens: SerializedProductAllergen[]
+}
+
+export type SerializedProductVariant = {
+    variant_id: number
+    product_id: number
+    establishment_id: number
+    variant_description: string
+    price: Prisma.Decimal
+    sku: string | null
+    sort_order: number | null
+    is_active: boolean | null
+    translations: ProductVariantTranslation[]
+}
+
+export type SerializedProductAllergen = {
+    product_id: number
+    allergen_id: number
+    allergen: SerializedAllergen
+}
+
+export type SerializedAllergen = {
+    allergen_id: number
+    code: string
+    name: string
+    description: string | null
+    icon_url: string | null
+    is_major_allergen: boolean
+    translations: AllergenTranslation[]
 }
 
 // Order Related Types
@@ -188,4 +242,4 @@ export type EstablishmentBasic = {
     website: string | null
     is_active: boolean | null
     accepts_orders: boolean
-  }
+}

@@ -37,7 +37,7 @@ export default function MenuClient({
   showProductsFromCategoryId,
 }: {
   establishment: { name: string } | null
-  categories: Category[]
+  categories: SerializedCategory[]
   language: AvailableLanguage
   showProductsFromCategoryId?: number
 }) {
@@ -46,7 +46,7 @@ export default function MenuClient({
   const [selectedCategory, setSelectedCategory] = useState<number | null>(
     showProductsFromCategoryId ?? null
   )
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<SerializedProduct | null>(null)
   const [order, setOrder] = useState<{ [variantId: number]: number }>({})
   const [orderSent, setOrderSent] = useState(false)
   const [notes, setNotes] = useState('')
@@ -112,18 +112,26 @@ export default function MenuClient({
 
         if (!variant) return null
 
-<<<<<<< HEAD:src/app/restaurante/[id]/carta/CartaCliente/index.tsx
-        const variantTranslation = variant.translations.find((t) => t.language_code === language)
-=======
-        const variantTranslation = variant.translations.find(
-          t => t.language_code === language.code
-        )
->>>>>>> 044dfeb (Actualiza estilos: nuevo esquema de color azul minimalista):src/app/restaurant/[id]/menu/components/index.tsx
+        // Find the product corresponding to the variant
+        const product = serializedCategories
+          .flatMap((cat) => cat.products)
+          .find((prod) =>
+            prod.variants.some((v) => v.variant_id === Number(variantId))
+          )
+
+        // Ensure product and variants exist
+        if (!product) return null
+
+        const variantTranslations = product.variants?.map((variant) => ({
+          ...variant,
+          translation: variant.translations?.find((t) => t.language_code === language.code),
+        }))
 
         return {
           variant_id: variant.variant_id,
           variant_description:
-            variantTranslation?.variant_description ?? variant.variant_description,
+            variantTranslations?.find((v) => v.variant_id === variant.variant_id)?.variant_description ??
+            variant.variant_description,
           quantity,
           unit_price: Number(variant.price), // Convert Decimal to number
         }

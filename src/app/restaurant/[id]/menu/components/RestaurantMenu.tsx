@@ -8,7 +8,8 @@ import OrderSummary from './OrderSummary'
 import OrderHistory from './OrderHistory'
 import { appContainerClasses } from '@/utils/tailwind'
 import { Category, Product, OrderStatus } from '@/types/menu'
-import { AVAILABLE_LANGUAGES } from '@/constants/languages'
+import { LanguageCode, AVAILABLE_LANGUAGES } from '@/constants/languages'
+
 
 type OrderHistory = {
   code: string
@@ -36,7 +37,7 @@ export default function MenuClient({
 }: {
   establishment: { name: string } | null
   categories: Category[]
-  language: string
+  language: LanguageCode
   showProductsFromCategoryId?: number
 }) {
   // Initialize state variables at the top of the component

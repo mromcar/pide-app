@@ -1,50 +1,71 @@
-import { PrismaClient, Prisma } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import type { EstablishmentBasic } from '@/types/menu'
 
 const db = new PrismaClient({ log: ['query', 'error', 'warn'] })
 
-export type CategoryWithTranslations = Prisma.CategoryGetPayload<{
-  select: {
-    category_id: true
-    establishment_id: true
-    name: true
-    image_url: true
-    sort_order: true
-    is_active: true
-    CategoryTranslation: true
-    products: {
-      select: {
-        product_id: true
-        establishment_id: true
-        category_id: true
-        name: true
-        description: true
-        image_url: true
-        sort_order: true
-        is_active: true
-        ProductTranslation: true
-        variants: {
-          select: {
-            variant_id: true
-            product_id: true
-            establishment_id: true
-            variant_description: true
-            price: true
-            sku: true
-            sort_order: true
-            is_active: true
-            translations: true
-          }
-        }
-      }
-    }
-  }
-}>
+// Tipos manualmente definidos para Category, CategoryTranslation, Product, etc.
+export interface CategoryTranslation {
+  translation_id: number
+  category_id: number
+  language_code: string
+  name: string
+}
+
+export interface ProductTranslation {
+  translation_id: number
+  product_id: number
+  language_code: string
+  name: string
+  description: string
+}
+
+export interface VariantTranslation {
+  translation_id: number
+  variant_id: number
+  language_code: string
+  variant_description: string
+}
+
+export interface Variant {
+  variant_id: number
+  product_id: number
+  establishment_id: number
+  variant_description: string
+  price: number
+  sku: string
+  sort_order: number
+  is_active: boolean
+  translations: VariantTranslation[]
+}
+
+export interface Product {
+  product_id: number
+  establishment_id: number
+  category_id: number
+  name: string
+  description: string
+  image_url: string
+  sort_order: number
+  is_active: boolean
+  ProductTranslation: ProductTranslation[]
+  variants: Variant[]
+}
+
+export interface Category {
+  category_id: number
+  establishment_id: number
+  name: string
+  image_url: string
+  sort_order: number
+  is_active: boolean
+  translations: CategoryTranslation[]
+  products: Product[]
+}
 
 export async function getCategoriesWithProducts(
   establishmentId: number,
   languageCode: string
-): Promise<CategoryWithTranslations[]> {
+): Promise<Category[]> {
   try {
     return await db.category.findMany({
       where: {
@@ -103,7 +124,7 @@ export async function getCategoriesWithProducts(
             },
           },
         },
-        CategoryTranslation: {
+        translations: {
           where: { language_code: languageCode },
           select: {
             translation_id: true,
