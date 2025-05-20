@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback } from 'react'
 import LanguageSelector from './LanguageSelector'
 import CategoryList from './CategoryList'
 import ProductList from './ProductList'
@@ -7,10 +7,11 @@ import { ProductModal } from './ProductModal'
 import OrderSummary from './OrderSummary'
 import OrderHistory from './OrderHistory'
 import { appContainerClasses } from '@/utils/tailwind'
-import { Category, Product, OrderStatus } from '@/types/menu'
+import { SerializedCategory, SerializedProduct } from '@/types/menu'
+import { ORDER_STATUS } from '@/constants/enums'
+import type { OrderStatus } from '@prisma/client'
 import { AvailableLanguage, AVAILABLE_LANGUAGES } from '@/constants/languages'
 import { uiTranslations } from '@/translations/ui'
-
 
 type OrderHistory = {
   code: string
@@ -41,7 +42,6 @@ export default function MenuClient({
   language: AvailableLanguage
   showProductsFromCategoryId?: number
 }) {
-  // Initialize state variables at the top of the component
   const t = uiTranslations[language.code]
   const [selectedCategory, setSelectedCategory] = useState<number | null>(
     showProductsFromCategoryId ?? null
@@ -56,31 +56,6 @@ export default function MenuClient({
     text: string
   } | null>(null)
 
-  // Translation and serialization
-  const serializedCategories = categories.map((category) => {
-    const categoryTranslation = category.translations?.find((t) => t.language_code === language.code)
-
-    return {
-      ...category,
-      name: categoryTranslation?.name ?? category.name,
-      products: (category.products ?? []).map((product: Product) => {
-        const translation = product.translations?.find((t) => t.language_code === language.code)
-        const variantTranslations = product.variants?.map((variant) => ({
-          ...variant,
-          translation: variant.translations?.find((t) => t.language_code === language.code),
-        }))
-
-        return {
-          ...product,
-          name: translation?.name ?? product.name,
-          description: translation?.description ?? product.description ?? null, // Handle null case
-          variants: variantTranslations ?? [],
-          translations: product.translations ?? [],
-        } as Product // Type assertion to ensure compatibility
-      }),
-    }
-  })
-
   const handleChange = (variantId: number, delta: number) => {
     setOrder((prev) => {
       const next = { ...prev, [variantId]: Math.max(0, (prev[variantId] || 0) + delta) }
@@ -91,49 +66,28 @@ export default function MenuClient({
 
   const calculateTotal = useCallback(
     () =>
-      serializedCategories
+      categories
         .flatMap((cat) => cat.products)
         .flatMap((prod) => prod.variants)
-        .reduce(
-          (sum, variant) => sum + (order[variant.variant_id] || 0) * Number(variant.price),
-          0
-        ),
-    [serializedCategories, order]
+        .reduce((sum, variant) => sum + (order[variant.variant_id] || 0) * variant.price, 0),
+    [categories, order]
   )
 
-  // Finish order and save to history
   const finishOrder = () => {
     const orderItems = Object.entries(order)
       .map(([variantId, quantity]) => {
-        const variant = serializedCategories
+        const variant = categories
           .flatMap((cat) => cat.products)
           .flatMap((prod) => prod.variants)
           .find((v) => v.variant_id === Number(variantId))
 
         if (!variant) return null
 
-        // Find the product corresponding to the variant
-        const product = serializedCategories
-          .flatMap((cat) => cat.products)
-          .find((prod) =>
-            prod.variants.some((v) => v.variant_id === Number(variantId))
-          )
-
-        // Ensure product and variants exist
-        if (!product) return null
-
-        const variantTranslations = product.variants?.map((variant) => ({
-          ...variant,
-          translation: variant.translations?.find((t) => t.language_code === language.code),
-        }))
-
         return {
           variant_id: variant.variant_id,
-          variant_description:
-            variantTranslations?.find((v) => v.variant_id === variant.variant_id)?.variant_description ??
-            variant.variant_description,
+          variant_description: variant.variant_description,
           quantity,
-          unit_price: Number(variant.price), // Convert Decimal to number
+          unit_price: variant.price,
         }
       })
       .filter(Boolean) as OrderHistory['items']
@@ -145,7 +99,7 @@ export default function MenuClient({
         items: orderItems,
         total_amount: calculateTotal(),
         date: new Date().toLocaleString(),
-        status: OrderStatus.PENDING,
+        status: ORDER_STATUS.PENDING,
         notes,
       },
     ])
@@ -158,7 +112,6 @@ export default function MenuClient({
     setSelectedProduct(null)
   }
 
-  // Modify note of a pending order
   const saveEditedNote = () => {
     if (editingNote) {
       setOrderHistory((prev) =>
@@ -168,22 +121,17 @@ export default function MenuClient({
     }
   }
 
-  // Cancel pending order
   const cancelOrder = (idx: number) => {
     setOrderHistory((prev) =>
       prev.map((p, i) => (i === idx ? { ...p, status: OrderStatus.CANCELLED } : p))
     )
   }
 
-  // VIEW OF SENT ORDER + HISTORY
   if (orderSent) {
     return (
       <main className="appContainer">
         <h1 className="title">{t.orderPlaced}</h1>
-        <button
-          className="btnMinimalista"
-          onClick={() => setOrderSent(false)}
-        >
+        <button className="btnMinimalista" onClick={() => setOrderSent(false)}>
           {t.placeAnotherOrder}
         </button>
         <OrderHistory
@@ -197,8 +145,6 @@ export default function MenuClient({
     )
   }
 
-  // VIEW OF PRODUCT MODAL
-  // Only render ProductModal if selectedProduct exists
   if (selectedProduct !== null) {
     return (
       <ProductModal
@@ -213,9 +159,8 @@ export default function MenuClient({
     )
   }
 
-  // VIEW OF PRODUCTS IN A CATEGORY
   if (selectedCategory !== null) {
-    const category = serializedCategories.find((cat) => cat.category_id === selectedCategory)
+    const category = categories.find((cat) => cat.category_id === selectedCategory)
     const showBackButton = !showProductsFromCategoryId
     const title =
       categories.length === 1 && showProductsFromCategoryId ? establishment?.name : category?.name
@@ -249,7 +194,6 @@ export default function MenuClient({
     )
   }
 
-  // VIEW OF CATEGORIES
   return (
     <main className={appContainerClasses}>
       <LanguageSelector language={language.code} availableLanguages={AVAILABLE_LANGUAGES} />
@@ -257,7 +201,7 @@ export default function MenuClient({
         {establishment?.name ?? 'Restaurant Menu'}
       </h1>
       <CategoryList
-        categories={serializedCategories}
+        categories={categories}
         onSelectCategory={setSelectedCategory}
         language={language.code}
       />

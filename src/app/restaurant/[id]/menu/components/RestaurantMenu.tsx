@@ -7,22 +7,20 @@ import { ProductModal } from './ProductModal'
 import OrderSummary from './OrderSummary'
 import OrderHistory from './OrderHistory'
 import { appContainerClasses } from '@/utils/tailwind'
-import { Category, Product, OrderStatus } from '@/types/menu'
+import { Category, SerializedCategory, SerializedProduct, SerializedOrderItem } from '@/types/menu'
+import type { OrderStatus } from '@prisma/client'
 import { LanguageCode, AVAILABLE_LANGUAGES } from '@/constants/languages'
-
+import { ORDER_STATUS } from '@/constants/enums'
+import { serializeCategory } from '@/utils/serializers'
 
 type OrderHistory = {
   code: string
-  items: {
-    variant_id: number
-    variant_description: string
-    quantity: number
-    unit_price: number
-  }[]
+  items: SerializedOrderItem[]
   total_amount: number
   date: string
   status: OrderStatus
   notes: string
+  completedAt?: string
 }
 
 function generateOrderCode() {
@@ -40,11 +38,10 @@ export default function MenuClient({
   language: LanguageCode
   showProductsFromCategoryId?: number
 }) {
-  // Initialize state variables at the top of the component
   const [selectedCategory, setSelectedCategory] = useState<number | null>(
     showProductsFromCategoryId ?? null
   )
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<SerializedProduct | null>(null)
   const [order, setOrder] = useState<{ [variantId: number]: number }>({})
   const [orderSent, setOrderSent] = useState(false)
   const [notes, setNotes] = useState('')
@@ -54,30 +51,11 @@ export default function MenuClient({
     text: string
   } | null>(null)
 
-  // Translation and serialization
-  const serializedCategories = categories.map((category) => {
-    const categoryTranslation = category.translations?.find((t) => t.language_code === language)
-
-    return {
-      ...category,
-      name: categoryTranslation?.name ?? category.name,
-      products: (category.products ?? []).map((product: Product) => {
-        const translation = product.translations?.find((t) => t.language_code === language)
-        const variantTranslations = product.variants?.map((variant) => ({
-          ...variant,
-          translation: variant.translations?.find((t) => t.language_code === language),
-        }))
-
-        return {
-          ...product,
-          name: translation?.name ?? product.name,
-          description: translation?.description ?? product.description ?? null, // Handle null case
-          variants: variantTranslations ?? [],
-          translations: product.translations ?? [],
-        } as Product // Type assertion to ensure compatibility
-      }),
-    }
-  })
+  // Use centralized serialization
+  const serializedCategories = useMemo(
+    () => categories.map((category) => serializeCategory(category, language)),
+    [categories, language]
+  )
 
   const handleChange = (variantId: number, delta: number) => {
     setOrder((prev) => {
@@ -92,10 +70,7 @@ export default function MenuClient({
       serializedCategories
         .flatMap((cat) => cat.products)
         .flatMap((prod) => prod.variants)
-        .reduce(
-          (sum, variant) => sum + (order[variant.variant_id] || 0) * Number(variant.price),
-          0
-        ),
+        .reduce((sum, variant) => sum + (order[variant.variant_id] || 0) * variant.price, 0),
     [serializedCategories, order]
   )
 
@@ -110,17 +85,14 @@ export default function MenuClient({
 
         if (!variant) return null
 
-        const variantTranslation = variant.translations.find((t) => t.language_code === language)
-
         return {
           variant_id: variant.variant_id,
-          variant_description:
-            variantTranslation?.variant_description ?? variant.variant_description,
+          variant_description: variant.variant_description,
           quantity,
-          unit_price: Number(variant.price), // Convert Decimal to number
+          unit_price: variant.price,
         }
       })
-      .filter(Boolean) as OrderHistory['items']
+      .filter(Boolean) as SerializedOrderItem[]
 
     setOrderHistory((prev) => [
       ...prev,
@@ -129,12 +101,11 @@ export default function MenuClient({
         items: orderItems,
         total_amount: calculateTotal(),
         date: new Date().toLocaleString(),
-        status: OrderStatus.PENDING,
+        status: ORDER_STATUS.PENDING,
         notes,
       },
     ])
 
-    // Reset state
     setOrder({})
     setNotes('')
     setOrderSent(true)
@@ -142,7 +113,6 @@ export default function MenuClient({
     setSelectedProduct(null)
   }
 
-  // Modify note of a pending order
   const saveEditedNote = () => {
     if (editingNote) {
       setOrderHistory((prev) =>
@@ -152,14 +122,12 @@ export default function MenuClient({
     }
   }
 
-  // Cancel pending order
   const cancelOrder = (idx: number) => {
     setOrderHistory((prev) =>
-      prev.map((p, i) => (i === idx ? { ...p, status: OrderStatus.CANCELLED } : p))
+      prev.map((p, i) => (i === idx ? { ...p, status: ORDER_STATUS.CANCELLED } : p))
     )
   }
 
-  // VIEW OF SENT ORDER + HISTORY
   if (orderSent) {
     return (
       <main className={appContainerClasses}>
@@ -176,13 +144,26 @@ export default function MenuClient({
           editingNote={editingNote}
           setEditingNote={setEditingNote}
           saveEditedNote={saveEditedNote}
+          onStatusChange={(orderId, newStatus) =>
+            setOrderHistory((prev) =>
+              prev.map((order, idx) =>
+                idx === orderId
+                  ? {
+                      ...order,
+                      status: newStatus,
+                      ...(newStatus === ORDER_STATUS.COMPLETED && {
+                        completedAt: new Date().toLocaleString(),
+                      }),
+                    }
+                  : order
+              )
+            )
+          }
         />
       </main>
     )
   }
 
-  // VIEW OF PRODUCT MODAL
-  // Only render ProductModal if selectedProduct exists
   if (selectedProduct !== null) {
     return (
       <ProductModal
@@ -197,7 +178,6 @@ export default function MenuClient({
     )
   }
 
-  // VIEW OF PRODUCTS IN A CATEGORY
   if (selectedCategory !== null) {
     const category = serializedCategories.find((cat) => cat.category_id === selectedCategory)
     const showBackButton = !showProductsFromCategoryId
@@ -232,7 +212,6 @@ export default function MenuClient({
     )
   }
 
-  // VIEW OF CATEGORIES
   return (
     <main className={appContainerClasses}>
       <LanguageSelector language={language} availableLanguages={AVAILABLE_LANGUAGES} />

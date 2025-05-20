@@ -10,7 +10,7 @@ export default function GestionCartaEmpleado() {
 
   useEffect(() => {
     const fetchCategorias = async () => {
-      const res = await fetch('/api/carta')
+      const res = await fetch('/api/menu')
       const data = await res.json()
       setCategorias(data.categorias || data)
     }
@@ -20,7 +20,7 @@ export default function GestionCartaEmpleado() {
   const handleAddCategoria = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!nuevaCategoria) return
-    const res = await fetch('/api/carta', {
+    const res = await fetch('/api/menu', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre: nuevaCategoria }),
@@ -58,7 +58,7 @@ export default function GestionCartaEmpleado() {
               onClick={async () => {
                 const nuevoNombre = prompt('Nuevo nombre de la categoría:', cat.nombre)
                 if (nuevoNombre && nuevoNombre !== cat.nombre) {
-                  const res = await fetch('/api/carta', {
+                  const res = await fetch('/api/menu', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id_categoria: cat.id_categoria, nombre: nuevoNombre }),
@@ -79,7 +79,7 @@ export default function GestionCartaEmpleado() {
               className="ml-2 text-red-600"
               onClick={async () => {
                 if (confirm('¿Seguro que quieres borrar esta categoría?')) {
-                  const res = await fetch('/api/carta', {
+                  const res = await fetch('/api/menu', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id_categoria: cat.id_categoria }),
@@ -107,7 +107,7 @@ export default function GestionCartaEmpleado() {
                         nuevoPrecio &&
                         !isNaN(Number(nuevoPrecio))
                       ) {
-                        const res = await fetch('/api/carta', {
+                        const res = await fetch('/api/menu', {
                           method: 'PATCH',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
@@ -141,7 +141,7 @@ export default function GestionCartaEmpleado() {
                     className="ml-2 text-red-600"
                     onClick={async () => {
                       if (confirm('¿Seguro que quieres borrar este producto?')) {
-                        const res = await fetch('/api/carta', {
+                        const res = await fetch('/api/menu', {
                           method: 'DELETE',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ id_producto: prod.id_producto }),

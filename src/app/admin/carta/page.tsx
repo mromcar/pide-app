@@ -18,7 +18,7 @@ export default function AdminCartaPage() {
   const [categorias, setCategorias] = useState<Categoria[]>([])
 
   useEffect(() => {
-    fetch('/api/carta')
+    fetch('/api/menu')
       .then((res) => res.json())
       .then((data) => setCategorias(data.categorias || []))
   }, [])

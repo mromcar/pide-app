@@ -1,164 +1,199 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import type { EstablishmentBasic } from '@/types/menu'
+import type {
+  CreateCategoryInput,
+  UpdateCategoryInput,
+  CreateProductInput,
+  UpdateProductInput
+} from '@/schemas/menu'
 
-const db = new PrismaClient({ log: ['query', 'error', 'warn'] })
+type CategoryWithProductsPayload = Prisma.CategoryGetPayload<{
+  include: {
+    CategoryTranslation: true
+    products: {
+      include: {
+        ProductTranslation: true
+        variants: {
+          include: {
+            ProductVariantTranslation: true
+          }
+        }
+        allergens: {
+          include: {
+            allergen: {
+              include: {
+                AllergenTranslation: true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}>
 
-// Tipos manualmente definidos para Category, CategoryTranslation, Product, etc.
-export interface CategoryTranslation {
-  translation_id: number
-  category_id: number
-  language_code: string
-  name: string
+// Validation helpers
+export function isValidNumber(value: any): boolean {
+  return typeof value === 'number' && !isNaN(value) && isFinite(value)
 }
 
-export interface ProductTranslation {
-  translation_id: number
-  product_id: number
-  language_code: string
-  name: string
-  description: string
+export function validatePrice(price: any): number | null {
+  if (!isValidNumber(price) || price < 0) return null
+  return parseFloat(price.toFixed(2))
 }
 
-export interface VariantTranslation {
-  translation_id: number
-  variant_id: number
-  language_code: string
-  variant_description: string
+// CRUD operations for categories
+export async function createCategory(
+  establishmentId: number,
+  data: CreateCategoryInput
+) {
+  return await prisma.category.create({
+    data: {
+      ...data,
+      sort_order: data.sort_order ?? 0,
+      establishment_id: establishmentId,
+      is_active: true
+    },
+  })
 }
 
-export interface Variant {
-  variant_id: number
-  product_id: number
-  establishment_id: number
-  variant_description: string
-  price: number
-  sku: string
-  sort_order: number
-  is_active: boolean
-  translations: VariantTranslation[]
+export async function updateCategory(
+  establishmentId: number,
+  categoryId: number,
+  data: UpdateCategoryInput
+) {
+  const category = await prisma.category.update({
+    where: {
+      category_id: categoryId,
+      establishment_id: establishmentId
+    },
+    data: {
+      name: data.name,
+      ...(data.sort_order !== undefined && { sort_order: data.sort_order })
+    },
+  })
+
+  if (!category) throw new Error("Category not found")
+  return category
 }
 
-export interface Product {
-  product_id: number
-  establishment_id: number
-  category_id: number
-  name: string
-  description: string
-  image_url: string
-  sort_order: number
-  is_active: boolean
-  ProductTranslation: ProductTranslation[]
-  variants: Variant[]
+export async function deleteCategory(
+  establishmentId: number,
+  categoryId: number
+) {
+  const productsDeleted = await prisma.product.deleteMany({
+    where: {
+      category_id: categoryId,
+      establishment_id: establishmentId
+    }
+  })
+
+  const { count } = await prisma.category.deleteMany({
+    where: {
+      category_id: categoryId,
+      establishment_id: establishmentId
+    }
+  })
+
+  if (count === 0) throw new Error("Category not found")
+  return { deleted: count, productsDeleted: productsDeleted.count }
 }
 
-export interface Category {
-  category_id: number
-  establishment_id: number
-  name: string
-  image_url: string
-  sort_order: number
-  is_active: boolean
-  translations: CategoryTranslation[]
-  products: Product[]
+// CRUD operations for products
+export async function updateProduct(
+  establishmentId: number,
+  productId: number,
+  data: UpdateProductInput
+) {
+  const product = await prisma.product.update({
+    where: {
+      product_id: productId,
+      establishment_id: establishmentId
+    },
+    data: {
+      name: data.name,
+      price: data.price,
+      description: data.description,
+      ...(data.sort_order !== undefined && { sort_order: data.sort_order })
+    },
+  })
+
+  if (!product) throw new Error("Product not found")
+  return product
+}
+
+export async function deleteProduct(
+  establishmentId: number,
+  productId: number
+) {
+  const { count } = await prisma.product.deleteMany({
+    where: {
+      product_id: productId,
+      establishment_id: establishmentId
+    }
+  })
+
+  if (count === 0) throw new Error("Product not found")
+  return { deleted: count }
 }
 
 export async function getCategoriesWithProducts(
   establishmentId: number,
   languageCode: string
-): Promise<Category[]> {
-  try {
-    return await db.category.findMany({
-      where: {
-        establishment_id: establishmentId,
-        is_active: true,
+): Promise<CategoryWithProductsPayload[]> {
+  return await prisma.category.findMany({
+    where: {
+      establishment_id: establishmentId,
+      is_active: true,
+    },
+    include: {
+      CategoryTranslation: {
+        where: { language_code: languageCode },
       },
-      select: {
-        category_id: true,
-        establishment_id: true,
-        name: true,
-        image_url: true,
-        sort_order: true,
-        is_active: true,
-        products: {
-          where: { is_active: true },
-          select: {
-            product_id: true,
-            establishment_id: true,
-            category_id: true,
-            name: true,
-            description: true,
-            image_url: true,
-            sort_order: true,
-            is_active: true,
-            ProductTranslation: {
-              where: { language_code: languageCode },
-              select: {
-                translation_id: true,
-                product_id: true,
-                language_code: true,
-                name: true,
-                description: true,
+      products: {
+        where: { is_active: true },
+        include: {
+          ProductTranslation: {
+            where: { language_code: languageCode },
+          },
+          variants: {
+            where: { is_active: true },
+            include: {
+              ProductVariantTranslation: {
+                where: { language_code: languageCode },
               },
             },
-            variants: {
-              where: { is_active: true },
-              select: {
-                variant_id: true,
-                product_id: true,
-                establishment_id: true,
-                variant_description: true,
-                price: true,
-                sku: true,
-                sort_order: true,
-                is_active: true,
-                translations: {
-                  where: { language_code: languageCode },
-                  select: {
-                    translation_id: true,
-                    variant_id: true,
-                    language_code: true,
-                    variant_description: true,
+          },
+          allergens: {
+            include: {
+              allergen: {
+                include: {
+                  AllergenTranslation: {
+                    where: { language_code: languageCode },
                   },
                 },
               },
             },
           },
         },
-        translations: {
-          where: { language_code: languageCode },
-          select: {
-            translation_id: true,
-            category_id: true,
-            language_code: true,
-            name: true,
-          },
-        },
       },
-    })
-  } finally {
-    await db.$disconnect()
-  }
+    },
+  })
 }
 
 export async function getEstablishmentById(
   establishmentId: number
 ): Promise<EstablishmentBasic | null> {
-  try {
-    return await db.establishment.findUnique({
-      where: { establishment_id: establishmentId },
-      select: {
-        establishment_id: true,
-        name: true,
-        description: true,
-        website: true,
-        is_active: true,
-        accepts_orders: true,
-      },
-    })
-  } catch (error) {
-    console.error('Error:', error)
-    throw error
-  } finally {
-    await db.$disconnect()
-  }
+  return await prisma.establishment.findUnique({
+    where: { establishment_id: establishmentId },
+    select: {
+      establishment_id: true,
+      name: true,
+      description: true,
+      website: true,
+      is_active: true,
+      accepts_orders: true,
+    },
+  })
 }

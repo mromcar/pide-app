@@ -1,6 +1,9 @@
-import { getTranslation } from '@/translations/ui'
-import { LanguageCode } from '@/constants/languages'
+import { getUITranslation } from '@/utils/translations'
+import type { LanguageCode } from '@/constants/languages'
+import type { UITranslations } from '@/translations/ui'
 
-export function useTranslation(language: string | LanguageCode) {
-    return getTranslation(language)
+export function useTranslation(language: LanguageCode) {
+  return {
+    t: (key: keyof UITranslations) => getUITranslation(key, language)
+  }
 }
