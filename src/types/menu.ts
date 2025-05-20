@@ -39,7 +39,7 @@ export type ProductTranslation = {
     product_id: number
     language_code: string
     name: string
-    description: string | null  
+    description: string | null
 }
 
 export type ProductVariantTranslation = {
@@ -57,7 +57,7 @@ export type AllergenTranslation = {
     description?: string | null
 }
 
-// Main Entity Types
+// Main Entity Types (Representing the structure as returned by Prisma Client by default)
 export type Category = {
     category_id: number
     establishment_id: number
@@ -80,9 +80,8 @@ export type Product = {
     is_active: boolean | null
     translations: ProductTranslation[]
     variants: ProductVariant[]
-    allergens: (ProductAllergen & {
-        allergen: Allergen
-    })[]
+    // Aquí, sin un 'include' anidado, Prisma devuelve solo ProductAllergen
+    allergens: ProductAllergen[]
 }
 
 export type ProductVariant = {
@@ -94,7 +93,7 @@ export type ProductVariant = {
     sku: string | null
     sort_order: number | null
     is_active: boolean | null
-    translations: ProductVariantTranslation[]
+    translations: ProductVariantTranslation[] // Asegurado en schema.prisma
 }
 
 export type Allergen = {
@@ -110,9 +109,11 @@ export type Allergen = {
 export type ProductAllergen = {
     product_id: number
     allergen_id: number
+    // Aquí no se incluye el objeto Allergen completo por defecto, se anidaría con include
+    // Si siempre lo necesitas, usa el tipo SerializedProductAllergen
 }
 
-// Serialized Types
+// Serialized Types (Designed for API responses or transformed data)
 export type SerializedCategory = {
     category_id: number
     establishment_id: number
@@ -135,7 +136,7 @@ export type SerializedProduct = {
     is_active: boolean | null
     translations: ProductTranslation[]
     variants: SerializedProductVariant[]
-    allergens: SerializedProductAllergen[]
+    allergens: SerializedProductAllergen[] // Aquí sí se espera el Allergen completo
 }
 
 export type SerializedProductVariant = {
@@ -153,7 +154,7 @@ export type SerializedProductVariant = {
 export type SerializedProductAllergen = {
     product_id: number
     allergen_id: number
-    allergen: SerializedAllergen
+    allergen: SerializedAllergen // Incluye el objeto Allergen completo
 }
 
 export type SerializedAllergen = {
@@ -170,7 +171,7 @@ export type SerializedAllergen = {
 export type OrderItem = {
     order_item_id: number
     order_id: number
-    variant_id: number
+    variant_id: number // Mapea a id_producto en DB, que es la variant_id para el item de pedido
     quantity: number
     unit_price: Prisma.Decimal
     item_total_price: Prisma.Decimal | null
@@ -233,6 +234,10 @@ export type Establishment = {
     website: string | null
     is_active: boolean | null
     accepts_orders: boolean
+    categories: Category[] // Añadidas para consistencia
+    products: Product[] // Añadidas para consistencia
+    variants: ProductVariant[] // Añadidas para consistencia
+    employees: User[] // Añadidas para consistencia
 }
 
 export type EstablishmentBasic = {
