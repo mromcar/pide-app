@@ -3,31 +3,32 @@
 
 import { useParams } from 'next/navigation' // Para obtener el ID del restaurante de la URL
 import { OrderProvider } from '@/lib/order-context' // Nuestro proveedor del carrito de compra
-import { ProductList } from '@/components/product/ProductList' // Componente para mostrar los productos
-import { OrderForm } from '@/components/order/OrderForm' // Componente para el formulario de pedido
-import { CartSummary } from '@/components/order/CartSummary' // Un nuevo componente para mostrar el resumen del carrito
+
+// --- Rutas de importación corregidas ---
+// ProductList se importa desde su ubicación en la carpeta 'menu'
+import { ProductList } from '@/app/restaurant/[id]/menu/components/ProductList'
+// OrderForm y CartSummary se importan desde su nueva ubicación dentro de '@/components/order'
+import { OrderForm } from '@/components/order/OrderForm'
+import { CartSummary } from '@/components/order/CartSummary'
+// ------------------------------------
 
 export default function OrderPage() {
   const params = useParams()
-  // El ID del restaurante viene de la URL, por ejemplo, de /restaurant/123/order
-  // Asegúrate de que 'id' coincida con el nombre de tu carpeta dinámica [id]
   const establishmentId = params.id
 
-  // Convertir el ID a número si es necesario (para pasarlo a funciones o APIs que lo esperan numérico)
   const numericEstablishmentId = establishmentId ? parseInt(establishmentId as string) : null
 
   if (numericEstablishmentId === null || isNaN(numericEstablishmentId)) {
-    // Manejar el caso donde el ID del restaurante no es válido o no está presente
     return (
-      <div className="flex items-center justify-center min-h-screen text-red-500">
-        ID de restaurante no válido. Por favor, escanee el QR correcto.
+      <div className="flex items-center justify-center min-h-screen bg-red-100 text-red-700 p-4 rounded-md shadow-md">
+        <p className="text-lg font-medium">
+          Error: ID de restaurante no válido. Por favor, asegúrese de usar un enlace o QR correcto.
+        </p>
       </div>
     )
   }
 
   return (
-    // Envuelve toda la página con el OrderProvider para que ProductList y OrderForm
-    // puedan acceder al contexto del carrito
     <OrderProvider>
       <div className="container mx-auto p-4 md:flex md:space-x-8">
         {/* Sección de la lista de productos */}
@@ -41,9 +42,8 @@ export default function OrderPage() {
         {/* Sección del resumen del carrito y formulario de pedido */}
         <div className="md:w-1/3 mt-8 md:mt-0 p-6 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-4 text-gray-700">Tu Pedido</h2>
-          <CartSummary /> {/* Muestra los ítems del carrito y el total */}
-          <OrderForm establishmentId={numericEstablishmentId} />{' '}
-          {/* Permite al cliente finalizar el pedido */}
+          <CartSummary />
+          <OrderForm establishmentId={numericEstablishmentId} />
         </div>
       </div>
     </OrderProvider>
