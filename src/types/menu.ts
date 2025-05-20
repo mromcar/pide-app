@@ -1,141 +1,250 @@
-import type {
-  Category as PrismaCategory,
-  Product as PrismaProduct,
-  ProductVariant as PrismaProductVariant,
-  ProductTranslation as PrismaProductTranslation,
-  ProductVariantTranslation as PrismaProductVariantTranslation,
-  Allergen as PrismaAllergen,
-  AllergenTranslation as PrismaAllergenTranslation,
-  ProductAllergen as PrismaProductAllergen,
-  Order as PrismaOrder,
-  OrderItem as PrismaOrderItem,
-  OrderStatusHistory as PrismaOrderStatusHistory,
-  User as PrismaUser,
-  Establishment as PrismaEstablishment,
-  Prisma,
-  UserRole,
-  OrderStatus,
-  OrderItemStatus
-} from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 
-// Re-export enums directly from Prisma
-export type { UserRole, OrderStatus, OrderItemStatus }
-
-// Define base Prisma types with relations
-type CategoryWithRelations = Prisma.CategoryGetPayload<{
-  include: {
-    CategoryTranslation: true // Changed from translations to match schema
-    products: {
-      include: {
-        ProductTranslation: true // Changed from translations to match schema
-        variants: {
-          include: {
-            ProductVariantTranslation: true // Changed from translations to match schema
-          }
-        }
-        allergens: {
-          include: {
-            allergen: {
-              include: {
-                AllergenTranslation: true // Changed from translations to match schema
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}>
-
-type ProductWithRelations = Prisma.ProductGetPayload<{
-  include: {
-    ProductTranslation: true // Changed from translations to match schema
-    variants: {
-      include: {
-        ProductVariantTranslation: true // Changed from translations to match schema
-      }
-    }
-    allergens: {
-      include: {
-        allergen: {
-          include: {
-            AllergenTranslation: true // Changed from translations to match schema
-          }
-        }
-      }
-    }
-  }
-}>
-
-// Database types (direct from Prisma)
-export type Category = CategoryWithRelations
-export type Product = ProductWithRelations
-export type ProductVariant = PrismaProductVariant & {
-  ProductVariantTranslation: ProductVariantTranslation[] // Changed from translations
+// Enums
+export enum UserRole {
+    client = 'client',
+    waiter = 'waiter',
+    cook = 'cook',
+    establishment_admin = 'establishment_admin',
+    general_admin = 'general_admin'
 }
 
-// Serialized types (for API/JSON responses)
-export type SerializedCategory = Omit<Category, 'price'> & {
-  products: SerializedProduct[]
-  CategoryTranslation: PrismaProductTranslation[] // Changed from translations
+export enum OrderStatus {
+    PENDING = 'PENDING',
+    PREPARING = 'PREPARING',
+    READY = 'READY',
+    DELIVERED = 'DELIVERED',
+    COMPLETED = 'COMPLETED',
+    CANCELLED = 'CANCELLED'
 }
 
-export type SerializedProduct = Omit<Product, 'price'> & {
-  variants: SerializedProductVariant[]
-  allergens: SerializedProductAllergen[]
-  ProductTranslation: PrismaProductTranslation[] // Changed from translations
+export enum OrderItemStatus {
+    PENDING = 'PENDING',
+    PREPARING = 'PREPARING',
+    READY = 'READY',
+    DELIVERED = 'DELIVERED',
+    CANCELLED = 'CANCELLED'
 }
 
-export type SerializedProductVariant = Omit<ProductVariant, 'price' | 'created_at' | 'updated_at'> & {
-  price: number // Convert Prisma.Decimal to number for JSON
-  created_at: string // ISO date string
-  updated_at: string // ISO date string
-  ProductVariantTranslation: PrismaProductVariantTranslation[] // Changed from translations
+// Base Translation Types
+export type CategoryTranslation = {
+    translation_id: number
+    category_id: number
+    language_code: string
+    name: string
 }
 
-export type SerializedProductAllergen = Omit<ProductAllergen, 'created_at' | 'updated_at'> & {
-  allergen: SerializedAllergen
-  created_at: string // ISO date string
-  updated_at: string // ISO date string
+export type ProductTranslation = {
+    translation_id: number
+    product_id: number
+    language_code: string
+    name: string
+    description: string | null
 }
 
-export type SerializedAllergen = Omit<Allergen, 'created_at' | 'updated_at'> & {
-  created_at: string // ISO date string
-  updated_at: string // ISO date string
-  AllergenTranslation: PrismaAllergenTranslation[] // Changed from translations
+export type ProductVariantTranslation = {
+    translation_id: number
+    variant_id: number
+    language_code: string
+    variant_description: string
 }
 
-// Order types with proper serialization
-export type SerializedOrderItem = Omit<OrderItem, 'price' | 'created_at' | 'updated_at'> & {
-  price: number // Convert Prisma.Decimal to number
-  created_at: string
-  updated_at: string
+export type AllergenTranslation = {
+    translation_id: number
+    allergen_id: number
+    language_code: string
+    name: string
+    description?: string | null
 }
 
-export type SerializedOrder = Omit<Order, 'total_amount' | 'created_at' | 'updated_at'> & {
-  items: SerializedOrderItem[]
-  total_amount: number // Convert Prisma.Decimal to number
-  created_at: string
-  updated_at: string
+// Main Entity Types (Representing the structure as returned by Prisma Client by default)
+export type Category = {
+    category_id: number
+    establishment_id: number
+    name: string
+    image_url: string | null
+    sort_order: number | null
+    is_active: boolean | null
+    translations: CategoryTranslation[]
+    products: Product[]
 }
 
-// Base types for database operations
-export type OrderItem = PrismaOrderItem
-export type Order = PrismaOrder & {
-  items: OrderItem[]
+export type Product = {
+    product_id: number
+    establishment_id: number
+    category_id: number
+    name: string
+    description: string | null
+    image_url: string | null
+    sort_order: number | null
+    is_active: boolean | null
+    translations: ProductTranslation[]
+    variants: ProductVariant[]
+    // Aquí, sin un 'include' anidado, Prisma devuelve solo ProductAllergen
+    allergens: ProductAllergen[]
 }
-export type OrderStatusHistory = PrismaOrderStatusHistory
 
-// User and Establishment types
-export type User = PrismaUser
-export type Establishment = PrismaEstablishment
+export type ProductVariant = {
+    variant_id: number
+    product_id: number
+    establishment_id: number
+    variant_description: string
+    price: Prisma.Decimal
+    sku: string | null
+    sort_order: number | null
+    is_active: boolean | null
+    translations: ProductVariantTranslation[] // Asegurado en schema.prisma
+}
 
-export type EstablishmentBasic = Pick<
-  PrismaEstablishment,
-  | 'establishment_id'
-  | 'name'
-  | 'description'
-  | 'website'
-  | 'is_active'
-  | 'accepts_orders'
->
+export type Allergen = {
+    allergen_id: number
+    code: string
+    name: string
+    description: string | null
+    icon_url: string | null
+    is_major_allergen: boolean
+    translations: AllergenTranslation[]
+}
+
+export type ProductAllergen = {
+    product_id: number
+    allergen_id: number
+    // Aquí no se incluye el objeto Allergen completo por defecto, se anidaría con include
+    // Si siempre lo necesitas, usa el tipo SerializedProductAllergen
+}
+
+// Serialized Types (Designed for API responses or transformed data)
+export type SerializedCategory = {
+    category_id: number
+    establishment_id: number
+    name: string
+    image_url: string | null
+    sort_order: number | null
+    is_active: boolean | null
+    translations: CategoryTranslation[]
+    products: SerializedProduct[]
+}
+
+export type SerializedProduct = {
+    product_id: number
+    establishment_id: number
+    category_id: number
+    name: string
+    description: string | null
+    image_url: string | null
+    sort_order: number | null
+    is_active: boolean | null
+    translations: ProductTranslation[]
+    variants: SerializedProductVariant[]
+    allergens: SerializedProductAllergen[] // Aquí sí se espera el Allergen completo
+}
+
+export type SerializedProductVariant = {
+    variant_id: number
+    product_id: number
+    establishment_id: number
+    variant_description: string
+    price: Prisma.Decimal
+    sku: string | null
+    sort_order: number | null
+    is_active: boolean | null
+    translations: ProductVariantTranslation[]
+}
+
+export type SerializedProductAllergen = {
+    product_id: number
+    allergen_id: number
+    allergen: SerializedAllergen // Incluye el objeto Allergen completo
+}
+
+export type SerializedAllergen = {
+    allergen_id: number
+    code: string
+    name: string
+    description: string | null
+    icon_url: string | null
+    is_major_allergen: boolean
+    translations: AllergenTranslation[]
+}
+
+// Order Related Types
+export type OrderItem = {
+    order_item_id: number
+    order_id: number
+    variant_id: number // Mapea a id_producto en DB, que es la variant_id para el item de pedido
+    quantity: number
+    unit_price: Prisma.Decimal
+    item_total_price: Prisma.Decimal | null
+    status: OrderItemStatus | null
+    notes: string | null
+}
+
+export type Order = {
+    order_id: number
+    establishment_id: number
+    client_user_id: number | null
+    waiter_user_id: number | null
+    table_number: string | null
+    status: OrderStatus
+    total_amount: Prisma.Decimal | null
+    payment_method: string | null
+    payment_status: string | null
+    order_type: string | null
+    notes: string | null
+    created_at: Date | null
+    updated_at: Date | null
+    items: OrderItem[]
+}
+
+export type OrderStatusHistory = {
+    history_id: number
+    order_id: number
+    status: OrderStatus
+    changed_by_user_id: number | null
+    changed_at: Date | null
+    notes: string | null
+}
+
+// User and Establishment Types
+export type User = {
+    user_id: number
+    role: UserRole
+    name: string | null
+    email: string
+    password_hash: string
+    establishment_id: number | null
+    created_at: Date | null
+    updated_at: Date | null
+}
+
+export type Establishment = {
+    establishment_id: number
+    name: string
+    tax_id: string | null
+    address: string | null
+    postal_code: string | null
+    city: string | null
+    phone1: string | null
+    phone2: string | null
+    billing_bank_details: string | null
+    payment_bank_details: string | null
+    contact_person: string | null
+    admin_user_id: number | null
+    description: string | null
+    website: string | null
+    is_active: boolean | null
+    accepts_orders: boolean
+    categories: Category[] // Añadidas para consistencia
+    products: Product[] // Añadidas para consistencia
+    variants: ProductVariant[] // Añadidas para consistencia
+    employees: User[] // Añadidas para consistencia
+}
+
+export type EstablishmentBasic = {
+    establishment_id: number
+    name: string
+    description: string | null
+    website: string | null
+    is_active: boolean | null
+    accepts_orders: boolean
+}

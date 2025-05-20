@@ -9,214 +9,214 @@ datasource db {
 }
 
 model User {
-  user_id          Int                  @id @default(autoincrement())
-  role             UserRole
-  name             String?              @db.VarChar(255)
-  email            String               @unique @db.VarChar(255)
-  password_hash    String               @db.VarChar(255)
-  establishment_id Int?
-  created_at       DateTime?            @default(now()) @db.Timestamp(6)
-  updated_at       DateTime?            @default(now()) @db.Timestamp(6)
-  manages          Establishment?       @relation("AdminEstablishment")
-  status_changes   OrderStatusHistory[] @relation("UserStatusChanges")
-  orders_placed    Order[]              @relation("ClientOrders")
-  orders_served    Order[]              @relation("WaiterOrders")
-  establishment    Establishment?       @relation("UserEstablishment", fields: [establishment_id], references: [establishment_id], onUpdate: NoAction, map: "fk_user_establishment")
+  user_id           Int                  @id @default(autoincrement()) @map("id_usuario")
+  role              UserRole             @map("rol")
+  name              String?              @db.VarChar(255) @map("nombre")
+  email             String               @unique @db.VarChar(255) @map("email")
+  password_hash     String               @db.VarChar(255) @map("contrasena")
+  establishment_id  Int?                 @map("id_establecimiento")
+  created_at        DateTime?            @default(now()) @db.Timestamp(6) @map("created_at") // Mantener si la columna es así
+  updated_at        DateTime?            @default(now()) @db.Timestamp(6) @map("updated_at") // Mantener si la columna es así
+  manages           Establishment?       @relation("AdminEstablishment")
+  status_changes    OrderStatusHistory[] @relation("UserStatusChanges")
+  orders_placed     Order[]              @relation("ClientOrders")
+  orders_served     Order[]              @relation("WaiterOrders")
+  establishment     Establishment?       @relation("UserEstablishment", fields: [establishment_id], references: [establishment_id], onUpdate: NoAction, map: "fk_user_establishment")
 
   @@index([email], map: "idx_users_email")
   @@index([establishment_id], map: "idx_users_establishment_id")
-  @@map("users")
+  @@map("usuarios") // Corregido el mapeo a la tabla
 }
 
 model Establishment {
-  establishment_id     Int              @id @default(autoincrement())
-  name                 String           @db.VarChar(255)
-  tax_id               String?          @unique @db.VarChar(20)
-  address              String?
-  postal_code          String?          @db.VarChar(10)
-  city                 String?          @db.VarChar(100)
-  phone1               String?          @db.VarChar(20)
-  phone2               String?          @db.VarChar(20)
-  billing_bank_details String?
-  payment_bank_details String?
-  contact_person       String?          @db.VarChar(255)
-  admin_user_id        Int?             @unique
-  description          String?
-  website              String?          @db.VarChar(255)
-  is_active            Boolean?         @default(true)
-  accepts_orders       Boolean          @default(true)
-  categories           Category[]
-  administrator        User?            @relation("AdminEstablishment", fields: [admin_user_id], references: [user_id], onUpdate: NoAction, map: "fk_establishment_admin")
-  orders               Order[]
-  variants             ProductVariant[]
-  products             Product[]
-  employees            User[]           @relation("UserEstablishment")
+  establishment_id      Int      @id @default(autoincrement()) @map("id_establecimiento")
+  name                  String   @db.VarChar(255) @map("nombre")
+  tax_id                String?  @unique @db.VarChar(20) @map("cif")
+  address               String?  @map("direccion")
+  postal_code           String?  @db.VarChar(10) @map("cp")
+  city                  String?  @db.VarChar(100) @map("ciudad")
+  phone1                String?  @db.VarChar(20) @map("telefono1")
+  phone2                String?  @db.VarChar(20) @map("telefono2")
+  billing_bank_details  String?  @map("datos_bancarios_cobro")
+  payment_bank_details  String?  @map("datos_bancarios_pago")
+  contact_person        String?  @db.VarChar(255) @map("contacto")
+  admin_user_id         Int?     @unique @map("id_administrador_establecimiento")
+  description           String?  @map("description") // Asumo que en BD se llama 'description' si es null
+  website               String?  @db.VarChar(255) @map("website") // Asumo que en BD se llama 'website'
+  is_active             Boolean? @default(true) @map("is_active") // Asumo que en BD se llama 'is_active'
+  accepts_orders        Boolean  @default(true) @map("accepts_orders") // Asumo que en BD se llama 'accepts_orders'
+  categories            Category[]
+  administrator         User?    @relation("AdminEstablishment", fields: [admin_user_id], references: [user_id], onUpdate: NoAction, map: "fk_establecimiento_admin")
+  orders                Order[]
+  variants              ProductVariant[]
+  products              Product[]
+  employees             User[]   @relation("UserEstablishment")
 
-  @@map("establishments")
+  @@map("establecimientos")
 }
 
 model Category {
-  category_id         Int                   @id @default(autoincrement())
-  establishment_id    Int
-  name                String                @db.VarChar(255)
-  image_url           String?               @db.VarChar(255)
-  sort_order          Int?                  @default(0)
-  is_active           Boolean?              @default(true)
-  establishment       Establishment         @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_category_establishment")
-  CategoryTranslation CategoryTranslation[]
+  category_id         Int                   @id @default(autoincrement()) @map("id_categoria")
+  establishment_id    Int                   @map("id_establecimiento")
+  name                String                @db.VarChar(255) @map("nombre")
+  image_url           String?               @db.VarChar(255) @map("imagen_url")
+  sort_order          Int?                  @default(0) @map("orden")
+  is_active           Boolean?              @default(true) @map("is_active") // Asumo columna 'is_active'
+  establishment       Establishment         @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_categoria_establecimiento")
+  translations        CategoryTranslation[]
   products            Product[]
 
   @@index([establishment_id], map: "idx_categories_establishment_id")
-  @@map("categories")
+  @@map("categorias")
 }
 
 model CategoryTranslation {
-  translation_id Int      @id @default(autoincrement())
-  category_id    Int
-  language_code  String   @db.VarChar(10)
-  name           String   @db.VarChar(255)
-  category       Category @relation(fields: [category_id], references: [category_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_category")
+  translation_id Int      @id @default(autoincrement()) @map("id_traduccion")
+  category_id    Int      @map("id_categoria")
+  language_code  String   @db.VarChar(10) @map("idioma")
+  name           String   @db.VarChar(255) @map("nombre")
+  category       Category @relation(fields: [category_id], references: [category_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_traduccion_categoria")
 
-  @@unique([category_id, language_code], map: "unique_category_language")
+  @@unique([category_id, language_code], map: "unique_categoria_idioma")
   @@index([category_id], map: "idx_category_translations_category_id")
   @@index([language_code], map: "idx_category_translations_language_code")
-  @@map("category_translations")
+  @@map("categorias_traducciones")
 }
 
 model Product {
-  product_id         Int                  @id @default(autoincrement())
-  establishment_id   Int
-  category_id        Int
-  name               String               @db.VarChar(255)
-  description        String?
-  image_url          String?              @db.VarChar(255)
-  sort_order         Int?                 @default(0)
-  is_active          Boolean?             @default(true)
-  allergens          ProductAllergen[]
-  ProductTranslation ProductTranslation[]
-  variants           ProductVariant[]
-  category           Category             @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "fk_product_category")
-  establishment      Establishment        @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_product_establishment")
+  product_id          Int                  @id @default(autoincrement()) @map("id_producto")
+  establishment_id    Int                  @map("id_establecimiento")
+  category_id         Int                  @map("id_categoria")
+  name                String               @db.VarChar(255) @map("nombre")
+  description         String?              @map("descripcion")
+  image_url           String?              @db.VarChar(255) @map("imagen_url")
+  sort_order          Int?                 @default(0) @map("orden")
+  is_active           Boolean?             @default(true) @map("is_active") // Asumo columna 'is_active'
+  allergens           ProductAllergen[]
+  translations        ProductTranslation[]
+  variants            ProductVariant[]
+  category            Category             @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "fk_product_categoria")
+  establishment       Establishment        @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_product_establecimiento")
 
   @@index([category_id], map: "idx_products_category_id")
   @@index([establishment_id], map: "idx_products_establishment_id")
   @@index([name], map: "idx_products_name")
-  @@map("products")
+  @@map("productos")
 }
 
 model ProductTranslation {
-  translation_id Int     @id @default(autoincrement())
-  product_id     Int
-  language_code  String  @db.VarChar(10)
-  name           String  @db.VarChar(255)
-  description    String?
-  product        Product @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_product")
+  translation_id Int      @id @default(autoincrement()) @map("id_traduccion")
+  product_id     Int      @map("id_producto")
+  language_code  String   @db.VarChar(10) @map("idioma")
+  name           String   @db.VarChar(255) @map("nombre")
+  description    String?  @map("descripcion")
+  product        Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_traduccion_producto")
 
-  @@unique([product_id, language_code], map: "unique_product_language")
+  @@unique([product_id, language_code], map: "unique_producto_idioma")
   @@index([language_code], map: "idx_product_translations_language_code")
   @@index([product_id], map: "idx_product_translations_product_id")
-  @@map("product_translations")
+  @@map("productos_traducciones")
 }
 
 model ProductVariant {
-  variant_id          Int                         @id @default(autoincrement())
-  product_id          Int
-  establishment_id    Int
-  variant_description String                      @db.VarChar(100)
-  price               Decimal                     @db.Decimal(10, 2)
-  sku                 String?                     @unique @db.VarChar(50)
-  sort_order          Int?                        @default(0)
-  is_active           Boolean?                    @default(true)
+  variant_id          Int                       @id @default(autoincrement()) @map("variant_id") // Asumo que el id de la variante en DB es 'variant_id' o 'id_variante'
+  product_id          Int                       @map("id_producto")
+  establishment_id    Int                       @map("id_establecimiento")
+  variant_description String                    @db.VarChar(100) @map("variant_description") // Asumo que en DB es 'variant_description'
+  price               Decimal                   @db.Decimal(10, 2) @map("price") // Asumo que en DB es 'price'
+  sku                 String?                   @unique @db.VarChar(50) @map("sku") // Asumo que en DB es 'sku'
+  sort_order          Int?                      @default(0) @map("sort_order") // Asumo que en DB es 'sort_order'
+  is_active           Boolean?                  @default(true) @map("is_active") // Asumo que en DB es 'is_active'
   orderItems          OrderItem[]
-  translations        ProductVariantTranslation[]
-  establishment       Establishment               @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_variant_establishment")
-  product             Product                     @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_variant_product")
+  translations        ProductVariantTranslation[] // <--- Añadido para que coincida con el tipo TypeScript
+  establishment       Establishment             @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_variant_establishment")
+  product             Product                   @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_variant_product")
 
   @@unique([product_id, variant_description], map: "unique_product_variant_description")
   @@index([establishment_id], map: "idx_product_variants_establishment_id")
   @@index([price], map: "idx_product_variants_price")
   @@index([product_id], map: "idx_product_variants_product_id")
-  @@map("product_variants")
+  @@map("product_variants") // Asumo que la tabla se llama 'product_variants'
 }
 
 model ProductVariantTranslation {
-  translation_id      Int            @id @default(autoincrement())
-  variant_id          Int
-  language_code       String         @db.VarChar(10)
-  variant_description String         @db.VarChar(255)
+  translation_id      Int            @id @default(autoincrement()) @map("translation_id") // Asumo columna 'translation_id'
+  variant_id          Int            @map("variant_id") // Asumo columna 'variant_id'
+  language_code       String         @db.VarChar(10) @map("language_code") // Asumo columna 'language_code'
+  variant_description String         @db.VarChar(255) @map("variant_description") // Asumo columna 'variant_description'
   variant             ProductVariant @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_variant")
 
   @@unique([variant_id, language_code], map: "unique_variant_language")
   @@index([language_code], map: "idx_product_variant_translations_language_code")
   @@index([variant_id], map: "idx_product_variant_translations_variant_id")
-  @@map("product_variant_translations")
+  @@map("product_variant_translations") // Asumo la tabla 'product_variant_translations'
 }
 
 model Order {
-  order_id         Int                  @id @default(autoincrement())
-  establishment_id Int
-  client_user_id   Int?
-  waiter_user_id   Int?
-  table_number     String?              @db.VarChar(20)
-  status           OrderStatus          @default(PENDING)
-  total_amount     Decimal?             @default(0.00) @db.Decimal(10, 2)
-  payment_method   String?              @db.VarChar(50)
-  payment_status   String?              @default("UNPAID") @db.VarChar(20)
-  order_type       String?              @db.VarChar(50)
-  notes            String?
-  created_at       DateTime?            @default(now()) @db.Timestamp(6)
-  updated_at       DateTime?            @default(now()) @db.Timestamp(6)
-  items            OrderItem[]
-  status_history   OrderStatusHistory[]
-  client           User?                @relation("ClientOrders", fields: [client_user_id], references: [user_id], onUpdate: NoAction, map: "fk_order_client")
-  establishment    Establishment        @relation(fields: [establishment_id], references: [establishment_id], onUpdate: NoAction, map: "fk_order_establishment")
-  waiter           User?                @relation("WaiterOrders", fields: [waiter_user_id], references: [user_id], onUpdate: NoAction, map: "fk_order_waiter")
+  order_id           Int                  @id @default(autoincrement()) @map("id_pedido")
+  establishment_id   Int                  @map("id_establecimiento")
+  client_user_id     Int?                 @map("id_cliente")
+  waiter_user_id     Int?                 @map("id_camarero") // Nuevo campo si lo necesitas en DB
+  table_number       String?              @db.VarChar(20) @map("numero_mesa") // Nuevo campo
+  status             OrderStatus          @default(PENDING) @map("estado")
+  total_amount       Decimal?             @default(0.00) @db.Decimal(10, 2) @map("total")
+  payment_method     String?              @db.VarChar(50) @map("metodo_pago")
+  payment_status     String?              @default("UNPAID") @db.VarChar(20) @map("payment_status") // Nuevo campo
+  order_type         String?              @db.VarChar(50) @map("tipo_pedido") // Nuevo campo
+  notes              String?              @map("notes") // Nuevo campo
+  created_at         DateTime?            @default(now()) @db.Timestamp(6) @map("fecha_hora")
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6) @map("updated_at") // Nuevo campo
+  items              OrderItem[]
+  status_history     OrderStatusHistory[]
+  client             User?                @relation("ClientOrders", fields: [client_user_id], references: [user_id], onUpdate: NoAction, map: "fk_pedido_cliente")
+  establishment      Establishment        @relation(fields: [establishment_id], references: [establishment_id], onUpdate: NoAction, map: "fk_pedido_establecimiento")
+  waiter             User?                @relation("WaiterOrders", fields: [waiter_user_id], references: [user_id], onUpdate: NoAction, map: "fk_order_waiter")
 
   @@index([client_user_id], map: "idx_orders_client_user_id")
   @@index([created_at], map: "idx_orders_created_at")
   @@index([establishment_id], map: "idx_orders_establishment_id")
-  @@map("orders")
+  @@map("pedidos")
 }
 
 model OrderItem {
-  order_item_id    Int              @id @default(autoincrement())
-  order_id         Int
-  variant_id       Int
-  quantity         Int              @default(1)
-  unit_price       Decimal          @db.Decimal(10, 2)
-  item_total_price Decimal?         @default(dbgenerated("((quantity)::numeric * unit_price)")) @db.Decimal(10, 2)
-  status           OrderItemStatus? @default(PENDING)
-  notes            String?
-  order            Order            @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_item_order")
-  variant          ProductVariant   @relation(fields: [variant_id], references: [variant_id], onUpdate: NoAction, map: "fk_item_variant")
+  order_item_id    Int              @id @default(autoincrement()) @map("id_detalle_pedido")
+  order_id         Int              @map("id_pedido")
+  variant_id       Int              @map("id_producto") // Esto mapea a 'id_producto' en tu DB, asumiendo que es el ID de la variante
+  quantity         Int              @default(1) @map("cantidad")
+  unit_price       Decimal          @db.Decimal(10, 2) @map("unit_price") // Nuevo campo si lo necesitas
+  item_total_price Decimal?         @default(dbgenerated("((quantity)::numeric * unit_price)")) @db.Decimal(10, 2) @map("item_total_price") // Nuevo campo
+  status           OrderItemStatus? @default(PENDING) @map("estado")
+  notes            String?          @map("especialidades") // Mapeado a 'especialidades'
+  order            Order            @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_detalle_pedido")
+  variant          ProductVariant   @relation(fields: [variant_id], references: [variant_id], onUpdate: NoAction, map: "fk_item_variant") // Mapeado a ProductVariant
 
   @@index([order_id], map: "idx_order_items_order_id")
   @@index([variant_id], map: "idx_order_items_variant_id")
-  @@map("order_items")
+  @@map("detallespedido")
 }
 
 model OrderStatusHistory {
-  history_id         Int         @id @default(autoincrement())
-  order_id           Int
-  status             OrderStatus
-  changed_by_user_id Int?
-  changed_at         DateTime?   @default(now()) @db.Timestamp(6)
-  notes              String?
-  order              Order       @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_history_order")
-  changed_by         User?       @relation("UserStatusChanges", fields: [changed_by_user_id], references: [user_id], onUpdate: NoAction, map: "fk_history_user_status_changes")
+  history_id         Int         @id @default(autoincrement()) @map("id_estado_pedido")
+  order_id           Int         @map("id_pedido")
+  status             OrderStatus @map("estado")
+  changed_by_user_id Int?        @map("id_usuario")
+  changed_at         DateTime?   @default(now()) @db.Timestamp(6) @map("fecha_hora")
+  notes              String?     @map("notes") // Nuevo campo
+  order              Order       @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_estado_pedido")
+  changed_by         User?       @relation("UserStatusChanges", fields: [changed_by_user_id], references: [user_id], onUpdate: NoAction, map: "fk_estado_usuario")
 
   @@index([changed_at], map: "idx_order_status_history_changed_at")
   @@index([order_id], map: "idx_order_status_history_order_id")
-  @@map("order_status_history")
+  @@map("estadospedido")
 }
 
 model Allergen {
-  allergen_id       Int                   @id @default(autoincrement())
-  code              String                @unique @db.VarChar(20)
-  name              String                @db.VarChar(100)
-  description       String?
-  icon_url          String?               @db.VarChar(255)
-  is_major_allergen Boolean?              @default(true)
+  allergen_id       Int                 @id @default(autoincrement()) @map("allergen_id") // Asumo columna 'allergen_id'
+  code              String              @unique @db.VarChar(20) @map("code") // Asumo columna 'code'
+  name              String              @db.VarChar(100) @map("name") // Asumo columna 'name'
+  description       String?             @map("description") // Asumo columna 'description'
+  icon_url          String?             @db.VarChar(255) @map("icon_url") // Asumo columna 'icon_url'
+  is_major_allergen Boolean?            @default(true) @map("is_major_allergen") // Asumo columna 'is_major_allergen'
   translations      AllergenTranslation[]
   products          ProductAllergen[]
 
@@ -225,11 +225,11 @@ model Allergen {
 }
 
 model AllergenTranslation {
-  translation_id Int      @id @default(autoincrement())
-  allergen_id    Int
-  language_code  String   @db.VarChar(10)
-  name           String   @db.VarChar(100)
-  description    String?
+  translation_id Int      @id @default(autoincrement()) @map("translation_id") // Asumo columna 'translation_id'
+  allergen_id    Int      @map("allergen_id") // Asumo columna 'allergen_id'
+  language_code  String   @db.VarChar(10) @map("language_code") // Asumo columna 'language_code'
+  name           String   @db.VarChar(100) @map("name") // Asumo columna 'name'
+  description    String?  @map("description") // Asumo columna 'description'
   allergen       Allergen @relation(fields: [allergen_id], references: [allergen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_allergen")
 
   @@unique([allergen_id, language_code], map: "unique_allergen_language")
@@ -239,10 +239,10 @@ model AllergenTranslation {
 }
 
 model ProductAllergen {
-  product_id  Int
-  allergen_id Int
+  product_id  Int     @map("product_id")
+  allergen_id Int     @map("allergen_id")
   allergen    Allergen @relation(fields: [allergen_id], references: [allergen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_allergen")
-  product     Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_product")
+  product     Product @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_product")
 
   @@id([product_id, allergen_id], map: "pk_product_allergen")
   @@index([allergen_id], map: "idx_product_allergens_allergen_id")
@@ -251,26 +251,26 @@ model ProductAllergen {
 }
 
 enum UserRole {
-  client
-  waiter
-  cook
+  client          @map("cliente")
+  waiter          @map("camarero")
+  cook            @map("cocinero")
   establishment_admin
   general_admin
 }
 
 enum OrderStatus {
-  PENDING
-  PREPARING
-  READY
-  DELIVERED
-  COMPLETED
-  CANCELLED
+  PENDING        @map("PENDIENTE")
+  PREPARING      @map("EN_PREPARACION")
+  READY          @map("LISTO")
+  DELIVERED      @map("ENTREGADO")
+  COMPLETED      @map("COMPLETADO")
+  CANCELLED      @map("CANCELADO")
 }
 
 enum OrderItemStatus {
-  PENDING
-  PREPARING
-  READY
-  DELIVERED
-  CANCELLED
+  PENDING        @map("PENDIENTE")
+  PREPARING      @map("EN_PREPARACION")
+  READY          @map("LISTO")
+  DELIVERED      @map("ENTREGADO")
+  CANCELLED      @map("CANCELADO")
 }
