@@ -1,5 +1,5 @@
 // src/services/product-service.ts
-import prisma from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 import type { Product, ProductVariant } from '@prisma/client';
 import type { CreateProductDTO, UpdateProductDTO, CreateProductVariantDTO, UpdateProductVariantDTO } from '../types/dtos/product';
 

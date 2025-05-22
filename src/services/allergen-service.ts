@@ -1,7 +1,7 @@
 // src/services/allergen-service.ts
-import prisma from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 import type { Allergen } from '@prisma/client';
-import type { CreateAllergenDTO, UpdateAllergenDTO } from '../types/dtos/product'; // Usando los DTOs de product.ts si están allí
+import type { CreateAllergenDTO, UpdateAllergenDTO } from '../types/dtos/allergen'; // Usando los DTOs de product.ts si están allí
 
 export const allergenService = {
   async createAllergen(data: CreateAllergenDTO): Promise<Allergen> {

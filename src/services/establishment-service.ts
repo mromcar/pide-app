@@ -1,5 +1,5 @@
 // src/services/establishment-service.ts
-import prisma from '../lib/prisma'; // Ajusta esta ruta si es necesario
+import { prisma } from '../lib/prisma';
 import type { Establishment } from '@prisma/client'; // Importa el tipo generado por Prisma
 import type { CreateEstablishmentDTO, UpdateEstablishmentDTO } from '../types/dtos/establishment'; // Asumiendo que crearás estos DTOs
 import { createEstablishmentSchema, updateEstablishmentSchema } from '../schemas/establishment'; // Asumiendo que crearás estos schemas

@@ -1,7 +1,12 @@
 // src/schemas/order.ts
 import { z } from 'zod';
 import { OrderStatus, OrderItemStatus } from '../types/enums'; // Asegúrate que la ruta sea correcta
-import { idSchema, optionalString } from './common';
+import { idSchema } from './common';
+
+// Utilidades reutilizables
+export const optionalString = z.string().optional().nullable();
+export const optionalStringMax20 = z.string().max(20).optional().nullable();
+export const optionalStringMax50 = z.string().max(50).optional().nullable();
 
 // Esquema para un Ítem de Pedido (al crear un pedido)
 export const createOrderItemSchema = z.object({
@@ -11,7 +16,6 @@ export const createOrderItemSchema = z.object({
   // but if the client must send it, it needs validation.
   // unitPrice: z.number().positive("Unit price must be positive"), // Consider if client sends this
   notes: optionalString,
-  // status will default to PENDING in the DB or can be set here
 });
 export type CreateOrderItemInput = z.infer<typeof createOrderItemSchema>;
 
@@ -20,11 +24,11 @@ export const createOrderSchema = z.object({
   establishmentId: idSchema,
   clientUserId: idSchema.optional().nullable(),
   waiterUserId: idSchema.optional().nullable(),
-  tableNumber: optionalString.max(20),
+  tableNumber: optionalStringMax20,
   status: z.nativeEnum(OrderStatus).default(OrderStatus.PENDING).optional(),
-  paymentMethod: optionalString.max(50),
+  paymentMethod: optionalStringMax50,
   paymentStatus: z.string().max(20).default('UNPAID').optional(),
-  orderType: optionalString.max(50),
+  orderType: optionalStringMax50,
   notes: optionalString,
   items: z.array(createOrderItemSchema).min(1, "Order must have at least one item"),
 });
@@ -32,8 +36,7 @@ export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 
 // Esquema para actualizar un Ítem de Pedido (cuando se actualiza un pedido)
 export const updateOrderItemSchema = createOrderItemSchema.partial().extend({
-  orderItemId: idSchema.optional(), // Para identificar ítems existentes
-  // unitPrice: z.number().positive().optional(), // Si se permite actualizar
+  orderItemId: idSchema.optional(),
   status: z.nativeEnum(OrderItemStatus).optional(),
 });
 export type UpdateOrderItemInput = z.infer<typeof updateOrderItemSchema>;
@@ -42,18 +45,12 @@ export type UpdateOrderItemInput = z.infer<typeof updateOrderItemSchema>;
 export const updateOrderSchema = z.object({
   clientUserId: idSchema.optional().nullable(),
   waiterUserId: idSchema.optional().nullable(),
-  tableNumber: optionalString.max(20),
+  tableNumber: optionalStringMax20,
   status: z.nativeEnum(OrderStatus).optional(),
-  paymentMethod: optionalString.max(50),
+  paymentMethod: optionalStringMax50,
   paymentStatus: z.string().max(20).optional(),
-  orderType: optionalString.max(50),
+  orderType: optionalStringMax50,
   notes: optionalString,
-  // Para actualizar ítems:
-  // - addItems: z.array(createOrderItemSchema).optional()
-  // - updateItems: z.array(updateOrderItemSchema.extend({ orderItemId: idSchema })).optional()
-  // - removeItems: z.array(idSchema).optional() // Array of orderItemIds to remove
-  // Simplificado: reemplazar ítems o manejar lógica de diff en el servicio.
-  // A continuación un ejemplo simple donde se reemplaza o se actualizan los existentes por id
   items: z.array(updateOrderItemSchema).optional(),
 });
 export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
@@ -61,7 +58,6 @@ export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
 // Esquema para actualizar solo el estado de un Pedido
 export const updateOrderStatusSchema = z.object({
   status: z.nativeEnum(OrderStatus),
-  // changedByUserId: idSchema.optional().nullable(), // El backend podría inferirlo del usuario autenticado
   notes: optionalString,
 });
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>;
@@ -81,6 +77,6 @@ export type OrderIdParam = z.infer<typeof orderIdParamSchema>;
 
 export const orderItemIdParamSchema = z.object({
   orderId: z.coerce.number().int().positive(),
-  itemId: z.coerce.number().int().positive(), // o orderItemId
+  itemId: z.coerce.number().int().positive(),
 });
 export type OrderItemIdParam = z.infer<typeof orderItemIdParamSchema>;

@@ -1,7 +1,7 @@
 // src/services/category-service.ts
-import prisma from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 import type { Category } from '@prisma/client';
-import type { CreateCategoryDTO, UpdateCategoryDTO } from '../types/dtos/product'; // Usando los DTOs de product.ts si están allí
+import type { CreateCategoryDTO, UpdateCategoryDTO } from '../types/dtos/category'; // Usando los DTOs de product.ts si están allí
 
 export const categoryService = {
   async createCategory(data: CreateCategoryDTO): Promise<Category> {

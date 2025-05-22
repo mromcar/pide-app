@@ -1,8 +1,8 @@
-//src/app/api/client/orders/[orderId]/route.ts
+//src/app/api/products/route.ts
 
 import { requireAuth } from "@/middleware/auth-middleware"
-import { categoryService } from "@/services/category-service"
-import { createCategorySchema } from "@/schemas/category"
+import { productService } from "@/services/product-service"
+import { createProductSchema } from "@/schemas/product"
 import { jsonOk, jsonError } from "@/utils/api"
 
 export async function GET(request: Request) {
@@ -11,11 +11,11 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const language = searchParams.get('lang') || 'es'
 
-    const categories = await categoryService.getAllCategories(
+    const products = await productService.getAllProducts(
       session.user.establishment_id,
       language
     )
-    return jsonOk({ categories })
+    return jsonOk({ products })
   } catch (error) {
     return jsonError(error.message)
   }
@@ -25,13 +25,13 @@ export async function POST(request: Request) {
   try {
     const session = await requireAuth('ADMIN')
     const body = await request.json()
-    const validatedData = createCategorySchema.parse(body)
+    const validatedData = createProductSchema.parse(body)
 
-    const category = await categoryService.createCategory({
+    const product = await productService.createProduct({
       ...validatedData,
       establishment_id: session.user.establishment_id
     })
-    return jsonOk({ category })
+    return jsonOk({ product })
   } catch (error) {
     return jsonError(error.message)
   }

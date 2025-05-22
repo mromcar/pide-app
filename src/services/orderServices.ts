@@ -1,5 +1,5 @@
 // src/services/order-service.ts
-import prisma from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 import type { Order, OrderItem, OrderStatusHistory } from '@prisma/client';
 import type { CreateOrderDTO, UpdateOrderDTO, UpdateOrderStatusDTO, CreateOrderItemDTO, UpdateOrderItemStatusDTO } from '../types/dtos/order';
 import { OrderStatus, OrderItemStatus } from '../types/enums'; // Necesario para validación/lógica

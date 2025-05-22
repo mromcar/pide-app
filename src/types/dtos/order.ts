@@ -8,9 +8,8 @@ import {
   updateOrderItemSchema,
   updateOrderItemStatusSchema,
   orderIdParamSchema,
-  orderItemIdParamSchema
+  orderItemIdParamSchema,
 } from '../../schemas/order';
-
 // Tipos inferidos de los esquemas Zod para el cuerpo de la solicitud (request body)
 export type CreateOrderDTO = z.infer<typeof createOrderSchema>;
 export type UpdateOrderDTO = z.infer<typeof updateOrderSchema>;
