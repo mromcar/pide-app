@@ -9,7 +9,6 @@ import type {
   UpdateOrderItemStatusDTO
 } from '../types/dtos/order';
 import { OrderStatus, OrderItemStatus } from '../types/enums';
-import { toSnakeCase } from '@/utils/case';
 
 export const orderService = {
   async createOrder(data: CreateOrderDTO, userIdMakingChange?: number): Promise<Order> {
@@ -17,12 +16,12 @@ export const orderService = {
 
     // Obtener precios de variantes desde la BD para seguridad y consistencia
     const variantIds = items.map(item => item.variantId);
-    const variantsFromDb = await prisma.product_variant.findMany({
-      where: { variant_id: { in: variantIds } },
-      select: { variant_id: true, price: true },
+    const variantsFromDb = await prisma.productVariant.findMany({
+      where: { id: { in: variantIds } },
+      select: { id: true, price: true },
     });
 
-    const variantPriceMap = new Map(variantsFromDb.map(v => [v.variant_id, v.price]));
+    const variantPriceMap = new Map(variantsFromDb.map(v => [v.id, v.price]));
 
     let calculatedTotalAmount = 0;
 
@@ -34,9 +33,9 @@ export const orderService = {
       const itemTotal = Number(price) * item.quantity;
       calculatedTotalAmount += itemTotal;
       return {
-        variant_id: item.variantId,
+        variantId: item.variantId,
         quantity: item.quantity,
-        unit_price: price,
+        unitPrice: price,
         status: item.status || OrderItemStatus.PENDING,
         notes: item.notes,
       };
@@ -44,14 +43,14 @@ export const orderService = {
 
     return prisma.order.create({
       data: {
-        ...toSnakeCase(orderData),
+        ...orderData, // camelCase aquí
         items: {
           create: orderItemsData,
         },
       },
       include: {
         items: { include: { variant: { include: { translations: true, product: { include: { translations: true } } } } } },
-        status_history: { orderBy: { changed_at: 'asc' } },
+        statusHistory: { orderBy: { changedAt: 'asc' } },
         client: true,
         waiter: true,
         establishment: true,
@@ -61,7 +60,7 @@ export const orderService = {
 
   async getOrderById(orderId: number): Promise<Order | null> {
     return prisma.order.findUnique({
-      where: { order_id: orderId },
+      where: { id: orderId },
       include: {
         items: {
           include: {
@@ -72,30 +71,30 @@ export const orderService = {
               },
             },
           },
-          orderBy: { order_item_id: 'asc' }
+          orderBy: { id: 'asc' }
         },
-        status_history: {
-          orderBy: { changed_at: 'desc' },
-          include: { changed_by: { select: { user_id: true, name: true, role: true } } },
+        statusHistory: {
+          orderBy: { changedAt: 'desc' },
+          include: { changedBy: { select: { id: true, name: true, role: true } } },
         },
-        client: { select: { user_id: true, name: true, email: true } },
-        waiter: { select: { user_id: true, name: true, email: true } },
-        establishment: { select: { establishment_id: true, name: true } },
+        client: { select: { id: true, name: true, email: true } },
+        waiter: { select: { id: true, name: true, email: true } },
+        establishment: { select: { id: true, name: true } },
       },
     });
   },
 
   async getOrdersByEstablishment(
     establishmentId: number,
-    options?: { status?: OrderStatus[], clientUserId?: number, waiterUserId?: number, dateFrom?: Date, dateTo?: Date, page?: number, limit?: number }
+    options?: { status?: OrderStatus[], clientId?: number, waiterId?: number, dateFrom?: Date, dateTo?: Date, page?: number, limit?: number }
   ): Promise<{ orders: Order[], totalCount: number }> {
     const { page = 1, limit = 10, ...filters } = options || {};
     const whereClause = {
-      establishment_id: establishmentId,
+      establishmentId,
       status: filters.status ? { in: filters.status } : undefined,
-      client_user_id: filters.clientUserId,
-      waiter_user_id: filters.waiterUserId,
-      created_at: {
+      clientId: filters.clientId,
+      waiterId: filters.waiterId,
+      createdAt: {
         gte: filters.dateFrom,
         lte: filters.dateTo,
       }
@@ -104,12 +103,12 @@ export const orderService = {
     const orders = await prisma.order.findMany({
       where: whereClause,
       include: {
-        items: { select: { order_item_id: true, variant: { select: { variant_description: true, product: { select: { name: true } } } }, quantity: true, item_total_price: true, status: true } },
+        items: { select: { id: true, variant: { select: { variantDescription: true, product: { select: { name: true } } } }, quantity: true, unitPrice: true, status: true } },
         client: { select: { name: true } },
         waiter: { select: { name: true } },
       },
       orderBy: {
-        created_at: 'desc',
+        createdAt: 'desc',
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -121,17 +120,17 @@ export const orderService = {
   async updateOrderStatus(orderId: number, data: UpdateOrderStatusDTO, changedByUserId?: number): Promise<Order | null> {
     return prisma.$transaction(async (tx) => {
       const updatedOrder = await tx.order.update({
-        where: { order_id: orderId },
+        where: { id: orderId },
         data: {
           status: data.status,
         },
       });
 
-      await tx.order_status_history.create({
+      await tx.orderStatusHistory.create({
         data: {
-          order_id: orderId,
+          orderId,
           status: data.status,
-          changed_by_user_id: changedByUserId,
+          changedByUserId,
           notes: data.notes,
         },
       });
@@ -140,8 +139,8 @@ export const orderService = {
   },
 
   async updateOrderItemStatus(orderItemId: number, data: UpdateOrderItemStatusDTO, changedByUserId?: number): Promise<OrderItem | null> {
-    return prisma.order_item.update({
-      where: { order_item_id: orderItemId },
+    return prisma.orderItem.update({
+      where: { id: orderItemId },
       data: {
         status: data.status,
         notes: data.notes,
@@ -153,23 +152,23 @@ export const orderService = {
     const { items, status, ...orderData } = data;
 
     return prisma.$transaction(async (tx) => {
-      const currentOrder = await tx.order.findUnique({ where: { order_id: orderId } });
+      const currentOrder = await tx.order.findUnique({ where: { id: orderId } });
       if (!currentOrder) throw new Error("Order not found");
 
       const updatedOrder = await tx.order.update({
-        where: { order_id: orderId },
+        where: { id: orderId },
         data: {
-          ...toSnakeCase(orderData),
+          ...orderData,
           ...(status && status !== currentOrder.status ? { status: status } : {})
         }
       });
 
       if (status && status !== currentOrder.status) {
-        await tx.order_status_history.create({
+        await tx.orderStatusHistory.create({
           data: {
-            order_id: orderId,
+            orderId,
             status: status,
-            changed_by_user_id: changedByUserId,
+            changedByUserId,
             notes: `Order details updated. Status changed to ${status}.`,
           },
         });
@@ -178,24 +177,24 @@ export const orderService = {
       // Aquí deberías implementar la lógica para actualizar los items si es necesario
 
       return tx.order.findUnique({
-        where: { order_id: orderId },
-        include: { items: true, status_history: true, client: true, waiter: true }
+        where: { id: orderId },
+        include: { items: true, statusHistory: true, client: true, waiter: true }
       });
     });
   },
 
   async addItemToOrder(orderId: number, itemData: CreateOrderItemDTO): Promise<OrderItem | null> {
-    const variant = await prisma.product_variant.findUnique({ where: { variant_id: itemData.variantId } });
+    const variant = await prisma.productVariant.findUnique({ where: { id: itemData.variantId } });
     if (!variant) throw new Error(`Variant ${itemData.variantId} not found.`);
     if (typeof itemData.quantity !== 'number' || itemData.quantity <= 0) {
       throw new Error('Quantity must be a positive number.');
     }
-    return prisma.order_item.create({
+    return prisma.orderItem.create({
       data: {
-        order_id: orderId,
-        variant_id: itemData.variantId,
+        orderId,
+        variantId: itemData.variantId,
         quantity: itemData.quantity,
-        unit_price: variant.price,
+        unitPrice: variant.price,
         status: itemData.status || OrderItemStatus.PENDING,
         notes: itemData.notes,
       },
@@ -203,11 +202,11 @@ export const orderService = {
   },
 
   async updateOrderItem(orderItemId: number, data: { quantity?: number, notes?: string }): Promise<OrderItem | null> {
-    const item = await prisma.order_item.findUnique({ where: { order_item_id: orderItemId }, select: { unit_price: true } });
+    const item = await prisma.orderItem.findUnique({ where: { id: orderItemId }, select: { unitPrice: true } });
     if (!item) throw new Error("Order item not found.");
 
-    return prisma.order_item.update({
-      where: { order_item_id: orderItemId },
+    return prisma.orderItem.update({
+      where: { id: orderItemId },
       data: {
         quantity: data.quantity,
         notes: data.notes,
@@ -216,8 +215,8 @@ export const orderService = {
   },
 
   async removeOrderItem(orderItemId: number): Promise<OrderItem | null> {
-    return prisma.order_item.delete({
-      where: { order_item_id: orderItemId }
+    return prisma.orderItem.delete({
+      where: { id: orderItemId }
     });
   }
 };

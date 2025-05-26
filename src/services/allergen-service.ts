@@ -3,12 +3,21 @@ import { prisma } from '../lib/prisma';
 import type { Allergen } from '@prisma/client';
 import type { CreateAllergenDTO, UpdateAllergenDTO, AllergenTranslationDTO } from '../types/dtos/allergen';
 import { toSnakeCase } from '@/utils/case';
-import { allergenTranslationSchema } from '../schemas/allergen';
 
-function cleanAllergenTranslation(t: AllergenTranslationDTO, allergenId?: number) {
+// Para createMany en relación (NO incluir allergenId)
+function cleanAllergenTranslation(t: AllergenTranslationDTO) {
   return {
-    ...(allergenId ? { allergen_id: allergenId } : {}),
-    language_code: t.languageCode,
+    languageCode: t.languageCode,
+    name: t.name,
+    description: typeof t.description === 'string' ? t.description : null,
+  };
+}
+
+// Para createMany directo sobre el modelo (SÍ incluir allergenId)
+function cleanAllergenTranslationWithId(t: AllergenTranslationDTO, allergenId: number) {
+  return {
+    allergenId,
+    languageCode: t.languageCode,
     name: t.name,
     description: typeof t.description === 'string' ? t.description : null,
   };
@@ -18,7 +27,7 @@ export async function createAllergen(data: CreateAllergenDTO): Promise<Allergen>
   const { translations, ...allergenData } = data;
   return prisma.allergen.create({
     data: {
-      ...toSnakeCase(allergenData),
+      ...allergenData, // Usa camelCase aquí, no toSnakeCase
       translations: translations && translations.length > 0
         ? {
           createMany: {
@@ -39,7 +48,7 @@ export async function getAllAllergens(establishmentId: number): Promise<Allergen
       products: {
         some: {
           product: {
-            establishment_id: establishmentId
+            establishmentId
           }
         }
       }
@@ -55,7 +64,7 @@ export async function getAllAllergens(establishmentId: number): Promise<Allergen
 
 export async function getAllergenById(allergenId: number): Promise<Allergen | null> {
   return prisma.allergen.findUnique({
-    where: { allergen_id: allergenId },
+    where: { id: allergenId },
     include: {
       translations: true,
     },
@@ -70,20 +79,20 @@ export async function updateAllergen(
 
   return prisma.$transaction(async (tx) => {
     await tx.allergen.update({
-      where: { allergen_id: allergenId },
-      data: toSnakeCase(allergenData),
+      where: { id: allergenId },
+      data: allergenData, // Usa camelCase aquí
     });
 
     if (translations) {
-      await tx.allergenTranslation.deleteMany({ where: { allergen_id: allergenId } });
+      await tx.allergenTranslation.deleteMany({ where: { allergenId } });
       if (translations.length > 0) {
         await tx.allergenTranslation.createMany({
-          data: translations.map((t: AllergenTranslationDTO) => cleanAllergenTranslation(t, allergenId)),
+          data: translations.map((t: AllergenTranslationDTO) => cleanAllergenTranslationWithId(t, allergenId)),
         });
       }
     }
     return tx.allergen.findUnique({
-      where: { allergen_id: allergenId },
+      where: { id: allergenId },
       include: { translations: true }
     });
   });
@@ -91,6 +100,6 @@ export async function updateAllergen(
 
 export async function deleteAllergen(allergenId: number): Promise<Allergen | null> {
   return prisma.allergen.delete({
-    where: { allergen_id: allergenId },
+    where: { id: allergenId },
   });
 }

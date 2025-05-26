@@ -2,15 +2,12 @@
 import { prisma } from '../lib/prisma';
 import type { Category } from '@prisma/client';
 import type { CreateCategoryDTO, UpdateCategoryDTO } from '../types/dtos/category';
-import { toSnakeCase } from '@/utils/case';
 
-
-
+// Función de limpieza para traducciones (camelCase, como espera Prisma Client)
 function cleanCategoryTranslation(t: any, categoryId?: number) {
-  // Recibe camelCase, devuelve snake_case
   return {
-    ...(categoryId ? { category_id: categoryId } : {}),
-    language_code: t.languageCode,
+    ...(categoryId ? { categoryId } : {}),
+    languageCode: t.languageCode,
     name: t.name,
     ...(typeof t.description === 'string' ? { description: t.description } : {}),
   };
@@ -21,7 +18,7 @@ export async function createCategory(data: CreateCategoryDTO): Promise<Category>
   const { translations, ...categoryData } = data;
   return prisma.category.create({
     data: {
-      ...toSnakeCase(categoryData),
+      ...categoryData, // camelCase aquí
       translations: translations && translations.length > 0
         ? {
           createMany: {
@@ -38,34 +35,34 @@ export async function createCategory(data: CreateCategoryDTO): Promise<Category>
 
 // Obtener todas las categorías de un restaurante
 export async function getCategoriesByEstablishment(
-  establishment_id: number,
-  options?: { is_active?: boolean }
+  establishmentId: number,
+  options?: { isActive?: boolean }
 ): Promise<Category[]> {
   return prisma.category.findMany({
     where: {
-      establishment_id,
-      is_active: options?.is_active,
+      establishmentId,
+      isActive: options?.isActive,
     },
     include: {
       translations: true,
       _count: { select: { products: true } }
     },
     orderBy: {
-      sort_order: 'asc',
+      sortOrder: 'asc',
     },
   });
 }
 
 // Obtener una categoría por ID
-export async function getCategoryById(category_id: number): Promise<Category | null> {
+export async function getCategoryById(categoryId: number): Promise<Category | null> {
   return prisma.category.findUnique({
-    where: { category_id },
+    where: { categoryId },
     include: {
       translations: true,
       products: {
-        where: { is_active: true },
+        where: { isActive: true },
         include: {
-          variants: { where: { is_active: true } },
+          variants: { where: { isActive: true } },
           translations: true,
         }
       }
@@ -75,29 +72,29 @@ export async function getCategoryById(category_id: number): Promise<Category | n
 
 // Actualizar categoría
 export async function updateCategory(
-  category_id: number,
-  establishment_id: number,
+  categoryId: number,
+  establishmentId: number,
   data: UpdateCategoryDTO
 ): Promise<Category | null> {
   const { translations, ...categoryData } = data;
 
   return prisma.$transaction(async (tx) => {
     await tx.category.update({
-      where: { category_id, establishment_id },
-      data: toSnakeCase(categoryData),
+      where: { categoryId, establishmentId },
+      data: categoryData, // camelCase aquí
     });
 
     if (translations) {
-      await tx.categoryTranslation.deleteMany({ where: { category_id } });
+      await tx.categoryTranslation.deleteMany({ where: { categoryId } });
       if (translations.length > 0) {
         await tx.categoryTranslation.createMany({
-          data: translations.map(t => cleanCategoryTranslation(t, category_id)),
+          data: translations.map(t => cleanCategoryTranslation(t, categoryId)),
         });
       }
     }
 
     return tx.category.findUnique({
-      where: { category_id, establishment_id },
+      where: { categoryId, establishmentId },
       include: { translations: true }
     });
   });
@@ -105,10 +102,10 @@ export async function updateCategory(
 
 // Eliminar categoría
 export async function deleteCategory(
-  category_id: number,
-  establishment_id: number
+  categoryId: number,
+  establishmentId: number
 ): Promise<Category | null> {
   return prisma.category.delete({
-    where: { category_id, establishment_id },
+    where: { categoryId, establishmentId },
   });
 }

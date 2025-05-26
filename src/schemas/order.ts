@@ -1,6 +1,6 @@
 // src/schemas/order.ts
 import { z } from 'zod';
-import { OrderStatus, OrderItemStatus } from '../types/enums'; // Asegúrate que la ruta sea correcta
+import { OrderStatus, OrderItemStatus } from '../types/enums';
 import { idSchema } from './common';
 
 // Utilidades reutilizables
@@ -12,10 +12,8 @@ export const optionalStringMax50 = z.string().max(50).optional().nullable();
 export const createOrderItemSchema = z.object({
   variantId: idSchema,
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
-  // unitPrice should ideally be fetched server-side based on variantId for security and accuracy,
-  // but if the client must send it, it needs validation.
-  // unitPrice: z.number().positive("Unit price must be positive"), // Consider if client sends this
   notes: optionalString,
+  status: z.nativeEnum(OrderItemStatus).optional(), // <-- Añadido aquí
 });
 export type CreateOrderItemInput = z.infer<typeof createOrderItemSchema>;
 
