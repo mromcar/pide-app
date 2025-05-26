@@ -8,6 +8,7 @@ export interface CategoryTranslation {
   categoryId: number;
   languageCode: string;
   name: string;
+  description?: string | null; // Añadido
   category?: Category; // Optional back-reference
 }
 

@@ -7,9 +7,11 @@ import { Order, OrderStatusHistory } from './order';
 export interface User {
   userId: number;
   role: UserRole;
-  name?: string | null;
+  name: string;
   email: string;
   passwordHash: string;
+  avatarUrl?: string | null;
+  isActive: boolean;
   establishmentId?: number | null;
   createdAt?: Date | null;
   updatedAt?: Date | null;

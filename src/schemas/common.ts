@@ -5,6 +5,12 @@ export const positiveInt = z.number().int().positive();
 export const nonNegativeInt = z.number().int().nonnegative();
 export const idSchema = positiveInt;
 
+// UUID schema para modelos que usen UUIDs
+export const uuidSchema = z.string().uuid();
+
+// Permite IDs como string o number (útil para params de Next.js)
+export const idParamSchema = z.union([z.coerce.number().int().positive(), uuidSchema]);
+
 export const languageCodeSchema = z.string().min(2).max(10);
 
 export const stringToBoolean = z.preprocess((val) => {

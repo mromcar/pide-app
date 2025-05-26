@@ -17,7 +17,7 @@ export interface Allergen {
   name: string;
   description?: string | null;
   iconUrl?: string | null;
-  isMajorAllergen?: boolean | null;
+  isMajorAllergen: boolean; // Mejor no opcional, ya que el schema lo pone por defecto
   translations?: AllergenTranslation[];
   products?: ProductAllergen[];
 }

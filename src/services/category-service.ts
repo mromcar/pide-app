@@ -3,16 +3,28 @@ import { prisma } from '../lib/prisma';
 import type { Category } from '@prisma/client';
 import type { CreateCategoryDTO, UpdateCategoryDTO } from '../types/dtos/category'; // Usando los DTOs de product.ts si están allí
 
+function cleanCategoryTranslation(t: any, categoryId?: number) {
+  if (typeof t.languageCode !== 'string' || typeof t.name !== 'string') {
+    throw new Error('Missing required fields for category translation');
+  }
+  return {
+    ...(categoryId ? { categoryId } : {}),
+    languageCode: t.languageCode,
+    name: t.name,
+    ...(typeof t.description === 'string' ? { description: t.description } : {}),
+  };
+}
+
 export const categoryService = {
   async createCategory(data: CreateCategoryDTO): Promise<Category> {
     const { translations, ...categoryData } = data;
     return prisma.category.create({
       data: {
         ...categoryData,
-        translations: translations
+        translations: translations && translations.length > 0
           ? {
               createMany: {
-                data: translations.map(t => ({ languageCode: t.languageCode, name: t.name })),
+                data: translations.map(t => cleanCategoryTranslation(t)),
               },
             }
           : undefined,
@@ -69,17 +81,10 @@ export const categoryService = {
       });
 
       if (translations) {
-        // Eliminar traducciones existentes y crear las nuevas, o hacer upsert
-        await tx.categoryTranslation.deleteMany({
-          where: { categoryId: categoryId },
-        });
+        await tx.categoryTranslation.deleteMany({ where: { categoryId } });
         if (translations.length > 0) {
           await tx.categoryTranslation.createMany({
-            data: translations.map(t => ({
-              categoryId: categoryId,
-              languageCode: t.languageCode,
-              name: t.name,
-            })),
+            data: translations.map(t => cleanCategoryTranslation(t, categoryId)),
           });
         }
       }

@@ -1,6 +1,6 @@
 // src/schemas/allergen.ts
 import { z } from 'zod';
-import { languageCodeSchema, optionalString, optionalUrl, idSchema } from './common';
+import { languageCodeSchema, optionalString, optionalUrl } from './common';
 
 // Esquema para Traducción de Alérgeno
 export const allergenTranslationSchema = z.object({

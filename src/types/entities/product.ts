@@ -12,7 +12,7 @@ export interface ProductTranslation {
   languageCode: string;
   name: string;
   description?: string | null;
-  product?: Product; // Optional back-reference
+  product?: Product;
 }
 
 export interface ProductVariantTranslation {
@@ -20,7 +20,7 @@ export interface ProductVariantTranslation {
   variantId: number;
   languageCode: string;
   variantDescription: string;
-  variant?: ProductVariant; // Optional back-reference
+  variant?: ProductVariant;
 }
 
 export interface ProductVariant {
@@ -28,10 +28,10 @@ export interface ProductVariant {
   productId: number;
   establishmentId: number;
   variantDescription: string;
-  price: number; // Prisma Decimal is often handled as number or string in JS
+  price: number;
   sku?: string | null;
   sortOrder?: number | null;
-  isActive?: boolean | null;
+  isActive: boolean;
   product?: Product;
   establishment?: Establishment;
   translations?: ProductVariantTranslation[];
@@ -53,7 +53,7 @@ export interface Product {
   description?: string | null;
   imageUrl?: string | null;
   sortOrder?: number | null;
-  isActive?: boolean | null;
+  isActive: boolean;
   responsibleRole?: UserRole | null;
   category?: Category;
   establishment?: Establishment;

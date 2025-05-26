@@ -7,6 +7,7 @@
 export interface SerializedCategoryTranslation {
   languageCode: string;
   name: string;
+  description?: string | null;
 }
 
 export interface SerializedCategory {

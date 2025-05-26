@@ -1,8 +1,8 @@
 // src/types/entities/order.ts
 
 import { OrderStatus, OrderItemStatus } from '../enums';
-import { Establishment } from './establishment'; // Assuming you created this
-import { User } from './user'; // Assuming you created this
+import { Establishment } from './establishment';
+import { User } from './user';
 import { ProductVariant } from './product';
 
 export interface OrderItem {
@@ -12,7 +12,7 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number; // Prisma Decimal
   itemTotalPrice?: number; // Prisma Decimal, generated
-  status?: OrderItemStatus | null;
+  status: OrderItemStatus;
   notes?: string | null;
   order?: Order;
   variant?: ProductVariant;
@@ -23,7 +23,7 @@ export interface OrderStatusHistory {
   orderId: number;
   status: OrderStatus;
   changedByUserId?: number | null;
-  changedAt?: Date | null;
+  changedAt: Date;
   notes?: string | null;
   order?: Order;
   changedBy?: User | null;
@@ -36,13 +36,13 @@ export interface Order {
   waiterUserId?: number | null;
   tableNumber?: string | null;
   status: OrderStatus;
-  totalAmount?: number | null; // Prisma Decimal
+  totalAmount: number; // Prisma Decimal
   paymentMethod?: string | null;
   paymentStatus?: string | null;
   orderType?: string | null;
   notes?: string | null;
-  createdAt?: Date | null;
-  updatedAt?: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
   items?: OrderItem[];
   statusHistory?: OrderStatusHistory[];
   client?: User | null;

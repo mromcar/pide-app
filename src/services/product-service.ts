@@ -3,6 +3,24 @@ import { prisma } from '../lib/prisma';
 import type { Product, ProductVariant } from '@prisma/client';
 import type { CreateProductDTO, UpdateProductDTO, CreateProductVariantDTO, UpdateProductVariantDTO } from '../types/dtos/product';
 
+function cleanVariantData(
+  v: CreateProductVariantDTO,
+  establishmentId: number
+) {
+  const { ...variantData } = v;
+  if (
+    typeof variantData.variantDescription !== 'string' ||
+    typeof variantData.price !== 'number' ||
+    typeof variantData.isActive !== 'boolean'
+  ) {
+    throw new Error('Missing required fields for variant');
+  }
+  return {
+    ...variantData,
+    establishmentId,
+  };
+}
+
 export const productService = {
   async createProduct(data: CreateProductDTO): Promise<Product> {
     const { translations, variants, allergenIds, ...productData } = data;
@@ -24,10 +42,10 @@ export const productService = {
         variants: variants
           ? {
               create: variants.map(v => {
-                const { translations: variantTranslations, ...variantData } = v;
+                const { translations: variantTranslations } = v;
+                const variantData = cleanVariantData(v, productData.establishmentId);
                 return {
                   ...variantData,
-                  establishmentId: productData.establishmentId, // Asegurar que la variante tenga el establishmentId
                   translations: variantTranslations
                     ? {
                         createMany: {
@@ -114,15 +132,23 @@ export const productService = {
   },
 
   async updateProduct(productId: number, data: UpdateProductDTO): Promise<Product | null> {
-    const { translations, variants, allergenIds, establishmentId, categoryId, ...productData } = data;
+    const { translations, variants, allergenIds, categoryId, ...productData } = data;
 
     return prisma.$transaction(async (tx) => {
       // 1. Actualizar datos del producto principal
+      // Elimina campos que no se pueden actualizar directamente
+      const { ...updatableProductData } = productData;
+
+      // Limpia los campos undefined
+      const cleanData = Object.fromEntries(
+        Object.entries(updatableProductData).filter(([v]) => v !== undefined)
+      );
+
       await tx.product.update({
         where: { id: productId },
         data: {
-          ...productData,
-          ...(categoryId && { category: { connect: { id: categoryId } } }), // Conectar si categoryId cambia
+          ...cleanData,
+          ...(categoryId ? { category: { connect: { id: categoryId } } } : {}),
         },
       });
 
@@ -130,32 +156,57 @@ export const productService = {
       if (translations) {
         await tx.productTranslation.deleteMany({ where: { productId } });
         if (translations.length > 0) {
-            await tx.productTranslation.createMany({
-              data: translations.map(t => ({ productId, ...t })),
-            });
+          await tx.productTranslation.createMany({
+            data: translations.map(t => ({ productId, ...t })),
+          });
         }
       }
 
-      // 3. Actualizar variantes (más complejo: añadir, modificar, eliminar)
+      // 3. Actualizar variantes (borrar y crear nuevas, con traducciones)
       if (variants) {
-        // Estrategia de ejemplo: borrar existentes y crear nuevas (simplificado)
-        // Una estrategia más robusta haría upserts o manejaría eliminaciones explícitas.
-        await tx.productVariant.deleteMany({ where: { productId } }); // Esto borraría también sus traducciones por cascada
-        const product = await tx.product.findUnique({ where: {id: productId}, select: { establishmentId: true }});
+        await tx.productVariant.deleteMany({ where: { productId } });
+        const product = await tx.product.findUnique({ where: { id: productId }, select: { establishmentId: true } });
         if (product?.establishmentId) {
-            await tx.productVariant.createMany({
-              data: variants.map(v => {
-                const { translations: variantTranslations, variantId, ...variantData } = v; // Ignorar variantId para createMany
-                return {
-                  ...variantData,
-                  productId,
-                  establishmentId: product.establishmentId, // Asegurar el ID correcto
-                };
-              }),
+          for (const v of variants) {
+            // Elimina variantId y asegura campos obligatorios
+            const {
+              translations: variantTranslations,
+              variantDescription,
+              price,
+              isActive,
+              sortOrder,
+              sku,
+            } = v;
+
+            if (
+              typeof variantDescription !== 'string' ||
+              typeof price !== 'number' ||
+              typeof isActive !== 'boolean'
+            ) {
+              throw new Error('Missing required fields for variant');
+            }
+
+            const variant = await tx.productVariant.create({
+              data: {
+                productId,
+                establishmentId: product.establishmentId,
+                variantDescription,
+                price,
+                isActive,
+                ...(typeof sortOrder === 'number' ? { sortOrder } : {}),
+                ...(typeof sku === 'string' ? { sku } : {}),
+              },
             });
-            // Re-crear traducciones de variantes si es necesario
-            // Esto es más complejo si se usa createMany para variantes, ya que no devuelve los IDs.
-            // Sería mejor un bucle con create para cada variante si las traducciones son clave aquí.
+
+            if (variantTranslations && variantTranslations.length > 0) {
+              await tx.productVariantTranslation.createMany({
+                data: variantTranslations.map(t => ({
+                  variantId: variant.id,
+                  ...t,
+                })),
+              });
+            }
+          }
         }
       }
 
@@ -163,9 +214,9 @@ export const productService = {
       if (allergenIds) {
         await tx.productAllergen.deleteMany({ where: { productId } });
         if (allergenIds.length > 0) {
-            await tx.productAllergen.createMany({
-              data: allergenIds.map(allergenId => ({ productId, allergenId })),
-            });
+          await tx.productAllergen.createMany({
+            data: allergenIds.map(allergenId => ({ productId, allergenId })),
+          });
         }
       }
 
@@ -206,7 +257,7 @@ export const productService = {
   },
 
   async updateProductVariant(variantId: number, data: UpdateProductVariantDTO): Promise<ProductVariant | null> {
-    const { translations, productId, establishmentId, ...variantData } = data; // productId y establishmentId no se actualizan directamente aquí
+    const { translations, ...variantData } = data; // productId y establishmentId no se actualizan directamente aquí
     return prisma.$transaction(async (tx) => {
         await tx.productVariant.update({
             where: {id: variantId},

@@ -205,21 +205,22 @@ export const orderService = {
   },
 
   async addItemToOrder(orderId: number, itemData: CreateOrderItemDTO): Promise<OrderItem | null> {
-      const variant = await prisma.productVariant.findUnique({ where: { id: itemData.variantId }});
-      if (!variant) throw new Error(`Variant ${itemData.variantId} not found.`);
-
-      return prisma.orderItem.create({
-          data: {
-              orderId,
-              variantId: itemData.variantId,
-              quantity: itemData.quantity,
-              unitPrice: variant.price, // Usar precio de BD
-              status: itemData.status || OrderItemStatus.PENDING,
-              notes: itemData.notes,
-          },
-          // El trigger `update_order_total` en OrderItems actualizará Order.totalAmount
-      });
-  },
+  const variant = await prisma.productVariant.findUnique({ where: { id: itemData.variantId }});
+  if (!variant) throw new Error(`Variant ${itemData.variantId} not found.`);
+  if (typeof itemData.quantity !== 'number' || itemData.quantity <= 0) {
+    throw new Error('Quantity must be a positive number.');
+  }
+  return prisma.orderItem.create({
+    data: {
+      orderId,
+      variantId: itemData.variantId,
+      quantity: itemData.quantity,
+      unitPrice: variant.price,
+      status: itemData.status || OrderItemStatus.PENDING,
+      notes: itemData.notes,
+    },
+  });
+},
 
   async updateOrderItem(orderItemId: number, data: { quantity?: number, notes?: string }): Promise<OrderItem | null> {
       const item = await prisma.orderItem.findUnique({ where: {id: orderItemId}, select: { unitPrice: true }});

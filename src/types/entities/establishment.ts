@@ -28,7 +28,8 @@ export interface Establishment {
   contactPerson?: string | null;
   description?: string | null;
   website?: string | null;
-  isActive?: boolean | null;
+  imageUrl?: string | null;
+  isActive: boolean;
   acceptsOrders: boolean;
   categories?: Category[];
   establishmentAdministrators?: EstablishmentAdministrator[];

@@ -1,7 +1,19 @@
 // src/services/allergen-service.ts
 import { prisma } from '../lib/prisma';
 import type { Allergen } from '@prisma/client';
-import type { CreateAllergenDTO, UpdateAllergenDTO } from '../types/dtos/allergen'; // Usando los DTOs de product.ts si están allí
+import type { CreateAllergenDTO, UpdateAllergenDTO } from '../types/dtos/allergen';
+
+function cleanAllergenTranslation(t: any, allergenId?: number) {
+  if (typeof t.languageCode !== 'string' || typeof t.name !== 'string') {
+    throw new Error('Missing required fields for allergen translation');
+  }
+  return {
+    ...(allergenId ? { allergenId } : {}),
+    languageCode: t.languageCode,
+    name: t.name,
+    ...(typeof t.description === 'string' ? { description: t.description } : {}),
+  };
+}
 
 export const allergenService = {
   async createAllergen(data: CreateAllergenDTO): Promise<Allergen> {
@@ -9,14 +21,10 @@ export const allergenService = {
     return prisma.allergen.create({
       data: {
         ...allergenData,
-        translations: translations
+        translations: translations && translations.length > 0
           ? {
               createMany: {
-                data: translations.map(t => ({
-                  languageCode: t.languageCode,
-                  name: t.name,
-                  description: t.description,
-                })),
+                data: translations.map(t => cleanAllergenTranslation(t)),
               },
             }
           : undefined,
@@ -30,7 +38,7 @@ export const allergenService = {
   async getAllAllergens(): Promise<Allergen[]> {
     return prisma.allergen.findMany({
       include: {
-        translations: true, // Considera filtrar por idioma
+        translations: true,
       },
       orderBy: {
         name: 'asc',
@@ -59,14 +67,9 @@ export const allergenService = {
       if (translations) {
         await tx.allergenTranslation.deleteMany({ where: { allergenId } });
         if (translations.length > 0) {
-            await tx.allergenTranslation.createMany({
-              data: translations.map(t => ({
-                allergenId,
-                languageCode: t.languageCode,
-                name: t.name,
-                description: t.description,
-              })),
-            });
+          await tx.allergenTranslation.createMany({
+            data: translations.map(t => cleanAllergenTranslation(t, allergenId)),
+          });
         }
       }
       return tx.allergen.findUnique({
@@ -77,7 +80,6 @@ export const allergenService = {
   },
 
   async deleteAllergen(allergenId: number): Promise<Allergen | null> {
-    // La relación con ProductAllergen es onDelete: Cascade, así que se borrarán las asociaciones.
     return prisma.allergen.delete({
       where: { id: allergenId },
     });
