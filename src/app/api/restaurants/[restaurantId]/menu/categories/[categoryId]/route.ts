@@ -1,41 +1,41 @@
 //src/app/api/categories/[categoryId]/route.ts
 import { requireAuth } from "@/middleware/auth-middleware"
-import { categoryService } from "@/services/category-service"
+import { updateCategory, deleteCategory } from "@/services/category-service"
 import { updateCategorySchema } from "@/schemas/category"
 import { jsonOk, jsonError } from "@/utils/api"
 
 export async function PUT(
   request: Request,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: { restaurantId: string, categoryId: string } }
 ) {
   try {
-    const session = await requireAuth('ADMIN')
+    await requireAuth('ADMIN')
     const body = await request.json()
     const validatedData = updateCategorySchema.parse(body)
 
-    const category = await categoryService.updateCategory(
+    const category = await updateCategory(
       Number(params.categoryId),
-      session.user.establishment_id,
+      Number(params.restaurantId),
       validatedData
     )
     return jsonOk({ category })
   } catch (error) {
-    return jsonError(error.message)
+    return jsonError(error instanceof Error ? error.message : String(error))
   }
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { categoryId: string } }
+  _request: Request,
+  { params }: { params: { restaurantId: string, categoryId: string } }
 ) {
   try {
-    const session = await requireAuth('ADMIN')
-    await categoryService.deleteCategory(
+    await requireAuth('ADMIN')
+    await deleteCategory(
       Number(params.categoryId),
-      session.user.establishment_id
+      Number(params.restaurantId)
     )
     return jsonOk({ message: 'Category deleted successfully' })
   } catch (error) {
-    return jsonError(error.message)
+    return jsonError(error instanceof Error ? error.message : String(error))
   }
 }

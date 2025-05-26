@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { fetchEmployeeOrders } from '@/services/orderServices'; // Importa tu función de servicio
+import { fetchEmployeeOrders } from '@/services/order-service'; // Importa tu función de servicio
 import { useSession } from 'next-auth/react'; // Para obtener la sesión del empleado
 import { OrderStatus } from '@prisma/client'; // Para los estados de los pedidos si los necesitas
 

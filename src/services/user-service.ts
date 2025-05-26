@@ -1,11 +1,14 @@
 import { prisma } from '../lib/prisma';
 import type { User } from '@prisma/client';
 import type { CreateUserDTO, UpdateUserDTO } from '../types/dtos/user';
+import { toSnakeCase } from '@/utils/case';
 
 function cleanUserData(data: Partial<CreateUserDTO | UpdateUserDTO>) {
-  // Elimina campos undefined
-  return Object.fromEntries(
-    Object.entries(data).filter(([_, v]) => v !== undefined)
+  // Elimina campos undefined y convierte a snake_case
+  return toSnakeCase(
+    Object.fromEntries(
+      Object.entries(data).filter(([_, v]) => v !== undefined)
+    )
   );
 }
 
@@ -16,7 +19,7 @@ export const userService = {
   },
 
   async getUserById(userId: number): Promise<User | null> {
-    return prisma.user.findUnique({ where: { id: userId } });
+    return prisma.user.findUnique({ where: { user_id: userId } }); // snake_case
   },
 
   async getUserByEmail(email: string): Promise<User | null> {
@@ -25,30 +28,30 @@ export const userService = {
 
   async updateUser(userId: number, data: UpdateUserDTO): Promise<User | null> {
     const cleanData = cleanUserData(data);
-    return prisma.user.update({ where: { id: userId }, data: cleanData });
+    return prisma.user.update({ where: { user_id: userId }, data: cleanData }); // snake_case
   },
 
   async deleteUser(userId: number): Promise<User | null> {
-    return prisma.user.delete({ where: { id: userId } });
+    return prisma.user.delete({ where: { user_id: userId } }); // snake_case
   },
 
   async listEmployees(establishmentId: number): Promise<User[]> {
     return prisma.user.findMany({
-      where: { establishmentId, isActive: true },
+      where: { establishment_id: establishmentId, is_active: true }, // snake_case
       orderBy: { name: 'asc' },
     });
   },
 
   async setActive(userId: number, isActive: boolean): Promise<User> {
     return prisma.user.update({
-      where: { id: userId },
-      data: { isActive },
+      where: { user_id: userId }, // snake_case
+      data: { is_active: isActive }, // snake_case
     });
   },
 
   async assignRole(userId: number, role: string): Promise<User> {
     return prisma.user.update({
-      where: { id: userId },
+      where: { user_id: userId }, // snake_case
       data: { role },
     });
   },

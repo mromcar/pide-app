@@ -10,7 +10,7 @@ import OrderHistory from './OrderHistory' // Este componente necesitará actuali
 import { appContainerClasses } from '@/utils/tailwind'
 import { SerializedCategory, SerializedProduct } from '@/types/menu'
 import { useOrderStore } from '@/store/orderStore' // Importa tu store de Zustand
-import { createClientOrder } from '@/services/orderServices' // Importa el servicio para crear pedidos
+import { createClientOrder } from '@/services/order-service' // Importa el servicio para crear pedidos
 import { CreateOrderItemDTO } from '@/types/dtos'
 import { ORDER_STATUS } from '@/constants/enums' // Si usas ORDER_STATUS como string
 import type { OrderStatus } from '@prisma/client' // Para el tipo OrderStatus de Prisma
@@ -119,7 +119,7 @@ export default function MenuClient({
         <OrderHistory
           orders={orderHistory} // Pasas la orden real
           language={language}
-          // No necesitamos las funciones de editar/cancelar aquí si el historial es solo para visualización inmediata
+        // No necesitamos las funciones de editar/cancelar aquí si el historial es solo para visualización inmediata
         />
       </main>
     )
