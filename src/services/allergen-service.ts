@@ -1,13 +1,9 @@
 // src/services/allergen-service.ts
 import { prisma } from '../lib/prisma';
 import type { Allergen } from '@prisma/client';
-import type { CreateAllergenDTO, UpdateAllergenDTO } from '../types/dtos/allergen';
+import type { CreateAllergenDTO, UpdateAllergenDTO, AllergenTranslationDTO } from '../types/dtos/allergen';
 import { toSnakeCase } from '@/utils/case';
-import { z } from 'zod';
 import { allergenTranslationSchema } from '../schemas/allergen';
-import type { AllergenTranslationDTO } from '../types/dtos/allergen';
-
-export type AllergenTranslationDTO = z.infer<typeof allergenTranslationSchema>
 
 function cleanAllergenTranslation(t: AllergenTranslationDTO, allergenId?: number) {
   return {
@@ -22,11 +18,11 @@ export async function createAllergen(data: CreateAllergenDTO): Promise<Allergen>
   const { translations, ...allergenData } = data;
   return prisma.allergen.create({
     data: {
-      ...allergenData,
+      ...toSnakeCase(allergenData),
       translations: translations && translations.length > 0
         ? {
           createMany: {
-            data: translations.map(t => cleanAllergenTranslation(t)),
+            data: translations.map((t: AllergenTranslationDTO) => cleanAllergenTranslation(t)),
           },
         }
         : undefined,
@@ -59,7 +55,7 @@ export async function getAllAllergens(establishmentId: number): Promise<Allergen
 
 export async function getAllergenById(allergenId: number): Promise<Allergen | null> {
   return prisma.allergen.findUnique({
-    where: { id: allergenId },
+    where: { allergen_id: allergenId },
     include: {
       translations: true,
     },
@@ -75,7 +71,7 @@ export async function updateAllergen(
   return prisma.$transaction(async (tx) => {
     await tx.allergen.update({
       where: { allergen_id: allergenId },
-      data: allergenData,
+      data: toSnakeCase(allergenData),
     });
 
     if (translations) {
