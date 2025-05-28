@@ -382,6 +382,7 @@ AFTER INSERT ON orders
 FOR EACH ROW EXECUTE FUNCTION log_initial_order_status();
 
 
+
 -- ===== FIN DEL SCRIPT =====
 
 SELECT 'Script de creación de esquema completado exitosamente.' AS status;
