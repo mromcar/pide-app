@@ -22,7 +22,14 @@ export const createAllergenSchema = z.object({
 export type CreateAllergenInput = z.infer<typeof createAllergenSchema>;
 
 // Esquema para Actualizar Alérgeno
-export const updateAllergenSchema = createAllergenSchema.partial();
+export const updateAllergenSchema = z.object({
+  code: z.string().min(1, "Code is required").max(20).optional(),
+  name: z.string().min(1, "Name is required").max(100).optional(), // Nombre por defecto
+  description: optionalString,
+  iconUrl: optionalUrl,
+  isMajorAllergen: z.boolean().optional(),
+  translations: z.array(allergenTranslationSchema).optional(),
+});
 export type UpdateAllergenInput = z.infer<typeof updateAllergenSchema>;
 
 // Esquema para parámetros de ruta

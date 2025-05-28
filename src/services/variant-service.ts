@@ -5,15 +5,15 @@ import type {
   UpdateProductVariantDTO,
 } from '../types/dtos/product';
 
-function cleanVariantData(v: CreateProductVariantDTO | UpdateProductVariantDTO) {
+// Función de limpieza para datos de variante (camelCase)
+function cleanVariantData(v: CreateProductVariantDTO | UpdateProductVariantDTO, establishmentId?: number) {
   const {
-    translations,
-    variantId, // nunca enviar en create/update
     variantDescription,
     price,
     isActive,
     sortOrder,
     sku,
+    productId,
   } = v;
 
   if (
@@ -25,6 +25,8 @@ function cleanVariantData(v: CreateProductVariantDTO | UpdateProductVariantDTO) 
   }
 
   return {
+    productId,
+    establishmentId,
     variantDescription,
     price,
     isActive,
@@ -33,22 +35,29 @@ function cleanVariantData(v: CreateProductVariantDTO | UpdateProductVariantDTO) 
   };
 }
 
+// Función de limpieza para traducción de variante (camelCase)
+function cleanVariantTranslation(t: any, variantId?: number) {
+  return {
+    ...(variantId ? { variantId } : {}),
+    languageCode: t.languageCode,
+    variantDescription: t.variantDescription,
+  };
+}
+
 export const variantService = {
   async createVariant(data: CreateProductVariantDTO): Promise<ProductVariant> {
-    const { translations, ...variantData } = data;
-    const cleanedVariantData = cleanVariantData(data);
+    const { translations, establishmentId, ...variantData } = data;
+    const cleanedVariantData = cleanVariantData(variantData, establishmentId);
     return prisma.productVariant.create({
       data: {
         ...cleanedVariantData,
+        establishmentId,
         translations: translations
           ? {
-              createMany: {
-                data: translations.map(t => ({
-                  languageCode: t.languageCode,
-                  variantDescription: t.variantDescription,
-                })),
-              },
-            }
+            createMany: {
+              data: translations.map(t => cleanVariantTranslation(t)),
+            },
+          }
           : undefined,
       },
       include: { translations: true },
@@ -73,18 +82,33 @@ export const variantService = {
     data: UpdateProductVariantDTO
   ): Promise<ProductVariant | null> {
     const { translations, ...variantData } = data;
-    // Puedes añadir lógica para actualizar traducciones si lo necesitas
-    const cleanedVariantData = cleanVariantData(data);
-    return prisma.productVariant.update({
-      where: { id: variantId, establishmentId },
-      data: cleanedVariantData,
-      include: { translations: true },
+    const cleanedVariantData = cleanVariantData(variantData, establishmentId);
+
+    return prisma.$transaction(async (tx) => {
+      await tx.productVariant.update({
+        where: { id: variantId },
+        data: cleanedVariantData,
+      });
+
+      if (translations) {
+        await tx.productVariantTranslation.deleteMany({ where: { variantId } });
+        if (translations.length > 0) {
+          await tx.productVariantTranslation.createMany({
+            data: translations.map(t => cleanVariantTranslation(t, variantId)),
+          });
+        }
+      }
+
+      return tx.productVariant.findUnique({
+        where: { id: variantId },
+        include: { translations: true }
+      });
     });
   },
 
-  async deleteVariant(variantId: number, establishmentId: number): Promise<ProductVariant | null> {
+  async deleteVariant(variantId: number): Promise<ProductVariant | null> {
     return prisma.productVariant.delete({
-      where: { id: variantId, establishmentId },
+      where: { id: variantId },
     });
   },
 };

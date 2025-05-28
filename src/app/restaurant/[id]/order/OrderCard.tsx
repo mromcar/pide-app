@@ -4,7 +4,7 @@
 import React, { useState } from 'react'
 import type { SerializedOrder } from '@/types/menu' // Tu tipo de pedido completo
 import { OrderStatus, OrderItemStatus } from '@prisma/client' // Enums de Prisma
-import { updateOrderStatus } from '@/services/orderServices' // Función para actualizar estado (debes crearla)
+import { updateOrderStatus } from '@/services/order-service' // Función para actualizar estado (debes crearla)
 import { format } from 'date-fns' // Para formatear fechas, si lo tienes instalado
 import { es } from 'date-fns/locale' // Para fechas en español
 

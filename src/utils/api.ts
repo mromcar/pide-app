@@ -1,12 +1,6 @@
-import { NextResponse } from 'next/server'
-
-export function jsonOk(data: any) {
-  return NextResponse.json({ success: true, ...data })
+export function jsonOk(data: any, status = 200) {
+  return new Response(JSON.stringify(data), { status })
 }
-
 export function jsonError(message: string, status = 400) {
-  return NextResponse.json(
-    { success: false, error: message },
-    { status }
-  )
+  return new Response(JSON.stringify({ error: message }), { status })
 }

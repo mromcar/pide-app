@@ -8,33 +8,29 @@ export async function PUT(
   { params }: { params: { allergenId: string } }
 ) {
   try {
-    const session = await requireAuth('ADMIN');
+    await requireAuth('ADMIN');
     const body = await request.json();
     const validatedData = updateAllergenSchema.parse(body);
 
     const allergen = await updateAllergen(
       Number(params.allergenId),
-      session.user.establishment_id,
       validatedData
     );
     return jsonOk({ allergen });
   } catch (error) {
-    return jsonError(error.message);
+    return jsonError(error instanceof Error ? error.message : String(error));
   }
 }
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: { allergenId: string } }
 ) {
   try {
-    const session = await requireAuth('ADMIN');
-    await deleteAllergen(
-      Number(params.allergenId),
-      session.user.establishment_id
-    );
+    await requireAuth('ADMIN');
+    await deleteAllergen(Number(params.allergenId));
     return jsonOk({ message: 'Allergen deleted successfully' });
   } catch (error) {
-    return jsonError(error.message);
+    return jsonError(error instanceof Error ? error.message : String(error));
   }
 }

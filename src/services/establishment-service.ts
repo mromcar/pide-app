@@ -22,11 +22,10 @@ function cleanEstablishmentUpdateData(data: UpdateEstablishmentDTO) {
 
 export const establishmentService = {
   async createEstablishment(data: CreateEstablishmentDTO): Promise<Establishment> {
-    if (typeof data.name !== 'string' || !data.name.trim()) {
-      throw new Error('Establishment name is required');
-    }
-    const cleanData = cleanEstablishmentCreateData(data);
-    return prisma.establishment.create({ data: cleanData });
+    const cleanData = cleanEstablishmentData(data);
+    return prisma.establishment.create({
+      data: cleanData,
+    });
   },
 
   async getAllEstablishments(options?: { isActive?: boolean }): Promise<Establishment[]> {
@@ -47,10 +46,10 @@ export const establishmentService = {
   },
 
   async updateEstablishment(establishmentId: number, data: UpdateEstablishmentDTO): Promise<Establishment | null> {
-    const cleanData = cleanEstablishmentUpdateData(data);
+    const cleanData = cleanEstablishmentData(data);
     return prisma.establishment.update({
       where: { id: establishmentId },
-      data: cleanData,
+      data,
     });
   },
 

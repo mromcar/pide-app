@@ -4,7 +4,7 @@ import type { CreateUserDTO, UpdateUserDTO } from '../types/dtos/user';
 import { UserRole } from '@prisma/client';
 
 function cleanUserData(data: Partial<CreateUserDTO | UpdateUserDTO>) {
-  // Elimina campos undefined
+  // Elimina campos undefined (no convierte a snake_case)
   return Object.fromEntries(
     Object.entries(data).filter(([key, value]) => value !== undefined)
   );

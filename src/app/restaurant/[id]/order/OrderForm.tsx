@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react'
 import { useOrderStore } from '@/store/orderStore' // O la ruta a tu store (Zustand, etc.)
-import { createClientOrder } from '@/services/orderServices' // Función para crear el pedido en el backend
+import { createClientOrder } from '@/services/order-service' // Función para crear el pedido en el backend
 import { CreateOrderDTO } from '@/types/dtos' // Tu DTO para el pedido
 
 type OrderFormProps = {
@@ -140,11 +140,10 @@ export function OrderForm({ establishmentId }: OrderFormProps) {
 
       {submissionStatus && (
         <div
-          className={`mt-4 p-4 rounded-md text-center font-medium ${
-            submissionStatus === 'success'
+          className={`mt-4 p-4 rounded-md text-center font-medium ${submissionStatus === 'success'
               ? 'bg-green-100 text-green-700'
               : 'bg-red-100 text-red-700'
-          }`}
+            }`}
         >
           {submissionMessage}
           {createdOrderId && submissionStatus === 'success' && (

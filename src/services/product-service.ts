@@ -1,23 +1,64 @@
 // src/services/product-service.ts
 import { prisma } from '../lib/prisma';
 import type { Product, ProductVariant } from '@prisma/client';
-import type { CreateProductDTO, UpdateProductDTO, CreateProductVariantDTO, UpdateProductVariantDTO } from '../types/dtos/product';
+import type {
+  CreateProductDTO,
+  UpdateProductDTO,
+  CreateProductVariantDTO,
+  UpdateProductVariantDTO
+} from '../types/dtos/product';
+
+// Funciones de limpieza para traducciones y variantes (camelCase)
+function cleanProductTranslation(t: any) {
+  return {
+    languageCode: t.languageCode,
+    name: t.name,
+    description: t.description,
+  };
+}
+
+function cleanProductTranslationWithId(t: any, productId: number) {
+  return {
+    productId,
+    languageCode: t.languageCode,
+    name: t.name,
+    description: t.description,
+  };
+}
 
 function cleanVariantData(
   v: CreateProductVariantDTO,
   establishmentId: number
 ) {
-  const { ...variantData } = v;
   if (
-    typeof variantData.variantDescription !== 'string' ||
-    typeof variantData.price !== 'number' ||
-    typeof variantData.isActive !== 'boolean'
+    typeof v.variantDescription !== 'string' ||
+    typeof v.price !== 'number' ||
+    typeof v.isActive !== 'boolean'
   ) {
     throw new Error('Missing required fields for variant');
   }
   return {
-    ...variantData,
+    variantDescription: v.variantDescription,
+    price: v.price,
+    isActive: v.isActive,
+    sortOrder: v.sortOrder,
+    sku: v.sku,
     establishmentId,
+  };
+}
+
+function cleanVariantTranslation(t: any) {
+  return {
+    languageCode: t.languageCode,
+    variantDescription: t.variantDescription,
+  };
+}
+
+function cleanVariantTranslationWithId(t: any, variantId: number) {
+  return {
+    variantId,
+    languageCode: t.languageCode,
+    variantDescription: t.variantDescription,
   };
 }
 
@@ -27,45 +68,38 @@ export const productService = {
 
     return prisma.product.create({
       data: {
-        ...productData,
+        ...productData, // camelCase aquí
         translations: translations
           ? {
-              createMany: {
-                data: translations.map(t => ({
-                  languageCode: t.languageCode,
-                  name: t.name,
-                  description: t.description,
-                })),
-              },
-            }
+            createMany: {
+              data: translations.map(t => cleanProductTranslation(t)),
+            },
+          }
           : undefined,
         variants: variants
           ? {
-              create: variants.map(v => {
-                const { translations: variantTranslations } = v;
-                const variantData = cleanVariantData(v, productData.establishmentId);
-                return {
-                  ...variantData,
-                  translations: variantTranslations
-                    ? {
-                        createMany: {
-                          data: variantTranslations.map(vt => ({
-                            languageCode: vt.languageCode,
-                            variantDescription: vt.variantDescription,
-                          })),
-                        },
-                      }
-                    : undefined,
-                };
-              }),
-            }
+            create: variants.map(v => {
+              const { translations: variantTranslations } = v;
+              const variantData = cleanVariantData(v, productData.establishmentId);
+              return {
+                ...variantData,
+                translations: variantTranslations
+                  ? {
+                    createMany: {
+                      data: variantTranslations.map(vt => cleanVariantTranslation(vt)),
+                    },
+                  }
+                  : undefined,
+              };
+            }),
+          }
           : undefined,
         allergens: allergenIds
           ? {
-              create: allergenIds.map(allergenId => ({
-                allergen: { connect: { id: allergenId } },
-              })),
-            }
+            create: allergenIds.map(allergenId => ({
+              allergen: { connect: { id: allergenId } }, // id en camelCase
+            })),
+          }
           : undefined,
       },
       include: {
@@ -88,16 +122,37 @@ export const productService = {
         isActive: options?.isActive,
       },
       include: {
-        translations: options?.includeTranslations ? (options.languageCode ? { where: { languageCode: options.languageCode }} : true) : false,
+        translations: options?.includeTranslations
+          ? (options.languageCode ? { where: { languageCode: options.languageCode } } : true)
+          : false,
         variants: {
           where: { isActive: true },
           include: {
-            translations: options?.includeTranslations ? (options.languageCode ? { where: { languageCode: options.languageCode }} : true) : false,
+            translations: options?.includeTranslations
+              ? (options.languageCode ? { where: { languageCode: options.languageCode } } : true)
+              : false,
           },
           orderBy: { sortOrder: 'asc' }
         },
-        allergens: options?.includeAllergens ? { include: { allergen: { include: { translations: options?.includeTranslations ? (options.languageCode ? { where: { languageCode: options.languageCode }} : true) : false, } } } } : false,
-        category: { include: { translations: options?.includeTranslations ? (options.languageCode ? { where: { languageCode: options.languageCode }} : true) : false, } },
+        allergens: options?.includeAllergens
+          ? {
+            include: {
+              allergen: {
+                include: {
+                  translations: options?.includeTranslations
+                    ? (options.languageCode ? { where: { languageCode: options.languageCode } } : true)
+                    : false,
+                }
+              }
+            }
+          } : false,
+        category: {
+          include: {
+            translations: options?.includeTranslations
+              ? (options.languageCode ? { where: { languageCode: options.languageCode } } : true)
+              : false,
+          }
+        },
       },
       orderBy: {
         sortOrder: 'asc',
@@ -136,12 +191,8 @@ export const productService = {
 
     return prisma.$transaction(async (tx) => {
       // 1. Actualizar datos del producto principal
-      // Elimina campos que no se pueden actualizar directamente
-      const { ...updatableProductData } = productData;
-
-      // Limpia los campos undefined
       const cleanData = Object.fromEntries(
-        Object.entries(updatableProductData).filter(([v]) => v !== undefined)
+        Object.entries(productData).filter(([_, v]) => v !== undefined)
       );
 
       await tx.product.update({
@@ -157,7 +208,7 @@ export const productService = {
         await tx.productTranslation.deleteMany({ where: { productId } });
         if (translations.length > 0) {
           await tx.productTranslation.createMany({
-            data: translations.map(t => ({ productId, ...t })),
+            data: translations.map((t: any) => cleanProductTranslationWithId(t, productId)),
           });
         }
       }
@@ -168,7 +219,6 @@ export const productService = {
         const product = await tx.product.findUnique({ where: { id: productId }, select: { establishmentId: true } });
         if (product?.establishmentId) {
           for (const v of variants) {
-            // Elimina variantId y asegura campos obligatorios
             const {
               translations: variantTranslations,
               variantDescription,
@@ -200,10 +250,7 @@ export const productService = {
 
             if (variantTranslations && variantTranslations.length > 0) {
               await tx.productVariantTranslation.createMany({
-                data: variantTranslations.map(t => ({
-                  variantId: variant.id,
-                  ...t,
-                })),
+                data: variantTranslations.map(t => cleanVariantTranslationWithId(t, variant.id)),
               });
             }
           }
@@ -233,52 +280,49 @@ export const productService = {
   },
 
   async deleteProduct(productId: number): Promise<Product | null> {
-    // Se borrarán en cascada: ProductTranslation, ProductVariant (y sus traducciones), ProductAllergen.
-    // Si hay OrderItems referenciando una ProductVariant de este producto con onDelete: RESTRICT, fallará.
     return prisma.product.delete({
       where: { id: productId },
     });
   },
 
-  // Métodos específicos para Variantes podrían estar aquí o en un product-variant-service.ts
   async addVariantToProduct(productId: number, establishmentId: number, variantData: CreateProductVariantDTO): Promise<ProductVariant> {
-     const { translations, ...data } = variantData;
-     return prisma.productVariant.create({
-        data: {
-            ...data,
-            product: { connect: { id: productId }},
-            establishment: { connect: { id: establishmentId }},
-            translations: translations ? {
-                createMany: { data: translations }
-            } : undefined,
-        },
-        include: { translations: true }
-     });
+    const { translations, ...data } = variantData;
+    return prisma.productVariant.create({
+      data: {
+        ...cleanVariantData(data, establishmentId),
+        product: { connect: { id: productId } },
+        establishment: { connect: { id: establishmentId } },
+        translations: translations ? {
+          createMany: { data: translations.map(t => cleanVariantTranslation(t)) }
+        } : undefined,
+      },
+      include: { translations: true }
+    });
   },
 
   async updateProductVariant(variantId: number, data: UpdateProductVariantDTO): Promise<ProductVariant | null> {
-    const { translations, ...variantData } = data; // productId y establishmentId no se actualizan directamente aquí
+    const { translations, ...variantData } = data;
     return prisma.$transaction(async (tx) => {
-        await tx.productVariant.update({
-            where: {id: variantId},
-            data: variantData
-        });
-        if (translations) {
-            await tx.productVariantTranslation.deleteMany({ where: { variantId }});
-            if (translations.length > 0) {
-                await tx.productVariantTranslation.createMany({
-                    data: translations.map(t => ({ variantId, ...t}))
-                });
-            }
+      await tx.productVariant.update({
+        where: { id: variantId },
+        data: variantData
+      });
+      if (translations) {
+        await tx.productVariantTranslation.deleteMany({ where: { variantId } });
+        if (translations.length > 0) {
+          await tx.productVariantTranslation.createMany({
+            data: translations.map(t => cleanVariantTranslationWithId(t, variantId))
+          });
         }
-        return tx.productVariant.findUnique({
-            where: { id: variantId },
-            include: { translations: true }
-        });
+      }
+      return tx.productVariant.findUnique({
+        where: { id: variantId },
+        include: { translations: true }
+      });
     });
   },
 
   async deleteProductVariant(variantId: number): Promise<ProductVariant | null> {
-    return prisma.productVariant.delete({ where: { id: variantId }});
+    return prisma.productVariant.delete({ where: { id: variantId } });
   }
 };
