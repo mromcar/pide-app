@@ -31,7 +31,7 @@ export const orderService = {
         quantity: item.quantity,
         unitPrice: price, // Usar precio de la BD
         // itemTotalPrice se genera en la BD
-        status: item.status || OrderItemStatus.PENDING,
+        status: OrderItemStatus.PENDING,
         notes: item.notes,
       };
     });
@@ -77,7 +77,7 @@ export const orderService = {
               },
             },
           },
-          orderBy: { orderItemId: 'asc' }
+          orderBy: { id: 'asc' }
         },
         statusHistory: {
           orderBy: { changedAt: 'desc' },
@@ -109,7 +109,7 @@ export const orderService = {
     const orders = await prisma.order.findMany({
       where: whereClause,
       include: {
-        items: { select: { orderItemId: true, variant: {select: {variantDescription: true, product: {select: {name: true}}}}, quantity: true, itemTotalPrice: true, status: true } }, // Resumido
+        items: { select: { id: true, variant: {select: {variantDescription: true, product: {select: {name: true}}}}, quantity: true, itemTotalPrice: true, status: true } }, // Resumido
         client: { select: { name: true } },
         waiter: { select: { name: true } },
       },
@@ -216,7 +216,7 @@ export const orderService = {
       variantId: itemData.variantId,
       quantity: itemData.quantity,
       unitPrice: variant.price,
-      status: itemData.status || OrderItemStatus.PENDING,
+      status: OrderItemStatus.PENDING,
       notes: itemData.notes,
     },
   });

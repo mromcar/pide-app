@@ -2,13 +2,15 @@
 import { prisma } from '../lib/prisma';
 import type { Allergen } from '@prisma/client';
 import type { CreateAllergenDTO, UpdateAllergenDTO } from '../types/dtos/allergen';
+import type { AllergenTranslationDTO } from '../types/dtos/allergen';
 
-function cleanAllergenTranslation(t: any, allergenId?: number) {
+function cleanAllergenTranslation(
+  t: AllergenTranslationDTO
+) {
   if (typeof t.languageCode !== 'string' || typeof t.name !== 'string') {
     throw new Error('Missing required fields for allergen translation');
   }
   return {
-    ...(allergenId ? { allergenId } : {}),
     languageCode: t.languageCode,
     name: t.name,
     ...(typeof t.description === 'string' ? { description: t.description } : {}),
@@ -68,7 +70,10 @@ export const allergenService = {
         await tx.allergenTranslation.deleteMany({ where: { allergenId } });
         if (translations.length > 0) {
           await tx.allergenTranslation.createMany({
-            data: translations.map(t => cleanAllergenTranslation(t, allergenId)),
+            data: translations.map(t => ({
+              ...cleanAllergenTranslation(t),
+              allergenId, // <-- aquí SIEMPRE va el id y nunca es undefined
+            })),
           });
         }
       }

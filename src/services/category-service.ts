@@ -2,13 +2,13 @@
 import { prisma } from '../lib/prisma';
 import type { Category } from '@prisma/client';
 import type { CreateCategoryDTO, UpdateCategoryDTO } from '../types/dtos/category'; // Usando los DTOs de product.ts si están allí
+import type { CategoryTranslationDTO } from '../types/dtos/category';
 
-function cleanCategoryTranslation(t: any, categoryId?: number) {
+function cleanCategoryTranslation(t: CategoryTranslationDTO) {
   if (typeof t.languageCode !== 'string' || typeof t.name !== 'string') {
     throw new Error('Missing required fields for category translation');
   }
   return {
-    ...(categoryId ? { categoryId } : {}),
     languageCode: t.languageCode,
     name: t.name,
     ...(typeof t.description === 'string' ? { description: t.description } : {}),
@@ -84,7 +84,10 @@ export const categoryService = {
         await tx.categoryTranslation.deleteMany({ where: { categoryId } });
         if (translations.length > 0) {
           await tx.categoryTranslation.createMany({
-            data: translations.map(t => cleanCategoryTranslation(t, categoryId)),
+            data: translations.map(t => ({
+              ...cleanCategoryTranslation(t),
+              categoryId, // <-- SIEMPRE presente
+            })),
           });
         }
       }

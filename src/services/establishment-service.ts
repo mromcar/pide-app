@@ -3,19 +3,30 @@ import { prisma } from '../lib/prisma';
 import type { Establishment } from '@prisma/client';
 import type { CreateEstablishmentDTO, UpdateEstablishmentDTO } from '../types/dtos/establishment';
 
-function cleanEstablishmentData(data: Partial<CreateEstablishmentDTO | UpdateEstablishmentDTO>) {
-  // Elimina campos undefined
+function cleanEstablishmentCreateData(data: CreateEstablishmentDTO) {
+  const { name, ...rest } = data;
+  const cleaned = Object.fromEntries(
+    Object.entries(rest).filter(([key, value]) => value !== undefined)
+  );
+  return {
+    name, // siempre presente
+    ...cleaned,
+  };
+}
+
+function cleanEstablishmentUpdateData(data: UpdateEstablishmentDTO) {
   return Object.fromEntries(
-    Object.entries(data).filter(([_, v]) => v !== undefined)
+    Object.entries(data).filter(([key, value]) => value !== undefined)
   );
 }
 
 export const establishmentService = {
   async createEstablishment(data: CreateEstablishmentDTO): Promise<Establishment> {
-    const cleanData = cleanEstablishmentData(data);
-    return prisma.establishment.create({
-      data: cleanData,
-    });
+    if (typeof data.name !== 'string' || !data.name.trim()) {
+      throw new Error('Establishment name is required');
+    }
+    const cleanData = cleanEstablishmentCreateData(data);
+    return prisma.establishment.create({ data: cleanData });
   },
 
   async getAllEstablishments(options?: { isActive?: boolean }): Promise<Establishment[]> {
@@ -36,7 +47,7 @@ export const establishmentService = {
   },
 
   async updateEstablishment(establishmentId: number, data: UpdateEstablishmentDTO): Promise<Establishment | null> {
-    const cleanData = cleanEstablishmentData(data);
+    const cleanData = cleanEstablishmentUpdateData(data);
     return prisma.establishment.update({
       where: { id: establishmentId },
       data: cleanData,
