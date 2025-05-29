@@ -1,25 +1,15 @@
-// src/types/entities/category.ts
-
-import { Establishment } from './establishment'; // Assuming you'll create this
-import { Product } from './product';
-
-export interface CategoryTranslation {
-  translationId: number;
-  categoryId: number;
-  languageCode: string;
-  name: string;
-  description?: string | null; // Añadido
-  category?: Category; // Optional back-reference
-}
+import { CategoryTranslation } from './categoryTranslation';
 
 export interface Category {
-  categoryId: number;
-  establishmentId: number;
+  category_id: number;
+  establishment_id: number;
   name: string;
-  imageUrl?: string | null;
-  sortOrder?: number | null;
-  isActive?: boolean | null;
-  establishment?: Establishment;
-  translations?: CategoryTranslation[];
-  products?: Product[];
+  image_url?: string | null;
+  sort_order?: number | null;
+  is_active?: boolean | null;
+  created_at?: Date | null;
+  updated_at?: Date | null;
+  deleted_at?: Date | null;
+  translations?: CategoryTranslation[]; // Relation to translations
+  // products: Product[]; // Assuming Product type will be defined elsewhere
 }

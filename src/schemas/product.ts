@@ -1,78 +1,52 @@
-// src/schemas/product.ts
 import { z } from 'zod';
-import { UserRole } from '../types/enums'; // Asegúrate que la ruta sea correcta
-import { idSchema, languageCodeSchema, optionalString, optionalUrl, nonNegativeInt } from './common';
+import { UserRole } from '@prisma/client'; // Assuming UserRole enum is accessible
+import { productTranslationCreateSchema, productTranslationUpdateSchema } from './productTranslation'; // Assuming these exist
 
-// Utilidades reutilizables
-export const optionalStringMax50 = z.string().max(50).optional().nullable();
-export const optionalStringMax100 = z.string().max(100).optional().nullable();
-export const optionalStringMax255 = z.string().max(255).optional().nullable();
+export const productIdSchema = z.object({
+  product_id: z.number().int().positive(),
+});
 
-// Esquema para Traducción de Producto
-export const productTranslationSchema = z.object({
-  languageCode: languageCodeSchema,
+export const productCreateSchema = z.object({
+  establishment_id: z.number().int().positive(),
+  category_id: z.number().int().positive(),
   name: z.string().min(1).max(255),
-  description: optionalStringMax255,
+  description: z.string().nullable().optional(),
+  image_url: z.string().url().nullable().optional(),
+  sort_order: z.number().int().optional().nullable().default(0),
+  is_active: z.boolean().optional().nullable().default(true),
+  responsible_role: z.nativeEnum(UserRole).nullable().optional(),
+  created_by_user_id: z.number().int().positive().nullable().optional(),
+  translations: z.array(productTranslationCreateSchema).optional(),
+  allergen_ids: z.array(z.number().int().positive()).optional(), // For associating allergens by ID
 });
-export type ProductTranslationInput = z.infer<typeof productTranslationSchema>;
 
-// Esquema para Traducción de Variante de Producto
-export const productVariantTranslationSchema = z.object({
-  languageCode: languageCodeSchema,
-  variantDescription: z.string().min(1).max(255),
+export const productUpdateSchema = z.object({
+  establishment_id: z.number().int().positive().optional(),
+  category_id: z.number().int().positive().optional(),
+  name: z.string().min(1).max(255).optional(),
+  description: z.string().nullable().optional(),
+  image_url: z.string().url().nullable().optional(),
+  sort_order: z.number().int().optional().nullable(),
+  is_active: z.boolean().optional().nullable(),
+  responsible_role: z.nativeEnum(UserRole).nullable().optional(),
+  translations: z.array(z.union([productTranslationCreateSchema, productTranslationUpdateSchema])).optional(),
+  allergen_ids: z.array(z.number().int().positive()).optional(),
 });
-export type ProductVariantTranslationInput = z.infer<typeof productVariantTranslationSchema>;
 
-// Esquema para Variante de Producto (para creación)
-export const createProductVariantSchema = z.object({
-  variantDescription: z.string().min(1, "Variant description is required").max(100),
-  price: z.number().positive("Price must be positive"),
-  sku: optionalStringMax50,
-  sortOrder: nonNegativeInt.default(0).optional(),
-  isActive: z.boolean().default(true).optional(),
-  translations: z.array(productVariantTranslationSchema).optional(),
+// Basic response schema, can be expanded with relations
+export const productResponseSchema = z.object({
+  product_id: z.number().int().positive(),
+  establishment_id: z.number().int().positive(),
+  category_id: z.number().int().positive(),
+  name: z.string(),
+  description: z.string().nullable(),
+  image_url: z.string().url().nullable(),
+  sort_order: z.number().int().nullable(),
+  is_active: z.boolean().nullable(),
+  responsible_role: z.nativeEnum(UserRole).nullable(),
+  created_by_user_id: z.number().int().positive().nullable(),
+  created_at: z.string().datetime().nullable(), // Assuming ISO string format for dates
+  updated_at: z.string().datetime().nullable(),
+  deleted_at: z.string().datetime().nullable(),
+  // translations, variants, allergens can be added here if needed, using their respective response schemas
 });
-export type CreateProductVariantInput = z.infer<typeof createProductVariantSchema>;
-
-// Esquema para Actualizar Variante de Producto
-export const updateProductVariantSchema = createProductVariantSchema.partial().extend({
-  variantId: idSchema.optional(),
-});
-export type UpdateProductVariantInput = z.infer<typeof updateProductVariantSchema>;
-
-// Esquema para Crear Producto
-export const createProductSchema = z.object({
-  establishmentId: idSchema,
-  categoryId: idSchema,
-  name: z.string().min(1, "Product name is required").max(255),
-  description: optionalStringMax255,
-  imageUrl: optionalUrl,
-  sortOrder: nonNegativeInt.default(0).optional(),
-  isActive: z.boolean().default(true).optional(),
-  responsibleRole: z.nativeEnum(UserRole).refine(
-    role => role === UserRole.COOK || role === UserRole.WAITER,
-    { message: "Responsible role must be 'cook' or 'waiter'" }
-  ).optional().nullable(),
-  translations: z.array(productTranslationSchema).optional(),
-  variants: z.array(createProductVariantSchema).min(1, "Product must have at least one variant"),
-  allergenIds: z.array(idSchema).optional(),
-});
-export type CreateProductInput = z.infer<typeof createProductSchema>;
-
-// Esquema para Actualizar Producto
-export const updateProductSchema = createProductSchema.partial().extend({
-  variants: z.array(updateProductVariantSchema).optional(),
-});
-export type UpdateProductInput = z.infer<typeof updateProductSchema>;
-
-// Esquema para parámetros de ruta
-export const productIdParamSchema = z.object({
-  productId: z.coerce.number().int().positive(),
-});
-export type ProductIdParam = z.infer<typeof productIdParamSchema>;
-
-export const productVariantIdParamSchema = z.object({
-  productId: z.coerce.number().int().positive(),
-  variantId: z.coerce.number().int().positive(),
-});
-export type ProductVariantIdParam = z.infer<typeof productVariantIdParamSchema>;

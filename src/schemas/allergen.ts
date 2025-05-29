@@ -1,39 +1,22 @@
-// src/schemas/allergen.ts
 import { z } from 'zod';
-import { languageCodeSchema, optionalString, optionalUrl } from './common';
+import { createAllergenTranslationSchema, updateAllergenTranslationSchema } from './allergenTranslation'; // Importación actualizada
 
-// Esquema para Traducción de Alérgeno
-export const allergenTranslationSchema = z.object({
-  languageCode: languageCodeSchema,
+export const baseAllergenSchema = z.object({
+  code: z.string().min(1).max(20),
   name: z.string().min(1).max(100),
-  description: optionalString,
+  description: z.string().max(65535).optional().nullable(),
+  icon_url: z.string().url().max(255).optional().nullable(),
+  is_major_allergen: z.boolean().optional().default(true),
 });
-export type AllergenTranslationInput = z.infer<typeof allergenTranslationSchema>;
 
-// Esquema para Crear Alérgeno
-export const createAllergenSchema = z.object({
-  code: z.string().min(1, "Code is required").max(20),
-  name: z.string().min(1, "Name is required").max(100), // Nombre por defecto
-  description: optionalString,
-  iconUrl: optionalUrl,
-  isMajorAllergen: z.boolean().default(true).optional(),
-  translations: z.array(allergenTranslationSchema).optional(),
+export const createAllergenSchema = baseAllergenSchema.extend({
+  translations: z.array(createAllergenTranslationSchema).optional(),
 });
-export type CreateAllergenInput = z.infer<typeof createAllergenSchema>;
 
-// Esquema para Actualizar Alérgeno
-export const updateAllergenSchema = z.object({
-  code: z.string().min(1, "Code is required").max(20).optional(),
-  name: z.string().min(1, "Name is required").max(100).optional(), // Nombre por defecto
-  description: optionalString,
-  iconUrl: optionalUrl,
-  isMajorAllergen: z.boolean().optional(),
-  translations: z.array(allergenTranslationSchema).optional(),
+export const updateAllergenSchema = baseAllergenSchema.partial().extend({
+  translations: z.array(updateAllergenTranslationSchema).optional(),
 });
-export type UpdateAllergenInput = z.infer<typeof updateAllergenSchema>;
 
-// Esquema para parámetros de ruta
-export const allergenIdParamSchema = z.object({
-  allergenId: z.coerce.number().int().positive(),
+export const allergenIdSchema = z.object({
+  allergen_id: z.coerce.number().int().positive(),
 });
-export type AllergenIdParam = z.infer<typeof allergenIdParamSchema>;

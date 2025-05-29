@@ -1,40 +1,28 @@
-// src/types/entities/establishment.ts
-
-import { Category } from './category';
-import { Order } from './order';
-import { Product } from './product';
-import { ProductVariant } from './product';
-import { User } from './user';
-
-// Forward declaration for EstablishmentAdministrator to break circular dependency
-export interface EstablishmentAdministrator {
-  userId: number;
-  establishmentId: number;
-  user?: User;
-  establishment?: Establishment;
-}
+// Assuming User, Category, Product, ProductVariant, Order, EstablishmentAdministrator types will be defined elsewhere
+// For now, we'll use placeholder types or omit them for brevity in this file.
 
 export interface Establishment {
-  establishmentId: number;
+  establishment_id: number;
   name: string;
-  taxId?: string | null;
+  tax_id?: string | null;
   address?: string | null;
-  postalCode?: string | null;
+  postal_code?: string | null;
   city?: string | null;
   phone1?: string | null;
   phone2?: string | null;
-  billingBankDetails?: string | null;
-  paymentBankDetails?: string | null;
-  contactPerson?: string | null;
+  billing_bank_details?: string | null;
+  payment_bank_details?: string | null;
+  contact_person?: string | null;
   description?: string | null;
   website?: string | null;
-  imageUrl?: string | null;
-  isActive: boolean;
-  acceptsOrders: boolean;
-  categories?: Category[];
-  establishmentAdministrators?: EstablishmentAdministrator[];
-  orders?: Order[];
-  productVariants?: ProductVariant[];
-  products?: Product[];
-  users?: User[];
+  is_active?: boolean | null;
+  accepts_orders: boolean;
+  created_at?: Date | null;
+  updated_at?: Date | null;
+  // users: User[];
+  // establishment_administrators: EstablishmentAdministrator[];
+  // categories: Category[];
+  // products: Product[];
+  // product_variants: ProductVariant[];
+  // orders: Order[];
 }

@@ -1,63 +1,33 @@
-// src/types/entities/product.ts
-
-import { UserRole } from '../enums';
+import { Prisma, UserRole } from '@prisma/client';
 import { Category } from './category';
 import { Establishment } from './establishment';
-import { Allergen } from './allergen';
-import { OrderItem } from './order';
-
-export interface ProductTranslation {
-  translationId: number;
-  productId: number;
-  languageCode: string;
-  name: string;
-  description?: string | null;
-  product?: Product;
-}
-
-export interface ProductVariantTranslation {
-  translationId: number;
-  variantId: number;
-  languageCode: string;
-  variantDescription: string;
-  variant?: ProductVariant;
-}
-
-export interface ProductVariant {
-  variantId: number;
-  productId: number;
-  establishmentId: number;
-  variantDescription: string;
-  price: number;
-  sku?: string | null;
-  sortOrder?: number | null;
-  isActive: boolean;
-  product?: Product;
-  establishment?: Establishment;
-  translations?: ProductVariantTranslation[];
-  orderItems?: OrderItem[];
-}
-
-export interface ProductAllergen {
-  productId: number;
-  allergenId: number;
-  product?: Product;
-  allergen?: Allergen;
-}
+import { ProductAllergen } from './productAllergen';
+import { ProductHistory } from './productHistory';
+import { ProductTranslation } from './productTranslation';
+import { ProductVariant } from './productVariant';
+import { User } from './user';
 
 export interface Product {
-  productId: number;
-  establishmentId: number;
-  categoryId: number;
+  product_id: number;
+  establishment_id: number;
+  category_id: number;
   name: string;
   description?: string | null;
-  imageUrl?: string | null;
-  sortOrder?: number | null;
-  isActive: boolean;
-  responsibleRole?: UserRole | null;
-  category?: Category;
+  image_url?: string | null;
+  sort_order?: number | null;
+  is_active?: boolean | null;
+  responsible_role?: UserRole | null;
+  created_by_user_id?: number | null;
+  created_at?: Date | null;
+  updated_at?: Date | null;
+  deleted_at?: Date | null;
+
+  // Relations
   establishment?: Establishment;
+  category?: Category;
+  creator?: User | null;
   translations?: ProductTranslation[];
+  history?: ProductHistory[];
   variants?: ProductVariant[];
   allergens?: ProductAllergen[];
 }

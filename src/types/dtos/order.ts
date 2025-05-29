@@ -1,23 +1,48 @@
-// src/types/dtos/order.ts
-import { z } from 'zod'
-import {
-  createOrderSchema,
-  updateOrderSchema,
-  updateOrderStatusSchema,
-  createOrderItemSchema,
-  updateOrderItemSchema,
-  updateOrderItemStatusSchema,
-  orderIdParamSchema,
-  orderItemIdParamSchema,
-} from '../../schemas/order'
+import { OrderStatus } from '@prisma/client';
+import { OrderItemCreateDTO, OrderItemDTO } from './orderItem'; // Assuming these will be defined
+import { OrderStatusHistoryDTO } from './orderStatusHistory'; // Assuming this will be defined
 
-export type CreateOrderDTO = z.infer<typeof createOrderSchema>
-export type UpdateOrderDTO = z.infer<typeof updateOrderSchema>
-export type UpdateOrderStatusDTO = z.infer<typeof updateOrderStatusSchema>
+export interface OrderCreateDTO {
+  establishment_id: number;
+  client_user_id?: number | null;
+  waiter_user_id?: number | null;
+  table_number?: string | null;
+  status?: OrderStatus; // Defaults to 'pending'
+  total_amount?: number | null; // Often calculated, but can be set
+  payment_method?: string | null;
+  payment_status?: string | null; // Defaults to 'UNPAID'
+  order_type?: string | null;
+  notes?: string | null;
+  order_items?: OrderItemCreateDTO[]; // For creating order items along with the order
+}
 
-export type CreateOrderItemDTO = z.infer<typeof createOrderItemSchema>
-export type UpdateOrderItemDTO = z.infer<typeof updateOrderItemSchema>
-export type UpdateOrderItemStatusDTO = z.infer<typeof updateOrderItemStatusSchema>
+export interface OrderUpdateDTO {
+  client_user_id?: number | null;
+  waiter_user_id?: number | null;
+  table_number?: string | null;
+  status?: OrderStatus;
+  total_amount?: number | null;
+  payment_method?: string | null;
+  payment_status?: string | null;
+  order_type?: string | null;
+  notes?: string | null;
+  // order_items might be handled via separate endpoints for adding/removing/updating items
+}
 
-export type OrderIdParamDTO = z.infer<typeof orderIdParamSchema>
-export type OrderItemIdParamDTO = z.infer<typeof orderItemIdParamSchema>
+export interface OrderDTO {
+  order_id: number;
+  establishment_id: number;
+  client_user_id?: number | null;
+  waiter_user_id?: number | null;
+  table_number?: string | null;
+  status: OrderStatus;
+  total_amount?: number | null;
+  payment_method?: string | null;
+  payment_status?: string | null;
+  order_type?: string | null;
+  notes?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  order_items?: OrderItemDTO[];
+  status_history?: OrderStatusHistoryDTO[];
+}

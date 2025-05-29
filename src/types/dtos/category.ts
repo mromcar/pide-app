@@ -1,19 +1,31 @@
-// src/types/dtos/category.ts
-import { z } from 'zod'
-import {
-  createCategorySchema,
-  updateCategorySchema,
-  categoryIdParamSchema,
-  categoryTranslationSchema,
-  updateCategoryTranslationSchema,
-} from '../../schemas/category'
+import { CategoryTranslationCreateDTO, CategoryTranslationDTO, CategoryTranslationUpdateDTO } from './categoryTranslation';
 
-// Para crear una categoría (POST)
-export type CreateCategoryDTO = z.infer<typeof createCategorySchema>
-// Para actualizar una categoría (PUT/PATCH)
-export type UpdateCategoryDTO = z.infer<typeof updateCategorySchema>
-// Para traducciones de categoría
-export type CategoryTranslationDTO = z.infer<typeof categoryTranslationSchema>
-export type UpdateCategoryTranslationDTO = z.infer<typeof updateCategoryTranslationSchema>
-// Para parámetros de ruta
-export type CategoryIdParamDTO = z.infer<typeof categoryIdParamSchema>
+export interface CategoryCreateDTO {
+  establishment_id: number;
+  name: string;
+  image_url?: string | null;
+  sort_order?: number | null;
+  is_active?: boolean | null;
+  translations?: CategoryTranslationCreateDTO[];
+}
+
+export interface CategoryUpdateDTO {
+  name?: string;
+  image_url?: string | null;
+  sort_order?: number | null;
+  is_active?: boolean | null;
+  translations?: (CategoryTranslationCreateDTO | CategoryTranslationUpdateDTO)[]; // Allow creating new or updating existing translations
+}
+
+export interface CategoryDTO {
+  category_id: number;
+  establishment_id: number;
+  name: string;
+  image_url?: string | null;
+  sort_order?: number | null;
+  is_active?: boolean | null;
+  created_at?: string | null; // Dates as strings for DTOs
+  updated_at?: string | null;
+  deleted_at?: string | null;
+  translations?: CategoryTranslationDTO[];
+}

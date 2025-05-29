@@ -1,15 +1,3 @@
-export interface SerializedAllergenTranslation {
-  languageCode: string;
-  name: string;
-  description?: string | null;
-}
+import type { AllergenResponseDTO } from '../dtos/allergen';
 
-export interface SerializedAllergen {
-  allergenId: number;
-  code: string;
-  name: string; // Default or translated
-  description?: string | null;
-  iconUrl?: string | null;
-  isMajorAllergen: boolean;
-  translations?: SerializedAllergenTranslation[];
-}
+export interface SerializedAllergen extends AllergenResponseDTO {}

@@ -1,23 +1,6 @@
-// src/types/entities/allergen.ts
+import type { Allergen as PrismaAllergen } from '@prisma/client';
+import type { AllergenTranslation } from './allergenTranslation'; // Importación actualizada
 
-import { ProductAllergen } from './product';
-
-export interface AllergenTranslation {
-  translationId: number;
-  allergenId: number;
-  languageCode: string;
-  name: string;
-  description?: string | null;
-  allergen?: Allergen; // Optional back-reference
-}
-
-export interface Allergen {
-  allergenId: number;
-  code: string;
-  name: string;
-  description?: string | null;
-  iconUrl?: string | null;
-  isMajorAllergen: boolean; // Mejor no opcional, ya que el schema lo pone por defecto
+export interface Allergen extends Omit<PrismaAllergen, 'translations'> {
   translations?: AllergenTranslation[];
-  products?: ProductAllergen[];
 }
