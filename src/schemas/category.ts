@@ -19,8 +19,10 @@ export const categoryUpdateSchema = z.object({
   image_url: z.string().url().max(255).optional().nullable(),
   sort_order: z.number().int().optional().nullable(),
   is_active: z.boolean().optional().nullable(),
-  translations: z.array(z.union([categoryTranslationCreateSchema, categoryTranslationUpdateSchema])).optional(),
+  translations: z.array(categoryTranslationCreateSchema).optional(), // Changed here
 });
 
 export type CategoryCreateInput = z.infer<typeof categoryCreateSchema>;
 export type CategoryUpdateInput = z.infer<typeof categoryUpdateSchema>;
+export type CategoryTranslationCreateInput = z.infer<typeof categoryTranslationCreateSchema>;
+export type CategoryTranslationUpdateInput = z.infer<typeof categoryTranslationUpdateSchema>;

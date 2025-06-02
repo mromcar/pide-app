@@ -7,74 +7,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  client
-  waiter
-  cook
-  establishment_admin
-  general_admin
-}
-
-enum OrderStatus {
-  pending
-  preparing
-  ready
-  delivered
-  cancelled
-  completed
-}
-
-enum OrderItemStatus {
-  pending
-  preparing
-  ready
-  delivered
-}
-
 model Establishment {
-  establishment_id         Int                          @id @default(autoincrement())
-  name                       String                       @db.VarChar(255)
-  tax_id                     String?                      @unique @db.VarChar(20)
-  address                    String?
-  postal_code                String?                      @db.VarChar(10)
-  city                       String?                      @db.VarChar(100)
-  phone1                     String?                      @db.VarChar(20)
-  phone2                     String?                      @db.VarChar(20)
-  billing_bank_details       String?
-  payment_bank_details       String?
-  contact_person             String?                      @db.VarChar(255)
-  description                String?
-  website                    String?                      @db.VarChar(255)
-  is_active                  Boolean?                     @default(true)
-  accepts_orders             Boolean                      @default(true)
-  created_at                 DateTime?                    @default(now()) @db.Timestamp()
-  updated_at                 DateTime?                    @default(now()) @db.Timestamp()
-  users                      User[]
+  establishment_id             Int                          @id @default(autoincrement())
+  name                         String                       @db.VarChar(255)
+  tax_id                       String?                      @unique @db.VarChar(20)
+  address                      String?
+  postal_code                  String?                      @db.VarChar(10)
+  city                         String?                      @db.VarChar(100)
+  phone1                       String?                      @db.VarChar(20)
+  phone2                       String?                      @db.VarChar(20)
+  billing_bank_details         String?
+  payment_bank_details         String?
+  contact_person               String?                      @db.VarChar(255)
+  description                  String?
+  website                      String?                      @db.VarChar(255)
+  is_active                    Boolean?                     @default(true)
+  accepts_orders               Boolean                      @default(true)
+  created_at                   DateTime?                    @default(now()) @db.Timestamp(6)
+  updated_at                   DateTime?                    @default(now()) @db.Timestamp(6)
+  categories                   Category[]
   establishment_administrators EstablishmentAdministrator[]
-  categories                 Category[]
-  products                   Product[]
-  product_variants           ProductVariant[]
-  orders                     Order[]
+  product_variants             ProductVariant[]
+  products                     Product[]
+  users                        User[]
 
   @@map("establishments")
 }
 
 model User {
-  user_id                    Int                          @id @default(autoincrement())
-  role                       UserRole
-  name                       String?                      @db.VarChar(255)
-  email                      String                       @unique @db.VarChar(255)
-  password_hash              String                       @db.VarChar(255)
-  establishment_id           Int?
-  created_at                 DateTime?                    @default(now()) @db.Timestamp()
-  updated_at                 DateTime?                    @default(now()) @db.Timestamp()
-  establishment              Establishment?               @relation(fields: [establishment_id], references: [establishment_id], onDelete: SetNull, map: "fk_user_establishment")
+  user_id                      Int                          @id @default(autoincrement())
+  role                         UserRole
+  name                         String?                      @db.VarChar(255)
+  email                        String                       @unique @db.VarChar(255)
+  password_hash                String                       @db.VarChar(255)
+  establishment_id             Int?
+  created_at                   DateTime?                    @default(now()) @db.Timestamp(6)
+  updated_at                   DateTime?                    @default(now()) @db.Timestamp(6)
   establishment_administrators EstablishmentAdministrator[]
-  created_products           Product[]                    @relation("ProductCreator")
-  product_variants_created   ProductVariant[]             @relation("VariantCreator")
-  orders_client              Order[]                      @relation("ClientOrders")
-  orders_waiter              Order[]                      @relation("WaiterOrders")
-  order_status_history       OrderStatusHistory[]         @relation("ChangedByUser")
+  product_variants_created     ProductVariant[]             @relation("VariantCreator")
+  created_products             Product[]                    @relation("ProductCreator")
+  establishment                Establishment?               @relation(fields: [establishment_id], references: [establishment_id], onUpdate: NoAction, map: "fk_user_establishment")
 
   @@map("users")
 }
@@ -82,8 +54,8 @@ model User {
 model EstablishmentAdministrator {
   user_id          Int
   establishment_id Int
-  user             User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade, map: "fk_ea_user")
-  establishment    Establishment @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, map: "fk_ea_establishment")
+  establishment    Establishment @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_ea_establishment")
+  user             User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_ea_user")
 
   @@id([user_id, establishment_id])
   @@map("establishment_administrators")
@@ -96,10 +68,10 @@ model Category {
   image_url        String?               @db.VarChar(255)
   sort_order       Int?                  @default(0)
   is_active        Boolean?              @default(true)
-  created_at       DateTime?             @default(now()) @db.Timestamp()
-  updated_at       DateTime?             @default(now()) @db.Timestamp()
-  deleted_at       DateTime?             @db.Timestamp()
-  establishment    Establishment         @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, map: "fk_category_establishment")
+  created_at       DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?             @default(now()) @db.Timestamp(6)
+  deleted_at       DateTime?             @db.Timestamp(6)
+  establishment    Establishment         @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_category_establishment")
   translations     CategoryTranslation[]
   products         Product[]
 
@@ -111,7 +83,7 @@ model CategoryTranslation {
   category_id    Int
   language_code  String   @db.VarChar(10)
   name           String   @db.VarChar(255)
-  category       Category @relation(fields: [category_id], references: [category_id], onDelete: Cascade, map: "fk_translation_category")
+  category       Category @relation(fields: [category_id], references: [category_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_category")
 
   @@unique([category_id, language_code], map: "unique_category_language")
   @@map("category_translations")
@@ -128,17 +100,17 @@ model Product {
   is_active          Boolean?             @default(true)
   responsible_role   UserRole?
   created_by_user_id Int?
-  created_at         DateTime?            @default(now()) @db.Timestamp()
-  updated_at         DateTime?            @default(now()) @db.Timestamp()
-  deleted_at         DateTime?            @db.Timestamp()
-  establishment      Establishment        @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, map: "fk_product_establishment")
-  category           Category             @relation(fields: [category_id], references: [category_id], onDelete: Restrict, map: "fk_product_category")
-  creator            User?                @relation("ProductCreator", fields: [created_by_user_id], references: [user_id], map: "fk_product_creator")
-  translations       ProductTranslation[]
-  history            ProductHistory[]
-  variants           ProductVariant[]
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  deleted_at         DateTime?            @db.Timestamp(6)
   allergens          ProductAllergen[]
-  // chk_product_responsible_role CHECK (responsible_role IN ('cook', 'waiter')) - Prisma does not directly support CHECK constraints in the schema, this should be handled at application level or via raw SQL if necessary.
+  history            ProductHistory[]
+  translations       ProductTranslation[]
+  variants           ProductVariant[]
+  category           Category             @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "fk_product_category")
+  creator            User?                @relation("ProductCreator", fields: [created_by_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_creator")
+  establishment      Establishment        @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_product_establishment")
+
   @@map("products")
 }
 
@@ -148,20 +120,25 @@ model ProductTranslation {
   language_code  String  @db.VarChar(10)
   name           String  @db.VarChar(255)
   description    String?
-  product        Product @relation(fields: [product_id], references: [product_id], onDelete: Cascade, map: "fk_translation_product")
+  product        Product @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_product")
 
   @@unique([product_id, language_code], map: "unique_product_language")
   @@map("product_translations")
 }
 
 model ProductHistory {
-  id          Int       @id @default(autoincrement())
-  product_id  Int?
-  name        String?
-  description String?
-  is_active   Boolean?
-  updated_at  DateTime? @default(now()) @db.Timestamp()
-  product     Product?  @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+  id           Int      @id @default(autoincrement())
+  product_id   Int
+  name         String?
+  description  String?
+  is_active    Boolean?
+  changed_at   DateTime @default(now()) // Ya no se necesita @map("updated_at")
+  action_type  String
+  details      Json?
+  user_id      Int?
+
+  product      Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+  user         User?    @relation(fields: [user_id], references: [user_id], onDelete: SetNull)
 
   @@map("product_history")
 }
@@ -171,20 +148,19 @@ model ProductVariant {
   product_id          Int
   establishment_id    Int
   variant_description String                      @db.VarChar(100)
-  price               Decimal                     @db.Decimal(10, 2) // CHECK (price >= 0) - Prisma does not directly support CHECK constraints for specific values in the schema, handle in application logic.
+  price               Decimal                     @db.Decimal(10, 2)
   sku                 String?                     @unique @db.VarChar(50)
   sort_order          Int?                        @default(0)
   is_active           Boolean?                    @default(true)
   created_by_user_id  Int?
-  created_at          DateTime?                   @default(now()) @db.Timestamp()
-  updated_at          DateTime?                   @default(now()) @db.Timestamp()
-  deleted_at          DateTime?                   @db.Timestamp()
-  product             Product                     @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
-  establishment       Establishment               @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade)
-  creator             User?                       @relation("VariantCreator", fields: [created_by_user_id], references: [user_id])
-  translations        ProductVariantTranslation[]
+  created_at          DateTime?                   @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?                   @default(now()) @db.Timestamp(6)
+  deleted_at          DateTime?                   @db.Timestamp(6)
   history             ProductVariantHistory[]
-  order_items         OrderItem[]
+  translations        ProductVariantTranslation[]
+  creator             User?                       @relation("VariantCreator", fields: [created_by_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  establishment       Establishment               @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction)
+  product             Product                     @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([product_id, variant_description])
   @@map("product_variants")
@@ -195,20 +171,20 @@ model ProductVariantTranslation {
   variant_id          Int
   language_code       String         @db.VarChar(10)
   variant_description String         @db.VarChar(255)
-  variant             ProductVariant @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade)
+  variant             ProductVariant @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([variant_id, language_code])
   @@map("product_variant_translations")
 }
 
 model ProductVariantHistory {
-  id                  Int       @id @default(autoincrement())
+  id                  Int             @id @default(autoincrement())
   variant_id          Int?
   variant_description String?
-  price               Decimal?  @db.Decimal(10, 2)
+  price               Decimal?        @db.Decimal(10, 2)
   is_active           Boolean?
-  updated_at          DateTime? @default(now()) @db.Timestamp()
-  variant             ProductVariant? @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade)
+  updated_at          DateTime?       @default(now()) @db.Timestamp(6)
+  variant             ProductVariant? @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("product_variant_history")
 }
@@ -232,7 +208,7 @@ model AllergenTranslation {
   language_code  String   @db.VarChar(10)
   name           String   @db.VarChar(100)
   description    String?
-  allergen       Allergen @relation(fields: [allergen_id], references: [allergen_id], onDelete: Cascade, map: "fk_translation_allergen")
+  allergen       Allergen @relation(fields: [allergen_id], references: [allergen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_allergen")
 
   @@unique([allergen_id, language_code], map: "unique_allergen_language")
   @@map("allergen_translations")
@@ -241,67 +217,33 @@ model AllergenTranslation {
 model ProductAllergen {
   product_id  Int
   allergen_id Int
-  product     Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade, map: "fk_pa_product")
-  allergen    Allergen @relation(fields: [allergen_id], references: [allergen_id], onDelete: Cascade, map: "fk_pa_allergen")
+  allergen    Allergen @relation(fields: [allergen_id], references: [allergen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_allergen")
+  product     Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_product")
 
   @@id([product_id, allergen_id])
   @@map("product_allergens")
 }
 
-model Order {
-  order_id         Int                  @id @default(autoincrement())
-  establishment_id Int
-  client_user_id   Int?
-  waiter_user_id   Int?
-  table_number     String?              @db.VarChar(20)
-  status           OrderStatus          @default(pending)
-  total_amount     Decimal?             @default(0.00) @db.Decimal(10, 2)
-  payment_method   String?              @db.VarChar(50)
-  payment_status   String?              @default("UNPAID") @db.VarChar(20)
-  order_type       String?              @db.VarChar(50)
-  notes            String?
-  created_at       DateTime?            @default(now()) @db.Timestamp()
-  updated_at       DateTime?            @default(now()) @db.Timestamp()
-  establishment    Establishment        @relation(fields: [establishment_id], references: [establishment_id], onDelete: Restrict)
-  client           User?                @relation("ClientOrders", fields: [client_user_id], references: [user_id], onDelete: SetNull)
-  waiter           User?                @relation("WaiterOrders", fields: [waiter_user_id], references: [user_id], onDelete: SetNull)
-  order_items      OrderItem[]
-  status_history   OrderStatusHistory[]
-
-  @@map("orders")
+enum UserRole {
+  client
+  waiter
+  cook
+  establishment_admin
+  general_admin
 }
 
-model OrderItem {
-  order_item_id    Int             @id @default(autoincrement())
-  order_id         Int
-  variant_id       Int
-  quantity         Int             @default(1) // CHECK (quantity > 0) - Prisma does not directly support CHECK constraints for specific values in the schema, handle in application logic.
-  unit_price       Decimal         @db.Decimal(10, 2)
-  item_total_price Decimal?        @db.Decimal(10, 2) // This is a GENERATED ALWAYS AS column in SQL, Prisma doesn't support it directly. It will be null or needs to be calculated by the application.
-  status           OrderItemStatus? @default(pending)
-  notes            String?
-  order            Order           @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
-  variant          ProductVariant  @relation(fields: [variant_id], references: [variant_id], onDelete: Restrict)
-
-  @@map("order_items")
+enum OrderStatus {
+  pending
+  preparing
+  ready
+  delivered
+  cancelled
+  completed
 }
 
-model OrderStatusHistory {
-  history_id         Int        @id @default(autoincrement())
-  order_id           Int
-  status             OrderStatus
-  changed_by_user_id Int?
-  changed_at         DateTime?  @default(now()) @db.Timestamp()
-  notes              String?
-  order              Order      @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
-  changed_by_user    User?      @relation("ChangedByUser", fields: [changed_by_user_id], references: [user_id], onDelete: SetNull)
-
-  @@map("order_status_history")
+enum OrderItemStatus {
+  pending
+  preparing
+  ready
+  delivered
 }
-
-// Views are not directly supported in Prisma schema. 
-// You would typically query the underlying tables and construct the view logic in your application code or use raw SQL queries if needed.
-// model MenuTranslated { ... } 
-
-// Triggers and Functions are not part of Prisma schema. 
-// These need to be managed directly in the database.

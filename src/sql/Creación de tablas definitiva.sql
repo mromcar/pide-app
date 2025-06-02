@@ -132,6 +132,12 @@ CREATE TABLE product_history (
   is_active BOOLEAN,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE product_history
+ADD COLUMN action_type VARCHAR(255),
+ADD COLUMN details JSONB,
+ADD COLUMN user_id INTEGER REFERENCES users(user_id) ON DELETE SET NULL;
+
+ALTER TABLE product_history RENAME COLUMN updated_at TO changed_at;
 
 CREATE TABLE product_variants (
   variant_id SERIAL PRIMARY KEY,

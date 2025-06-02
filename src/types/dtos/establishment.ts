@@ -1,3 +1,6 @@
+import { CategoryDTO } from './category'; 
+import { UserResponseDTO } from './user'; 
+
 export interface EstablishmentCreateDTO {
   name: string;
   tax_id?: string | null;
@@ -50,4 +53,26 @@ export interface EstablishmentDTO {
   accepts_orders: boolean;
   created_at?: string | null; // Dates as strings for DTOs
   updated_at?: string | null;
+}
+
+export interface EstablishmentResponseDTO { // O el nombre que le hayas dado, ej: EstablishmentDTO
+  establishment_id: number;
+  name: string;
+  tax_id?: string | null;
+  address?: string | null;
+  postal_code?: string | null;
+  city?: string | null;
+  phone1?: string | null;
+  phone2?: string | null;
+  billing_bank_details?: string | null;
+  payment_bank_details?: string | null;
+  contact_person?: string | null;
+  description?: string | null;
+  website?: string | null;
+  is_active?: boolean | null;
+  accepts_orders: boolean;
+  created_at?: string | null; 
+  updated_at?: string | null;
+  categories?: CategoryDTO[]; // Añadido
+  administrators?: UserResponseDTO[]; // Añadido, asumiendo que quieres una lista de UserResponseDTO
 }

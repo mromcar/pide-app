@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { UserRole } from '@prisma/client'; // Assuming UserRole enum is accessible
-import { productTranslationCreateSchema, productTranslationUpdateSchema } from './productTranslation'; // Assuming these exist
+import { UserRole } from '@prisma/client';
+import { productTranslationCreateSchema, productTranslationUpdateSchema } from './productTranslation'; // Asumiendo que productTranslationUpdateSchema también es para crear en el contexto de updateProduct
 
 export const productIdSchema = z.object({
-  product_id: z.number().int().positive(),
+  product_id: z.coerce.number().int().positive(),
 });
 
 export const productCreateSchema = z.object({
@@ -11,29 +11,34 @@ export const productCreateSchema = z.object({
   category_id: z.number().int().positive(),
   name: z.string().min(1).max(255),
   description: z.string().nullable().optional(),
-  image_url: z.string().url().nullable().optional(),
-  sort_order: z.number().int().optional().nullable().default(0),
-  is_active: z.boolean().optional().nullable().default(true),
+  image_url: z.string().url().max(255).nullable().optional(),
+  sort_order: z.number().int().optional().nullable(),
+  is_active: z.boolean().optional().default(true),
   responsible_role: z.nativeEnum(UserRole).nullable().optional(),
-  created_by_user_id: z.number().int().positive().nullable().optional(),
-  translations: z.array(productTranslationCreateSchema).optional(),
-  allergen_ids: z.array(z.number().int().positive()).optional(), // For associating allergens by ID
+  translations: z.array(productTranslationCreateSchema).optional(), // productTranslationCreateSchema ya valida language_code y name
+  allergen_ids: z.array(z.number().int().positive()).optional(),
+  // created_by_user_id se añadirá en el servicio
 });
 
 export const productUpdateSchema = z.object({
-  establishment_id: z.number().int().positive().optional(),
   category_id: z.number().int().positive().optional(),
   name: z.string().min(1).max(255).optional(),
   description: z.string().nullable().optional(),
-  image_url: z.string().url().nullable().optional(),
+  image_url: z.string().url().max(255).nullable().optional(),
   sort_order: z.number().int().optional().nullable(),
-  is_active: z.boolean().optional().nullable(),
+  is_active: z.boolean().optional(),
   responsible_role: z.nativeEnum(UserRole).nullable().optional(),
-  translations: z.array(z.union([productTranslationCreateSchema, productTranslationUpdateSchema])).optional(),
+  // Para las traducciones en la actualización, si se proporcionan, deben ser válidas para la creación.
+  // productTranslationCreateSchema asegura que language_code y name son strings no vacíos.
+  translations: z.array(productTranslationCreateSchema).optional(), 
   allergen_ids: z.array(z.number().int().positive()).optional(),
 });
 
-// Basic response schema, can be expanded with relations
+export type ProductCreateInput = z.infer<typeof productCreateSchema>;
+export type ProductUpdateInput = z.infer<typeof productUpdateSchema>;
+
+// No es necesario productResponseSchema si los DTOs de respuesta se manejan manualmente
+// o si se quiere un control más granular sobre lo que se expone.
 export const productResponseSchema = z.object({
   product_id: z.number().int().positive(),
   establishment_id: z.number().int().positive(),
