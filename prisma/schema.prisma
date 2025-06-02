@@ -47,6 +47,7 @@ model User {
   product_variants_created     ProductVariant[]             @relation("VariantCreator")
   created_products             Product[]                    @relation("ProductCreator")
   establishment                Establishment?               @relation(fields: [establishment_id], references: [establishment_id], onUpdate: NoAction, map: "fk_user_establishment")
+  product_history_entries      ProductHistory[]             // <--- AÑADE ESTA LÍNEA
 
   @@map("users")
 }
@@ -127,18 +128,18 @@ model ProductTranslation {
 }
 
 model ProductHistory {
-  id           Int      @id @default(autoincrement())
-  product_id   Int
-  name         String?
-  description  String?
-  is_active    Boolean?
-  changed_at   DateTime @default(now()) // Ya no se necesita @map("updated_at")
-  action_type  String
-  details      Json?
-  user_id      Int?
+  id          Int      @id @default(autoincrement())
+  product_id  Int
+  name        String?
+  description String?
+  is_active   Boolean?
+  changed_at  DateTime @default(now())
+  action_type String
+  details     Json?
+  user_id     Int?
 
-  product      Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
-  user         User?    @relation(fields: [user_id], references: [user_id], onDelete: SetNull)
+  product Product @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+  user    User?   @relation(fields: [user_id], references: [user_id], onDelete: SetNull)
 
   @@map("product_history")
 }

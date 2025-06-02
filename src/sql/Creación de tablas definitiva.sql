@@ -130,14 +130,13 @@ CREATE TABLE product_history (
   name TEXT,
   description TEXT,
   is_active BOOLEAN,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  action_type VARCHAR(50), -- NUEVO
+  details JSONB,           -- NUEVO
+  changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- RENOMBRADO (antes updated_at)
+  user_id INTEGER,         -- NUEVO
+  CONSTRAINT fk_product_history_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL -- NUEVA RESTRICCIÓN
 );
-ALTER TABLE product_history
-ADD COLUMN action_type VARCHAR(255),
-ADD COLUMN details JSONB,
-ADD COLUMN user_id INTEGER REFERENCES users(user_id) ON DELETE SET NULL;
 
-ALTER TABLE product_history RENAME COLUMN updated_at TO changed_at;
 
 CREATE TABLE product_variants (
   variant_id SERIAL PRIMARY KEY,
