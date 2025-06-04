@@ -2,19 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { orderService } from '@/services/order.service';
 import { jsonOk, jsonError } from '@/utils/api';
-import { createOrderSchema } from '@/schemas/order';
+import { orderIdSchema } from '@/schemas/order';
 import { UserRole } from '@/types/enums';
-import { z } from 'zod';
-
-const pathParamsSchema = z.object({
-  restaurantId: z.coerce.number().int().positive(),
-});
 
 /**
  * @swagger
- * /api/restaurants/{restaurantId}/orders/client:
- *   post:
- *     summary: Create a new order for a client
+ * /api/restaurants/{restaurantId}/orders/client/{orderId}:
+ *   get:
+ *     summary: Get an order by ID for a client
  *     tags:
  *       - Orders
  *     parameters:
@@ -24,31 +19,31 @@ const pathParamsSchema = z.object({
  *           type: integer
  *         required: true
  *         description: ID of the restaurant
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/OrderCreateInput'
+ *       - in: path
+ *         name: orderId
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: ID of the order
  *     responses:
  *       200:
- *         description: Order created successfully
+ *         description: Order retrieved successfully
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/OrderResponseDTO'
- *       400:
- *         description: Invalid request body or parameters
  *       401:
  *         description: Unauthorized
  *       403:
  *         description: Forbidden
+ *       404:
+ *         description: Order not found
  *       500:
  *         description: Internal server error
  */
-export async function POST(
+export async function GET(
   req: NextRequest,
-  { params }: { params: { restaurantId: string } }
+  { params }: { params: { restaurantId: string; orderId: string } }
 ) {
   try {
     const token = await getToken({ req });
@@ -57,33 +52,35 @@ export async function POST(
       return jsonError('Unauthorized', 401);
     }
 
-    const parsedPathParams = pathParamsSchema.safeParse(params);
+    const { restaurantId, orderId } = params;
+
+    const parsedPathParams = orderIdSchema.safeParse({ orderId: Number(orderId) });
     if (!parsedPathParams.success) {
       return jsonError(parsedPathParams.error, 400);
     }
 
-    const { restaurantId } = parsedPathParams.data;
+    const parsedRestaurantId = Number(restaurantId);
+    if (isNaN(parsedRestaurantId)) {
+      return jsonError('Invalid restaurant ID', 400);
+    }
 
     // Authorization check: Only general_admin or establishment_admin of the specific restaurant
     if (
       token.role !== UserRole.general_admin &&
-      !(token.role === UserRole.establishment_admin && token.establishment_id === restaurantId)
+      !(token.role === UserRole.establishment_admin && token.establishment_id === parsedRestaurantId)
     ) {
       return jsonError('Forbidden', 403);
     }
 
-    const body = await req.json();
-    const validatedData = createOrderSchema.safeParse(body);
+    const order = await orderService.getOrderById(
+      parsedPathParams.data.orderId,
+      parsedRestaurantId,
+      token.sub // Assuming token.sub is the user ID
+    );
 
-    if (!validatedData.success) {
-      return jsonError(validatedData.error, 400);
+    if (!order) {
+      return jsonError('Order not found', 404);
     }
-
-    const order = await orderService.createOrder({
-      ...validatedData.data,
-      client_user_id: token.sub, // Assuming token.sub is the user ID
-      establishment_id: restaurantId,
-    });
 
     return jsonOk(order);
   } catch (error) {

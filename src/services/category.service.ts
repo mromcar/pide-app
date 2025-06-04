@@ -94,7 +94,7 @@ export class CategoryService {
     return category ? this.mapToDTO(category) : null;
   }
 
-  async updateCategory(categoryId: number, data: CategoryUpdateInput): Promise<CategoryDTO | null> {
+  async updateCategory(categoryId: number, restaurantId: number, data: CategoryUpdateInput): Promise<CategoryDTO | null> {
     categoryIdSchema.parse({ categoryId });
     categoryUpdateSchema.parse(data); // Zod now ensures translations (if any) have string language_code and name
 
@@ -102,8 +102,18 @@ export class CategoryService {
 
     try {
       const updatedCategory = await prisma.$transaction(async (tx) => {
-        const category = await tx.category.update({
+        // First, verify the category belongs to the restaurant
+        const existingCategory = await tx.category.findUnique({
           where: { category_id: categoryId },
+        });
+
+        if (!existingCategory || existingCategory.establishment_id !== restaurantId) {
+          // Category not found or does not belong to the specified restaurant
+          return null; // Or throw a specific error
+        }
+
+        const category = await tx.category.update({
+          where: { category_id: categoryId }, // No need for establishment_id here as we already checked
           data: categoryData,
         });
 
@@ -112,60 +122,60 @@ export class CategoryService {
             where: { category_id: categoryId },
           });
 
-          // No need for filtering, Zod already validated this based on categoryTranslationCreateSchema
-          // const validTranslations = translations.filter(
-          //   t => typeof t.language_code === 'string' && typeof t.name === 'string'
-          // );
-
-          // if (validTranslations.length > 0) { // Now, if translations exist, they are valid
-          if (translations.length > 0) { // Check if there are any translations to create
+          if (translations.length > 0) {
             await tx.categoryTranslation.createMany({
               data: translations.map(t => ({
                 category_id: categoryId,
-                language_code: t.language_code, // No '!' needed, Zod ensures it's a string
-                name: t.name, // No '!' needed, Zod ensures it's a string
+                language_code: t.language_code,
+                name: t.name,
               })),
             });
           }
         }
 
-        // Re-fetch the category with updated translations
         const result = await tx.category.findUnique({
           where: { category_id: categoryId },
           include: { translations: true },
         });
-        if (!result) throw new Error('Category not found after update transaction.'); // Should not happen
+        if (!result) throw new Error('Category not found after update transaction.');
         return result;
       });
+
+      if (!updatedCategory) return null; // Handles the case where the category didn't belong to the restaurant
 
       return this.mapToDTO(updatedCategory);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null; // Record to update not found
+        return null; // Record to update not found (already handled by the check above, but good as a fallback)
       }
       console.error("Error updating category:", error);
       throw error;
     }
   }
 
-  async deleteCategory(categoryId: number): Promise<CategoryDTO | null> {
+  async deleteCategory(categoryId: number, restaurantId: number): Promise<CategoryDTO | null> {
     categoryIdSchema.parse({ categoryId });
     try {
-      // Option 1: Soft delete (if you have a deleted_at field and want to keep data)
-      const category = await prisma.category.update({
+      // First, verify the category belongs to the restaurant
+      const existingCategory = await prisma.category.findUnique({
         where: { category_id: categoryId },
-        data: { deleted_at: new Date() },
-        include: { translations: true }, // To return the DTO before marking as deleted
       });
-      // If you truly want to delete, use prisma.category.delete()
-      // const deletedCategory = await prisma.category.delete({
-      //   where: { category_id: categoryId },
-      //   include: { translations: true },
-      // });
+
+      if (!existingCategory || existingCategory.establishment_id !== restaurantId) {
+        // Category not found or does not belong to the specified restaurant
+        return null; // Or throw a specific error
+      }
+
+      // Soft delete
+      const category = await prisma.category.update({
+        where: { category_id: categoryId }, // No need for establishment_id here
+        data: { deleted_at: new Date() },
+        include: { translations: true },
+      });
       return this.mapToDTO(category);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null; // Record to delete not found
+        return null; // Record to delete not found (already handled by the check above)
       }
       console.error("Error deleting category:", error);
       throw error;

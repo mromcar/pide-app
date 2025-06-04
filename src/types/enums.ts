@@ -9,18 +9,18 @@ export enum UserRole {
 }
 
 export enum OrderStatus {
-  PENDING = 'PENDING',
-  PREPARING = 'PREPARING',
-  READY = 'READY',
-  DELIVERED = 'DELIVERED',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
+  PENDING = 'pending',
+  PREPARING = 'preparing',
+  READY = 'ready',
+  DELIVERED = 'delivered',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
 }
 
 export enum OrderItemStatus {
-  PENDING = 'PENDING',
-  PREPARING = 'PREPARING',
-  READY = 'READY',
-  DELIVERED = 'DELIVERED',
-  CANCELLED = 'CANCELLED',
+  PENDING = 'pending',
+  PREPARING = 'preparing',
+  READY = 'ready',
+  DELIVERED = 'delivered',
+  CANCELLED = 'cancelled',
 }

@@ -1,5 +1,5 @@
-import { PrismaClient, Allergen, AllergenTranslation, Prisma } from '@prisma/client';
-import { prisma } from '@/lib/prisma'; // Add this import
+import { prisma } from '@/lib/prisma';
+import { Allergen, AllergenTranslation } from '@prisma/client';
 import {
   CreateAllergenDTO,
   UpdateAllergenDTO,

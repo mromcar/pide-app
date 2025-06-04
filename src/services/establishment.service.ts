@@ -1,5 +1,5 @@
+import { prisma } from '@/lib/prisma';
 import { PrismaClient, Establishment, EstablishmentAdministrator, User, Category, UserRole } from '@prisma/client'; // Mantén esta si usas tipos específicos
-import { prisma } from '@/lib/prisma'; // <--- AÑADE ESTA IMPORTACIÓN
 import { EstablishmentCreateDTO, EstablishmentUpdateDTO, EstablishmentResponseDTO } from '../types/dtos/establishment';
 import { EstablishmentAdministratorCreateDTO } from '../types/dtos/establishmentAdministrator'; // Asumiendo que existe
 import { UserResponseDTO } from '../types/dtos/user'; // Para respuestas que incluyan administradores

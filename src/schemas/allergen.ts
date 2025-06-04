@@ -2,18 +2,18 @@ import { z } from 'zod';
 import { createAllergenTranslationSchema, updateAllergenTranslationSchema } from './allergenTranslation'; // Importación actualizada
 
 export const baseAllergenSchema = z.object({
-  code: z.string().min(1).max(20),
-  name: z.string().min(1).max(100),
-  description: z.string().max(65535).optional().nullable(),
-  icon_url: z.string().url().max(255).optional().nullable(),
-  is_major_allergen: z.boolean().optional().default(true),
+  name: z.string().min(1, "Name is required"),
+  code: z.string().min(1, "Code is required"),
+  is_major_allergen: z.boolean(),
+  description: z.string().nullable().optional().transform(e => e === undefined ? null : e),
+  icon_url: z.string().url("Invalid URL format").nullable().optional().transform(e => e === undefined ? null : e), // Transformación añadida aquí
 });
 
 export const createAllergenSchema = baseAllergenSchema.extend({
   translations: z.array(createAllergenTranslationSchema).optional(),
 });
 
-export const updateAllergenSchema = baseAllergenSchema.partial().extend({
+export const updateAllergenSchema = baseAllergenSchema.extend({
   translations: z.array(updateAllergenTranslationSchema).optional(),
 });
 
