@@ -26,7 +26,7 @@ export interface OrderUpdateDTO {
   payment_status?: string | null;
   order_type?: string | null;
   notes?: string | null;
-  // order_items might be handled via separate endpoints for adding/removing/updating items
+  order_items?: OrderItemCreateDTO[];
 }
 
 export interface OrderDTO {

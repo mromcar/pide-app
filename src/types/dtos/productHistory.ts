@@ -7,5 +7,9 @@ export interface ProductHistoryResponseDTO {
   name?: string | null;
   description?: string | null;
   is_active?: boolean | null;
-  updated_at?: string | null; // Date as ISO string
+  // updated_at?: string | null; // Reemplazado por changed_at
+  changed_at: string; // Asegúrate de que siempre sea un string (ISO date)
+  action_type: string; // O un tipo enum más específico si lo tienes
+  user_id?: number | null;
+  user_name?: string | null; // Nombre del usuario que realizó el cambio
 }

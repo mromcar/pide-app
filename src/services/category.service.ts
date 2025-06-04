@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 import { PrismaClient, Category, CategoryTranslation, Prisma } from '@prisma/client';
 import {
   CategoryCreateDTO,
@@ -18,7 +19,8 @@ import {
 } from '../schemas/category';
 import { categoryTranslationCreateSchema, categoryTranslationUpdateSchema } from '../schemas/categoryTranslation';
 
-const prisma = new PrismaClient();
+
+
 
 export class CategoryService {
   private mapToTranslationDTO(translation: CategoryTranslation): CategoryTranslationDTO {
@@ -180,7 +182,7 @@ export class CategoryService {
     // For example, ensure language_code and name are always provided for an upsert.
     if (!translationData.language_code || !translationData.name) {
         // Or handle this more gracefully depending on requirements
-        throw new Error('Language code and name are required for category translation upsert.'); 
+        throw new Error('Language code and name are required for category translation upsert.');
     }
 
     // It's also a good practice to validate translationData with its Zod schema if available and appropriate here
@@ -192,13 +194,13 @@ export class CategoryService {
         where: {
           category_id_language_code: {
             category_id: categoryId,
-            language_code: translationData.language_code, 
+            language_code: translationData.language_code,
           },
         },
-        update: { name: translationData.name }, 
+        update: { name: translationData.name },
         create: {
           category_id: categoryId,
-          language_code: translationData.language_code, 
+          language_code: translationData.language_code,
           name: translationData.name,
         },
       });

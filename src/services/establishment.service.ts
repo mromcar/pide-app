@@ -1,4 +1,5 @@
-import { PrismaClient, Establishment, EstablishmentAdministrator, User, Category, UserRole } from '@prisma/client';
+import { PrismaClient, Establishment, EstablishmentAdministrator, User, Category, UserRole } from '@prisma/client'; // Mantén esta si usas tipos específicos
+import { prisma } from '@/lib/prisma'; // <--- AÑADE ESTA IMPORTACIÓN
 import { EstablishmentCreateDTO, EstablishmentUpdateDTO, EstablishmentResponseDTO } from '../types/dtos/establishment';
 import { EstablishmentAdministratorCreateDTO } from '../types/dtos/establishmentAdministrator'; // Asumiendo que existe
 import { UserResponseDTO } from '../types/dtos/user'; // Para respuestas que incluyan administradores
@@ -6,7 +7,7 @@ import { establishmentCreateSchema, establishmentUpdateSchema, establishmentIdSc
 import { userIdSchema } from '../schemas/user'; // Para validar IDs de usuario al asignar administradores
 import { CategoryDTO } from '../types/dtos/category'; // Importa CategoryDTO
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient(); // <--- ELIMINA ESTA LÍNEA
 
 export class EstablishmentService {
   // Obtener todos los establecimientos (con paginación opcional)

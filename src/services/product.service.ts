@@ -1,9 +1,13 @@
-import { PrismaClient, Product, ProductTranslation, ProductHistory, ProductAllergen, Prisma, UserRole, Allergen, AllergenTranslation, User } from '@prisma/client';
+import { prisma } from '@/lib/prisma'; // Add this import
+import { PrismaClient, Product, ProductTranslation, ProductHistory, ProductAllergen, Prisma, UserRole, Allergen, AllergenTranslation, User, ProductVariant, ProductVariantTranslation } from '@prisma/client'; // Añadir User
 import {
-  ProductCreateDTO, 
-  ProductUpdateDTO, 
+  ProductCreateDTO,
+  ProductUpdateDTO,
   ProductResponseDTO,
 } from '../types/dtos/product';
+import {
+  ProductVariantResponseDTO // <<< ADD THIS IMPORT
+} from '../types/dtos/productVariant'; // <<< ADD THIS IMPORT
 import {
   ProductTranslationCreateDTO,
   ProductTranslationResponseDTO,
@@ -25,19 +29,25 @@ import {
   productCreateSchema,
   productUpdateSchema,
   productIdSchema,
-  ProductCreateInput, 
-  ProductUpdateInput  
+  ProductCreateInput,
+  ProductUpdateInput
 } from '../schemas/product';
 import { productTranslationCreateSchema, productTranslationUpdateSchema } from '../schemas/productTranslation';
 
-const prisma = new PrismaClient();
 
 // Tipo para el alérgeno incluido en ProductAllergen con sus traducciones
 type AllergenWithTranslations = Allergen & { translations?: AllergenTranslation[] };
 
 // Tipo para ProductHistory que incluye el usuario (opcionalmente)
-// Prisma generará esto, pero es bueno tenerlo en mente para los DTOs
-type ProductHistoryWithUser = ProductHistory & { user?: User | null };
+type ProductHistoryWithUser = ProductHistory & { user?: { name: string | null } | null };
+
+// Definición del tipo para el producto con todos sus detalles para el mapToDTO
+type ProductWithDetails = Product & {
+  translations?: ProductTranslation[];
+  allergens?: (ProductAllergen & { allergen?: AllergenWithTranslations })[];
+  variants?: (ProductVariant & { translations?: ProductVariantTranslation[] })[];
+  category?: Prisma.CategoryGetPayload<{}>; // Assuming category is a simple type or adjust as needed
+};
 
 export class ProductService {
   private mapToTranslationDTO(translation: ProductTranslation): ProductTranslationResponseDTO {
@@ -76,61 +86,93 @@ export class ProductService {
   }
 
   private mapToHistoryDTO(history: ProductHistoryWithUser): ProductHistoryResponseDTO {
-    // Ahora 'details', 'action_type', 'changed_at' y 'user_id' existen en 'history'
     const detailsJson = history.details as Prisma.JsonObject | null;
     return {
       id: history.id,
       product_id: history.product_id,
-      // Estos campos pueden venir de 'details' o de los campos directos si los mantienes
-      name: (detailsJson?.name as string) || history.name || '', 
+      name: (detailsJson?.name as string) || history.name || '',
       description: (detailsJson?.description as string) || history.description || null,
-      is_active: typeof (detailsJson?.is_active) === 'boolean' ? (detailsJson.is_active as boolean) : history.is_active ?? false, // Asumir false si no está
-      changed_at: history.changed_at.toISOString(), // changed_at ahora es obligatorio
-      action_type: history.action_type, // Añadido
+      is_active: typeof (detailsJson?.is_active) === 'boolean' ? (detailsJson.is_active as boolean) : history.is_active ?? false,
+      changed_at: history.changed_at ? history.changed_at.toISOString() : new Date(0).toISOString(),
+      action_type: history.action_type,
       user_id: history.user_id,
-      user_name: history.user?.name, // Ejemplo si incluyes el usuario
-      // details: history.details, // Podrías devolver el JSON completo si es necesario
+      user_name: history.user?.name,
     };
   }
 
-  private mapToDTO(product: Product & { 
-    translations?: ProductTranslation[], 
-    product_allergens?: (ProductAllergen & { allergen?: AllergenWithTranslations })[], 
-  }): ProductResponseDTO {
+  private mapVariantToDTO(variant: ProductVariant & { translations?: ProductVariantTranslation[] }): ProductVariantResponseDTO { // <<< Ensure ProductVariantResponseDTO is imported
+    return {
+      variant_id: variant.variant_id,
+      product_id: variant.product_id,
+      establishment_id: variant.establishment_id,
+      variant_description: variant.variant_description,
+      price: parseFloat(variant.price.toString()),
+      sku: variant.sku,
+      sort_order: variant.sort_order,
+      is_active: variant.is_active ?? true,
+      created_by_user_id: variant.created_by_user_id,
+      created_at: variant.created_at?.toISOString() || null,
+      updated_at: variant.updated_at?.toISOString() || null,
+      deleted_at: variant.deleted_at?.toISOString() || null,
+      translations: variant.translations?.map(vt => ({
+        translation_id: vt.translation_id,
+        variant_id: vt.variant_id,
+        language_code: vt.language_code,
+        variant_description: vt.variant_description,
+      })) || [],
+    };
+  }
+
+  private mapToDTO(product: ProductWithDetails): ProductResponseDTO {
     return {
       product_id: product.product_id,
       establishment_id: product.establishment_id,
       category_id: product.category_id,
-      name: product.name, 
+      name: product.name,
       description: product.description,
       image_url: product.image_url,
       sort_order: product.sort_order,
-      is_active: product.is_active ?? true, // Proporcionar un valor predeterminado
-      responsible_role: product.responsible_role as UserRole | null, 
+      is_active: product.is_active ?? true,
+      responsible_role: product.responsible_role as UserRole | null,
       created_by_user_id: product.created_by_user_id,
       created_at: product.created_at?.toISOString() || null,
       updated_at: product.updated_at?.toISOString() || null,
       deleted_at: product.deleted_at?.toISOString() || null,
       translations: product.translations?.map(this.mapToTranslationDTO) || [],
-      allergens: product.product_allergens?.map(pa => this.mapToAllergenDTO(pa)) || [],
+      allergens: product.allergens?.map(pa => this.mapToAllergenDTO(pa)) || [],
+      variants: product.variants?.map(v => this.mapVariantToDTO(v)) || [], // Corrected to call this.mapVariantToDTO
+      // category: product.category ? this.mapToCategoryDTO(product.category) : undefined, // If you have a mapToCategoryDTO
     };
   }
 
   private get allergenInclude() {
     return {
-      allergen: {
-        include: {
-          translations: true, 
+      include: {
+        allergen: {
+          include: {
+            translations: true,
+          },
         },
       },
     };
   }
 
+  private get variantInclude() {
+    return {
+      where: { deleted_at: null },
+      orderBy: { sort_order: Prisma.SortOrder.asc }, // <<< CORRECTED: Use Prisma.SortOrder.asc
+      include: {
+        translations: true,
+      },
+    };
+  }
+
   async createProduct(data: ProductCreateInput, userId?: number): Promise<ProductResponseDTO> {
-    const { translations, allergen_ids, ...productData } = data;
+    const parsedData = productCreateSchema.parse(data);
+    const { translations, allergen_ids, ...productData } = parsedData;
 
     const newProduct = await prisma.product.create({
-      data: { // Los datos para crear el producto
+      data: {
         ...productData,
         created_by_user_id: userId,
         translations: translations && translations.length > 0 ? {
@@ -138,48 +180,48 @@ export class ProductService {
             data: translations.map(t => ({ language_code: t.language_code, name: t.name, description: t.description })),
           },
         } : undefined,
-        product_allergens: allergen_ids && allergen_ids.length > 0 ? {
+        allergens: allergen_ids && allergen_ids.length > 0 ? {
           createMany: {
-            data: allergen_ids.map(id => ({ allergen_id: id })),
+            // Ensure 'data' property is used for createMany
+            data: allergen_ids.map((allergen_id: number) => ({ allergen_id })),
           },
         } : undefined,
       },
-      // El 'include' para la respuesta está al mismo nivel que 'data'
-      include: { 
-        translations: true, 
-        product_allergens: { include: this.allergenInclude } 
+      include: {
+        translations: true,
+        allergens: this.allergenInclude,
+        category: true,
+        variants: this.variantInclude,
       },
     });
 
-    // Crear entrada de historial
     await prisma.productHistory.create({
       data: {
         product_id: newProduct.product_id,
-        // Los campos name, description, is_active pueden tomarse del newProduct
-        // o dejarse nulos si toda la info va en 'details'
         name: newProduct.name,
         description: newProduct.description,
         is_active: newProduct.is_active,
-        user_id: userId, // Ahora existe en el modelo ProductHistory
         action_type: 'CREATE',
-        details: { createdData: this.mapToDTO(newProduct) } as Prisma.InputJsonValue, 
+        user_id: userId,
+        details: { ...productData, translations, allergen_ids } as unknown as Prisma.JsonObject, // Use allergen_ids here as well
       },
     });
 
-    return this.mapToDTO(newProduct);
+    return this.mapToDTO(newProduct as ProductWithDetails);
   }
 
   async getProductById(productId: number): Promise<ProductResponseDTO | null> {
     productIdSchema.parse({ product_id: productId });
     const product = await prisma.product.findUnique({
-      where: { product_id: productId, deleted_at: null }, 
+      where: { product_id: productId, deleted_at: null },
       include: {
         translations: true,
-        product_allergens: { include: this.allergenInclude },
-        category: true, 
+        allergens: this.allergenInclude, // <<< CORRECTED: Use the getter directly
+        category: true,
+        variants: this.variantInclude, // <<< CORRECTED: Use the getter directly
       },
     });
-    return product ? this.mapToDTO(product) : null;
+    return product ? this.mapToDTO(product as ProductWithDetails) : null;
   }
 
   async getAllProducts(establishmentId: number, page: number = 1, pageSize: number = 10): Promise<ProductResponseDTO[]> {
@@ -190,30 +232,30 @@ export class ProductService {
       take: pageSize,
       include: {
         translations: true,
-        product_allergens: { include: this.allergenInclude },
+        allergens: this.allergenInclude, // <<< CORRECTED: Use the getter directly
         category: true,
+        variants: this.variantInclude, // <<< CORRECTED: Use the getter directly
       },
       orderBy: [
         { sort_order: 'asc' },
         { name: 'asc' },
       ]
     });
-    return products.map(p => this.mapToDTO(p));
+    return products.map(p => this.mapToDTO(p as ProductWithDetails));
   }
 
   async updateProduct(productId: number, data: ProductUpdateInput, userId?: number): Promise<ProductResponseDTO | null> {
     productIdSchema.parse({ product_id: productId });
-    const { translations, allergen_ids, ...productData } = data;
+    const parsedData = productUpdateSchema.parse(data);
+    const { translations, allergen_ids: allergenIdsToSet, ...productData } = parsedData;
 
-    const existingProduct = await prisma.product.findUnique({ 
+    const existingProduct = await prisma.product.findUnique({
       where: { product_id: productId, deleted_at: null },
-      include: { 
-        translations: true, 
-        product_allergens: { include: this.allergenInclude } 
-      }
+      include: { allergens: true }
     });
+
     if (!existingProduct) {
-      return null; 
+      return null;
     }
 
     const updatedProduct = await prisma.product.update({
@@ -221,25 +263,24 @@ export class ProductService {
       data: {
         ...productData,
         translations: translations ? {
-          deleteMany: { product_id: productId }, 
-          createMany: {
-            data: translations.map(t => ({ 
-                language_code: t.language_code, 
-                name: t.name, 
-                description: t.description 
-            })),
-          },
-        } : undefined,
-        product_allergens: allergen_ids ? {
           deleteMany: { product_id: productId },
           createMany: {
-            data: allergen_ids.map(id => ({ allergen_id: id })),
-          }
+            data: translations.map(t => ({ language_code: t.language_code, name: t.name, description: t.description })),
+          },
+        } : undefined,
+        allergens: allergenIdsToSet !== undefined ? {
+          deleteMany: { product_id: productId },
+          createMany: {
+            // Ensure 'data' property is used for createMany
+            data: allergenIdsToSet.map((allergen_id: number) => ({ allergen_id })),
+          },
         } : undefined,
       },
-      include: { 
-        translations: true, 
-        product_allergens: { include: this.allergenInclude }
+      include: {
+        translations: true,
+        allergens: this.allergenInclude,
+        category: true,
+        variants: this.variantInclude,
       },
     });
 
@@ -249,55 +290,51 @@ export class ProductService {
         name: updatedProduct.name,
         description: updatedProduct.description,
         is_active: updatedProduct.is_active,
-        user_id: userId, 
         action_type: 'UPDATE',
-        details: { oldData: this.mapToDTO(existingProduct), newData: this.mapToDTO(updatedProduct) } as Prisma.InputJsonValue,
+        user_id: userId,
+        details: { ...parsedData } as unknown as Prisma.JsonObject,
       },
     });
 
-    return this.mapToDTO(updatedProduct);
+    return this.mapToDTO(updatedProduct as ProductWithDetails);
   }
 
   async deleteProduct(productId: number, userId?: number): Promise<ProductResponseDTO | null> {
     productIdSchema.parse({ product_id: productId });
-    
-    const existingProduct = await prisma.product.findUnique({ 
+    const existingProduct = await prisma.product.findUnique({
         where: { product_id: productId, deleted_at: null },
-        include: { // Incluir para el log, mapToDTO lo necesita
-            translations: true, 
-            product_allergens: { include: this.allergenInclude } 
-        }
     });
     if (!existingProduct) return null;
 
-    // Soft delete
     const deletedProduct = await prisma.product.update({
       where: { product_id: productId },
       data: { deleted_at: new Date() },
-      include: { 
-        translations: true, 
-        product_allergens: { include: this.allergenInclude } 
-      } 
+      include: {
+        translations: true,
+        allergens: this.allergenInclude, // <<< CORRECTED: Use the getter directly
+        category: true,
+        variants: this.variantInclude, // <<< CORRECTED: Use the getter directly
+      }
     });
 
     await prisma.productHistory.create({
       data: {
-        product_id: productId,
-        name: deletedProduct.name, 
-        description: deletedProduct.description,
-        is_active: deletedProduct.is_active, // Esto será false si el producto se desactiva al borrar
-        user_id: userId,
+        product_id: deletedProduct.product_id,
+        name: existingProduct.name, // Log current name before soft delete
+        description: existingProduct.description,
+        is_active: false, // Mark as inactive in history
         action_type: 'DELETE',
-        details: { deletedData: this.mapToDTO(existingProduct) } as Prisma.InputJsonValue, // Log del estado *antes* de marcar como borrado
+        user_id: userId,
+        details: { name: existingProduct.name, description: existingProduct.description, is_active: false } as unknown as Prisma.JsonObject,
       },
     });
 
-    return this.mapToDTO(deletedProduct); 
+    return this.mapToDTO(deletedProduct as ProductWithDetails);
   }
 
   async addOrUpdateProductTranslation(productId: number, translationData: ProductTranslationCreateDTO | ProductTranslationUpdateDTO ): Promise<ProductTranslationResponseDTO> {
     productIdSchema.parse({ product_id: productId });
-    
+
     let parsedData;
     if ('translation_id' in translationData && translationData.translation_id) {
         parsedData = productTranslationUpdateSchema.parse(translationData);
@@ -307,7 +344,7 @@ export class ProductService {
 
     const { language_code, name, description } = parsedData;
 
-    if (!language_code) { 
+    if (!language_code) {
         throw new Error('Language code is required for translation upsert.');
     }
 
@@ -315,25 +352,24 @@ export class ProductService {
       where: {
         product_id_language_code: {
           product_id: productId,
-          language_code: language_code, 
+          language_code: language_code,
         },
       },
-      update: { name: name, description: description }, 
-      create: { product_id: productId, language_code: language_code, name: name!, description: description }, 
+      update: { name: name, description: description },
+      create: { product_id: productId, language_code: language_code, name: name!, description: description },
     });
     return this.mapToTranslationDTO(translation);
   }
 
   async assignAllergenToProduct(productId: number, allergenId: number): Promise<ProductAllergenResponseDTO> {
-    // Aquí podrías añadir validación con Zod para productId y allergenId si lo deseas
     const assignment = await prisma.productAllergen.create({
       data: {
         product_id: productId,
         allergen_id: allergenId,
       },
-      include: { allergen: { include: { translations: true } } } 
+      include: { allergen: { include: { translations: true } } }
     });
-    return this.mapToAllergenDTO(assignment as any); 
+    return this.mapToAllergenDTO(assignment);
   }
 
   async removeAllergenFromProduct(productId: number, allergenId: number): Promise<ProductAllergenResponseDTO | null> {
@@ -345,12 +381,12 @@ export class ProductService {
             allergen_id: allergenId,
           },
         },
-        include: { allergen: { include: { translations: true } } } 
+        include: { allergen: { include: { translations: true } } }
       });
-      return this.mapToAllergenDTO(unassignment as any); 
+      return this.mapToAllergenDTO(unassignment);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null; 
+        return null;
       }
       throw error;
     }
@@ -364,12 +400,14 @@ export class ProductService {
       skip: skip,
       take: pageSize,
       orderBy: {
-        changed_at: 'desc', // Usar changed_at
+        changed_at: 'desc',
       },
       include: {
-        user: { select: { name: true } } // Opcional: incluir nombre del usuario
+        user: { select: { name: true } }
       }
     });
     return histories.map(h => this.mapToHistoryDTO(h));
   }
 }
+
+export const productService = new ProductService();

@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 import { PrismaClient, User, UserRole, Establishment, EstablishmentAdministrator, Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs'; // Still needed for password hashing and comparison
 // import jwt from 'jsonwebtoken'; // No longer needed for token generation here
@@ -7,7 +8,7 @@ import { EstablishmentResponseDTO } from '../types/dtos/establishment';
 import { userCreateSchema, userUpdateSchema, userIdSchema /* userLoginSchema */ } from '../schemas/user'; // userLoginSchema might be less relevant here
 import { establishmentAdministratorCreateSchema } from '../schemas/establishmentAdministrator';
 
-const prisma = new PrismaClient();
+
 // const JWT_SECRET = process.env.JWT_SECRET || 'your-very-secret-key'; // No longer needed here
 const SALT_ROUNDS = 10;
 
@@ -85,7 +86,7 @@ export class UserService {
     });
     // Return the full User object as NextAuth might need it, or map to DTO if preferred for consistency
     // For NextAuth, often the raw user object (or a slightly augmented one) is more useful in the authorize callback
-    return user ? this.mapToDTO(user) : null; 
+    return user ? this.mapToDTO(user) : null;
     // Or, if NextAuth needs more direct User object:
     // return user;
   }
@@ -118,8 +119,8 @@ export class UserService {
 
     // Extraer la contraseña del DTO si existe, para no incluirla directamente en updateData
     const { password, ...restOfData } = data;
-    const updateData: Partial<Omit<User, 'user_id' | 'created_at' | 'updated_at'>> & { password_hash?: string } = { 
-        ...restOfData 
+    const updateData: Partial<Omit<User, 'user_id' | 'created_at' | 'updated_at'>> & { password_hash?: string } = {
+        ...restOfData
     };
 
     if (password) {

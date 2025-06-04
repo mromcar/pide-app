@@ -41,14 +41,14 @@ export interface ProductResponseDTO {
   description?: string | null;
   image_url?: string | null;
   sort_order?: number | null;
-  is_active?: boolean | null;
-  responsible_role?: UserRole | null;
+  is_active: boolean; // Asumiendo que siempre tendrá un valor (default true en el servicio)
+  responsible_role?: string | null; // UserRole es un enum, pero en DTO puede ser string
   created_by_user_id?: number | null;
-  created_at?: string | null; // Dates as ISO strings
+  created_at?: string | null;
   updated_at?: string | null;
   deleted_at?: string | null;
   translations?: ProductTranslationResponseDTO[];
-  variants?: ProductVariantResponseDTO[];
-  allergens?: ProductAllergenResponseDTO[]; // Or a simplified version
-  // history is usually not sent in main product response unless specifically requested
+  allergens?: ProductAllergenResponseDTO[];
+  variants?: ProductVariantResponseDTO[]; // <--- AÑADIR ESTA LÍNEA
 }
+  // history is usually not sent in main product response unless specifically requested
