@@ -35,7 +35,6 @@ export interface UserResponseDTO {
 
 // UserLoginDTO and UserLoginResponseDTO can be removed if NextAuth handles the entire login flow
 // and you don't use these types elsewhere.
-/*
 export interface UserLoginDTO {
   email: string;
   password: string;
@@ -45,4 +44,3 @@ export interface UserLoginResponseDTO {
   token: string;
   user: UserResponseDTO;
 }
-*/
