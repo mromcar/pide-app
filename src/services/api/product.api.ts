@@ -2,10 +2,10 @@ import {
   ProductCreateDTO,
   ProductUpdateDTO,
   ProductResponseDTO,
-  ProductWithRelationsResponseDTO, // Mantener si es un tipo definido, o usar ProductResponseDTO
+  ProductWithRelationsResponseDTO,
 } from '@/types/dtos/product';
-import { handleApiResponse, ApiError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils';
-import { ProductApiError } from '@/types/errors/product.api.error'; // Nueva importación
+import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils'; // Actualizado
+import { ProductApiError } from '@/types/errors/product.api.error';
 
 const API_BASE_URL = '/api/restaurants'; // Asumiendo que los productos están bajo un restaurante
 
@@ -41,14 +41,7 @@ async function getAllProductsByRestaurant(
     // y harías: const result = await handleApiResponse<{ products: ProductResponseDTO[] }>(response); return result.products;
     return await handleApiResponse<ProductResponseDTO[]>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('Error de red al obtener productos.');
-    }
-    if (error instanceof ApiError) {
-      throw new ProductApiError(error.message, error.status, error.errorResponse);
-    }
-    console.error('Error inesperado en getAllProductsByRestaurant:', error);
-    throw new UnexpectedResponseError('Error inesperado obteniendo productos.');
+    throw handleCaughtError(error, ProductApiError, 'Error de red al obtener productos.');
   }
 }
 
@@ -74,21 +67,10 @@ async function getProductById(
 
     return await handleApiResponse<ProductWithRelationsResponseDTO>(response); // O ProductResponseDTO
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('Error de red al obtener el producto.');
-    }
     if (error instanceof ApiError && error.status === 404) {
-        // Para 404, podrías querer lanzar ProductApiError o simplemente devolver null como antes
-        // Si devuelves null, el throw de ProductApiError no se alcanzaría para 404.
-        // Si quieres que 404 también sea un ProductApiError, elimina la condición específica de 404 aquí
-        // y deja que el siguiente bloque lo capture.
         return null; 
     }
-    if (error instanceof ApiError) {
-      throw new ProductApiError(error.message, error.status, error.errorResponse);
-    }
-    console.error('Error inesperado en getProductById:', error);
-    throw new UnexpectedResponseError('Error inesperado obteniendo el producto.');
+    throw handleCaughtError(error, ProductApiError, 'Error de red al obtener el producto.');
   }
 }
 
@@ -112,14 +94,7 @@ async function createProduct(
     });
     return await handleApiResponse<ProductResponseDTO>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('Error de red al crear el producto.');
-    }
-    if (error instanceof ApiError) {
-      throw new ProductApiError(error.message, error.status, error.errorResponse);
-    }
-    console.error('Error inesperado en createProduct:', error);
-    throw new UnexpectedResponseError('Error inesperado creando el producto.');
+    throw handleCaughtError(error, ProductApiError, 'Error de red al crear el producto.');
   }
 }
 
@@ -145,14 +120,7 @@ async function updateProduct(
     });
     return await handleApiResponse<ProductResponseDTO>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('Error de red al actualizar el producto.');
-    }
-    if (error instanceof ApiError) {
-      throw new ProductApiError(error.message, error.status, error.errorResponse);
-    }
-    console.error('Error inesperado en updateProduct:', error);
-    throw new UnexpectedResponseError('Error inesperado actualizando el producto.');
+    throw handleCaughtError(error, ProductApiError, 'Error de red al actualizar el producto.');
   }
 }
 
@@ -172,14 +140,7 @@ async function deleteProduct(restaurantId: number, productId: number): Promise<v
     });
     await handleApiResponse<void>(response); // Asume 204 No Content o similar para DELETE exitoso
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('Error de red al eliminar el producto.');
-    }
-    if (error instanceof ApiError) {
-      throw new ProductApiError(error.message, error.status, error.errorResponse);
-    }
-    console.error('Error inesperado en deleteProduct:', error);
-    throw new UnexpectedResponseError('Error inesperado eliminando el producto.');
+    throw handleCaughtError(error, ProductApiError, 'Error de red al eliminar el producto.');
   }
 }
 

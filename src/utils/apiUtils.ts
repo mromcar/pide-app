@@ -12,23 +12,25 @@
  */
 export interface ErrorResponse {
   message: string;
-  error?: string; // o cualquier otra estructura que tu API devuelva
-  details?: any;
+  error?: string; // Mantener por compatibilidad si algunas APIs lo usan
+  details?: any; // Para errores de validación u otros datos
 }
 
 export class ApiError extends Error {
-  status?: number;
-  errorResponse?: ErrorResponse;
-  constructor(
-    message: string,
-    public status: number,
-    public errors?: any // Puede ser un array de ZodIssue, un objeto, etc.
-  ) {
+  public status: number;
+  public details?: any; // Para errores de validación de Zod, etc.
+
+  constructor(message: string, status: number, details?: any) {
     super(message);
     this.name = 'ApiError';
+    this.status = status;
+    this.details = details;
+
     // Mantener la pila de errores original (stack trace)
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, ApiError);
+    } else {
+      Object.setPrototypeOf(this, ApiError.prototype); // Fallback para entornos sin captureStackTrace
     }
   }
 }
@@ -38,8 +40,10 @@ export class ApiError extends Error {
  */
 export class NetworkError extends ApiError {
   constructor(message: string = 'Error de red. Por favor, verifica tu conexión.') {
-    super(message, 0); // Status 0 o un código específico para errores de red del cliente
+    // Usamos 0 o un código negativo para errores de red del cliente que no tienen un status HTTP
+    super(message, 0); 
     this.name = 'NetworkError';
+    Object.setPrototypeOf(this, NetworkError.prototype);
   }
 }
 
@@ -50,6 +54,7 @@ export class UnexpectedResponseError extends ApiError {
   constructor(message: string = 'Respuesta inesperada del servidor.') {
     super(message, 500); // Asumir un error de servidor si no se especifica
     this.name = 'UnexpectedResponseError';
+    Object.setPrototypeOf(this, UnexpectedResponseError.prototype);
   }
 }
 
@@ -86,8 +91,9 @@ export async function handleApiResponse<T>(response: Response): Promise<T> {
 
   if (!response.ok) {
     const errorMessage = responseBody?.message || responseBody?.error || response.statusText || 'Error desconocido de la API';
-    const errors = responseBody?.errors || (responseBody?.error && typeof responseBody.error !== 'string' ? responseBody.error : undefined);
-    throw new ApiError(errorMessage, response.status, errors);
+    // Pasamos responseBody?.details en lugar de responseBody?.errors para consistencia
+    const errorDetails = responseBody?.details || (responseBody?.error && typeof responseBody.error !== 'string' ? responseBody.error : undefined);
+    throw new ApiError(errorMessage, response.status, errorDetails);
   }
 
   // Si la respuesta es OK pero no había cuerpo (ej. 204), y T no es null o void, puede ser un problema.
@@ -95,4 +101,34 @@ export async function handleApiResponse<T>(response: Response): Promise<T> {
   // Esta función asume que el llamador espera un tipo T, y si responseBody es null y T no lo permite,
   // TypeScript lo detectará en el punto de asignación o uso.
   return responseBody as T;
+}
+
+/**
+ * Atrapa errores de llamadas a la API y los relanza de forma consistente.
+ * @param error El error capturado.
+ * @param SpecificApiErrorConstructor El constructor de la clase de error específica de la API (ej. UserApiError).
+ * @param defaultMessage Mensaje por defecto si el error no proporciona uno claro.
+ * @returns Nunca devuelve, siempre lanza un error.
+ */
+export function handleCaughtError<SpecificError extends ApiError>(
+  error: unknown,
+  SpecificApiErrorConstructor: new (message: string, status: number, details?: any) => SpecificError,
+  defaultMessage: string = 'Ocurrió un error inesperado.'
+): never {
+  if (error instanceof SpecificApiErrorConstructor) {
+    throw error; // Ya es del tipo específico, relanzar
+  }
+  if (error instanceof ApiError) {
+    // Es un ApiError genérico, NetworkError o UnexpectedResponseError
+    // Lo transformamos al error específico del contexto actual (ej. UserApiError)
+    throw new SpecificApiErrorConstructor(error.message, error.status, error.details);
+  }
+  if (error instanceof Error) {
+    // Error genérico de JavaScript
+    console.error('Error no esperado en la API:', error);
+    throw new SpecificApiErrorConstructor(error.message || defaultMessage, 500, { originalError: error.name });
+  }
+  // Si no es una instancia de Error
+  console.error('Error desconocido en la API:', error);
+  throw new SpecificApiErrorConstructor(defaultMessage, 500, { originalError: String(error) });
 }

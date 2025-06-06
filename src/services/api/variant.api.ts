@@ -3,7 +3,7 @@ import {
   ProductVariantUpdateDTO,
   ProductVariantResponseDTO,
 } from '@/types/dtos/productVariant';
-import { handleApiResponse, ApiError, NetworkError } from '@/utils/apiUtils';
+import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils'; // Actualizado
 import { VariantApiError } from '@/types/errors/variant.api.error';
 
 const API_BASE_URL = '/api/restaurants';
@@ -28,14 +28,7 @@ async function getAllVariantsByProduct(
     });
     return await handleApiResponse<ProductVariantResponseDTO[]>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('Error de red al obtener variantes del producto.');
-    }
-    if (error instanceof ApiError) {
-      throw new VariantApiError(error.message, error.status, error.errorResponse);
-    }
-    console.error('Error inesperado en getAllVariantsByProduct:', error);
-    throw new UnexpectedResponseError('Error inesperado al obtener variantes del producto.');
+    throw handleCaughtError(error, VariantApiError, 'Error de red al obtener variantes del producto.');
   }
 }
 
@@ -61,14 +54,7 @@ async function getVariantById(
     });
     return await handleApiResponse<ProductVariantResponseDTO>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('Error de red al obtener la variante.');
-    }
-    if (error instanceof ApiError) {
-      throw new VariantApiError(error.message, error.status, error.errorResponse);
-    }
-    console.error('Error inesperado en getVariantById:', error);
-    throw new UnexpectedResponseError('Error inesperado al obtener la variante.');
+    throw handleCaughtError(error, VariantApiError, 'Error de red al obtener la variante.');
   }
 }
 
@@ -96,14 +82,7 @@ async function createVariant(
     });
     return await handleApiResponse<ProductVariantResponseDTO>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('Error de red al crear la variante.');
-    }
-    if (error instanceof ApiError) {
-      throw new VariantApiError(error.message, error.status, error.errorResponse);
-    }
-    console.error('Error inesperado en createVariant:', error);
-    throw new UnexpectedResponseError('Error inesperado al crear la variante.');
+    throw handleCaughtError(error, VariantApiError, 'Error de red al crear la variante.');
   }
 }
 
@@ -133,14 +112,7 @@ async function updateVariant(
     });
     return await handleApiResponse<ProductVariantResponseDTO>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('Error de red al actualizar la variante.');
-    }
-    if (error instanceof ApiError) {
-      throw new VariantApiError(error.message, error.status, error.errorResponse);
-    }
-    console.error('Error inesperado en updateVariant:', error);
-    throw new UnexpectedResponseError('Error inesperado al actualizar la variante.');
+    throw handleCaughtError(error, VariantApiError, 'Error de red al actualizar la variante.');
   }
 }
 
@@ -167,14 +139,7 @@ async function deleteVariant(
     });
     await handleApiResponse<void>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('Error de red al eliminar la variante.');
-    }
-    if (error instanceof ApiError) {
-      throw new VariantApiError(error.message, error.status, error.errorResponse);
-    }
-    console.error('Error inesperado en deleteVariant:', error);
-    throw new UnexpectedResponseError('Error inesperado al eliminar la variante.');
+    throw handleCaughtError(error, VariantApiError, 'Error de red al eliminar la variante.');
   }
 }
 

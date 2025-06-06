@@ -1,6 +1,6 @@
 import { EstablishmentCreateDTO, EstablishmentUpdateDTO, EstablishmentResponseDTO } from '@/types/dtos/establishment';
 // Quitar el import de handleApiResponse de @/utils/api si existía y el ApiError local
-import { handleApiResponse, ApiError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
+import { handleApiResponse, handleCaughtError, ApiError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
 
 const API_BASE_URL = '/api/restaurants';
 
@@ -42,12 +42,8 @@ export async function getAllEstablishments(
     // Para este ejemplo, asumimos que la API devuelve directamente el array.
     return await handleApiResponse<EstablishmentResponseDTO[]>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError();
-    }
-    if (error instanceof ApiError) throw error;
-    console.error('Error inesperado en getAllEstablishments:', error);
-    throw new UnexpectedResponseError('Error inesperado obteniendo establecimientos.');
+    // Lanza ApiError genérico o puedes crear EstablishmentApiError si lo prefieres.
+    throw handleCaughtError(error, ApiError, 'Error al obtener los establecimientos.');
   }
 }
 

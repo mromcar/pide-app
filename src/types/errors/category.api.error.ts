@@ -1,8 +1,10 @@
-import { ApiError, ErrorResponse } from '@/utils/apiUtils';
+// src/types/errors/category.api.error.ts
+import { ApiError } from '@/utils/apiUtils';
 
 export class CategoryApiError extends ApiError {
-  constructor(message: string = 'Error en la API de categorías', status: number = 500, errorResponse?: ErrorResponse) {
-    super(message, status, errorResponse);
+  constructor(message: string, statusCode: number, details?: unknown) {
+    super(message, statusCode, details);
     this.name = 'CategoryApiError';
+    Object.setPrototypeOf(this, CategoryApiError.prototype);
   }
 }

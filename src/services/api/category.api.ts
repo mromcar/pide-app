@@ -1,6 +1,7 @@
 import type { CategoryCreateDTO, CategoryUpdateDTO, CategoryDTO } from '@/types/dtos/category';
 // Quitar el import de handleApiResponse de @/utils/api si existía y el ApiError local
-import { handleApiResponse, ApiError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
+import { handleApiResponse, handleCaughtError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
+import { CategoryApiError } from '@/types/errors/category.api.error';
 
 const API_BASE_URL = '/api/restaurants';
 
@@ -19,7 +20,7 @@ const API_BASE_URL = '/api/restaurants';
  * @throws {ApiError} Si ocurre un error en la API.
  * @throws {NetworkError} Si hay un problema de red.
  */
-async function getAllCategoriesByEstablishment(restaurantId: number): Promise<CategoryDTO[]> {
+async function getAllCategoriesByEstablishment(restaurantId: number): Promise<CategoryDTO[]> { // Asumiendo que CategoryDTO es el tipo correcto
   try {
     const response = await fetch(`${API_BASE_URL}/${restaurantId}/menu/categories`, {
       method: 'GET',
@@ -45,17 +46,8 @@ async function getAllCategoriesByEstablishment(restaurantId: number): Promise<Ca
     return data.categories; // Si la respuesta es { categories: [...] }
     // Si la respuesta es directamente CategoryDTO[], entonces: return await handleApiResponse<CategoryDTO[]>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError();
-    }
-    // ApiError ya es lanzado por handleApiResponse
-    // Si quieres añadir contexto específico de categoría, puedes capturar ApiError y relanzar un CategoryApiError
-    if (error instanceof ApiError) {
-        // console.error(`Category API Error (${error.status}) en getAllCategoriesByEstablishment: ${error.message}`, error.errors);
-        throw error; // Relanzar el ApiError original
-    }
-    console.error('Error inesperado en getAllCategoriesByEstablishment:', error);
-    throw new UnexpectedResponseError('Error inesperado obteniendo categorías.');
+    // handleCaughtError se encarga de la lógica de conversión y relanzamiento
+    throw handleCaughtError(error, CategoryApiError, 'Error al obtener las categorías.');
   }
 }
 

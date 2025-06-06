@@ -6,7 +6,7 @@ import { signIn, signOut, getSession } from 'next-auth/react';
 import type { SignInResponse, SignInOptions, SignOutParams } from 'next-auth/react';
 import type { Session } from 'next-auth'; // Assuming Session type is correctly defined in next-auth.d.ts
 import type { UserLoginDTO } from '@/types/dtos/user';
-import { ApiError, NetworkError, UnexpectedResponseError, handleApiResponse } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
+import { ApiError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils'; // No necesitamos handleApiResponse aquí directamente
 
 // Custom Error Classes - Ahora pueden extender ApiError o ser reemplazadas si es conveniente
 // Por simplicidad, podemos usar ApiError directamente o mantener AuthError si tiene lógica específica.
@@ -36,9 +36,6 @@ export class AuthError extends ApiError { // EXTENDER ApiError
  */
 async function login(credentials: UserLoginDTO, options?: SignInOptions): Promise<SignInResponse> {
   try {
-    // signIn de NextAuth no usa fetch directamente de la misma manera, su manejo de errores es particular.
-    // handleApiResponse es más para llamadas fetch directas que haces tú.
-    // Por lo tanto, el manejo de errores para `signIn` se mantiene más o menos igual.
     const response = await signIn('credentials', {
       ...credentials,
       redirect: options?.redirect ?? false,
@@ -47,69 +44,57 @@ async function login(credentials: UserLoginDTO, options?: SignInOptions): Promis
 
     if (response && response.error) {
       if (response.error === 'CredentialsSignin') {
-        throw new AuthError('Credenciales inválidas. Por favor, verifica tu email y contraseña.', response.status || 401, response.error);
+        // Usamos el status de la respuesta si está, o 401 por defecto para credenciales inválidas
+        throw new AuthError('Credenciales inválidas.', response.status || 401, response.error);
       } else {
-        // Usar response.status si está disponible, o un genérico 400/500
         throw new AuthError(`Error de autenticación: ${response.error}`, response.status || 400, response.error);
       }
     }
     if (!response) {
-        // Esto puede ocurrir si signIn es interrumpido o hay un problema no capturado por response.error
         throw new UnexpectedResponseError('Respuesta inesperada del servicio de autenticación.');
     }
-    return response as SignInResponse;
+    return response as SignInResponse; // Asegurar el tipo de retorno
+
   } catch (error) {
-    if (error instanceof ApiError) { // Captura AuthError y otros que extiendan ApiError
+    if (error instanceof AuthError || error instanceof NetworkError || error instanceof UnexpectedResponseError) {
+      // Si ya es uno de nuestros errores personalizados (incluyendo AuthError que extiende ApiError), relanzarlo.
       throw error;
-    } else if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.');
-    } else {
-      console.error('An unexpected error occurred during login:', error);
-      throw new UnexpectedResponseError('Ocurrió un error inesperado durante el inicio de sesión.');
     }
+    // Para errores de red no capturados explícitamente por next-auth (aunque signIn suele manejarlos)
+    if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
+      throw new NetworkError('No se pudo conectar con el servidor.');
+    }
+    // Para cualquier otro error inesperado
+    console.error('Error inesperado durante el login:', error);
+    throw new UnexpectedResponseError('Ocurrió un error inesperado durante el inicio de sesión.');
   }
 }
 
-/**
- * Signs out the current user using NextAuth.
- *
- * @param options - Optional NextAuth SignOutParams, e.g., callbackUrl to redirect after sign out.
- * @returns A promise that resolves when the sign-out process is initiated.
- * @throws {NetworkError} If there's a network issue.
- * @throws {UnexpectedResponseError} For any other unexpected errors.
- */
-async function logout(options?: SignOutParams<true>): Promise<void> {
+// La función logout y getCurrentSession seguirían un patrón similar de try/catch,
+// adaptando el manejo de errores a lo que devuelvan signOut y getSession.
+
+export async function logout(options?: SignOutParams<true>): Promise<void> {
   try {
-    await signOut(options);
+    await signOut({ redirect: false, ...options }); // signOut no devuelve un error en la promesa de la misma forma
+    // Si signOut falla, usualmente es por configuración o problemas de red no capturados aquí.
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError('No se pudo conectar con el servidor para cerrar sesión.');
-    } else {
-      console.error('An unexpected error occurred during logout:', error);
-      throw new UnexpectedResponseError('Ocurrió un error inesperado durante el cierre de sesión.');
+    // Es menos común que signOut lance errores capturables aquí, pero por si acaso:
+    if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
+      throw new NetworkError('Error de red durante el cierre de sesión.');
     }
+    console.error('Error inesperado durante el logout:', error);
+    throw new UnexpectedResponseError('Error inesperado durante el cierre de sesión.');
   }
 }
 
-/**
- * Retrieves the current user's session.
- *
- * @returns A promise that resolves to the Session object or null if not authenticated.
- * @throws {NetworkError} If there's a network issue.
- * @throws {UnexpectedResponseError} For any other unexpected errors.
- */
-async function getCurrentUserSession(): Promise<Session | null> {
+export async function getCurrentSession(): Promise<Session | null> {
   try {
     const session = await getSession();
     return session;
   } catch (error) {
-    // getSession no suele lanzar 'Failed to fetch' directamente, pero es bueno ser cauteloso.
-    if (error instanceof TypeError && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError'))) {
-      throw new NetworkError('No se pudo conectar con el servidor para obtener la sesión.');
-    } else {
-      console.error('An unexpected error occurred while fetching the session:', error);
-      throw new UnexpectedResponseError('Ocurrió un error inesperado al obtener la sesión.');
-    }
+    // getSession es menos propenso a errores de red aquí, más a configuración.
+    console.error('Error inesperado obteniendo la sesión:', error);
+    throw new UnexpectedResponseError('Error inesperado al obtener la sesión actual.');
   }
 }
 
