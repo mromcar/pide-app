@@ -1,34 +1,16 @@
 import { EstablishmentCreateDTO, EstablishmentUpdateDTO, EstablishmentResponseDTO } from '@/types/dtos/establishment';
-import { handleApiResponse, ApiError } from '@/utils/api'; // Asumiendo que existe este helper
+// Quitar el import de handleApiResponse de @/utils/api si existía y el ApiError local
+import { handleApiResponse, ApiError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
 
 const API_BASE_URL = '/api/restaurants';
 
-// Tipos de error personalizados
-export class EstablishmentApiError extends Error {
-  constructor(message: string, public statusCode: number) {
-    super(message);
-    this.name = 'EstablishmentApiError';
-  }
-}
+// Ya no necesitamos EstablishmentApiError local si ApiError es suficiente.
+// Ya no necesitamos el handleError local.
 
-// Interfaces para las respuestas
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
-// Función helper para manejar errores
-const handleError = (error: unknown) => {
-  console.error('Establishment API Error:', error);
-  if (error instanceof EstablishmentApiError) {
-    throw error;
-  }
-  throw new EstablishmentApiError(
-    error instanceof Error ? error.message : 'An unexpected error occurred',
-    500
-  );
-};
+// Interfaces para las respuestas - Estas son DTOs, no el wrapper ApiResponse que tenías antes.
+// El handleApiResponse que te di espera que el cuerpo de la respuesta sea T directamente.
+// Si tu API devuelve { success: boolean, data?: T, error?: string }, entonces T en handleApiResponse sería ese wrapper.
+// Por ahora, asumiré que la API devuelve directamente EstablishmentResponseDTO[] o EstablishmentResponseDTO.
 
 /**
  * Obtiene todos los establecimientos
@@ -46,14 +28,26 @@ export async function getAllEstablishments(
 
     const response = await fetch(
       `${API_BASE_URL}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`,
-      { credentials: 'include' } // Para incluir las cookies de autenticación
+      { 
+        credentials: 'include', // Para incluir las cookies de autenticación
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
     );
-
-    const data = await handleApiResponse<ApiResponse<EstablishmentResponseDTO[]>>(response);
-    return data.data || [];
+    // Asume que la API devuelve directamente EstablishmentResponseDTO[]
+    // o un objeto que handleApiResponse puede manejar y extraer T.
+    // Si tu backend envuelve en { data: [...] }, T sería { data: EstablishmentResponseDTO[] }
+    // y luego harías: const result = await handleApiResponse<{ data: EstablishmentResponseDTO[] }>(response); return result.data;
+    // Para este ejemplo, asumimos que la API devuelve directamente el array.
+    return await handleApiResponse<EstablishmentResponseDTO[]>(response);
   } catch (error) {
-    handleError(error);
-    return []; // TypeScript necesita este retorno aunque nunca se alcance
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      throw new NetworkError();
+    }
+    if (error instanceof ApiError) throw error;
+    console.error('Error inesperado en getAllEstablishments:', error);
+    throw new UnexpectedResponseError('Error inesperado obteniendo establecimientos.');
   }
 }
 
@@ -64,16 +58,30 @@ export async function getAllEstablishments(
 export async function getEstablishmentById(id: number): Promise<EstablishmentResponseDTO | null> {
   try {
     const response = await fetch(`${API_BASE_URL}/${id}`, {
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      }
     });
 
+    // handleApiResponse lanzará un ApiError para 404. Si quieres tratar 404 como null:
     if (response.status === 404) return null;
 
-    const data = await handleApiResponse<ApiResponse<EstablishmentResponseDTO>>(response);
-    return data.data || null;
+    return await handleApiResponse<EstablishmentResponseDTO>(response);
   } catch (error) {
-    handleError(error);
-    return null;
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      throw new NetworkError();
+    }
+    // Si el error es un ApiError con status 404 y no lo manejaste antes, se propagará.
+    // Si quieres convertir específicamente el ApiError 404 a null aquí:
+    if (error instanceof ApiError && error.status === 404) {
+        // Esto es redundante si ya verificaste response.status === 404 antes de handleApiResponse
+        // pero es una forma de manejarlo si handleApiResponse es la primera verificación.
+        return null;
+    }
+    if (error instanceof ApiError) throw error;
+    console.error('Error inesperado en getEstablishmentById:', error);
+    throw new UnexpectedResponseError('Error inesperado obteniendo establecimiento.');
   }
 }
 
@@ -94,12 +102,14 @@ export async function createEstablishment(
       body: JSON.stringify(establishmentData),
     });
 
-    const data = await handleApiResponse<ApiResponse<EstablishmentResponseDTO>>(response);
-    if (!data.data) throw new EstablishmentApiError('Failed to create establishment', 500);
-    return data.data;
+    return await handleApiResponse<EstablishmentResponseDTO>(response);
   } catch (error) {
-    handleError(error);
-    throw error; // Para satisfacer TypeScript
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      throw new NetworkError();
+    }
+    if (error instanceof ApiError) throw error;
+    console.error('Error inesperado en createEstablishment:', error);
+    throw new UnexpectedResponseError('Error inesperado creando establecimiento.');
   }
 }
 
@@ -121,13 +131,14 @@ export async function updateEstablishment(
       },
       body: JSON.stringify(updateData),
     });
-
-    const data = await handleApiResponse<ApiResponse<EstablishmentResponseDTO>>(response);
-    if (!data.data) throw new EstablishmentApiError('Failed to update establishment', 500);
-    return data.data;
+    return await handleApiResponse<EstablishmentResponseDTO>(response);
   } catch (error) {
-    handleError(error);
-    throw error;
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      throw new NetworkError();
+    }
+    if (error instanceof ApiError) throw error;
+    console.error('Error inesperado en updateEstablishment:', error);
+    throw new UnexpectedResponseError('Error inesperado actualizando establecimiento.');
   }
 }
 
@@ -135,55 +146,33 @@ export async function updateEstablishment(
  * Elimina un establecimiento
  * @param id ID del establecimiento a eliminar
  */
-export async function deleteEstablishment(id: number): Promise<void> {
+export async function deleteEstablishment(id: number): Promise<void> { // O el tipo que devuelva tu API
   try {
     const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: 'DELETE',
       credentials: 'include',
-    });
-
-    await handleApiResponse(response);
-  } catch (error) {
-    handleError(error);
-  }
-}
-
-/**
- * Añade un administrador a un establecimiento
- * @param establishmentId ID del establecimiento
- * @param userId ID del usuario a añadir como administrador
- */
-export async function addAdministrator(establishmentId: number, userId: number): Promise<void> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/${establishmentId}/administrators`, {
-      method: 'POST',
-      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ user_id: userId }),
     });
-
-    await handleApiResponse(response);
+    // Si DELETE devuelve 204 No Content, T sería void.
+    // handleApiResponse devolverá null en este caso, que es compatible con Promise<void>.
+    await handleApiResponse<void>(response);
   } catch (error) {
-    handleError(error);
+    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+      throw new NetworkError();
+    }
+    if (error instanceof ApiError) throw error;
+    console.error('Error inesperado en deleteEstablishment:', error);
+    throw new UnexpectedResponseError('Error inesperado eliminando establecimiento.');
   }
 }
 
-/**
- * Elimina un administrador de un establecimiento
- * @param establishmentId ID del establecimiento
- * @param userId ID del usuario a eliminar como administrador
- */
-export async function removeAdministrator(establishmentId: number, userId: number): Promise<void> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/${establishmentId}/administrators/${userId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-
-    await handleApiResponse(response);
-  } catch (error) {
-    handleError(error);
-  }
-}
+export const establishmentApiService = {
+  getAllEstablishments,
+  getEstablishmentById,
+  createEstablishment,
+  updateEstablishment,
+  deleteEstablishment,
+  // Ya no es necesario exportar EstablishmentApiError si se usa ApiError directamente
+};
