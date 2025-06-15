@@ -1,0 +1,106 @@
+🧾 Nombre del Proyecto
+Pide
+
+💡 ¿Qué es Pide?
+Pide es una plataforma web responsive (móvil, tablet, PC) diseñada para digitalizar la experiencia de pedir en bares, restaurantes y otros establecimientos hosteleros.
+ A través de un código QR, los clientes pueden acceder a la carta de un establecimiento concreto, hacer pedidos desde su dispositivo móvil sin esperar al camarero, y opcionalmente pagar.
+Su funcionamiento es similar al kiosko de McDonald's, pero más flexible: puede actuar como un sistema interactivo de pedidos o simplemente como una carta digital con categorías, descripciones, precios, variantes, alérgenos, etc.
+
+🧍 Cliente (sin cuenta)
+Acceso por QR: Escanea un QR único que incluye el identificador del establecimiento y datos opcionales como número o zona de mesa.
+
+
+Consulta del Menú: Visualiza la carta actualizada con categorías, productos, variantes, precios, alérgenos y descripciones.
+
+
+Realiza pedidos: Puede pedir desde su móvil sin necesidad de esperar al camarero.
+
+
+Pago opcional: Puede pagar en línea si el establecimiento lo permite.
+
+
+Seguimiento del pedido: Consulta en tiempo real el estado del pedido ("pendiente", "en preparación", "listo", "entregado", etc.).
+
+
+Gestión de pedidos: Puede hacer varios pedidos o editar un pedido que aún no haya sido tramitado.
+
+
+
+👨‍🍳 Empleado (con cuenta)
+Inicio de sesión: Accede con sus credenciales.
+
+
+Gestión de pedidos en tiempo real: Ve los pedidos entrantes con filtros por estado o categoría.
+
+
+Cambio de estado: Puede marcar pedidos como "en preparación", "listo", "entregado", etc., según su rol.
+
+
+Visualización detallada: Accede a los detalles del pedido (productos, cantidades, notas, mesa, cliente).
+
+
+Perfil personal: Edita información personal como nombre y foto de perfil.
+
+
+Roles diferenciados:
+
+
+Camarero: Atiende pedidos que requieren servicio en mesa.
+
+
+Cocinero: Atiende pedidos que requieren preparación en cocina.
+ Los productos indican claramente quién debe elaborarlos.
+
+
+
+🧑‍💼 Administrador de establecimiento
+Inicio de sesión: Accede con su cuenta de administrador.
+
+
+Gestión de carta: Añade, edita o elimina categorías, productos y variantes.
+
+
+Gestión de empleados: Crea cuentas para empleados, los asigna a roles y los vincula a establecimientos concretos.
+
+
+Supervisión de pedidos: Visualiza el estado global de todos los pedidos.
+
+
+Multiestablecimiento: Puede administrar varios restaurantes desde una misma cuenta.
+
+
+
+👨‍💼 Administrador general (de la plataforma)
+Inicio de sesión: Accede al dashboard de administración global.
+
+
+Gestión de establecimientos: Crea nuevos restaurantes y asigna administradores.
+
+
+Supervisión global: Accede a estadísticas, vistas generales, paneles de control y herramientas de auditoría (opcional).
+
+
+Control total: Tiene permisos para gestionar cualquier entidad del sistema.
+
+
+
+🖥️ Interfaz de empleados – Pantalla de pedidos
+Listado de pedidos: Muestra todos los pedidos asignados al establecimiento.
+
+
+Filtro por estado: Pendientes, en preparación, listos, entregados, etc.
+
+
+Filtro por categoría: Permite a empleados ver solo los pedidos de productos que les correspondan según su rol (bebidas, cocina, etc.).
+
+
+Cambio de estado: Posibilidad de actualizar el estado de un pedido en un solo clic.
+
+
+Interfaz ágil: Filtros accesibles desde pestañas o menús desplegables para facilitar la navegación y respuesta rápida.
+
+
+
+
+
+
