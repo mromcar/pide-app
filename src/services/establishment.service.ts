@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { prisma as prismaClient } from '@/lib/prisma';
 import { PrismaClient, Establishment, EstablishmentAdministrator, User, Category, UserRole } from '@prisma/client'; // Mantén esta si usas tipos específicos
 import { EstablishmentCreateDTO, EstablishmentUpdateDTO, EstablishmentResponseDTO } from '../types/dtos/establishment';
 import { EstablishmentAdministratorCreateDTO } from '../types/dtos/establishmentAdministrator'; // Asumiendo que existe
@@ -6,8 +6,6 @@ import { UserResponseDTO } from '../types/dtos/user'; // Para respuestas que inc
 import { establishmentCreateSchema, establishmentUpdateSchema, establishmentIdSchema } from '../schemas/establishment';
 import { userIdSchema } from '../schemas/user'; // Para validar IDs de usuario al asignar administradores
 import { CategoryDTO } from '../types/dtos/category'; // Importa CategoryDTO
-
-// const prisma = new PrismaClient(); // <--- ELIMINA ESTA LÍNEA
 
 export class EstablishmentService {
   // Obtener todos los establecimientos (con paginación opcional)
@@ -84,8 +82,17 @@ export class EstablishmentService {
 
   // Obtener un establecimiento por ID
   async getEstablishmentById(id: number): Promise<EstablishmentResponseDTO | null> {
-    establishmentIdSchema.parse({ establishment_id: id }); // Validar ID
-    const establishment = await prisma.establishment.findUnique({
+    console.log('Inspecting prisma object in getEstablishmentById:', this.prismaInstance);
+    if (!this.prismaInstance) {
+      console.error('Prisma instance is undefined in getEstablishmentById!');
+      // Podrías intentar re-importar o lanzar un error más específico
+      // import { prisma as newPrismaClient } from '@/lib/prisma';
+      // this.prismaInstance = newPrismaClient;
+      // if(!this.prismaInstance) throw new Error("Failed to load prisma instance");
+      return null; // O manejar el error apropiadamente
+    }
+    establishmentIdSchema.parse({ establishmentId: id });
+    const establishment = await this.prismaInstance.establishment.findUnique({
       where: { establishment_id: id },
       include: {
         categories: true, // Incluye las categorías directamente

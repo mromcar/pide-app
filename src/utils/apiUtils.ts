@@ -104,6 +104,19 @@ export async function handleApiResponse<T>(response: Response): Promise<T> {
 }
 
 /**
+ * Valida si una cadena es un UUID v4 válido.
+ * @param uuid La cadena a validar.
+ * @returns true si es un UUID v4 válido, false en caso contrario.
+ */
+export function isValidUUID(uuid: string): boolean {
+  if (!uuid || typeof uuid !== 'string') {
+    return false;
+  }
+  const regex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+  return regex.test(uuid);
+}
+
+/**
  * Atrapa errores de llamadas a la API y los relanza de forma consistente.
  * @param error El error capturado.
  * @param SpecificApiErrorConstructor El constructor de la clase de error específica de la API (ej. UserApiError).

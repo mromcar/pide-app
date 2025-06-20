@@ -1,145 +1,148 @@
-import { categoryApiService } from '@/services/api/category.api';
-import { productApiService } from '@/services/api/product.api';
-import MenuDisplay from '@/components/MenuDisplay';
-import { CategoryDTO } from '@/types/dtos/category';
-import { ProductResponseDTO } from '@/types/dtos/product';
-import { uiTranslations } from '@/translations/ui'; // Asumiendo que aquí están tus traducciones
-import { LanguageCode, DEFAULT_LANGUAGE } from '@/constants/languages'; // Asumiendo que tienes DEFAULT_LANGUAGE
-import type { Metadata, ResolvingMetadata } from 'next';
+import { establishmentApiService } from '@/services/api/establishment.api'
+import { categoryApiService } from '@/services/api/category.api'
+import { productApiService } from '@/services/api/product.api'
+import MenuDisplay from '@/components/MenuDisplay'
+import { CategoryDTO } from '@/types/dtos/category'
+import { ProductResponseDTO } from '@/types/dtos/product'
+import { uiTranslations } from '@/translations/ui'
+import { LanguageCode, DEFAULT_LANGUAGE } from '@/constants/languages'
+import type { Metadata } from 'next'
 
-// Definimos una interfaz para la estructura de datos que pasaremos al componente de visualización
 interface MenuCategory extends CategoryDTO {
-  products: ProductResponseDTO[];
+  products: ProductResponseDTO[]
 }
 
 interface RestaurantMenuPageProps {
-  params: { restaurantId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: { restaurantId: string }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export async function generateMetadata({
-  params,
-  searchParams,
-}: RestaurantMenuPageProps): Promise<Metadata> {
-  const lang = Array.isArray(searchParams.lang) ? searchParams.lang[0] : searchParams.lang || 'en';
-  const restaurantId = params.restaurantId;
-  const t = uiTranslations[lang];
+export async function generateMetadata(
+  { params, searchParams }: RestaurantMenuPageProps
+): Promise<Metadata> {
+  const awaitedParams = await params; // Await params
+  const awaitedSearchParams = await searchParams; // Await searchParams
 
-  // Opcional: Podrías obtener el nombre del restaurante para incluirlo en el título
-  // const establishment = await establishmentApiService.getOneById(restaurantId); // Necesitarías este servicio
-  // const title = establishment ? `${t.restaurantMenu} - ${establishment.name}` : t.restaurantMenu;
+  const langParam = awaitedSearchParams?.lang;
+  const lang = (Array.isArray(langParam) ? langParam[0] : langParam) || DEFAULT_LANGUAGE;
+  const t = uiTranslations[lang as LanguageCode] || uiTranslations[DEFAULT_LANGUAGE];
+  const restaurantIdString = awaitedParams.restaurantId;
+
+  let establishmentName = ''
+  const numericRestaurantId = parseInt(restaurantIdString, 10)
+
+  if (!isNaN(numericRestaurantId)) {
+    try {
+      const establishment = await establishmentApiService.getEstablishmentById(numericRestaurantId)
+      if (establishment) {
+        establishmentName = establishment.name
+      }
+    } catch (e) {
+      console.error('Failed to fetch establishment by ID for metadata', e)
+      // Opcional: manejar el error, por ejemplo, no mostrar el nombre del establecimiento
+    }
+  } else {
+    console.warn('Invalid numeric restaurantId for metadata:', restaurantIdString)
+  }
+
+  const pageTitle = establishmentName
+    ? `${t.restaurantMenu.title} - ${establishmentName}`
+    : t.restaurantMenu.title
 
   return {
-    title: t.restaurantMenu, // Ejemplo: "Menú del Restaurante"
-    // description: `Explora el delicioso menú de ${establishment?.name || 'nuestro restaurante'}.`
-  };
+    title: pageTitle,
+    description:
+      t.restaurantMenu.description ||
+      `Explora el menú de ${establishmentName || 'nuestro restaurante'}.`,
+  }
+}
+
+async function getMenuDataForPage(
+  restaurantIdString: string,
+  lang: LanguageCode
+): Promise<MenuCategory[]> {
+  const numericRestaurantId = parseInt(restaurantIdString, 10)
+
+  if (isNaN(numericRestaurantId)) {
+    console.error('Invalid restaurant ID format for API calls:', restaurantIdString)
+    throw new Error('Invalid restaurant ID format for API calls.')
+  }
+
+  // Ahora numericRestaurantId es un número validado.
+  const categories = await categoryApiService.getAllCategoriesByEstablishment(numericRestaurantId)
+  const activeCategories = categories.filter((cat) => cat.is_active)
+  const menu: MenuCategory[] = []
+
+  for (const category of activeCategories) {
+    const products = await productApiService.getAllProductsByRestaurant(
+      numericRestaurantId,
+      category.category_id
+    )
+    const activeProducts = products.filter((prod) => prod.is_active)
+    if (activeProducts.length > 0) {
+      menu.push({ ...category, products: activeProducts })
+    }
+  }
+  return menu.filter((cat) => cat.products.length > 0)
 }
 
 export default async function RestaurantMenuPage({
   params,
   searchParams,
 }: RestaurantMenuPageProps) {
-  const lang = Array.isArray(searchParams.lang) ? searchParams.lang[0] : searchParams.lang || 'en';
-  const restaurantId = params.restaurantId;
-  const translations = uiTranslations[lang as LanguageCode] || uiTranslations.en;
+  const awaitedParams = await params; // Await params
+  const awaitedSearchParams = await searchParams; // Await searchParams
 
-  if (!isValidUUID(restaurantId)) {
-    return <p>{translations.restaurantMenu.invalidRestaurantIdError}</p>;
+  const langParam = awaitedSearchParams?.lang;
+  const lang = ((Array.isArray(langParam) ? langParam[0] : langParam) || DEFAULT_LANGUAGE) as LanguageCode;
+  const restaurantIdString = awaitedParams.restaurantId;
+  const translations = uiTranslations[lang] || uiTranslations[DEFAULT_LANGUAGE];
+
+  const numericRestaurantId = parseInt(restaurantIdString, 10)
+
+  if (isNaN(numericRestaurantId)) {
+    return (
+      <div className="container mx-auto p-4 text-center text-red-600">
+        {translations.restaurantMenu.invalidRestaurantIdError}
+      </div>
+    )
   }
 
   try {
-    const menuData = await getActiveMenuByRestaurantId(restaurantId, lang as LanguageCode);
+    // Pasamos restaurantIdString, getMenuDataForPage se encargará de parsear y validar de nuevo.
+    // O podríamos pasar numericRestaurantId directamente si ya lo validamos aquí.
+    // Para consistencia y evitar doble parseo, podemos pasar numericRestaurantId (ya validado).
+    // Sin embargo, getMenuDataForPage espera un string, así que mantenemos restaurantIdString.
+    // O mejor, ajustamos getMenuDataForPage para que acepte number.
+    // Por simplicidad ahora, dejaremos que getMenuDataForPage parseé.
+    const menuDataForDisplay = await getMenuDataForPage(restaurantIdString, lang)
 
-    if (!menuData) {
-      return <p>{translations.restaurantMenu.menuNotAvailableError}</p>;
+    if (!menuDataForDisplay || menuDataForDisplay.length === 0) {
+      return (
+        <div className="container mx-auto p-4 text-center">
+          {translations.restaurantMenu.menuNoItems}
+        </div>
+      )
     }
 
-    if (menuData.categories.length === 0) {
-      return <p>{translations.restaurantMenu.menuNoItems}</p>;
-    }
-
-    return <MenuDisplay menuData={menuData} lang={lang as LanguageCode} />;
-  } catch (error) {
-    console.error('Error fetching menu data:', error);
-    // Consider a more specific error message based on the error type
-    return <p>{translations.restaurantMenu.menuNotAvailableError}</p>; // Or a generic error
+    return (
+      <div className="container mx-auto p-4">
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          {/* Idealmente, el nombre del restaurante vendría aquí si se obtiene */}
+          {translations.restaurantMenu.title}
+        </h1>
+        {/* Ajusta el prop de MenuDisplay si espera 'menu' en lugar de 'menuData' */}
+        <MenuDisplay menuData={menuDataForDisplay} lang={lang} />
+      </div>
+    )
+  } catch (error: any) {
+    console.error('Error fetching menu data for page:', error)
+    // Puedes personalizar el mensaje de error basado en el tipo de error si es necesario
+    const errorMessage = translations.restaurantMenu.menuNotAvailableError
+    // Ya no necesitamos el chequeo de "Incompatible ID" porque ahora solo manejamos numéricos
+    // if (error.message && error.message.includes("Incompatible ID")) {
+    //     errorMessage = "Error: Problema con la identificación del restaurante.";
+    // }
+    return <div className="container mx-auto p-4 text-center text-red-600">{errorMessage}</div>
   }
 }
-
-// Considera añadir metadata para SEO
-// export async function generateMetadata({ params }: RestaurantMenuPageProps) { ... }
-
-async function getMenuData(restaurantId: number, lang: LanguageCode): Promise<MenuCategory[]> {
-  try {
-    // Aquí asumimos que tus servicios API pueden tomar el 'lang' para devolver traducciones si es necesario
-    // o que MenuDisplay se encargará de traducir usando los datos base y el 'lang' prop.
-    const categories = await categoryApiService.getAllCategoriesByEstablishment(restaurantId, lang);
-    const activeCategories = categories.filter(cat => cat.is_active);
-
-    const menu: MenuCategory[] = [];
-
-    for (const category of activeCategories) {
-      const products = await productApiService.getAllProductsByRestaurant(restaurantId, category.category_id, lang);
-      const activeProducts = products.filter(prod => prod.is_active);
-      // Solo añadir la categoría si tiene productos activos
-      if (activeProducts.length > 0) {
-        menu.push({ ...category, products: activeProducts });
-      }
-    }
-    // Filtrar categorías que quedaron sin productos después del segundo filtro
-    return menu.filter(cat => cat.products.length > 0);
-  } catch (error) {
-    console.error('Error fetching menu data:', error);
-    // Considera un sistema de logging más robusto para producción
-    // Devolver un array vacío permite a la UI manejar el estado "sin datos"
-    // Si el error es crítico (ej. servicio caído), podrías lanzar el error
-    // para que lo capture un ErrorBoundary o la página de error de Next.js.
-    // throw error; // Descomentar si prefieres que Next.js maneje el error con una página de error
-    return [];
-  }
-}
-
-export async function generateMetadata(
-  { params, searchParams }: RestaurantMenuPageProps,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const restaurantId = parseInt(params.restaurantId, 10);
-  const lang = searchParams?.lang || DEFAULT_LANGUAGE;
-  const t = uiTranslations[lang];
-
-  // Opcional: Podrías obtener el nombre del restaurante para incluirlo en el título
-  // const establishment = await establishmentApiService.getOneById(restaurantId); // Necesitarías este servicio
-  // const title = establishment ? `${t.restaurantMenu} - ${establishment.name}` : t.restaurantMenu;
-
-  return {
-    title: t.restaurantMenu, // Ejemplo: "Menú del Restaurante"
-    // description: `Explora el delicioso menú de ${establishment?.name || 'nuestro restaurante'}.`
-  };
-}
-
-export default async function RestaurantMenuPage({ params, searchParams }: RestaurantMenuPageProps) {
-  const restaurantId = parseInt(params.restaurantId, 10);
-  const lang = searchParams?.lang || DEFAULT_LANGUAGE;
-  const t = uiTranslations[lang];
-
-  if (isNaN(restaurantId)) {
-    return <div className="container mx-auto p-4 text-center text-red-600">{t.invalidRestaurantIdError}</div>; // Ejemplo: "ID de restaurante inválido."
-  }
-
-  const menuData = await getMenuData(restaurantId, lang);
-
-  if (!menuData || menuData.length === 0) {
-    return <div className="container mx-auto p-4 text-center">{t.menuNotAvailableError}</div>; // Ejemplo: "No se pudo cargar el menú o no hay ítems disponibles."
-  }
-
-  return (
-    <div className="container mx-auto p-4">
-      {/* El título podría venir del 'establishment' si lo obtienes para metadata */}
-      <h1 className="text-3xl font-bold mb-6 text-center">{t.restaurantMenu}</h1>
-      <MenuDisplay menu={menuData} lang={lang} />
-    </div>
-  );
-}
-
-// Considera añadir metadata para SEO
-// export async function generateMetadata({ params }: RestaurantMenuPageProps) { ... }

@@ -1,0 +1,37 @@
+Para continuar con la parte visual (Frontend Components), te sugiero el siguiente enfoque:
+
+1. Revisa los Casos de Uso y Funcionalidades Clave:
+
+   - Tus documentos `Documentación técnica.txt` y `MiProyecto.txt` son tu mejor guía. Identifica las vistas y componentes necesarios para cada rol (Cliente, Empleado, Administrador de Establecimiento, Administrador General).
+2. Diseño y Componentización (Mobile-First):
+
+   - Comienza diseñando los componentes más pequeños y reutilizables (botones, inputs, tarjetas de producto, ítems de categoría, etc.) y luego ensambla las vistas más complejas.
+   - Dado que mencionas TailwindCSS, aprovéchalo para un desarrollo ágil y responsive.
+   - Presta atención a la experiencia de usuario (UX) para cada rol.
+3. Conexión con el Backend:
+
+   - Utiliza los servicios de API que has creado en `api` (por ejemplo, `auth.api.ts` , product.api.ts , etc.) para interactuar con tu backend desde los componentes de React.
+   - Maneja los estados de carga, éxito y error de las llamadas a la API.
+4. Autenticación y Autorización en el Frontend:
+
+   - Integra next-auth/react en tus componentes para gestionar las sesiones de usuario.
+   - Crea componentes de orden superior o hooks para proteger rutas y funcionalidades según el rol del usuario (puedes inspirarte en tu `auth-middleware.ts` para la lógica del lado del cliente).
+   - El archivo `next-auth.d.ts` y la configuración en `route.ts` son la base para esto.
+5. Internacionalización (i18n):
+
+   - Veo que tienes `ui.ts` y el hook `useTranslation.ts` . Continúa aplicando esto en todos los textos visibles por el usuario.
+6. Gestión de Estado:
+
+   - Para flujos complejos como la creación de pedidos o la actualización en tiempo real, tu `orderStore.ts` y `order-context.tsx` serán fundamentales. Evalúa si necesitas soluciones más globales o si el contexto de React y Zustand son suficientes.
+7. Flujos de Usuario Específicos:
+
+   - Cliente: Acceso por QR, visualización de menú (categorías, productos, variantes, alérgenos), creación de pedidos, seguimiento de estado.
+   - Empleado (Camarero/Cocinero): Login, panel de pedidos en tiempo real, filtros, cambio de estado de pedidos.
+   - Administrador de Establecimiento: Gestión de empleados, gestión completa del menú (CRUD para categorías, productos, variantes), supervisión de pedidos.
+   - Administrador General: Gestión de establecimientos, asignación de administradores, vista global.
+Comprobaciones y Puntos a Considerar:
+
+- Consistencia de Tipos: Asegúrate de que los DTOs y tipos definidos en `types` se utilicen consistentemente entre el frontend y el backend para evitar errores.
+- Validaciones Zod en Frontend: Aunque tienes validaciones en el backend con Zod ( `schemas` ), considera usar las mismas (o un subconjunto) en el frontend para dar feedback inmediato al usuario antes de enviar datos al servidor.
+- Manejo de Errores: Implementa un buen manejo de errores en el frontend, mostrando mensajes claros al usuario. Puedes usar las clases de error de `errors` y las utilidades de `apiUtils.ts` .
+- Real-time: La funcionalidad de seguimiento de estado de pedidos en tiempo real podría requerir WebSockets o Server-Sent Events (SSE) si no quieres depender solo de polling.
