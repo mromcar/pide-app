@@ -2,7 +2,8 @@ import { EstablishmentCreateDTO, EstablishmentUpdateDTO, EstablishmentResponseDT
 // Quitar el import de handleApiResponse de @/utils/api si existía y el ApiError local
 import { handleApiResponse, handleCaughtError, ApiError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
 
-const API_BASE_URL = '/api/restaurants';
+const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+const API_SERVICE_PATH = '/api/restaurants';
 
 // Ya no necesitamos EstablishmentApiError local si ApiError es suficiente.
 // Ya no necesitamos el handleError local.
@@ -27,7 +28,7 @@ export async function getAllEstablishments(
     if (pageSize) queryParams.append('pageSize', pageSize.toString());
 
     const response = await fetch(
-      `${API_BASE_URL}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`,
+      `${ENV_API_BASE_URL}${API_SERVICE_PATH}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`,
       { 
         credentials: 'include', // Para incluir las cookies de autenticación
         headers: {
@@ -53,7 +54,7 @@ export async function getAllEstablishments(
  */
 export async function getEstablishmentById(id: number): Promise<EstablishmentResponseDTO | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${id}`, {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ export async function createEstablishment(
   establishmentData: EstablishmentCreateDTO
 ): Promise<EstablishmentResponseDTO> {
   try {
-    const response = await fetch(API_BASE_URL, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -119,7 +120,7 @@ export async function updateEstablishment(
   updateData: EstablishmentUpdateDTO
 ): Promise<EstablishmentResponseDTO> {
   try {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${id}`, {
       method: 'PUT',
       credentials: 'include',
       headers: {
@@ -144,7 +145,7 @@ export async function updateEstablishment(
  */
 export async function deleteEstablishment(id: number): Promise<void> { // O el tipo que devuelva tu API
   try {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${id}`, {
       method: 'DELETE',
       credentials: 'include',
       headers: {

@@ -3,7 +3,8 @@ import type { CategoryCreateDTO, CategoryUpdateDTO, CategoryDTO } from '@/types/
 import { handleApiResponse, handleCaughtError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
 import { CategoryApiError } from '@/types/errors/category.api.error';
 
-const API_BASE_URL = '/api/restaurants';
+const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+const API_SERVICE_PATH = '/api/restaurants'; // Mantén la parte específica del servicio aquí
 
 // Ya no necesitamos CategoryApiError local si ApiError es suficiente.
 // Si necesitas campos específicos en CategoryApiError, puedes hacer que extienda ApiError:
@@ -22,7 +23,7 @@ const API_BASE_URL = '/api/restaurants';
  */
 async function getAllCategoriesByEstablishment(restaurantId: number): Promise<CategoryDTO[]> { // Asumiendo que CategoryDTO es el tipo correcto
   try {
-    const response = await fetch(`${API_BASE_URL}/${restaurantId}/menu/categories`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/categories`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -60,7 +61,7 @@ async function getAllCategoriesByEstablishment(restaurantId: number): Promise<Ca
  */
 async function createCategory(restaurantId: number, categoryData: CategoryCreateDTO): Promise<CategoryDTO> {
   try {
-    const response = await fetch(`${API_BASE_URL}/${restaurantId}/menu/categories`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/categories`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ async function createCategory(restaurantId: number, categoryData: CategoryCreate
  */
 async function updateCategory(restaurantId: number, categoryId: number, updateData: CategoryUpdateDTO): Promise<CategoryDTO> {
   try {
-    const response = await fetch(`${API_BASE_URL}/${restaurantId}/menu/categories/${categoryId}`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/categories/${categoryId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -121,7 +122,7 @@ async function updateCategory(restaurantId: number, categoryId: number, updateDa
  */
 async function deleteCategory(restaurantId: number, categoryId: number): Promise<{ message: string; category?: CategoryDTO }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/${restaurantId}/menu/categories/${categoryId}`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/categories/${categoryId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

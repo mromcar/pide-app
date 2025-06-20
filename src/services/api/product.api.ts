@@ -7,7 +7,8 @@ import {
 import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils'; // Actualizado
 import { ProductApiError } from '@/types/errors/product.api.error';
 
-const API_BASE_URL = '/api/restaurants'; // Asumiendo que los productos están bajo un restaurante
+const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+const API_SERVICE_PATH = '/api/restaurants'; // Asumiendo que los productos están bajo un restaurante
 
 /**
  * Obtiene todos los productos para un establecimiento específico.
@@ -20,7 +21,7 @@ async function getAllProductsByRestaurant(
   categoryId?: number
 ): Promise<ProductResponseDTO[]> {
   try {
-    let url = `${API_BASE_URL}/${restaurantId}/menu/products`;
+    let url = `${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products`;
     const queryParams = new URLSearchParams();
     if (categoryId) {
       queryParams.append('categoryId', categoryId.toString());
@@ -56,7 +57,7 @@ async function getProductById(
   productId: number
 ): Promise<ProductWithRelationsResponseDTO | null> { // O ProductResponseDTO | null
   try {
-    const response = await fetch(`${API_BASE_URL}/${restaurantId}/menu/products/${productId}`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products/${productId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -85,7 +86,7 @@ async function createProduct(
   productData: ProductCreateDTO
 ): Promise<ProductResponseDTO> {
   try {
-    const response = await fetch(`${API_BASE_URL}/${restaurantId}/menu/products`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -111,7 +112,7 @@ async function updateProduct(
   productData: ProductUpdateDTO
 ): Promise<ProductResponseDTO> {
   try {
-    const response = await fetch(`${API_BASE_URL}/${restaurantId}/menu/products/${productId}`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products/${productId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -132,7 +133,7 @@ async function updateProduct(
  */
 async function deleteProduct(restaurantId: number, productId: number): Promise<void> {
   try {
-    const response = await fetch(`${API_BASE_URL}/${restaurantId}/menu/products/${productId}`, {
+    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products/${productId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

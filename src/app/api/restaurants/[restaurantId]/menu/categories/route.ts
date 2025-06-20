@@ -1,6 +1,6 @@
 import { requireAuth } from "@/middleware/auth-middleware";
 import { CategoryService } from '@/services/category.service';
-import { createCategorySchema } from '@/schemas/category';
+import { categoryCreateSchema } from '@/schemas/category'; // Corregido aquí
 import { jsonOk, jsonError } from "@/utils/api";
 import { ZodError } from "zod";
 import { NextRequest, NextResponse } from 'next/server';
@@ -122,7 +122,7 @@ export async function POST(
 
     // Parse and validate request body using Zod schema
     const body = await request.json();
-    const validatedData = createCategorySchema.parse(body);
+    const validatedData = categoryCreateSchema.parse(body); // Corregido aquí también si se usa directamente
 
     // Create category using the service
     const category = await categoryService.createCategory({

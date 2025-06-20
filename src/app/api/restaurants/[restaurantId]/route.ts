@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { jsonOk, jsonError } from '@/utils/api';
 // Importa aquí los servicios y esquemas necesarios, por ejemplo:
-// import { establishmentService } from '@/services/establishment.service';
+import { establishmentService } from '@/services/establishment.service'; // Uncommented this line
 // import { restaurantIdSchema } from '@/schemas/establishment'; // Asumiendo que tienes un esquema para validar el ID
 
 /**
@@ -39,15 +39,16 @@ import { jsonOk, jsonError } from '@/utils/api';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { restaurantId: string } }
+  { params: paramsPromise }: { params: Promise<{ restaurantId: string }> } // Renamed params to paramsPromise and typed as Promise
 ) {
   try {
-    const token = await getToken({ req });
-    if (!token) {
-      return jsonError('Unauthorized', 401);
-    }
+    const params = await paramsPromise; // Await paramsPromise here
+    // const token = await getToken({ req }); // Comentado para acceso público
+    // if (!token) { // Comentado para acceso público
+    //   return jsonError('Unauthorized', 401); // Comentado para acceso público
+    // }
 
-    const { restaurantId } = params;
+    const { restaurantId } = params; // Now accessing restaurantId from the resolved params
     const parsedRestaurantId = Number(restaurantId);
 
     if (isNaN(parsedRestaurantId)) {
@@ -55,22 +56,27 @@ export async function GET(
     }
 
     // Aquí iría la lógica para obtener el restaurante por su ID
-    // Por ejemplo:
-    // const restaurant = await establishmentService.getEstablishmentById(parsedRestaurantId);
-    // if (!restaurant) {
-    //   return jsonError('Restaurant not found', 404);
-    // }
+    const restaurant = await establishmentService.getEstablishmentById(parsedRestaurantId);
+    if (!restaurant) {
+      return jsonError('Restaurant not found', 404);
+    }
 
-    // Lógica de autorización (ejemplo):
-    // if (token.role !== 'ADMIN' && token.establishment_id !== parsedRestaurantId) {
-    //   return jsonError('Forbidden', 403);
-    // }
+    // La lógica de autorización específica para usuarios logueados se movería a PUT/DELETE si es necesario
+    // o se manejaría de forma diferente si GET necesita mostrar más o menos info según el rol.
+    // Por ahora, para la vista pública del menú, no se requiere autorización aquí.
 
-    // return jsonOk(restaurant);
-    return jsonOk({ message: `GET request for restaurant ${parsedRestaurantId} successful` }); // Placeholder response
+    return jsonOk(restaurant);
 
   } catch (error: unknown) {
-    console.error(`Error fetching restaurant ${params.restaurantId}:`, error);
+    // Safely try to get restaurantId for logging, or use a generic message
+    let restaurantIdForErrorLog = 'unknown';
+    try {
+      const params = await paramsPromise;
+      restaurantIdForErrorLog = params.restaurantId;
+    } catch (paramsError) {
+      console.error('Error resolving params for logging:', paramsError);
+    }
+    console.error(`Error fetching restaurant ${restaurantIdForErrorLog}:`, error);
     if (error instanceof Error) {
       return jsonError(error.message, 500);
     } else {
