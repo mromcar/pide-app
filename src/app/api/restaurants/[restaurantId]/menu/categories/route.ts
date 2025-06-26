@@ -41,12 +41,12 @@ const categoryService = new CategoryService();
  *         description: Internal server error.
  */
 export async function GET(
-  _req: NextRequest, // Use NextRequest
-  { params }: { params: { restaurantId: string } }
+  _req: NextRequest,
+  { params: paramsPromise }: { params: Promise<{ restaurantId: string }> }
 ) {
   try {
-    // Authentication middleware
-    await requireAuth(); // Adjust role if needed
+    const params = await paramsPromise; // ✅ Await params first
+    // await requireAuth(); // Comentado para acceso público
 
     const restaurantId = Number(params.restaurantId);
     if (isNaN(restaurantId)) {

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { PrismaClient, ProductVariant, ProductVariantTranslation, ProductVariantHistory, Prisma } from '@prisma/client';
+import { ProductVariant, ProductVariantTranslation, ProductVariantHistory, Prisma } from '@prisma/client';
 import {
   ProductVariantCreateDTO,
   ProductVariantUpdateDTO,

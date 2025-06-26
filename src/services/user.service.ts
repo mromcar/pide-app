@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { PrismaClient, User, UserRole, Establishment, EstablishmentAdministrator, Prisma } from '@prisma/client';
+import { User, UserRole, Establishment, EstablishmentAdministrator, Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs'; // Still needed for password hashing and comparison
 // import jwt from 'jsonwebtoken'; // No longer needed for token generation here
 import { UserCreateDTO, UserUpdateDTO, UserResponseDTO /* UserLoginDTO, UserLoginResponseDTO */ } from '../types/dtos/user'; // Login DTOs might be handled by NextAuth directly or adapted
