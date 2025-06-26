@@ -53,12 +53,17 @@ const paramsSchema = z.object({
  *       500:
  *         description: Internal server error.
  */
-export async function GET(request: NextRequest, { params }: { params: { restaurantId: string } }) {
+export async function GET(
+  request: NextRequest, 
+  { params: paramsPromise }: { params: Promise<{ restaurantId: string }> }
+) {
   try {
-    const token = await getToken({ req: request });
-    if (!token || !token.sub) {
-      return jsonError('Unauthorized', 401);
-    }
+    const params = await paramsPromise; // ✅ Await params first
+    // Comentar autenticación para acceso público al menú
+    // const token = await getToken({ req: request });
+    // if (!token || !token.sub) {
+    //   return jsonError('Unauthorized', 401);
+    // }
 
     const paramsValidation = paramsSchema.safeParse(params);
     if (!paramsValidation.success) {
@@ -66,13 +71,12 @@ export async function GET(request: NextRequest, { params }: { params: { restaura
     }
     const { restaurantId } = paramsValidation.data;
 
-    // Authorization: Ensure the user can access this restaurant's data
-    const isGeneralAdmin = token.role === UserRole.general_admin;
-    const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishment_id === restaurantId;
-
-    if (!isGeneralAdmin && !isCorrectEstablishmentAdmin) {
-        return jsonError('Forbidden: You do not have access to this restaurant.', 403);
-    }
+    // Comentar verificación de autorización para acceso público
+    // const isGeneralAdmin = token.role === UserRole.general_admin;
+    // const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishment_id === restaurantId;
+    // if (!isGeneralAdmin && !isCorrectEstablishmentAdmin) {
+    //     return jsonError('Forbidden: You do not have access to this restaurant.', 403);
+    // }
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1', 10);

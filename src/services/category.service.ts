@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { PrismaClient, Category, CategoryTranslation, Prisma } from '@prisma/client';
+import { Category, CategoryTranslation, Prisma } from '@prisma/client';
 import {
   CategoryCreateDTO,
   CategoryUpdateDTO,

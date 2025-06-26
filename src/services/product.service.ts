@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma'; // Add this import
-import { PrismaClient, Product, ProductTranslation, ProductHistory, ProductAllergen, Prisma, UserRole, Allergen, AllergenTranslation, User, ProductVariant, ProductVariantTranslation } from '@prisma/client'; // Añadir User
+import { prisma } from '@/lib/prisma';
+import { Product, ProductTranslation, ProductHistory, ProductAllergen, Prisma, UserRole, Allergen, AllergenTranslation, User, ProductVariant, ProductVariantTranslation } from '@prisma/client';
 import {
   ProductCreateDTO,
   ProductUpdateDTO,
