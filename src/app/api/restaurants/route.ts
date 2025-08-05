@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { jsonOk, jsonError } from '@/utils/api';
 // Importa aquí los servicios y esquemas necesarios, por ejemplo:

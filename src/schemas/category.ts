@@ -8,7 +8,6 @@ export const categoryIdSchema = z.object({
 export const categoryCreateSchema = z.object({
   establishment_id: z.number().int().positive(),
   name: z.string().min(1).max(255),
-  image_url: z.string().url().max(255).optional().nullable(),
   sort_order: z.number().int().optional().nullable(),
   is_active: z.boolean().optional().nullable(),
   translations: z.array(categoryTranslationCreateSchema).optional(),
@@ -16,10 +15,9 @@ export const categoryCreateSchema = z.object({
 
 export const categoryUpdateSchema = z.object({
   name: z.string().min(1).max(255).optional(),
-  image_url: z.string().url().max(255).optional().nullable(),
   sort_order: z.number().int().optional().nullable(),
   is_active: z.boolean().optional().nullable(),
-  translations: z.array(categoryTranslationCreateSchema).optional(), // Changed here
+  translations: z.array(categoryTranslationCreateSchema).optional(),
 });
 
 export type CategoryCreateInput = z.infer<typeof categoryCreateSchema>;

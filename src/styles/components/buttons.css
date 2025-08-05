@@ -1,0 +1,151 @@
+@layer components {
+  /* Botón base minimalista */
+  .btn-base {
+    @apply inline-flex items-center justify-center;
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+    border: 1px solid var(--color-primary);
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+    text-decoration: none;
+    font-family: inherit;
+  }
+
+  .btn-base:hover:not(:disabled) {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+  }
+
+  .btn-base:disabled {
+    background-color: var(--color-disabled);
+    color: #666;
+    cursor: not-allowed;
+    border-color: var(--color-disabled);
+  }
+
+  /* Variantes de tamaño */
+  .btn-sm {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.875rem;
+    border-radius: var(--border-radius-full);
+  }
+
+  .btn-md {
+    padding: 0.625rem var(--spacing-lg);
+    font-size: 1rem;
+    border-radius: var(--border-radius-full);
+  }
+
+  .btn-lg {
+    padding: 0.75rem var(--spacing-xl);
+    font-size: 1.125rem;
+    border-radius: var(--border-radius-full);
+  }
+
+  /* Botón completo */
+  .btn-full {
+    width: 100%;
+  }
+
+  /* Botones compuestos - definidos directamente */
+  .btn-minimalista {
+    @apply btn-base btn-md;
+  }
+
+  .add-to-cart-button,
+  .add-to-cart-button-standalone {
+    @apply btn-base;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: var(--border-radius-full);
+    margin-left: var(--spacing-sm);
+    white-space: nowrap;
+    min-width: 120px;
+  }
+
+  .cart-place-order-btn {
+    @apply btn-base btn-lg btn-full;
+    margin-top: var(--spacing-lg);
+  }
+
+  /* Botones de cantidad - MEJORADOS */
+  .quantity-button {
+    @apply btn-base;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .quantity-button:first-child {
+    border-radius: 50%;
+  }
+
+  .quantity-button:last-child {
+    border-radius: 50%;
+  }
+
+  /* Botones específicos de checkout */
+  .order-confirmation-track-btn {
+    @apply btn-base btn-md btn-full;
+  }
+
+  .order-confirmation-order-again-btn {
+    @apply btn-base btn-md btn-full;
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+  }
+
+  .order-confirmation-order-again-btn:hover {
+    background-color: var(--color-border-light);
+  }
+}
+
+/* Botones de navegación de categorías - fuera de @layer para evitar conflictos */
+.category-nav-button {
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: font-weight 0.2s ease-in-out;
+  color: var(--color-text);
+}
+
+.category-nav-button:hover {
+  background-color: transparent;
+}
+
+.category-nav-button.active {
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+/* Selector de idioma */
+.idioma-btn {
+  background-color: #f3f4f6;
+  color: var(--color-text);
+  font-weight: 600;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-full);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+}
+
+.idioma-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.idioma-btn.active {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+}

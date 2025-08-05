@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { z } from 'zod';
 import { productVariantService } from '@/services/productVariant.service';
-import { productService } from '@/services/product.service'; // Added productService import
+import { productService } from '@/services/product.service';
 import { productVariantCreateSchema } from '@/schemas/productVariant';
 import { jsonOk, jsonError } from '@/utils/api';
 import { UserRole } from '@prisma/client';

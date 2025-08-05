@@ -1,0 +1,54 @@
+/* Variables CSS para diseño minimalista */
+:root {
+  --color-primary: #000;
+  --color-secondary: #fff;
+  --color-text: #000;
+  --color-text-muted: #666;
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+  --color-hover: #333;
+  --color-disabled: #ccc;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --border-radius: 8px;
+  --border-radius-full: 9999px;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --transition: all 0.2s ease;
+}
+
+/* Reset y estilos base */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-secondary);
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+}
+
+/* Contenedor principal de la aplicación */
+.app-container {
+  padding: var(--spacing-lg);
+  max-width: 80rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  background-color: var(--color-secondary);
+}
+
+.app-container .title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}

@@ -3,7 +3,6 @@ import { CategoryTranslationCreateDTO, CategoryTranslationDTO, CategoryTranslati
 export interface CategoryCreateDTO {
   establishment_id: number;
   name: string;
-  image_url?: string | null;
   sort_order?: number | null;
   is_active?: boolean | null;
   translations?: CategoryTranslationCreateDTO[];
@@ -11,20 +10,18 @@ export interface CategoryCreateDTO {
 
 export interface CategoryUpdateDTO {
   name?: string;
-  image_url?: string | null;
   sort_order?: number | null;
   is_active?: boolean | null;
-  translations?: (CategoryTranslationCreateDTO | CategoryTranslationUpdateDTO)[]; // Allow creating new or updating existing translations
+  translations?: (CategoryTranslationCreateDTO | CategoryTranslationUpdateDTO)[];
 }
 
 export interface CategoryDTO {
   category_id: number;
   establishment_id: number;
   name: string;
-  image_url?: string | null;
   sort_order?: number | null;
   is_active?: boolean | null;
-  created_at?: string | null; // Dates as strings for DTOs
+  created_at?: string | null;
   updated_at?: string | null;
   deleted_at?: string | null;
   translations?: CategoryTranslationDTO[];

@@ -1,113 +1,76 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getToken, JWT } from 'next-auth/jwt';
+import { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 import { orderService } from '@/services/order.service';
 import { jsonOk, jsonError } from '@/utils/api';
-import { orderIdSchema } from '@/schemas/order';
+import { create_order_schema } from '@/schemas/order';
 import { UserRole } from '@/types/enums';
-import { ZodIssue } from 'zod';
+import { OrderCreateDTO } from '@/types/dtos/order'; // ✅ Importación faltante
+import { z } from 'zod';
 
-// Helper function to parse and validate path parameters
-function validatePathParams(params: { restaurantId: string; orderId: string }): 
-  | { success: true; data: { restaurantId: number; orderId: number } } 
-  | { success: false; error: ZodIssue[] | string; status: number } {
-  const parsedRestaurantId = Number(params.restaurantId);
-  if (isNaN(parsedRestaurantId)) {
-    return { success: false, error: 'Invalid restaurant ID', status: 400 };
-  }
+// Schema para validar parámetros internos en snake_case
+const path_params_schema = z.object({
+  restaurant_id: z.coerce.number().int().positive(),
+});
 
-  const parsedOrderId = orderIdSchema.safeParse({ orderId: Number(params.orderId) });
-  if (!parsedOrderId.success) {
-    return { success: false, error: parsedOrderId.error.issues, status: 400 };
-  }
-
-  return { success: true, data: { restaurantId: parsedRestaurantId, orderId: parsedOrderId.data.orderId } };
-}
-
-// Helper function for authorization check
-function isAuthorized(token: JWT, restaurantId: number): boolean {
-  if (!token) return false;
-  return (
-    token.role === UserRole.GENERAL_ADMIN ||
-    (token.role === UserRole.ESTABLISHMENT_ADMIN && token.establishment_id === restaurantId)
-  );
-}
-
-/**
- * @swagger
- * /api/restaurants/{restaurantId}/orders/client/{orderId}:
- *   get:
- *     summary: Get an order by ID for a client
- *     tags:
- *       - Orders
- *     parameters:
- *       - in: path
- *         name: restaurantId
- *         schema:
- *           type: integer
- *         required: true
- *         description: ID of the restaurant
- *       - in: path
- *         name: orderId
- *         schema:
- *           type: integer
- *         required: true
- *         description: ID of the order
- *     responses:
- *       200:
- *         description: Order retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/OrderResponseDTO'
- *       400:
- *         description: Invalid request parameters
- *       401:
- *         description: Unauthorized
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Order not found
- *       500:
- *         description: Internal server error
- */
-export async function GET(
+export async function POST(
   req: NextRequest,
-  { params }: { params: { restaurantId: string; orderId: string } }
+  { params }: { params: { restaurantId: string } } // ✅ Next.js requiere camelCase
 ) {
   try {
     const token = await getToken({ req });
+
     if (!token) {
       return jsonError('Unauthorized', 401);
     }
 
-    const validationResult = validatePathParams(params);
-    if (!validationResult.success) {
-      return jsonError(validationResult.error, validationResult.status);
+    // ✅ Conversión inmediata: camelCase → snake_case
+    const { restaurantId } = params; // Next.js camelCase
+    const restaurant_id = parseInt(restaurantId); // Convertir a snake_case para uso interno
+
+    const parsed_path_params = path_params_schema.safeParse({
+      restaurant_id // ✅ Usar snake_case internamente
+    });
+
+    if (!parsed_path_params.success) {
+      return jsonError(parsed_path_params.error.errors, 400);
     }
 
-    const { restaurantId, orderId } = validationResult.data;
+    const { restaurant_id: validated_restaurant_id } = parsed_path_params.data;
 
-    if (!isAuthorized(token, restaurantId)) {
+    // Authorization check: Only general_admin or establishment_admin of the specific restaurant
+    if (
+      token.role !== UserRole.GENERAL_ADMIN &&
+      !(token.role === UserRole.ESTABLISHMENT_ADMIN && token.establishment_id === validated_restaurant_id)
+    ) {
       return jsonError('Forbidden', 403);
     }
 
-    const order = await orderService.getOrderById(
-      orderId,
-      restaurantId,
-      token.sub // Assuming token.sub is the user ID
-    );
+    const body = await req.json();
+    const validated_data = create_order_schema.safeParse(body); // ✅ Cambiar validatedBody por validated_data
 
-    if (!order) {
-      return jsonError('Order not found', 404);
+    if (!validated_data.success) {
+      return jsonError(validated_data.error.issues, 400);
     }
+
+    // ✅ Crear orderData usando validated_data en lugar de validatedBody
+    const orderData: OrderCreateDTO = {
+      establishment_id: validated_restaurant_id,
+      client_user_id: parseInt(token.sub),
+      table_number: validated_data.data.table_number,
+      notes: validated_data.data.notes,
+      total_amount: validated_data.data.total_amount ?? 0, // ✅ Proporcionar valor por defecto
+      order_items: validated_data.data.order_items
+    };
+
+    // ✅ Usar orderData en lugar de mezclar datos
+    const order = await orderService.createOrder(orderData);
 
     return jsonOk(order);
-  } catch (error: unknown) {
-    console.error('Error fetching order:', error); // It's good practice to log the actual error
+  } catch (error) {
+    console.error('Error creating order:', error);
     if (error instanceof Error) {
       return jsonError(error.message, 500);
-    } else {
-      return jsonError('An unexpected error occurred', 500);
     }
+    return jsonError('An unexpected error occurred', 500);
   }
 }

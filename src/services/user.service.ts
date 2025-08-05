@@ -1,15 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import { User, UserRole, Establishment, EstablishmentAdministrator, Prisma } from '@prisma/client';
-import bcrypt from 'bcryptjs'; // Still needed for password hashing and comparison
-// import jwt from 'jsonwebtoken'; // No longer needed for token generation here
-import { UserCreateDTO, UserUpdateDTO, UserResponseDTO /* UserLoginDTO, UserLoginResponseDTO */ } from '../types/dtos/user'; // Login DTOs might be handled by NextAuth directly or adapted
+import bcrypt from 'bcryptjs';
+import { UserCreateDTO, UserUpdateDTO, UserResponseDTO } from '../types/dtos/user';
 import { EstablishmentAdministratorCreateDTO } from '../types/dtos/establishmentAdministrator';
-import { EstablishmentResponseDTO } from '../types/dtos/establishment';
-import { userCreateSchema, userUpdateSchema, userIdSchema /* userLoginSchema */ } from '../schemas/user'; // userLoginSchema might be less relevant here
+import { userCreateSchema, userUpdateSchema, userIdSchema } from '../schemas/user';
 import { establishmentAdministratorCreateSchema } from '../schemas/establishmentAdministrator';
+import logger from '@/lib/logger';
 
-
-// const JWT_SECRET = process.env.JWT_SECRET || 'your-very-secret-key'; // No longer needed here
 const SALT_ROUNDS = 10;
 
 export class UserService {
@@ -45,17 +42,96 @@ export class UserService {
     };
   }
 
-  // --- CRUD Operations (largely unchanged) ---
+  // --- CRUD Operations ---
   async createUser(data: UserCreateDTO): Promise<UserResponseDTO> {
     userCreateSchema.parse(data); // Validate input
+
+    // Verificar si el email ya existe
+    const existingUser = await prisma.user.findUnique({
+      where: { email: data.email }
+    });
+
+    if (existingUser) {
+      throw new Error('User with this email already exists');
+    }
+
     const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
+
+    // Excluir el campo 'password' del objeto data
+    const { password, ...dataWithoutPassword } = data;
+
     const newUser = await prisma.user.create({
       data: {
-        ...data,
+        ...dataWithoutPassword,
         password_hash: hashedPassword,
       },
       include: { establishment: true },
     });
+
+    logger.info('User created successfully', { userId: newUser.user_id, email: newUser.email });
+    return this.mapToDTO(newUser);
+  }
+
+  // Método específico para crear usuarios OAuth
+  async createOAuthUser(data: {
+    email: string;
+    name?: string;
+    google_id?: string;
+    apple_id?: string;
+    role?: UserRole;
+    establishment_id?: number;
+  }): Promise<UserResponseDTO> {
+    // Verificar si el usuario ya existe por email o OAuth ID
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: data.email },
+          ...(data.google_id ? [{ google_id: data.google_id }] : []),
+          ...(data.apple_id ? [{ apple_id: data.apple_id }] : []),
+        ]
+      }
+    });
+
+    if (existingUser) {
+      // Si existe, actualizar con los datos OAuth si es necesario
+      const updateData: any = {};
+      if (data.google_id && !existingUser.google_id) {
+        updateData.google_id = data.google_id;
+      }
+      if (data.apple_id && !existingUser.apple_id) {
+        updateData.apple_id = data.apple_id;
+      }
+      if (data.name && !existingUser.name) {
+        updateData.name = data.name;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        const updatedUser = await prisma.user.update({
+          where: { user_id: existingUser.user_id },
+          data: updateData,
+          include: { establishment: true },
+        });
+        return this.mapToDTO(updatedUser);
+      }
+
+      return this.mapToDTO(existingUser);
+    }
+
+    // Crear nuevo usuario OAuth
+    const newUser = await prisma.user.create({
+      data: {
+        email: data.email,
+        name: data.name || null,
+        google_id: data.google_id || null,
+        apple_id: data.apple_id || null,
+        role: data.role || UserRole.client,
+        establishment_id: data.establishment_id || null,
+        password_hash: null, // OAuth users don't have password
+      },
+      include: { establishment: true },
+    });
+
+    logger.info('OAuth user created successfully', { userId: newUser.user_id, email: newUser.email });
     return this.mapToDTO(newUser);
   }
 
@@ -82,46 +158,57 @@ export class UserService {
   async getUserByEmail(email: string): Promise<UserResponseDTO | null> {
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { establishment: true }, // Include establishment for context
+      include: { establishment: true },
     });
-    // Return the full User object as NextAuth might need it, or map to DTO if preferred for consistency
-    // For NextAuth, often the raw user object (or a slightly augmented one) is more useful in the authorize callback
     return user ? this.mapToDTO(user) : null;
-    // Or, if NextAuth needs more direct User object:
-    // return user;
   }
 
-  // This method is specifically for NextAuth's CredentialsProvider
+  // Método para buscar usuario por OAuth ID
+  async getUserByOAuthId(provider: 'google' | 'apple', oauthId: string): Promise<UserResponseDTO | null> {
+    const whereClause = provider === 'google'
+      ? { google_id: oauthId }
+      : { apple_id: oauthId };
+
+    const user = await prisma.user.findUnique({
+      where: whereClause,
+      include: { establishment: true },
+    });
+
+    return user ? this.mapToDTO(user) : null;
+  }
+
+  // Método específico para NextAuth's CredentialsProvider
   async verifyCredentials(credentials: { email?: string; password?: string }): Promise<Omit<User, 'password_hash'> | null> {
     if (!credentials?.email || !credentials.password) {
-        return null;
+      return null;
     }
+
     const user = await prisma.user.findUnique({
       where: { email: credentials.email },
     });
 
     if (!user || !user.password_hash) {
-      return null; // User not found or password not set
+      return null; // User not found or password not set (OAuth user)
     }
 
     const isPasswordValid = await bcrypt.compare(credentials.password, user.password_hash);
     if (!isPasswordValid) {
       return null; // Invalid password
     }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password_hash, ...userWithoutPassword } = user;
-    return userWithoutPassword; // userWithoutPassword ya no tiene password_hash
+    return userWithoutPassword;
   }
 
   async updateUser(userId: number, data: UserUpdateDTO): Promise<UserResponseDTO | null> {
-    userIdSchema.parse({ user_id: userId }); // Validate ID
-    userUpdateSchema.parse(data); // Validate input
+    userIdSchema.parse({ user_id: userId })
+    userUpdateSchema.parse(data)
 
-    // Extraer la contraseña del DTO si existe, para no incluirla directamente en updateData
-    const { password, ...restOfData } = data;
-    const updateData: Partial<Omit<User, 'user_id' | 'created_at' | 'updated_at'>> & { password_hash?: string } = {
-        ...restOfData
-    };
+    const { password, ...restOfData } = data
+    const updateData: Partial<Pick<User, 'name' | 'email' | 'establishment_id'>> & { password_hash?: string } = {
+      ...restOfData
+    }
 
     if (password) {
       updateData.password_hash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -133,35 +220,39 @@ export class UserService {
         data: updateData,
         include: { establishment: true },
       });
+
+      logger.info('User updated successfully', { userId, updatedFields: Object.keys(updateData) });
       return this.mapToDTO(updatedUser);
-    } catch (error) { // Cambiado de error: any
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') { // Prisma error code for record not found
-        return null;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return null; // User not found
       }
-      // Considera registrar el error o manejar otros tipos de errores específicos
-      console.error("Error updating user:", error);
-      throw error; // Relanzar el error si no se maneja específicamente
+      logger.error('Error updating user:', { userId, error });
+      throw error;
     }
   }
 
   async deleteUser(userId: number): Promise<UserResponseDTO | null> {
     userIdSchema.parse({ user_id: userId }); // Validate ID
+
     try {
       const deletedUser = await prisma.user.delete({
         where: { user_id: userId },
-        include: { establishment: true }, // To return the full DTO before deletion
+        include: { establishment: true },
       });
+
+      logger.info('User deleted successfully', { userId });
       return this.mapToDTO(deletedUser);
-    } catch (error) { // Cambiado de error: any
+    } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null;
+        return null; // User not found
       }
-      console.error("Error deleting user:", error);
+      logger.error('Error deleting user:', { userId, error });
       throw error;
     }
   }
 
-  // --- Authorization (largely unchanged, used internally or by other services/API routes) ---
+  // --- Authorization methods ---
   async hasRole(userId: number, role: UserRole): Promise<boolean> {
     const user = await this.getUserById(userId);
     return user?.role === role;
@@ -179,17 +270,47 @@ export class UserService {
     return !!adminRecord;
   }
 
-  // --- Establishment Administrator Management (unchanged) ---
+  async canAccessEstablishment(userId: number, establishmentId: number): Promise<boolean> {
+    const user = await this.getUserById(userId);
+    if (!user) return false;
+
+    // General admin can access any establishment
+    if (user.role === UserRole.general_admin) {
+      return true;
+    }
+
+    // Check if user belongs to the establishment
+    if (user.establishment_id === establishmentId) {
+      return true;
+    }
+
+    // Check if user is an administrator of the establishment
+    return await this.isEstablishmentAdmin(userId, establishmentId);
+  }
+
+  // --- Establishment Administrator Management ---
   async assignAdminToEstablishment(data: EstablishmentAdministratorCreateDTO): Promise<EstablishmentAdministrator> {
     establishmentAdministratorCreateSchema.parse(data);
-    return prisma.establishmentAdministrator.create({
-      data,
-    });
+
+    try {
+      const adminRecord = await prisma.establishmentAdministrator.create({
+        data,
+      });
+
+      logger.info('Admin assigned to establishment', { userId: data.user_id, establishmentId: data.establishment_id });
+      return adminRecord;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        throw new Error('User is already an administrator of this establishment');
+      }
+      logger.error('Error assigning admin to establishment:', { data, error });
+      throw error;
+    }
   }
 
   async removeAdminFromEstablishment(userId: number, establishmentId: number): Promise<EstablishmentAdministrator | null> {
     try {
-      return await prisma.establishmentAdministrator.delete({
+      const removedAdmin = await prisma.establishmentAdministrator.delete({
         where: {
           user_id_establishment_id: {
             user_id: userId,
@@ -197,12 +318,69 @@ export class UserService {
           },
         },
       });
-    } catch (error) { // Cambiado de error: any
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') { // Record to delete not found
-        return null;
+
+      logger.info('Admin removed from establishment', { userId, establishmentId });
+      return removedAdmin;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return null; // Record not found
       }
-      console.error("Error removing admin from establishment:", error);
+      logger.error('Error removing admin from establishment:', { userId, establishmentId, error });
       throw error;
     }
+  }
+
+  async getEstablishmentAdmins(establishmentId: number): Promise<UserResponseDTO[]> {
+    const adminRecords = await prisma.establishmentAdministrator.findMany({
+      where: { establishment_id: establishmentId },
+      include: {
+        user: {
+          include: { establishment: true }
+        }
+      }
+    });
+
+    return adminRecords.map(record => this.mapToDTO(record.user));
+  }
+
+  // --- Utility methods ---
+  async getUserCount(): Promise<number> {
+    return await prisma.user.count();
+  }
+
+  async getUsersByRole(role: UserRole): Promise<UserResponseDTO[]> {
+    const users = await prisma.user.findMany({
+      where: { role },
+      include: { establishment: true },
+      orderBy: { created_at: 'desc' }
+    });
+
+    return users.map(user => this.mapToDTO(user));
+  }
+
+  async getUsersByEstablishment(establishmentId: number): Promise<UserResponseDTO[]> {
+    const users = await prisma.user.findMany({
+      where: { establishment_id: establishmentId },
+      include: { establishment: true },
+      orderBy: { created_at: 'desc' }
+    });
+
+    return users.map(user => this.mapToDTO(user));
+  }
+
+  async searchUsers(query: string, limit: number = 10): Promise<UserResponseDTO[]> {
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { email: { contains: query, mode: 'insensitive' } }
+        ]
+      },
+      include: { establishment: true },
+      take: limit,
+      orderBy: { created_at: 'desc' }
+    });
+
+    return users.map(user => this.mapToDTO(user));
   }
 }

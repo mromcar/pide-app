@@ -1,6 +1,6 @@
 import { EstablishmentCreateDTO, EstablishmentUpdateDTO, EstablishmentResponseDTO } from '@/types/dtos/establishment';
 // Quitar el import de handleApiResponse de @/utils/api si existía y el ApiError local
-import { handleApiResponse, handleCaughtError, ApiError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
+import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
 
 const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 const API_SERVICE_PATH = '/api/restaurants';
@@ -66,9 +66,6 @@ export async function getEstablishmentById(id: number): Promise<EstablishmentRes
 
     return await handleApiResponse<EstablishmentResponseDTO>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError();
-    }
     // Si el error es un ApiError con status 404 y no lo manejaste antes, se propagará.
     // Si quieres convertir específicamente el ApiError 404 a null aquí:
     if (error instanceof ApiError && error.status === 404) {
@@ -76,9 +73,7 @@ export async function getEstablishmentById(id: number): Promise<EstablishmentRes
         // pero es una forma de manejarlo si handleApiResponse es la primera verificación.
         return null;
     }
-    if (error instanceof ApiError) throw error;
-    console.error('Error inesperado en getEstablishmentById:', error);
-    throw new UnexpectedResponseError('Error inesperado obteniendo establecimiento.');
+    throw handleCaughtError(error, ApiError, 'Error inesperado obteniendo establecimiento.');
   }
 }
 
@@ -101,12 +96,7 @@ export async function createEstablishment(
 
     return await handleApiResponse<EstablishmentResponseDTO>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError();
-    }
-    if (error instanceof ApiError) throw error;
-    console.error('Error inesperado en createEstablishment:', error);
-    throw new UnexpectedResponseError('Error inesperado creando establecimiento.');
+    throw handleCaughtError(error, ApiError, 'Error inesperado creando establecimiento.');
   }
 }
 
@@ -130,12 +120,7 @@ export async function updateEstablishment(
     });
     return await handleApiResponse<EstablishmentResponseDTO>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError();
-    }
-    if (error instanceof ApiError) throw error;
-    console.error('Error inesperado en updateEstablishment:', error);
-    throw new UnexpectedResponseError('Error inesperado actualizando establecimiento.');
+    throw handleCaughtError(error, ApiError, 'Error inesperado actualizando establecimiento.');
   }
 }
 
@@ -156,12 +141,7 @@ export async function deleteEstablishment(id: number): Promise<void> { // O el t
     // handleApiResponse devolverá null en este caso, que es compatible con Promise<void>.
     await handleApiResponse<void>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError();
-    }
-    if (error instanceof ApiError) throw error;
-    console.error('Error inesperado en deleteEstablishment:', error);
-    throw new UnexpectedResponseError('Error inesperado eliminando establecimiento.');
+    throw handleCaughtError(error, ApiError, 'Error inesperado eliminando establecimiento.');
   }
 }
 

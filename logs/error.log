@@ -1,0 +1,296 @@
+2025-07-22 20:59:24:5924 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-22 20:59:24:5924 [31merror[39m: [31m[API] Error fetching restaurant 4: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 20:59:24:5924 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-22 20:59:24:5924 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 20:59:27:5927 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 20:59:27:5927 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 20:59:53:5953 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-22 20:59:53:5953 [31merror[39m: [31m[API] Error fetching restaurant 2: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 20:59:54:5954 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 21:00:39:039 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-22 21:00:39:039 [31merror[39m: [31m[API] Error fetching restaurant 2: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 21:00:40:040 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 21:01:33:133 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-22 21:01:33:133 [31merror[39m: [31m[API] Error fetching restaurant 2: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 21:01:36:136 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 21:04:48:448 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-22 21:04:48:448 [31merror[39m: [31m[API] Error fetching restaurant 2: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 21:04:49:449 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mError occurred during query execution:[39m
+[31mConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "0A000", message: "cached plan must not change result type", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })[39m
+2025-07-22 21:06:45:645 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-22 21:06:45:645 [31merror[39m: [31m[API] Error fetching restaurant 2: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe table `public.establishments` does not exist in the current database.[39m
+2025-07-22 21:06:46:646 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe table `public.categories` does not exist in the current database.[39m
+2025-07-28 13:06:33:633 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:06:33:633 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:06:40:640 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:09:07:97 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:09:07:97 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:09:10:910 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:12:57:1257 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:12:57:1257 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:12:58:1258 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:14:53:1453 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:14:53:1453 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:14:53:1453 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:15:20:1520 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:15:20:1520 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:15:20:1520 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:19:41:1941 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:19:41:1941 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:19:41:1941 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:20:11:2011 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:20:11:2011 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:20:12:2012 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:22:06:226 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:22:06:226 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:22:07:227 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:22:08:228 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:22:08:228 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:22:08:228 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:22:09:229 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:22:09:229 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:22:30:2230 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:22:30:2230 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:22:30:2230 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:24:58:2458 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:24:58:2458 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:25:01:251 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:25:01:251 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:25:01:251 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:25:01:251 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:25:01:251 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:25:01:251 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:25:27:2527 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-07-28 13:25:27:2527 [31merror[39m: [31m[API] Error fetching restaurant 3: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-28 13:25:27:2527 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-07-29 11:18:33:1833 [31merror[39m: [31mError registering user: [39m
+[31mInvalid `prisma.user.create()` invocation:[39m
+
+[31m{[39m
+[31m  data: {[39m
+[31m    name: "Pepe Romero",[39m
+[31m    email: "peperomero@hotmail.com",[39m
+[31m    password: "pepe1234",[39m
+[31m    ~~~~~~~~[39m
+[31m    role: "client",[39m
+[31m    establishment_id: null,[39m
+[31m    password_hash: "$2b$10$nDvo7/4fNN8kdXRnWhCEpeBEgDQkmPeMrMk3I4.OtFN6QoU.EuwRC",[39m
+[31m?   google_id?: String | Null,[39m
+[31m?   apple_id?: String | Null,[39m
+[31m?   created_at?: DateTime | Null,[39m
+[31m?   updated_at?: DateTime | Null,[39m
+[31m?   establishment_administrators?: EstablishmentAdministratorCreateNestedManyWithoutUserInput,[39m
+[31m?   product_variants_created?: ProductVariantCreateNestedManyWithoutCreatorInput,[39m
+[31m?   created_products?: ProductCreateNestedManyWithoutCreatorInput,[39m
+[31m?   establishment?: EstablishmentCreateNestedOneWithoutUsersInput,[39m
+[31m?   product_history_entries?: ProductHistoryCreateNestedManyWithoutUserInput,[39m
+[31m?   client_orders?: OrderCreateNestedManyWithoutClient_userInput,[39m
+[31m?   waiter_orders?: OrderCreateNestedManyWithoutWaiter_userInput,[39m
+[31m?   order_status_changes?: OrderStatusHistoryCreateNestedManyWithoutChanged_by_userInput[39m
+[31m  },[39m
+[31m  include: {[39m
+[31m    establishment: true[39m
+[31m  }[39m
+[31m}[39m
+
+[31mUnknown argument `password`. Available options are marked with ?.[39m
+2025-07-29 11:27:24:2724 [31merror[39m: [31mError registering user: [39m
+[31mInvalid `prisma.user.create()` invocation:[39m
+
+
+[31mUnique constraint failed on the fields: (`user_id`)[39m
+2025-08-03 15:15:45:1545 [31merror[39m: [31m[API] ID inválido:[39m
+2025-08-03 19:14:50:1450 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-03 19:14:50:1450 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mCan't reach database server at `ep-dry-rice-a4dpqky4-pooler.us-east-1.aws.neon.tech:5432`[39m
+
+[31mPlease make sure your database server is running at `ep-dry-rice-a4dpqky4-pooler.us-east-1.aws.neon.tech:5432`.[39m
+2025-08-03 19:14:56:1456 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mCan't reach database server at `ep-dry-rice-a4dpqky4-pooler.us-east-1.aws.neon.tech:5432`[39m
+
+[31mPlease make sure your database server is running at `ep-dry-rice-a4dpqky4-pooler.us-east-1.aws.neon.tech:5432`.[39m

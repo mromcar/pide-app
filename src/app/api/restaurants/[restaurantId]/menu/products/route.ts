@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { productService } from '@/services/product.service';
-import { productCreateSchema } from '@/schemas/product'; // Corrected import name
+import { productCreateSchema } from '@/schemas/product';
 import { jsonOk, jsonError } from '@/utils/api';
 import { z } from 'zod';
 import { UserRole } from '@prisma/client';
+import logger from '@/lib/logger';
 
 const paramsSchema = z.object({
   restaurantId: z.coerce.number().int().positive(),
@@ -81,14 +82,16 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1', 10);
     const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
+    const categoryIdString = searchParams.get('categoryId');
+    const categoryId = categoryIdString ? parseInt(categoryIdString, 10) : undefined;
 
     // Assuming getAllProducts in service is updated to accept restaurantId, page, pageSize
     // and does not need language directly for basic product listing.
     // Language-specific data would typically be handled by how translations are included/queried in the service.
-    const products = await productService.getAllProducts(restaurantId, page, pageSize);
+    const products = await productService.getAllProducts(restaurantId, page, pageSize, categoryId);
     return jsonOk(products);
   } catch (error) {
-    console.error('Error in GET products:', error);
+    logger.error('Error in GET products:', error);
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);
     }
@@ -171,7 +174,7 @@ export async function POST(request: NextRequest, { params }: { params: { restaur
     );
     return jsonOk(product, 201);
   } catch (error) {
-    console.error('Error in POST product:', error);
+    logger.error('Error in POST product:', error);
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);
     }

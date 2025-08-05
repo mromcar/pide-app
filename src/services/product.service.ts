@@ -1,13 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import { Product, ProductTranslation, ProductHistory, ProductAllergen, Prisma, UserRole, Allergen, AllergenTranslation, User, ProductVariant, ProductVariantTranslation } from '@prisma/client';
+import { Product, ProductTranslation, ProductHistory, ProductAllergen, Prisma, UserRole, Allergen, AllergenTranslation, ProductVariant, ProductVariantTranslation } from '@prisma/client';
+import { ProductResponseDTO } from '../types/dtos/product';
 import {
-  ProductCreateDTO,
-  ProductUpdateDTO,
-  ProductResponseDTO,
-} from '../types/dtos/product';
-import {
-  ProductVariantResponseDTO // <<< ADD THIS IMPORT
-} from '../types/dtos/productVariant'; // <<< ADD THIS IMPORT
+  ProductVariantResponseDTO
+} from '../types/dtos/productVariant';
 import {
   ProductTranslationCreateDTO,
   ProductTranslationResponseDTO,
@@ -16,9 +12,6 @@ import {
 import {
   ProductAllergenResponseDTO
 } from '../types/dtos/productAllergen';
-import {
-  AllergenResponseDTO // Asegúrate de que esta importación exista y sea correcta
-} from '../types/dtos/allergen';
 import {
   AllergenTranslationResponseDTO
 } from '../types/dtos/allergenTranslation';
@@ -128,9 +121,9 @@ export class ProductService {
       product_id: product.product_id,
       establishment_id: product.establishment_id,
       category_id: product.category_id,
+      category_name: product.category?.name, // Safely access category name
       name: product.name,
       description: product.description,
-      image_url: product.image_url,
       sort_order: product.sort_order,
       is_active: product.is_active ?? true,
       responsible_role: product.responsible_role as UserRole | null,
@@ -210,6 +203,39 @@ export class ProductService {
     return this.mapToDTO(newProduct as ProductWithDetails);
   }
 
+  async getAllProducts(
+    establishmentId: number,
+    page: number = 1,
+    pageSize: number = 10,
+    categoryId?: number
+  ): Promise<ProductResponseDTO[]> {
+    const where: Prisma.ProductWhereInput = {
+      establishment_id: establishmentId,
+      deleted_at: null,
+    };
+
+    if (categoryId) {
+      where.category_id = categoryId;
+    }
+
+    const products = await prisma.product.findMany({
+      where,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      include: {
+        translations: true,
+        allergens: this.allergenInclude,
+        category: true, // Ensure category is included
+        variants: this.variantInclude,
+      },
+      orderBy: [
+        { sort_order: 'asc' },
+        { name: 'asc' },
+      ]
+    });
+    return products.map(p => this.mapToDTO(p as ProductWithDetails));
+  }
+
   async getProductById(productId: number): Promise<ProductResponseDTO | null> {
     productIdSchema.parse({ product_id: productId });
     const product = await prisma.product.findUnique({
@@ -222,26 +248,6 @@ export class ProductService {
       },
     });
     return product ? this.mapToDTO(product as ProductWithDetails) : null;
-  }
-
-  async getAllProducts(establishmentId: number, page: number = 1, pageSize: number = 10): Promise<ProductResponseDTO[]> {
-    const skip = (page - 1) * pageSize;
-    const products = await prisma.product.findMany({
-      where: { establishment_id: establishmentId, deleted_at: null },
-      skip: skip,
-      take: pageSize,
-      include: {
-        translations: true,
-        allergens: this.allergenInclude, // <<< CORRECTED: Use the getter directly
-        category: true,
-        variants: this.variantInclude, // <<< CORRECTED: Use the getter directly
-      },
-      orderBy: [
-        { sort_order: 'asc' },
-        { name: 'asc' },
-      ]
-    });
-    return products.map(p => this.mapToDTO(p as ProductWithDetails));
   }
 
   async updateProduct(productId: number, data: ProductUpdateInput, userId?: number): Promise<ProductResponseDTO | null> {

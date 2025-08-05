@@ -11,102 +11,89 @@
  * Clase base para errores de API.
  */
 export interface ErrorResponse {
-  message: string;
-  error?: string; // Mantener por compatibilidad si algunas APIs lo usan
-  details?: any; // Para errores de validación u otros datos
+  message: string
+  error?: string
+  details?: Record<string, unknown> | string | null
 }
 
 export class ApiError extends Error {
-  public status: number;
-  public details?: any; // Para errores de validación de Zod, etc.
+  public status: number
+  public details?: Record<string, unknown> | string | null
 
-  constructor(message: string, status: number, details?: any) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-    this.details = details;
+  constructor(message: string, status: number, details?: Record<string, unknown> | string | null) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+    this.details = details
 
-    // Mantener la pila de errores original (stack trace)
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, ApiError);
     } else {
-      Object.setPrototypeOf(this, ApiError.prototype); // Fallback para entornos sin captureStackTrace
+      Object.setPrototypeOf(this, ApiError.prototype);
     }
   }
 }
 
 /**
- * Error específico para problemas de red.
+ * Network-specific error for connection issues.
  */
 export class NetworkError extends ApiError {
-  constructor(message: string = 'Error de red. Por favor, verifica tu conexión.') {
-    // Usamos 0 o un código negativo para errores de red del cliente que no tienen un status HTTP
-    super(message, 0); 
+  constructor(message: string = 'Network error. Please check your connection.') {
+    super(message, 0);
     this.name = 'NetworkError';
     Object.setPrototypeOf(this, NetworkError.prototype);
   }
 }
 
 /**
- * Error para respuestas inesperadas o no manejadas.
+ * Error for unexpected or unhandled responses.
  */
 export class UnexpectedResponseError extends ApiError {
-  constructor(message: string = 'Respuesta inesperada del servidor.') {
-    super(message, 500); // Asumir un error de servidor si no se especifica
+  constructor(message: string = 'Unexpected server response.') {
+    super(message, 500);
     this.name = 'UnexpectedResponseError';
     Object.setPrototypeOf(this, UnexpectedResponseError.prototype);
   }
 }
 
 /**
- * Maneja la respuesta de una llamada fetch.
- * Parsea el JSON y lanza ApiError si la respuesta no es OK.
- * @param response La respuesta de la API (objeto Response).
- * @returns Una promesa que resuelve con los datos parseados (T).
- * @throws {ApiError} Si la respuesta no es ok (status 4xx o 5xx).
- * @throws {NetworkError} Si ocurre un error de red al intentar hacer fetch (manejado antes de llamar a esta función).
- * @throws {Error} Si el parseo del JSON falla por una razón que no sea un error de API.
+ * Handles API response, parses JSON and throws ApiError if response is not OK.
+ * @param response The API response (Response object).
+ * @returns A promise that resolves with parsed data (T).
+ * @throws {ApiError} If response is not ok (status 4xx or 5xx).
+ * @throws {NetworkError} If network error occurs during fetch (handled before calling this function).
+ * @throws {Error} If JSON parsing fails for reasons other than API error.
  */
 export async function handleApiResponse<T>(response: Response): Promise<T> {
   let responseBody;
   try {
-    // Intentar leer el cuerpo solo una vez
     const textBody = await response.text();
     if (textBody) {
       responseBody = JSON.parse(textBody);
     } else {
-      // Para respuestas como 204 No Content que no tienen cuerpo
       responseBody = null;
     }
   } catch (e) {
-    // Si el JSON.parse falla y la respuesta era OK, es un problema de formato inesperado
     if (response.ok) {
-      console.error('Error al parsear JSON de respuesta OK:', e);
-      throw new UnexpectedResponseError('Formato de respuesta inválido del servidor.');
+      console.error('Error parsing JSON from OK response:', e);
+      throw new UnexpectedResponseError('Invalid response format from server.');
     }
-    // Si el parseo falla y la respuesta NO era OK, el error original es más importante
-    // Se asigna null para que el error de la API se construya sin 'errors' específicos del body
     responseBody = null;
   }
 
   if (!response.ok) {
-    const errorMessage = responseBody?.message || responseBody?.error || response.statusText || 'Error desconocido de la API';
-    // Pasamos responseBody?.details en lugar de responseBody?.errors para consistencia
+    const errorMessage = responseBody?.message || responseBody?.error || response.statusText || 'Unknown API error';
     const errorDetails = responseBody?.details || (responseBody?.error && typeof responseBody.error !== 'string' ? responseBody.error : undefined);
     throw new ApiError(errorMessage, response.status, errorDetails);
   }
 
-  // Si la respuesta es OK pero no había cuerpo (ej. 204), y T no es null o void, puede ser un problema.
-  // Sin embargo, si T es `void` o `null`, `responseBody` (que sería `null`) es aceptable.
-  // Esta función asume que el llamador espera un tipo T, y si responseBody es null y T no lo permite,
-  // TypeScript lo detectará en el punto de asignación o uso.
   return responseBody as T;
 }
 
 /**
- * Valida si una cadena es un UUID v4 válido.
- * @param uuid La cadena a validar.
- * @returns true si es un UUID v4 válido, false en caso contrario.
+ * Validates if a string is a valid UUID v4.
+ * @param uuid The string to validate.
+ * @returns true if it's a valid UUID v4, false otherwise.
  */
 export function isValidUUID(uuid: string): boolean {
   if (!uuid || typeof uuid !== 'string') {
@@ -117,31 +104,27 @@ export function isValidUUID(uuid: string): boolean {
 }
 
 /**
- * Atrapa errores de llamadas a la API y los relanza de forma consistente.
- * @param error El error capturado.
- * @param SpecificApiErrorConstructor El constructor de la clase de error específica de la API (ej. UserApiError).
- * @param defaultMessage Mensaje por defecto si el error no proporciona uno claro.
- * @returns Nunca devuelve, siempre lanza un error.
+ * Catches API call errors and re-throws them consistently.
+ * @param error The caught error.
+ * @param SpecificApiErrorConstructor The constructor for the specific API error class.
+ * @param defaultMessage Default message if error doesn't provide a clear one.
+ * @returns Never returns, always throws an error.
  */
 export function handleCaughtError<SpecificError extends ApiError>(
   error: unknown,
   SpecificApiErrorConstructor: new (message: string, status: number, details?: any) => SpecificError,
-  defaultMessage: string = 'Ocurrió un error inesperado.'
+  defaultMessage: string = 'An unexpected error occurred.'
 ): never {
   if (error instanceof SpecificApiErrorConstructor) {
-    throw error; // Ya es del tipo específico, relanzar
+    throw error;
   }
   if (error instanceof ApiError) {
-    // Es un ApiError genérico, NetworkError o UnexpectedResponseError
-    // Lo transformamos al error específico del contexto actual (ej. UserApiError)
     throw new SpecificApiErrorConstructor(error.message, error.status, error.details);
   }
   if (error instanceof Error) {
-    // Error genérico de JavaScript
-    console.error('Error no esperado en la API:', error);
+    console.error('Unexpected API error:', error);
     throw new SpecificApiErrorConstructor(error.message || defaultMessage, 500, { originalError: error.name });
   }
-  // Si no es una instancia de Error
-  console.error('Error desconocido en la API:', error);
+  console.error('Unknown API error:', error);
   throw new SpecificApiErrorConstructor(defaultMessage, 500, { originalError: String(error) });
 }

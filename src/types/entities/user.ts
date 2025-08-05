@@ -7,12 +7,13 @@ import { Product } from './product';
 import { ProductVariant } from './productVariant';
 
 export interface User {
-  user_id: number;
+  user_id: number; // Cambiar de id a user_id para consistencia
   role: UserRole;
   name?: string | null;
   email: string;
-  password_hash: string; // This should not be exposed in DTOs directly
+  password_hash: string;
   establishment_id?: number | null;
+  active: boolean; // Agregar propiedad active
   created_at?: Date | null;
   updated_at?: Date | null;
 

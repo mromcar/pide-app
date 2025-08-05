@@ -3,9 +3,9 @@ import { OrderItemStatus } from '@prisma/client';
 export interface OrderItemCreateDTO {
   variant_id: number;
   quantity: number;
-  unit_price: number; // Should this be set on creation or fetched from variant?
+  unit_price: number;
   notes?: string | null;
-  status?: OrderItemStatus; // Defaults to 'pending'
+  status?: OrderItemStatus;
 }
 
 export interface OrderItemUpdateDTO {
@@ -21,7 +21,7 @@ export interface OrderItemDTO {
   variant_id: number;
   quantity: number;
   unit_price: number;
-  item_total_price?: number | null; // Calculated field
+  item_total_price?: number | null;
   status?: OrderItemStatus | null;
   notes?: string | null;
 }

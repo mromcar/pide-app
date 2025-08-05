@@ -1,13 +1,13 @@
-
 DROP VIEW IF EXISTS menu_translated CASCADE;
 DROP TABLE IF EXISTS product_variant_history CASCADE;
 DROP TABLE IF EXISTS product_history CASCADE;
 DROP TABLE IF EXISTS order_status_history CASCADE;
 DROP TABLE IF EXISTS order_items CASCADE;
-DROP TABLE IF EXISTS order_detail CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
 DROP TABLE IF EXISTS product_variant_translations CASCADE;
 DROP TABLE IF EXISTS product_variants CASCADE;
 DROP TABLE IF EXISTS product_translations CASCADE;
+ALTER TABLE IF EXISTS products DROP CONSTRAINT IF EXISTS unique_product_establishment_name;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS category_translations CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
@@ -17,7 +17,14 @@ DROP TABLE IF EXISTS allergens CASCADE;
 DROP TABLE IF EXISTS establishment_administrators CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS establishments CASCADE;
-
+ALTER TABLE IF EXISTS categories DROP CONSTRAINT IF EXISTS unique_category_establishment_name;
+DROP INDEX IF EXISTS unique_category_establishment_name;
+ALTER TABLE IF EXISTS establishments DROP CONSTRAINT IF EXISTS establishments_name_key;
+ALTER TABLE IF EXISTS establishments DROP CONSTRAINT IF EXISTS establishments_tax_id_key;
+ALTER TABLE IF EXISTS users DROP CONSTRAINT IF EXISTS users_email_key;
+ALTER TABLE IF EXISTS allergens DROP CONSTRAINT IF EXISTS allergens_code_key;
+ALTER TABLE IF EXISTS product_variants DROP CONSTRAINT IF EXISTS product_variants_sku_key;
+ALTER TABLE IF EXISTS products DROP CONSTRAINT IF EXISTS unique_product_establishment_name;
 DROP TYPE IF EXISTS "UserRole" CASCADE;
 DROP TYPE IF EXISTS "OrderStatus" CASCADE;
 DROP TYPE IF EXISTS "OrderItemStatus" CASCADE;
@@ -30,7 +37,7 @@ CREATE TYPE "OrderItemStatus" AS ENUM ('pending', 'preparing', 'ready', 'deliver
 
 CREATE TABLE establishments (
   establishment_id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL UNIQUE,
   tax_id VARCHAR(20) UNIQUE,
   address TEXT,
   postal_code VARCHAR(10),
@@ -80,7 +87,8 @@ CREATE TABLE categories (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   deleted_at TIMESTAMP,
-  CONSTRAINT fk_category_establishment FOREIGN KEY (establishment_id) REFERENCES establishments(establishment_id) ON DELETE CASCADE
+  CONSTRAINT fk_category_establishment FOREIGN KEY (establishment_id) REFERENCES establishments(establishment_id) ON DELETE CASCADE,
+  CONSTRAINT unique_category_establishment_name UNIQUE (establishment_id, name)
 );
 
 
@@ -111,7 +119,8 @@ CREATE TABLE products (
   CONSTRAINT fk_product_establishment FOREIGN KEY (establishment_id) REFERENCES establishments(establishment_id) ON DELETE CASCADE,
   CONSTRAINT fk_product_category FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE RESTRICT,
   CONSTRAINT fk_product_creator FOREIGN KEY (created_by_user_id) REFERENCES users(user_id),
-  CONSTRAINT chk_product_responsible_role CHECK (responsible_role IN ('cook', 'waiter'))
+  CONSTRAINT chk_product_responsible_role CHECK (responsible_role IN ('cook', 'waiter')),
+  CONSTRAINT unique_product_establishment_name UNIQUE (establishment_id, name)
 );
 
 CREATE TABLE product_translations (
@@ -130,11 +139,11 @@ CREATE TABLE product_history (
   name TEXT,
   description TEXT,
   is_active BOOLEAN,
-  action_type VARCHAR(50), -- NUEVO
-  details JSONB,           -- NUEVO
-  changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- RENOMBRADO (antes updated_at)
-  user_id INTEGER,         -- NUEVO
-  CONSTRAINT fk_product_history_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL -- NUEVA RESTRICCIÓN
+  action_type VARCHAR(50),
+  details JSONB,
+  changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  user_id INTEGER,
+  CONSTRAINT fk_product_history_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
 
@@ -207,10 +216,10 @@ CREATE TABLE orders (
   client_user_id INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
   waiter_user_id INTEGER REFERENCES users(user_id) ON DELETE SET NULL,
   table_number VARCHAR(20),
-  status "OrderStatus" NOT NULL DEFAULT 'PENDING',
+  status "OrderStatus" NOT NULL DEFAULT 'pending',
   total_amount DECIMAL(10, 2) DEFAULT 0.00,
   payment_method VARCHAR(50),
-  payment_status VARCHAR(20) DEFAULT 'UNPAID',
+  payment_status VARCHAR(20) DEFAULT 'unpaid',
   order_type VARCHAR(50),
   notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -413,3 +422,21 @@ CREATE INDEX idx_translation_lang_prod ON product_translations(language_code, pr
 CREATE INDEX idx_translation_lang_var ON product_variant_translations(language_code, variant_id);
 
 SELECT 'Script de creación de esquema completado exitosamente.' AS status;
+
+
+-- Eliminar columnas image_url porque ya no las necesitas
+ALTER TABLE categories DROP COLUMN IF EXISTS image_url;
+ALTER TABLE products DROP COLUMN IF EXISTS image_url;
+
+-- Añadir campos OAuth a la tabla users existente
+ALTER TABLE users
+ADD COLUMN google_id VARCHAR(255) UNIQUE,
+ADD COLUMN apple_id VARCHAR(255) UNIQUE;
+
+-- Hacer password_hash opcional (permitir NULL para usuarios OAuth)
+ALTER TABLE users
+ALTER COLUMN password_hash DROP NOT NULL;
+
+-- Crear índices para mejorar rendimiento
+CREATE INDEX idx_users_google_id ON users(google_id) WHERE google_id IS NOT NULL;
+CREATE INDEX idx_users_apple_id ON users(apple_id) WHERE apple_id IS NOT NULL;

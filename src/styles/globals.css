@@ -1,0 +1,25 @@
+﻿/* Importaciones de fuentes y archivos CSS PRIMERO */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import './fonts.css';
+@import './base.css';
+@import './components/buttons.css';
+@import './components/forms.css';
+@import './components/cards.css';
+@import './components/navigation.css';
+@import './components/cart.css';
+@import './components/allergens.css';
+@import './utilities.css';
+@import './pages/checkout.css';
+@import './pages/menu.css';
+
+/* Directivas Tailwind DESPUÉS de todos los imports */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Utilidades personalizadas al final */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

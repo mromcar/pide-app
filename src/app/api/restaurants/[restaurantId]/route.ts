@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import { NextRequest } from 'next/server';
 import { jsonOk, jsonError } from '@/utils/api';
-// Importa aquí los servicios y esquemas necesarios, por ejemplo:
-import { establishmentService } from '@/services/establishment.service'; // Uncommented this line
-// import { restaurantIdSchema } from '@/schemas/establishment'; // Asumiendo que tienes un esquema para validar el ID
+import { getEstablishmentById } from '@/services/establishment.service';
+import { EstablishmentResponseDTO } from '@/types/dtos/establishment';
+import logger  from '@/lib/logger';
 
 /**
  * @swagger
@@ -25,7 +24,7 @@ import { establishmentService } from '@/services/establishment.service'; // Unco
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Establishment' // Ajusta según tu esquema de respuesta
+ *               $ref: '#/components/schemas/Establishment'
  *       400:
  *         description: Invalid restaurant ID
  *       401:
@@ -39,44 +38,37 @@ import { establishmentService } from '@/services/establishment.service'; // Unco
  */
 export async function GET(
   req: NextRequest,
-  { params: paramsPromise }: { params: Promise<{ restaurantId: string }> } // Renamed params to paramsPromise and typed as Promise
+  { params: paramsPromise }: { params: Promise<{ restaurantId: string }> }
 ) {
   try {
-    const params = await paramsPromise; // Await paramsPromise here
-    // const token = await getToken({ req }); // Comentado para acceso público
-    // if (!token) { // Comentado para acceso público
-    //   return jsonError('Unauthorized', 401); // Comentado para acceso público
-    // }
+    const params = await paramsPromise;
+    const { restaurantId } = params;
+    // Note: restaurantId in URL maps to establishment_id internally
+    const parsedEstablishmentId = Number(restaurantId);
 
-    const { restaurantId } = params; // Now accessing restaurantId from the resolved params
-    const parsedRestaurantId = Number(restaurantId);
-
-    if (isNaN(parsedRestaurantId)) {
+    if (isNaN(parsedEstablishmentId)) {
+      logger.error('[API] ID inválido:', { restaurantId });
       return jsonError('Invalid restaurant ID', 400);
     }
 
-    // Aquí iría la lógica para obtener el restaurante por su ID
-    const restaurant = await establishmentService.getEstablishmentById(parsedRestaurantId);
+    const restaurant: EstablishmentResponseDTO | null = await getEstablishmentById(parsedEstablishmentId);
+
     if (!restaurant) {
+      logger.warn('[API] Restaurante no encontrado para id:', { parsedEstablishmentId });
       return jsonError('Restaurant not found', 404);
     }
-
-    // La lógica de autorización específica para usuarios logueados se movería a PUT/DELETE si es necesario
-    // o se manejaría de forma diferente si GET necesita mostrar más o menos info según el rol.
-    // Por ahora, para la vista pública del menú, no se requiere autorización aquí.
 
     return jsonOk(restaurant);
 
   } catch (error: unknown) {
-    // Safely try to get restaurantId for logging, or use a generic message
     let restaurantIdForErrorLog = 'unknown';
     try {
       const params = await paramsPromise;
       restaurantIdForErrorLog = params.restaurantId;
     } catch (paramsError) {
-      console.error('Error resolving params for logging:', paramsError);
+      logger.error('Error resolving params for logging:', paramsError);
     }
-    console.error(`Error fetching restaurant ${restaurantIdForErrorLog}:`, error);
+    logger.error(`[API] Error fetching restaurant ${restaurantIdForErrorLog}:`, error);
     if (error instanceof Error) {
       return jsonError(error.message, 500);
     } else {

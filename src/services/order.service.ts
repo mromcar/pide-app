@@ -1,34 +1,37 @@
-import { PrismaClient, Order, OrderItem, OrderStatusHistory, Prisma, OrderStatus, OrderItemStatus } from '@prisma/client';
+import { Order, OrderStatus, OrderItem, OrderStatusHistory, Prisma } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import {
   OrderCreateDTO,
   OrderUpdateDTO,
   OrderResponseDTO,
-} from '../types/dtos/order';
-import {
-  OrderItemCreateDTO,
-  OrderItemUpdateDTO,
-  OrderItemDTO
-} from '../types/dtos/orderItem';
-import {
-  OrderStatusHistoryCreateDTO,
   OrderStatusHistoryDTO
-} from '../types/dtos/orderStatusHistory';
+} from '@/types/dtos/order';
 import {
-  orderCreateSchema,
-  orderUpdateSchema,
-  orderIdSchema
-} from '../schemas/order';
+  OrderItemUpdateDTO,
+  OrderItemCreateDTO,
+  OrderItemDTO
+} from '@/types/dtos/orderItem';
+import {
+  order_id_schema,
+  create_order_schema,
+  update_order_schema
+} from '@/schemas/order';
 import {
   orderItemCreateSchema,
   orderItemUpdateSchema
-} from '../schemas/orderItem';
-import {
-  orderStatusHistoryCreateSchema
-} from '../schemas/orderStatusHistory';
-import { prisma } from '@/lib/prisma'; // O la ruta relativa correcta, ej: '../lib/prisma'
+} from '@/schemas/orderItem';
 
+// Definir tipo para filtros
+interface OrderFilters {
+  status?: OrderStatus;
+  establishment_id?: number;
+  client_user_id?: number;
+  waiter_user_id?: number;
+  from_date?: string;
+  to_date?: string;
+}
 
-export class OrderService {
+class OrderService {
   private readonly orderInclude = {
     order_items: true,
     order_status_history: {
@@ -40,43 +43,70 @@ export class OrderService {
   private mapToDTO(order: Order & { order_items?: OrderItem[]; order_status_history?: OrderStatusHistory[] }): OrderResponseDTO {
     return {
       ...order,
-      order_items: order.order_items ? order.order_items.map((item: OrderItem) => ({ ...item })) : [], // Explicitly type item
-      order_status_history: order.order_status_history ? order.order_status_history.map((history: OrderStatusHistory) => ({ ...history })) : [], // Explicitly type history
+      created_at: order.created_at?.toISOString() || null,
+      updated_at: order.updated_at?.toISOString() || null,
+      total_amount: order.total_amount ? parseFloat(order.total_amount.toString()) : 0, // Default to 0 instead of null
+      order_items: order.order_items ? order.order_items.map((item: OrderItem) => ({
+        ...item,
+        unit_price: parseFloat(item.unit_price.toString())
+      })) : [],
+      status_history: order.order_status_history ? order.order_status_history.map((history: OrderStatusHistory) => ({
+        ...history,
+        changed_at: history.changed_at?.toISOString() || null
+      })) : [],
     };
   }
 
   // Crear un nuevo pedido
   public async createOrder(data: OrderCreateDTO): Promise<OrderResponseDTO> {
-    orderCreateSchema.parse(data); // Validar input
+    create_order_schema.parse(data);
 
     const { order_items, ...orderData } = data;
 
+    // Ensure total_amount is not null and convert to Decimal if needed
+    const cleanOrderData = {
+      ...orderData,
+      status: orderData.status || OrderStatus.pending,
+      total_amount: orderData.total_amount || 0, // Default to 0 if undefined
+    };
+
     const newOrder = await prisma.order.create({
-      data: {
-        ...orderData,
-        status: orderData.status || OrderStatus.pending, // Corregido: Usar OrderStatus.pending
-        order_items: {
-          createMany: {
-            data: order_items || [],
-          },
-        },
-        order_status_history: {
-          create: {
-            status: orderData.status || OrderStatus.pending, // Corregido: Usar OrderStatus.pending
-            changed_by_user_id: orderData.client_user_id, // Or a dedicated user for order creation
-            notes: 'Order created',
-          },
-        },
-      },
+      data: cleanOrderData,
       include: this.orderInclude,
     });
 
-    return this.mapToDTO(newOrder);
+    // Crear ítems de orden si existen
+    if (order_items && order_items.length > 0) {
+      await prisma.orderItem.createMany({
+        data: order_items.map(item => ({
+          ...item,
+          order_id: newOrder.order_id,
+        })),
+      });
+    }
+
+    // Crear historial de estado
+    await prisma.orderStatusHistory.create({
+      data: {
+        order_id: newOrder.order_id,
+        status: orderData.status || OrderStatus.pending,
+        changed_by_user_id: orderData.client_user_id,
+        notes: 'Order created',
+      },
+    });
+
+    // Obtener la orden completa con todos los datos
+    const completeOrder = await prisma.order.findUnique({
+      where: { order_id: newOrder.order_id },
+      include: this.orderInclude,
+    });
+
+    return this.mapToDTO(completeOrder!);
   }
 
   // Obtener pedido por ID
   public async getOrderById(order_id: number): Promise<OrderResponseDTO | null> {
-    orderIdSchema.parse({ order_id }); // Validar ID
+    order_id_schema.parse({ order_id }); // Validar ID
 
     const order = await prisma.order.findUnique({
       where: { order_id },
@@ -87,23 +117,38 @@ export class OrderService {
   }
 
   // Obtener todos los pedidos
-  public async getAllOrders(): Promise<OrderResponseDTO[]> {
+  // Modificar getAllOrders para aceptar filtros opcionales
+  // Corregir getAllOrders con tipo específico para filtros
+  public async getAllOrders(filters?: OrderFilters): Promise<OrderResponseDTO[]> {
     const orders = await prisma.order.findMany({
       include: this.orderInclude,
+      where: filters ? {
+        // Aplicar filtros si se proporcionan
+        ...(filters.status && { status: filters.status }),
+        ...(filters.establishment_id && { establishment_id: filters.establishment_id }),
+        ...(filters.client_user_id && { client_user_id: filters.client_user_id }),
+        ...(filters.waiter_user_id && { waiter_user_id: filters.waiter_user_id })
+      } : undefined,
+      orderBy: { created_at: 'desc' }
     });
-    return orders.map(this.mapToDTO);
+    return orders.map(order => this.mapToDTO(order));
   }
 
   // Actualizar un pedido existente
   public async updateOrder(order_id: number, data: OrderUpdateDTO): Promise<OrderResponseDTO> {
-    orderIdSchema.parse({ order_id }); // Validar ID
-    orderUpdateSchema.parse(data); // Validar input
+    order_id_schema.parse({ order_id });
+    update_order_schema.parse(data);
 
     const { order_items, status, ...orderData } = data;
 
+    // Filtrar campos undefined para evitar conflictos con Prisma
+    const cleanOrderData = Object.fromEntries(
+      Object.entries(orderData).filter(([, value]) => value !== undefined)
+    );
+
     const updatedOrder = await prisma.order.update({
       where: { order_id },
-      data: orderData,
+      data: cleanOrderData,
       include: this.orderInclude,
     });
 
@@ -115,7 +160,7 @@ export class OrderService {
       });
       if (order_items.length > 0) {
         await prisma.orderItem.createMany({
-          data: order_items.map(item => ({
+          data: order_items.map((item: OrderItemCreateDTO) => ({ // Tipar explícitamente el parámetro item
             ...item,
             order_id,
           })),
@@ -150,7 +195,7 @@ export class OrderService {
 
   // Eliminar un pedido
   public async deleteOrder(order_id: number): Promise<void> {
-    orderIdSchema.parse({ order_id }); // Validar ID
+    order_id_schema.parse({ order_id }); // Validar ID
 
     await prisma.order.delete({
       where: { order_id },
@@ -159,7 +204,7 @@ export class OrderService {
 
   // Añadir un ítem a un pedido existente
   public async addOrderItem(order_id: number, itemData: OrderItemCreateDTO): Promise<OrderResponseDTO> {
-    orderIdSchema.parse({ order_id });
+    order_id_schema.parse({ order_id });
     orderItemCreateSchema.parse(itemData);
 
     await prisma.orderItem.create({
@@ -190,7 +235,11 @@ export class OrderService {
       data: itemData,
     });
 
-    return updatedItem;
+    // Convertir Decimal a number para cumplir con OrderItemDTO
+    return {
+      ...updatedItem,
+      unit_price: parseFloat(updatedItem.unit_price.toString()),
+    };
   }
 
   // Eliminar un ítem de pedido
@@ -202,7 +251,7 @@ export class OrderService {
 
   // Actualizar el estado de un pedido
   public async updateOrderStatus(order_id: number, newStatus: OrderStatus, changed_by_user_id?: number | null, notes?: string): Promise<OrderResponseDTO> {
-    orderIdSchema.parse({ order_id });
+    order_id_schema.parse({ order_id });
 
     const order = await prisma.order.findUnique({
       where: { order_id },
@@ -238,7 +287,7 @@ export class OrderService {
 
   // Obtener historial de estado de un pedido
   public async getOrderStatusHistory(order_id: number): Promise<OrderStatusHistoryDTO[]> {
-    orderIdSchema.parse({ order_id });
+    order_id_schema.parse({ order_id });
 
     const history = await prisma.orderStatusHistory.findMany({
       where: { order_id },
@@ -248,3 +297,7 @@ export class OrderService {
     return history.map(h => ({ ...h }));
   }
 }
+
+// EXPORTACIÓN PRINCIPAL
+export const orderService = new OrderService();
+export default orderService;

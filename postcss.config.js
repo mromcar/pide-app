@@ -1,7 +1,12 @@
-// postcss.config.js
 module.exports = {
   plugins: {
-    tailwindcss: {}, // <--- Change '@tailwindcss/postcss' to 'tailwindcss'
+    'postcss-import': {
+      // Procesar imports primero
+    },
+    'tailwindcss/nesting': {
+      // Habilitar anidamiento CSS
+    },
+    tailwindcss: {},
     autoprefixer: {},
   },
-};
+}

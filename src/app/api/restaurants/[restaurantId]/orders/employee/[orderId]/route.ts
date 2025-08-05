@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
-import { UserRole } from '@prisma/client'; // Corrected import
+import { getToken } from 'next-auth/jwt'; // ✅ Usar getToken en lugar de getServerSession
+import { UserRole, OrderStatus } from '@prisma/client';
 import { orderService } from '@/services/order.service';
-import { orderIdSchema, orderUpdateStatusSchema } from '@/schemas/order';
+import { order_id_schema, update_order_status_schema } from '@/schemas/order';
 import { establishmentIdSchema } from '@/schemas/establishment';
+import logger from '@/lib/logger';
 
 /**
  * @swagger
@@ -73,9 +74,9 @@ export async function PATCH(
     req: NextRequest,
     { params }: { params: { restaurantId: string; orderId: string } }
 ) {
-    const token = await getToken({ req });
+    const token = await getToken({ req }); // ✅ Usar getToken
 
-    if (!token || !token.sub) { // Also check for token.sub for user ID
+    if (!token || !token.sub) {
         return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
@@ -87,13 +88,13 @@ export async function PATCH(
             return NextResponse.json({ message: 'Invalid Restaurant ID', errors: validatedRestaurantId.error.issues }, { status: 400 });
         }
 
-        const validatedOrderId = orderIdSchema.safeParse({ orderId: Number(orderId) });
+        const validatedOrderId = order_id_schema.safeParse({ order_id: Number(orderId) });
         if (!validatedOrderId.success) {
             return NextResponse.json({ message: 'Invalid Order ID', errors: validatedOrderId.error.issues }, { status: 400 });
         }
 
         const body = await req.json();
-        const validatedBody = orderUpdateStatusSchema.safeParse(body);
+        const validatedBody = update_order_status_schema.safeParse(body);
 
         if (!validatedBody.success) {
             return NextResponse.json({ message: 'Invalid request body', errors: validatedBody.error.issues }, { status: 400 });
@@ -113,49 +114,21 @@ export async function PATCH(
         }
 
         const updatedOrder = await orderService.updateOrderStatus(
-            validatedOrderId.data.orderId,
-            status,
-            parseInt(token.sub, 10), // Ensure user ID is passed as a number
+            validatedOrderId.data.order_id, // Corregido: usar order_id
+            status as OrderStatus, // Corregido: cast explícito a OrderStatus
+            parseInt(token.sub, 10),
             notes
         );
 
         return NextResponse.json(updatedOrder, { status: 200 });
 
-    } catch (error: any) {
-        console.error(`Error updating order status for order ${orderId} in restaurant ${restaurantId}:`, error);
-        if (error.message === 'Order not found' || error.message === 'Establishment not found') {
-            return NextResponse.json({ message: error.message }, { status: 404 });
+    } catch (error: unknown) { // Corregido: cambiar any por unknown
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        logger.error(`Error updating order status for order ${orderId} in restaurant ${restaurantId}:`, error);
+
+        if (errorMessage === 'Order not found' || errorMessage === 'Establishment not found') {
+            return NextResponse.json({ message: errorMessage }, { status: 404 });
         }
-        return NextResponse.json({ message: 'Error updating order status', error: error.message }, { status: 500 });
+        return NextResponse.json({ message: 'Error updating order status', error: errorMessage }, { status: 500 });
     }
 }
-
-// Make sure you have these schemas defined in your Swagger/OpenAPI components:
-// components:
-//   schemas:
-//     OrderUpdateStatusInput: // Define based on orderUpdateStatusSchema
-//       type: object
-//       properties:
-//         status:
-//           type: string
-//           enum: [PENDING, CONFIRMED, PREPARING, READY_FOR_PICKUP, DELIVERED, CANCELLED] // Example statuses
-//         notes:
-//           type: string
-//           nullable: true
-//     OrderResponse: // Define based on your Order DTO
-//       type: object
-//       properties:
-//         order_id:
-//           type: integer
-//         # ... other order properties
-//     ErrorResponse:
-//       type: object
-//       properties:
-//         message:
-//           type: string
-//         errors:
-//           type: array
-//           items:
-//             type: object # Define error issue structure if needed
-//         error:
-//           type: string

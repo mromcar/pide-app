@@ -6,6 +6,7 @@ import { productService } from '@/services/product.service'; // Added productSer
 import { productVariantUpdateSchema, productVariantIdSchema } from '@/schemas/productVariant'; // Updated schema imports
 import { jsonOk, jsonError } from '@/utils/api';
 import { UserRole } from '@prisma/client';
+import logger from '@/lib/logger';
 
 const paramsSchema = z.object({
   restaurantId: z.coerce.number().int().positive(),
@@ -79,7 +80,7 @@ export async function GET(
     }
     return jsonOk(variant);
   } catch (error: any) {
-    console.error(`Error fetching product variant ${params.variantId}:`, error);
+    logger.error(`Error fetching product variant ${params.variantId}:`, error);
     return jsonError(error.message || 'Failed to fetch product variant', 500);
   }
 }
@@ -187,7 +188,7 @@ export async function PUT(
     }
     return jsonOk(updatedVariant);
   } catch (error: any) {
-    console.error(`Error updating product variant ${params.variantId}:`, error);
+    logger.error(`Error updating product variant ${params.variantId}:`, error);
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);
     }
@@ -269,103 +270,7 @@ export async function DELETE(
     }
     return jsonOk({ message: 'Product variant deleted successfully' });
   } catch (error: any) {
-    console.error(`Error deleting product variant ${params.variantId}:`, error);
+    logger.error(`Error deleting product variant ${params.variantId}:`, error);
     return jsonError(error.message || 'Failed to delete product variant', 500);
   }
 }
-
-// Placeholder for Swagger schemas - these should be defined in a central place or generated
-/**
- * @swagger
- * components:
- *   schemas:
- *     ProductVariantUpdate:
- *       type: object
- *       properties:
- *         product_id:
- *           type: integer
- *           description: ID of the product this variant belongs to.
- *         establishment_id:
- *           type: integer
- *           description: ID of the establishment this variant belongs to (should match restaurantId in path).
- *         variant_description:
- *           type: string
- *           maxLength: 100
- *         price:
- *           type: number
- *           format: float
- *           description: Price of the variant.
- *         sku:
- *           type: string
- *           maxLength: 50
- *           nullable: true
- *         sort_order:
- *           type: integer
- *           nullable: true
- *         is_active:
- *           type: boolean
- *           nullable: true
- *         translations:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/ProductVariantTranslationInput'
- *     ProductVariantResponse:
- *       type: object
- *       properties:
- *         variant_id:
- *           type: integer
- *         product_id:
- *           type: integer
- *         establishment_id:
- *           type: integer
- *         variant_description:
- *           type: string
- *         price:
- *           type: number
- *         sku:
- *           type: string
- *           nullable: true
- *         sort_order:
- *           type: integer
- *           nullable: true
- *         is_active:
- *           type: boolean
- *           nullable: true
- *         created_by_user_id:
- *           type: integer
- *           nullable: true
- *         created_at:
- *           type: string
- *           format: date-time
- *           nullable: true
- *         updated_at:
- *           type: string
- *           format: date-time
- *           nullable: true
- *         deleted_at:
- *           type: string
- *           format: date-time
- *           nullable: true
- *         translations:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/ProductVariantTranslationResponse'
- *     ProductVariantTranslationInput:
- *       type: object
- *       properties:
- *         language_code:
- *           type: string
- *         variant_description:
- *           type: string
- *     ProductVariantTranslationResponse:
- *       type: object
- *       properties:
- *         translation_id:
- *           type: integer
- *         variant_id:
- *           type: integer
- *         language_code:
- *           type: string
- *         variant_description:
- *           type: string
- */

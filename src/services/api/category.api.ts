@@ -1,6 +1,6 @@
 import type { CategoryCreateDTO, CategoryUpdateDTO, CategoryDTO } from '@/types/dtos/category';
 // Quitar el import de handleApiResponse de @/utils/api si existía y el ApiError local
-import { handleApiResponse, handleCaughtError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
+import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils'; // NUEVA IMPORTACIÓN
 import { CategoryApiError } from '@/types/errors/category.api.error';
 
 const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
@@ -44,7 +44,7 @@ async function getAllCategoriesByEstablishment(restaurantId: number): Promise<Ca
     // Si tu backend envuelve la respuesta, por ejemplo: { categories: [...] }
     // entonces T sería { categories: CategoryDTO[] }
     const data = await handleApiResponse<{ categories: CategoryDTO[] }>(response); // Ajusta T según la estructura real de tu respuesta
-    return data.categories; // Si la respuesta es { categories: [...] }
+    return data?.categories || []; // Si la respuesta es { categories: [...] }
     // Si la respuesta es directamente CategoryDTO[], entonces: return await handleApiResponse<CategoryDTO[]>(response);
   } catch (error) {
     // handleCaughtError se encarga de la lógica de conversión y relanzamiento
@@ -74,12 +74,7 @@ async function createCategory(restaurantId: number, categoryData: CategoryCreate
     return data.category;
     // Si es directamente CategoryDTO: return await handleApiResponse<CategoryDTO>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError();
-    }
-    if (error instanceof ApiError) throw error;
-    console.error('Error inesperado en createCategory:', error);
-    throw new UnexpectedResponseError('Error inesperado creando categoría.');
+    throw handleCaughtError(error, CategoryApiError, 'Error inesperado creando categoría.');
   }
 }
 
@@ -104,12 +99,7 @@ async function updateCategory(restaurantId: number, categoryId: number, updateDa
     return data.category;
     // Si es directamente CategoryDTO: return await handleApiResponse<CategoryDTO>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError();
-    }
-    if (error instanceof ApiError) throw error;
-    console.error('Error inesperado en updateCategory:', error);
-    throw new UnexpectedResponseError('Error inesperado actualizando categoría.');
+    throw handleCaughtError(error, CategoryApiError, 'Error inesperado actualizando categoría.');
   }
 }
 
@@ -136,12 +126,7 @@ async function deleteCategory(restaurantId: number, categoryId: number): Promise
     // Asumamos que devuelve un JSON con mensaje y opcionalmente la categoría eliminada.
     return await handleApiResponse<{ message: string; category?: CategoryDTO }>(response);
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-      throw new NetworkError();
-    }
-    if (error instanceof ApiError) throw error;
-    console.error('Error inesperado en deleteCategory:', error);
-    throw new UnexpectedResponseError('Error inesperado eliminando categoría.');
+    throw handleCaughtError(error, CategoryApiError, 'Error inesperado eliminando categoría.');
   }
 }
 

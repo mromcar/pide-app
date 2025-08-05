@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { z } from 'zod';
 import { productService } from '@/services/product.service';
-import { productUpdateSchema, productIdSchema } from '@/schemas/product';
+import { productUpdateSchema } from '@/schemas/product';
 import { jsonOk, jsonError } from '@/utils/api';
 import { UserRole } from '@prisma/client';
+import logger from '@/lib/logger';
 
 const paramsSchema = z.object({
   restaurantId: z.coerce.number().int().positive(),
@@ -77,7 +78,7 @@ export async function GET(req: NextRequest, { params }: { params: { restaurantId
 
     return jsonOk(product);
   } catch (error) {
-    console.error('Error in GET product:', error);
+    logger.error('Error in GET product:', error);
     // Removed: if (error instanceof ErrorResponse) return error.toNextResponse();
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);
@@ -172,7 +173,7 @@ export async function PUT(req: NextRequest, { params }: { params: { restaurantId
 
     return jsonOk(updatedProduct);
   } catch (error) {
-    console.error('Error in PUT product:', error);
+    logger.error('Error in PUT product:', error);
     // Removed: if (error instanceof ErrorResponse) return error.toNextResponse();
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);
@@ -254,7 +255,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { restauran
 
     return jsonOk(deletedProduct);
   } catch (error) {
-    console.error('Error in DELETE product:', error);
+    logger.error('Error in DELETE product:', error);
     // Removed: if (error instanceof ErrorResponse) return error.toNextResponse();
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);

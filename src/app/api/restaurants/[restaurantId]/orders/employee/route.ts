@@ -1,75 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { orderService } from '@/services/order.service';
-import { jsonError } from '@/utils/api'; // Assuming jsonOk is not needed if using NextResponse directly
-import { UserRole } from '@prisma/client'; // Changed import to @prisma/client
+import { UserRole } from '@/types/enums';
+import { OrderStatus } from '@/types/enums';
 import { z } from 'zod';
 
-const pathParamsSchema = z.object({
+// ✅ Schema para parámetros de Next.js (camelCase)
+const path_params_schema = z.object({
   restaurantId: z.coerce.number().int().positive(),
 });
 
-const queryParamsSchema = z.object({
-  status: z.string().optional(), // Add more specific validation if OrderStatus is an enum
-  fromDate: z.string().datetime({ offset: true }).optional(), // Expects ISO 8601 date string
-  toDate: z.string().datetime({ offset: true }).optional(),
+// ✅ Schema para parámetros de consulta (snake_case interno)
+const query_params_schema = z.object({
+  status: z.string().optional(),
+  from_date: z.string().optional(), // Cambiar a string simple para mayor flexibilidad
+  to_date: z.string().optional(),
 });
 
-/**
- * @swagger
- * /api/restaurants/{restaurantId}/orders/employee:
- *   get:
- *     summary: Get all orders for a restaurant (employee access)
- *     tags:
- *       - Orders
- *     parameters:
- *       - in: path
- *         name: restaurantId
- *         schema:
- *           type: integer
- *         required: true
- *         description: The ID of the restaurant.
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *         description: Filter orders by status.
- *       - in: query
- *         name: fromDate
- *         schema:
- *           type: string
- *           format: date-time
- *         description: Filter orders from this date.
- *       - in: query
- *         name: toDate
- *         schema:
- *           type: string
- *           format: date-time
- *         description: Filter orders up to this date.
- *     responses:
- *       200:
- *         description: A list of orders.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 orders:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/SerializedOrder'
- *       400:
- *         description: Invalid input.
- *       401:
- *         description: Unauthorized.
- *       403:
- *         description: Forbidden.
- *       500:
- *         description: Internal server error.
- */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { restaurantId: string } }
+  { params }: { params: { restaurantId: string } } // ✅ Next.js requiere camelCase
 ) {
   try {
     const token = await getToken({ req });
@@ -77,57 +27,71 @@ export async function GET(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const pathParamsValidation = pathParamsSchema.safeParse(params);
-    if (!pathParamsValidation.success) {
+    // ✅ Validar parámetros de ruta de Next.js
+    const path_params_validation = path_params_schema.safeParse(params);
+    if (!path_params_validation.success) {
       return NextResponse.json(
-        { message: 'Invalid path parameters', errors: pathParamsValidation.error.issues },
+        { message: 'Invalid path parameters', errors: path_params_validation.error.issues },
         { status: 400 }
       );
     }
-    const { restaurantId } = pathParamsValidation.data;
+    
+    // ✅ Conversión inmediata: camelCase → snake_case
+    const { restaurantId } = path_params_validation.data; // Next.js camelCase
+    const restaurant_id = restaurantId; // Convertir a snake_case para uso interno
 
     // Authorization: general_admin can access any restaurant's orders.
     // establishment_admin and employee can only access orders of their own establishment.
-    const isGeneralAdmin = token.role === UserRole.general_admin; // Corrected to use lowercase enum key
-    const isRestaurantAdminOrEmployee =
-      (token.role === UserRole.establishment_admin || token.role === UserRole.waiter || token.role === UserRole.cook) &&
-      token.establishment_id === restaurantId;
+    const is_general_admin = token.role === UserRole.GENERAL_ADMIN;
+    const is_restaurant_admin_or_employee =
+      (token.role === UserRole.ESTABLISHMENT_ADMIN || 
+       token.role === UserRole.WAITER || 
+       token.role === UserRole.COOK) &&
+      token.establishment_id === restaurant_id;
 
-    if (!isGeneralAdmin && !isRestaurantAdminOrEmployee) {
+    if (!is_general_admin && !is_restaurant_admin_or_employee) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
-    const queryParams = {
+    // ✅ Extraer parámetros de consulta y convertir a snake_case
+    const query_params = {
       status: req.nextUrl.searchParams.get('status') || undefined,
-      fromDate: req.nextUrl.searchParams.get('fromDate') || undefined,
-      toDate: req.nextUrl.searchParams.get('toDate') || undefined,
+      from_date: req.nextUrl.searchParams.get('fromDate') || undefined, // camelCase de URL
+      to_date: req.nextUrl.searchParams.get('toDate') || undefined,     // camelCase de URL
     };
 
-    const queryParamsValidation = queryParamsSchema.safeParse(queryParams);
-    if (!queryParamsValidation.success) {
+    const query_params_validation = query_params_schema.safeParse(query_params);
+    if (!query_params_validation.success) {
       return NextResponse.json(
-        { message: 'Invalid query parameters', errors: queryParamsValidation.error.issues },
+        { message: 'Invalid query parameters', errors: query_params_validation.error.issues },
         { status: 400 }
       );
     }
 
-    const filters = {
-      ...queryParamsValidation.data,
-      establishment_id: restaurantId, // Service expects establishment_id
+    // ✅ Construir filtros en snake_case
+    const filters: any = {
+      establishment_id: restaurant_id, // ✅ snake_case
     };
-
+    
+    const { status, from_date, to_date } = query_params_validation.data;
+    
+    if (status && status !== 'all') {
+      if (Object.values(OrderStatus).includes(status as OrderStatus)) {
+        filters.status = status as OrderStatus;
+      }
+    }
+    
+    if (from_date) filters.from_date = from_date; // ✅ snake_case
+    if (to_date) filters.to_date = to_date;       // ✅ snake_case
+    
     const orders = await orderService.getAllOrders(filters);
     return NextResponse.json({ orders });
 
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ message: 'Validation failed', errors: error.issues }, { status: 400 });
-    }
     console.error('Error fetching orders:', error);
-    // Use the existing jsonError utility or create a new NextResponse for consistency
-    if (error instanceof Error && typeof (error as any).status === 'number') {
-      return NextResponse.json({ message: error.message }, { status: (error as any).status });
-    }
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
