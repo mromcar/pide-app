@@ -11,32 +11,33 @@ export default function OrderSupervisionPage() {
   const params = useParams()
   const { t } = useTranslation(DEFAULT_LANGUAGE)
 
-  const establishmentId = params.id as string
+  const establishment_id = params.id as string
+  const language_code = DEFAULT_LANGUAGE
 
   const navigationItems = [
     {
       id: 'dashboard',
       label: t.establishmentAdmin.navigation.dashboard,
       icon: '🏠',
-      path: `/admin/establishment/${establishmentId}`,
+      path: `/admin/establishment/${establishment_id}`,
     },
     {
       id: 'menu',
       label: t.establishmentAdmin.navigation.menuManagement,
       icon: '📋',
-      path: `/admin/establishment/${establishmentId}/menu`,
+      path: `/admin/establishment/${establishment_id}/menu`,
     },
     {
       id: 'employees',
       label: t.establishmentAdmin.navigation.employeeManagement,
       icon: '👥',
-      path: `/admin/establishment/${establishmentId}/employees`,
+      path: `/admin/establishment/${establishment_id}/employees`,
     },
     {
       id: 'orders',
       label: t.establishmentAdmin.navigation.orderSupervision,
       icon: '📦',
-      path: `/admin/establishment/${establishmentId}/orders`,
+      path: `/admin/establishment/${establishment_id}/orders`,
     },
   ]
 
@@ -48,7 +49,7 @@ export default function OrderSupervisionPage() {
         navigationItems={navigationItems}
         activeSection="orders"
       >
-        <OrderSupervision establishmentId={establishmentId} language={DEFAULT_LANGUAGE} />
+        <OrderSupervision establishment_id={establishment_id} language_code={language_code} />
       </AdminLayout>
     </ProtectedPage>
   )

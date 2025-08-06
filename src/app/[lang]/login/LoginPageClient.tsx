@@ -75,7 +75,6 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
             </div>
           )}
 
-          {/* Google OAuth Button */}
           <div className="login-google-section">
             <button onClick={handleGoogleLogin} disabled={isLoading} className="login-google-btn">
               <svg className="login-google-icon" viewBox="0 0 24 24">

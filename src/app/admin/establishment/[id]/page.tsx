@@ -18,7 +18,8 @@ export default function EstablishmentAdminPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const establishmentId = params.id as string
+  const establishment_id = params.id as string
+  const language_code = DEFAULT_LANGUAGE
 
   useEffect(() => {
     if (status === 'loading') return
@@ -28,19 +29,18 @@ export default function EstablishmentAdminPage() {
       return
     }
 
-    // Check if user has establishment admin role
     if (!['establishment_admin', 'general_admin'].includes(session.user.role)) {
       router.push('/access-denied')
       return
     }
 
     fetchEstablishment()
-  }, [session, status, establishmentId])
+  }, [session, status, establishment_id])
 
   const fetchEstablishment = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/establishments/${establishmentId}`)
+      const response = await fetch(`/api/establishments/${establishment_id}`)
 
       if (!response.ok) {
         throw new Error('Failed to fetch establishment')
@@ -87,8 +87,8 @@ export default function EstablishmentAdminPage() {
     <ProtectedPage allowedRoles={['establishment_admin', 'general_admin']}>
       <EstablishmentAdminDashboard
         establishment={establishment}
-        establishmentId={establishmentId}
-        language={DEFAULT_LANGUAGE}
+        establishment_id={establishment_id}
+        language_code={language_code}
       />
     </ProtectedPage>
   )

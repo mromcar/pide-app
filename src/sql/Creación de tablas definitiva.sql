@@ -428,7 +428,7 @@ SELECT 'Script de creación de esquema completado exitosamente.' AS status;
 ALTER TABLE categories DROP COLUMN IF EXISTS image_url;
 ALTER TABLE products DROP COLUMN IF EXISTS image_url;
 
--- Añadir campos OAuth a la tabla users existente
+
 ALTER TABLE users
 ADD COLUMN google_id VARCHAR(255) UNIQUE,
 ADD COLUMN apple_id VARCHAR(255) UNIQUE;

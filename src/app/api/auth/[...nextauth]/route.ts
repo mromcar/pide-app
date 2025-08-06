@@ -89,7 +89,7 @@ export const authOptions: AuthOptions = {
           }
           return true;
         } catch (error) {
-          console.error("Error during Google OAuth sign in:", error);
+          console.error("Error during Google sign in:", error);
           return false;
         }
       }
@@ -101,7 +101,7 @@ export const authOptions: AuthOptions = {
           where: { email: user.email! },
           include: { establishment: true }
         });
-        
+
         if (dbUser) {
           token.id = dbUser.user_id.toString();
           token.role = dbUser.role;
