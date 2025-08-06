@@ -1,7 +1,7 @@
 import { establishmentApiService } from '@/services/api/establishment.api'
 import { categoryApiService } from '@/services/api/category.api'
 import { productApiService } from '@/services/api/product.api'
-import MenuDisplay from '@/components/MenuDisplay'
+import MenuDisplay from '@/components/menu/MenuDisplay'
 import { CategoryDTO } from '@/types/dtos/category'
 import { ProductResponseDTO } from '@/types/dtos/product'
 import { getTranslation } from '@/translations'

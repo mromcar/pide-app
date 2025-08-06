@@ -14,12 +14,12 @@ interface CategoryFormData {
 }
 
 interface CategoryManagementProps {
-  establishmentId: string
-  language: LanguageCode
+  establishment_id: string
+  language_code: LanguageCode
 }
 
-export function CategoryManagement({ establishmentId, language }: CategoryManagementProps) {
-  const { t } = useTranslation(language)
+export function CategoryManagement({ establishment_id, language_code }: CategoryManagementProps) {
+  const { t } = useTranslation(language_code)
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -28,12 +28,12 @@ export function CategoryManagement({ establishmentId, language }: CategoryManage
 
   useEffect(() => {
     fetchCategories()
-  }, [establishmentId])
+  }, [establishment_id])
 
   const fetchCategories = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/establishments/${establishmentId}/categories`)
+      const response = await fetch(`/api/establishments/${establishment_id}/categories`)
       if (response.ok) {
         const data = await response.json()
         setCategories(data)
@@ -55,9 +55,9 @@ export function CategoryManagement({ establishmentId, language }: CategoryManage
     setShowForm(true)
   }
 
-  const handleDeleteCategory = async (categoryId: number) => {
+  const handleDeleteCategory = async (category_id: number) => {
     try {
-      const response = await fetch(`/api/categories/${categoryId}`, {
+      const response = await fetch(`/api/categories/${category_id}`, {
         method: 'DELETE',
       })
       if (response.ok) {
@@ -73,7 +73,7 @@ export function CategoryManagement({ establishmentId, language }: CategoryManage
     try {
       const url = editingCategory
         ? `/api/categories/${editingCategory.category_id}`
-        : `/api/establishments/${establishmentId}/categories`
+        : `/api/establishments/${establishment_id}/categories`
 
       const method = editingCategory ? 'PUT' : 'POST'
 
@@ -161,7 +161,7 @@ export function CategoryManagement({ establishmentId, language }: CategoryManage
       {showForm && (
         <CategoryForm
           category={editingCategory}
-          language={language}
+          language_code={language_code}
           onSubmit={handleFormSubmit}
           onCancel={() => setShowForm(false)}
         />
@@ -200,13 +200,13 @@ export function CategoryManagement({ establishmentId, language }: CategoryManage
 // Category Form Component
 interface CategoryFormProps {
   category: Category | null
-  language: LanguageCode
+  language_code: LanguageCode
   onSubmit: (data: CategoryFormData) => void
   onCancel: () => void
 }
 
-function CategoryForm({ category, language, onSubmit, onCancel }: CategoryFormProps) {
-  const { t } = useTranslation(language)
+function CategoryForm({ category, language_code, onSubmit, onCancel }: CategoryFormProps) {
+  const { t } = useTranslation(language_code)
   const [formData, setFormData] = useState<CategoryFormData>({
     name: category?.name || '',
     image_url: category?.image_url || '',

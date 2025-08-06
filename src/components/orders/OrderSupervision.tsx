@@ -8,8 +8,8 @@ import type { LanguageCode } from '@/constants/languages'
 import { OrderResponseDTO } from '@/types/dtos/order'
 
 interface OrderSupervisionProps {
-  establishmentId: string
-  language: LanguageCode
+  establishment_id: string
+  language_code: LanguageCode
 }
 
 // Definir el flujo de estados
@@ -26,8 +26,8 @@ function getNextStatus(currentStatus: OrderStatus): OrderStatus | null {
   return statusFlow[currentStatus]
 }
 
-export function OrderSupervision({ establishmentId, language }: OrderSupervisionProps) {
-  const { t } = useTranslation(language)
+export function OrderSupervision({ establishment_id, language_code }: OrderSupervisionProps) {
+  const { t } = useTranslation(language_code)
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | 'all'>('all')
@@ -44,7 +44,7 @@ export function OrderSupervision({ establishmentId, language }: OrderSupervision
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [establishmentId, selectedStatus, selectedDate])
+  }, [establishment_id, selectedStatus, selectedDate])
 
   const fetchOrders = async () => {
     try {
@@ -53,7 +53,7 @@ export function OrderSupervision({ establishmentId, language }: OrderSupervision
         ...(selectedStatus !== 'all' && { status: selectedStatus }),
       })
 
-      const response = await fetch(`/api/establishments/${establishmentId}/orders?${params}`)
+      const response = await fetch(`/api/establishments/${establishment_id}/orders?${params}`)
 
       if (response.ok) {
         const data = await response.json()

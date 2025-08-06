@@ -8,12 +8,12 @@ import type { ProductVariant } from '@/types/entities/productVariant'
 import type { LanguageCode } from '@/constants/languages'
 
 interface ProductManagementProps {
-  establishmentId: string
-  language: LanguageCode
+  establishment_id: string
+  language_code: LanguageCode
 }
 
-export function ProductManagement({ establishmentId, language }: ProductManagementProps) {
-  const { t } = useTranslation(language)
+export function ProductManagement({ establishment_id, language_code }: ProductManagementProps) {
+  const { t } = useTranslation(language_code)
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -24,20 +24,20 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
 
   useEffect(() => {
     fetchData()
-  }, [establishmentId])
+  }, [establishment_id])
 
   const fetchData = async () => {
     try {
       setLoading(true)
       const [productsRes, categoriesRes] = await Promise.all([
-        fetch(`/api/restaurants/${establishmentId}/menu/products`),
-        fetch(`/api/restaurants/${establishmentId}/menu/categories`)
+        fetch(`/api/restaurants/${establishment_id}/menu/products`),
+        fetch(`/api/restaurants/${establishment_id}/menu/categories`),
       ])
-      
+
       if (productsRes.ok && categoriesRes.ok) {
         const [productsData, categoriesData] = await Promise.all([
           productsRes.json(),
-          categoriesRes.json()
+          categoriesRes.json(),
         ])
         setProducts(productsData)
         setCategories(categoriesData)
@@ -49,23 +49,26 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
     }
   }
 
-  const toggleProductExpansion = (productId: number) => {
+  const toggleProductExpansion = (product_id: number) => {
     const newExpanded = new Set(expandedProducts)
-    if (newExpanded.has(productId)) {
-      newExpanded.delete(productId)
+    if (newExpanded.has(product_id)) {
+      newExpanded.delete(product_id)
     } else {
-      newExpanded.add(productId)
+      newExpanded.add(product_id)
     }
     setExpandedProducts(newExpanded)
   }
 
-  const handleDeleteProduct = async (productId: number) => {
+  const handleDeleteProduct = async (product_id: number) => {
     if (!confirm(t.establishmentAdmin.menuManagement.products.confirmDelete)) return
-    
+
     try {
-      const response = await fetch(`/api/restaurants/${establishmentId}/menu/products/${productId}`, {
-        method: 'DELETE'
-      })
+      const response = await fetch(
+        `/api/restaurants/${establishment_id}/menu/products/${product_id}`,
+        {
+          method: 'DELETE',
+        }
+      )
       if (response.ok) {
         await fetchData()
       }
@@ -74,9 +77,10 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
     }
   }
 
-  const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category_id.toString() === selectedCategory)
+  const filteredProducts =
+    selectedCategory === 'all'
+      ? products
+      : products.filter((product) => product.category_id.toString() === selectedCategory)
 
   if (loading) {
     return (
@@ -93,23 +97,20 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
       <div className="management-header">
         <div className="header-content">
           <h2>{t.establishmentAdmin.menuManagement.products.title}</h2>
-          <button 
-            onClick={() => setShowForm(true)}
-            className="btn btn-primary"
-          >
+          <button onClick={() => setShowForm(true)} className="btn btn-primary">
             {t.establishmentAdmin.menuManagement.products.addNew}
           </button>
         </div>
-        
+
         {/* Category Filter */}
         <div className="filter-section">
-          <select 
-            value={selectedCategory} 
+          <select
+            value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="category-filter"
           >
             <option value="all">Todas las categorías</option>
-            {categories.map(category => (
+            {categories.map((category) => (
               <option key={category.category_id} value={category.category_id.toString()}>
                 {category.name}
               </option>
@@ -120,34 +121,30 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
 
       {/* Products List */}
       <div className="products-grid">
-        {filteredProducts.map(product => (
+        {filteredProducts.map((product) => (
           <div key={product.product_id} className="product-card">
             <div className="product-header">
               <div className="product-info">
                 {product.image_url && (
-                  <img 
-                    src={product.image_url} 
-                    alt={product.name}
-                    className="product-image"
-                  />
+                  <img src={product.image_url} alt={product.name} className="product-image" />
                 )}
                 <div className="product-details">
                   <h3>{product.name}</h3>
                   <p className="product-description">{product.description}</p>
                   <span className="product-category">
-                    {categories.find(c => c.category_id === product.category_id)?.name}
+                    {categories.find((c) => c.category_id === product.category_id)?.name}
                   </span>
                 </div>
               </div>
-              
+
               <div className="product-actions">
-                <button 
+                <button
                   onClick={() => toggleProductExpansion(product.product_id)}
                   className="btn btn-secondary btn-sm"
                 >
                   {expandedProducts.has(product.product_id) ? '▼' : '▶'} Variantes
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     setEditingProduct(product)
                     setShowForm(true)
@@ -156,7 +153,7 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
                 >
                   {t.establishmentAdmin.menuManagement.products.edit}
                 </button>
-                <button 
+                <button
                   onClick={() => handleDeleteProduct(product.product_id)}
                   className="btn btn-danger btn-sm"
                 >
@@ -171,7 +168,7 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
                 <h4>Variantes</h4>
                 {product.variants && product.variants.length > 0 ? (
                   <div className="variants-list">
-                    {product.variants.map(variant => (
+                    {product.variants.map((variant) => (
                       <div key={variant.variant_id} className="variant-item">
                         <span className="variant-name">{variant.variant_description}</span>
                         <span className="variant-price">€{variant.price.toString()}</span>
@@ -185,9 +182,7 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
                 ) : (
                   <p className="no-variants">No hay variantes para este producto</p>
                 )}
-                <button className="btn btn-secondary btn-sm mt-2">
-                  + Añadir Variante
-                </button>
+                <button className="btn btn-secondary btn-sm mt-2">+ Añadir Variante</button>
               </div>
             )}
 
@@ -196,7 +191,7 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
               <div className="allergens-section">
                 <h5>Alérgenos:</h5>
                 <div className="allergens-list">
-                  {product.allergens.map(allergen => (
+                  {product.allergens.map((allergen) => (
                     <span key={allergen.allergen_id} className="allergen-tag">
                       {allergen.allergen?.name}
                     </span>
@@ -213,8 +208,8 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
         <ProductForm
           product={editingProduct}
           categories={categories}
-          establishmentId={establishmentId}
-          language={language}
+          establishment_id={establishment_id}
+          language_code={language_code}
           onSubmit={handleSubmit}
           onCancel={() => setShowForm(false)}
         />
@@ -226,33 +221,35 @@ export function ProductManagement({ establishmentId, language }: ProductManageme
 interface ProductFormProps {
   product: Product | null
   categories: Category[]
-  establishmentId: string
-  language: LanguageCode
+  establishment_id: string
+  language_code: LanguageCode
   onSubmit: (data: any) => void
   onCancel: () => void
 }
 
-function ProductForm({ product, categories, establishmentId, language, onSubmit, onCancel }: ProductFormProps) {
-  const { t } = useTranslation(language)
+function ProductForm({
+  product,
+  categories,
+  establishment_id,
+  language_code,
+  onSubmit,
+  onCancel,
+}: ProductFormProps) {
+  const { t } = useTranslation(language_code)
   const [formData, setFormData] = useState({
     name: product?.name || '',
     description: product?.description || '',
+    price: product?.price || 0,
     category_id: product?.category_id || categories[0]?.category_id || '',
     image_url: product?.image_url || '',
-    is_active: product?.is_active ?? true
+    is_active: product?.is_active ?? true,
   })
-
-  // ✅ Agregar la función handleSubmit
-  const handleSubmit = async (data: ProductFormData) => {
-  // Implementar lógica de envío
-  console.log('Submitting product data:', data);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSubmit({
       ...formData,
-      establishment_id: establishmentId
+      establishment_id,
     })
   }
 
@@ -260,68 +257,67 @@ function ProductForm({ product, categories, establishmentId, language, onSubmit,
     <div className="modal-overlay">
       <div className="modal-content">
         <h3>
-          {product 
+          {product
             ? t.establishmentAdmin.menuManagement.products.edit
-            : t.establishmentAdmin.menuManagement.products.addNew
-          }
+            : t.establishmentAdmin.menuManagement.products.addNew}
         </h3>
-        
+
         <form onSubmit={handleSubmit} className="product-form">
           <div className="form-group">
             <label>{t.establishmentAdmin.menuManagement.products.name}</label>
             <input
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label>{t.establishmentAdmin.menuManagement.products.description}</label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
             />
           </div>
-          
+
           <div className="form-group">
             <label>{t.establishmentAdmin.menuManagement.products.category}</label>
             <select
               value={formData.category_id}
-              onChange={(e) => setFormData({...formData, category_id: parseInt(e.target.value)})}
+              onChange={(e) => setFormData({ ...formData, category_id: parseInt(e.target.value) })}
               required
             >
-              {categories.map(category => (
+              {categories.map((category) => (
                 <option key={category.category_id} value={category.category_id}>
                   {category.name}
                 </option>
               ))}
             </select>
           </div>
-          
+
           <div className="form-group">
             <label>{t.establishmentAdmin.menuManagement.products.image}</label>
             <input
               type="url"
               value={formData.image_url}
-              onChange={(e) => setFormData({...formData, image_url: e.target.value})}
+              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
               placeholder="URL de la imagen"
             />
           </div>
-          
+
           <div className="form-group checkbox-group">
             <label>
               <input
                 type="checkbox"
                 checked={formData.is_active}
-                onChange={(e) => setFormData({...formData, is_active: e.target.checked})}
+                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
               />
               {t.establishmentAdmin.menuManagement.products.active}
             </label>
           </div>
-          
+
           <div className="form-actions">
             <button type="button" onClick={onCancel} className="btn btn-secondary">
               {t.establishmentAdmin.forms.cancel}

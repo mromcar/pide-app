@@ -10,39 +10,38 @@ import type { UITranslation } from '@/translations'
 // Define allowed employee roles (exclude 'client')
 type EmployeeRole = Exclude<PrismaUserRole, 'client'>
 
-// Update the form data interface
 interface EmployeeFormData {
   name: string
   email: string
-  role: EmployeeRole // Use EmployeeRole instead of UserRole
+  role: EmployeeRole
   active: boolean
   password?: string
-  establishmentId?: string
+  establishment_id?: string // snake_case
 }
 
 interface EmployeeManagementProps {
-  establishmentId: string
-  language: LanguageCode
+  establishment_id: string // snake_case
+  language_code: LanguageCode // snake_case
 }
 
-export function EmployeeManagement({ establishmentId, language }: EmployeeManagementProps) {
-  const { t } = useTranslation(language)
+export function EmployeeManagement({ establishment_id, language_code }: EmployeeManagementProps) {
+  const { t } = useTranslation(language_code)
   const [employees, setEmployees] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingEmployee, setEditingEmployee] = useState<User | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [roleFilter, setRoleFilter] = useState<EmployeeRole | 'all'>('all') // Fix: Use EmployeeRole instead of UserRole
+  const [roleFilter, setRoleFilter] = useState<EmployeeRole | 'all'>('all')
 
   useEffect(() => {
     fetchEmployees()
-  }, [establishmentId])
+  }, [establishment_id])
 
   const fetchEmployees = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/establishments/${establishmentId}/employees`)
+      const response = await fetch(`/api/establishments/${establishment_id}/employees`)
       if (response.ok) {
         const data = await response.json()
         setEmployees(data)
@@ -64,10 +63,10 @@ export function EmployeeManagement({ establishmentId, language }: EmployeeManage
     setShowForm(true)
   }
 
-  const handleDeleteEmployee = async (employeeId: string) => {
+  const handleDeleteEmployee = async (user_id: string) => {
     try {
-      const response = await fetch(`/api/users/${employeeId}`, {
-        method: 'DELETE'
+      const response = await fetch(`/api/users/${user_id}`, {
+        method: 'DELETE',
       })
       if (response.ok) {
         await fetchEmployees()
@@ -78,26 +77,25 @@ export function EmployeeManagement({ establishmentId, language }: EmployeeManage
     }
   }
 
-  // Corregir la función handleSubmit con tipo específico
   const handleFormSubmit = async (formData: EmployeeFormData) => {
     try {
-      const url = editingEmployee 
-        ? `/api/users/${editingEmployee.user_id}` // Use user_id instead of id
-        : `/api/establishments/${establishmentId}/employees`
-      
+      const url = editingEmployee
+        ? `/api/users/${editingEmployee.user_id}`
+        : `/api/establishments/${establishment_id}/employees`
+
       const method = editingEmployee ? 'PUT' : 'POST'
-      
+
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...formData,
-          establishmentId
-        })
+          establishment_id, // snake_case
+        }),
       })
-      
+
       if (response.ok) {
         await fetchEmployees()
         setShowForm(false)
@@ -108,9 +106,10 @@ export function EmployeeManagement({ establishmentId, language }: EmployeeManage
     }
   }
 
-  const filteredEmployees = employees.filter(employee => {
-    const matchesSearch = employee.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         employee.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredEmployees = employees.filter((employee) => {
+    const matchesSearch =
+      employee.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.email.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesRole = roleFilter === 'all' || employee.role === roleFilter
     return matchesSearch && matchesRole
   })
@@ -128,13 +127,8 @@ export function EmployeeManagement({ establishmentId, language }: EmployeeManage
     <div className="employee-management">
       {/* Header */}
       <div className="management-header">
-        <h2 className="management-title">
-          {t.establishmentAdmin.employeeManagement.title}
-        </h2>
-        <button 
-          onClick={handleAddEmployee}
-          className="btn-primary"
-        >
+        <h2 className="management-title">{t.establishmentAdmin.employeeManagement.title}</h2>
+        <button onClick={handleAddEmployee} className="btn-primary">
           {t.establishmentAdmin.employeeManagement.addEmployee}
         </button>
       </div>
@@ -148,16 +142,18 @@ export function EmployeeManagement({ establishmentId, language }: EmployeeManage
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
         />
-        
+
         <select
           value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value as EmployeeRole | 'all')} // Use EmployeeRole
+          onChange={(e) => setRoleFilter(e.target.value as EmployeeRole | 'all')}
           className="filter-select"
         >
           <option value="all">All Roles</option>
           <option value="waiter">{t.establishmentAdmin.employeeManagement.roles.waiter}</option>
           <option value="cook">{t.establishmentAdmin.employeeManagement.roles.cook}</option>
-          <option value="establishment_admin">{t.establishmentAdmin.employeeManagement.roles.establishment_admin}</option>
+          <option value="establishment_admin">
+            {t.establishmentAdmin.employeeManagement.roles.establishment_admin}
+          </option>
         </select>
       </div>
 
@@ -175,7 +171,7 @@ export function EmployeeManagement({ establishmentId, language }: EmployeeManage
           </thead>
           <tbody>
             {filteredEmployees.map((employee) => (
-              <tr key={employee.user_id}> {/* Use user_id instead of id */}
+              <tr key={employee.user_id}>
                 <td>{employee.name || '-'}</td>
                 <td>{employee.email}</td>
                 <td>
@@ -184,21 +180,19 @@ export function EmployeeManagement({ establishmentId, language }: EmployeeManage
                   </span>
                 </td>
                 <td>
-                  <span className={`status-badge ${
-                    employee.active ? 'active' : 'inactive'
-                  }`}>
+                  <span className={`status-badge ${employee.active ? 'active' : 'inactive'}`}>
                     {employee.active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td>
                   <div className="action-buttons">
-                    <button 
+                    <button
                       onClick={() => handleEditEmployee(employee)}
                       className="btn-secondary btn-sm"
                     >
                       {t.establishmentAdmin.employeeManagement.editEmployee}
                     </button>
-                    <button 
+                    <button
                       onClick={() => setDeleteConfirm(employee.user_id.toString())}
                       className="btn-danger btn-sm"
                     >
@@ -210,16 +204,15 @@ export function EmployeeManagement({ establishmentId, language }: EmployeeManage
             ))}
           </tbody>
         </table>
-        
+
         {filteredEmployees.length === 0 && (
           <div className="empty-state">
             <div className="empty-state-icon">👥</div>
             <h3 className="empty-state-title">No employees found</h3>
             <p className="empty-state-description">
-              {searchTerm || roleFilter !== 'all' 
+              {searchTerm || roleFilter !== 'all'
                 ? 'No employees match your search criteria'
-                : 'Start by adding your first employee'
-              }
+                : 'Start by adding your first employee'}
             </p>
             {!searchTerm && roleFilter === 'all' && (
               <button onClick={handleAddEmployee} className="btn-primary">
@@ -232,12 +225,12 @@ export function EmployeeManagement({ establishmentId, language }: EmployeeManage
 
       {/* Employee Form Modal */}
       {showForm && (
-        // Corregir el JSX
         <EmployeeForm
           employee={editingEmployee}
-          onSubmit={handleFormSubmit} // Corregido: usar handleFormSubmit
+          onSubmit={handleFormSubmit}
           onCancel={() => setEditingEmployee(null)}
           t={t}
+          establishment_id={establishment_id} // <-- snake_case
         />
       )}
 
@@ -254,16 +247,10 @@ export function EmployeeManagement({ establishmentId, language }: EmployeeManage
               <p>{t.establishmentAdmin.employeeManagement.deleteMessage}</p>
             </div>
             <div className="modal-footer">
-              <button 
-                onClick={() => setDeleteConfirm(null)}
-                className="btn-secondary"
-              >
+              <button onClick={() => setDeleteConfirm(null)} className="btn-secondary">
                 Cancel
               </button>
-              <button 
-                onClick={() => handleDeleteEmployee(deleteConfirm)}
-                className="btn-danger"
-              >
+              <button onClick={() => handleDeleteEmployee(deleteConfirm)} className="btn-danger">
                 Delete
               </button>
             </div>
@@ -280,23 +267,24 @@ interface EmployeeFormProps {
   onSubmit: (data: EmployeeFormData) => void
   onCancel: () => void
   t: UITranslation
+  establishment_id: string // <-- snake_case
 }
 
-// Update the EmployeeForm component
-function EmployeeForm({ employee, onSubmit, onCancel, t }: EmployeeFormProps) {
+function EmployeeForm({ employee, onSubmit, onCancel, t, establishment_id }: EmployeeFormProps) {
   const [formData, setFormData] = useState<EmployeeFormData>({
     name: employee?.name || '',
     email: employee?.email || '',
-    role: (employee?.role as EmployeeRole) || 'waiter', // Cast to EmployeeRole and ensure it's not 'client'
+    role: (employee?.role as EmployeeRole) || 'waiter',
     active: employee?.active ?? true,
-    password: ''
+    password: '',
+    establishment_id, // <-- snake_case
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const submitData = { ...formData }
     if (employee && !submitData.password) {
-      delete submitData.password // Don't update password if not provided
+      delete submitData.password
     }
     onSubmit(submitData)
   }
@@ -306,20 +294,19 @@ function EmployeeForm({ employee, onSubmit, onCancel, t }: EmployeeFormProps) {
       <div className="modal-content modal-large">
         <div className="modal-header">
           <h3 className="modal-title">
-            {employee 
+            {employee
               ? t.establishmentAdmin.employeeManagement.editEmployee
-              : t.establishmentAdmin.employeeManagement.addEmployee
-            }
+              : t.establishmentAdmin.employeeManagement.addEmployee}
           </h3>
-          <button onClick={onCancel} className="modal-close">×</button>
+          <button onClick={onCancel} className="modal-close">
+            ×
+          </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="admin-form">
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">
-                {t.establishmentAdmin.employeeManagement.name}
-              </label>
+              <label className="form-label">{t.establishmentAdmin.employeeManagement.name}</label>
               <input
                 type="text"
                 className="form-input"
@@ -327,11 +314,9 @@ function EmployeeForm({ employee, onSubmit, onCancel, t }: EmployeeFormProps) {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
-            
+
             <div className="form-group">
-              <label className="form-label">
-                {t.establishmentAdmin.employeeManagement.email}
-              </label>
+              <label className="form-label">{t.establishmentAdmin.employeeManagement.email}</label>
               <input
                 type="email"
                 className="form-input"
@@ -341,24 +326,26 @@ function EmployeeForm({ employee, onSubmit, onCancel, t }: EmployeeFormProps) {
               />
             </div>
           </div>
-          
+
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">
-                {t.establishmentAdmin.employeeManagement.role}
-              </label>
+              <label className="form-label">{t.establishmentAdmin.employeeManagement.role}</label>
               <select
                 className="form-select"
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value as EmployeeRole })}
                 required
               >
-                <option value="waiter">{t.establishmentAdmin.employeeManagement.roles.waiter}</option>
+                <option value="waiter">
+                  {t.establishmentAdmin.employeeManagement.roles.waiter}
+                </option>
                 <option value="cook">{t.establishmentAdmin.employeeManagement.roles.cook}</option>
-                <option value="establishment_admin">{t.establishmentAdmin.employeeManagement.roles.establishment_admin}</option>
+                <option value="establishment_admin">
+                  {t.establishmentAdmin.employeeManagement.roles.establishment_admin}
+                </option>
               </select>
             </div>
-            
+
             <div className="form-group">
               <label className="form-label">
                 Password {employee && '(leave empty to keep current)'}
@@ -373,7 +360,7 @@ function EmployeeForm({ employee, onSubmit, onCancel, t }: EmployeeFormProps) {
               />
             </div>
           </div>
-          
+
           <div className="form-group">
             <label className="form-label flex items-center">
               <input
@@ -385,7 +372,7 @@ function EmployeeForm({ employee, onSubmit, onCancel, t }: EmployeeFormProps) {
               {t.establishmentAdmin.employeeManagement.active}
             </label>
           </div>
-          
+
           <div className="modal-footer">
             <button type="button" onClick={onCancel} className="btn-secondary">
               Cancel

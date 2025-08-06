@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getProductImageUrlIfExists } from '../utils/imageUtils';
+import { getProductImageUrlIfExists } from '../../utils/imageUtils';
 
 interface ProductImageProps {
   productId: number;

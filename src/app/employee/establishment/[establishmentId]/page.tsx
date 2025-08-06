@@ -1,6 +1,6 @@
 import { requireEstablishmentAccess } from '@/middleware/auth-middleware'
 import { UserRole } from '@/types/enums'
-import EmployeeDashboard from '@/components/EmployeeDashboard'
+import EmployeeDashboard from '@/components/employee/EmployeeDashboard'
 
 interface EmployeePageProps {
   params: { establishmentId: string }

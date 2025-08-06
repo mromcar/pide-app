@@ -18,5 +18,9 @@ export default async function OrderTrackPage({ params, searchParams }: OrderTrac
   const orderIdNum = parseInt(orderId)
   const restaurantIdNum = restaurantId ? parseInt(restaurantId) : 1
 
-  return <OrderTracking lang={lang} orderId={orderIdNum} restaurantId={restaurantIdNum} />
+  return <OrderTracking 
+    lang={lang} 
+    orderId={orderIdNum.toString()} 
+    restaurantId={restaurantIdNum.toString()} 
+  />
 }

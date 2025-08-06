@@ -11,6 +11,8 @@
 @import './utilities.css';
 @import './pages/checkout.css';
 @import './pages/menu.css';
+@import './pages/login.css';
+@import './pages/admin.css';
 
 /* Directivas Tailwind DESPUÉS de todos los imports */
 @tailwind base;

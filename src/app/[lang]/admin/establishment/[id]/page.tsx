@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from '@/hooks/useTranslation'
-import { EstablishmentAdminDashboard } from '@/components/EstablishmentAdminDashboard'
+import { EstablishmentAdminDashboard } from '@/components/admin/EstablishmentAdminDashboard'
 import ProtectedPage from '@/components/auth/ProtectedPage'
 import type { Establishment } from '@/types/entities/establishment'
 import type { LanguageCode } from '@/constants/languages'
@@ -13,13 +13,13 @@ export default function EstablishmentAdminPage() {
   const params = useParams()
   const router = useRouter()
   const { data: session, status } = useSession()
-  const language = params.lang as LanguageCode
-  const { t } = useTranslation(language)
+  const language_code = params.lang as LanguageCode
+  const { t } = useTranslation(language_code)
   const [establishment, setEstablishment] = useState<Establishment | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const establishmentId = params.id as string
+  const establishment_id = params.id as string
 
   useEffect(() => {
     if (status === 'loading') return
@@ -36,12 +36,12 @@ export default function EstablishmentAdminPage() {
     }
 
     fetchEstablishment()
-  }, [session, status, establishmentId])
+  }, [session, status, establishment_id])
 
   const fetchEstablishment = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/establishments/${establishmentId}`)
+      const response = await fetch(`/api/establishments/${establishment_id}`)
 
       if (!response.ok) {
         throw new Error('Failed to fetch establishment')
@@ -88,8 +88,8 @@ export default function EstablishmentAdminPage() {
     <ProtectedPage allowedRoles={['establishment_admin', 'general_admin']}>
       <EstablishmentAdminDashboard
         establishment={establishment}
-        establishmentId={establishmentId}
-        language={language}
+        establishment_id={establishment_id}
+        language_code={language_code}
       />
     </ProtectedPage>
   )

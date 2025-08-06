@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react'
 import { OrderStatus, UserRole } from '@/types/enums'
 import { OrderResponseDTO } from '@/types/dtos/order'
-import OrderFilters from './OrderFilters'
-import OrderCard from './OrderCard'
+import OrderFilters from '../orders/OrderFilters'
+import OrderCard from '../orders/OrderCard'
 
 interface EmployeeDashboardProps {
   establishmentId: number
@@ -102,45 +102,22 @@ export default function EmployeeDashboard({
     }
   }
 
-  const getFilteredOrders = () => {
-    let filtered = [...orders]
-
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter((order) => order.status === statusFilter)
-    }
-
-    // Filter by role responsibility
-    if (userRole === UserRole.COOK) {
-      // Cooks see orders that need preparation
-      filtered = filtered.filter(
-        (order) => order.status === OrderStatus.PENDING || order.status === OrderStatus.PREPARING
-      )
-    } else if (userRole === UserRole.WAITER) {
-      // Waiters see orders ready for delivery or that need table service
-      filtered = filtered.filter(
-        (order) => order.status === OrderStatus.READY || order.status === OrderStatus.DELIVERED
-      )
-    }
-
-    setFilteredOrders(filtered)
-  }
-
   const getAvailableActions = (status: OrderStatus) => {
     const actions: Array<{ status: OrderStatus; label: string; color: string }> = []
 
     if (userRole === UserRole.COOK) {
-      if (currentStatus === OrderStatus.PENDING) {
+      if (status === OrderStatus.PENDING) {
         actions.push({
           status: OrderStatus.PREPARING,
           label: 'Start Preparing',
           color: 'bg-yellow-500',
         })
       }
-      if (currentStatus === OrderStatus.PREPARING) {
+      if (status === OrderStatus.PREPARING) {
         actions.push({ status: OrderStatus.READY, label: 'Mark Ready', color: 'bg-green-500' })
       }
     } else if (userRole === UserRole.WAITER) {
-      if (currentStatus === OrderStatus.READY) {
+      if (status === OrderStatus.READY) {
         actions.push({
           status: OrderStatus.DELIVERED,
           label: 'Mark Delivered',
@@ -149,9 +126,9 @@ export default function EmployeeDashboard({
       }
     }
 
-    return actions.map(action => ({
+    return actions.map((action) => ({
       ...action,
-      status: action.status as OrderStatus // ✅ Cast explícito
+      status: action.status as OrderStatus,
     }))
   }
 
@@ -192,7 +169,9 @@ export default function EmployeeDashboard({
             <OrderCard
               key={order.order_id}
               order={order}
-              availableActions={getAvailableActions(order.status).map((action) => action.status as OrderStatus)}
+              availableActions={getAvailableActions(order.status).map(
+                (action) => action.status as OrderStatus
+              )}
               onStatusUpdate={(orderId: number, newStatus: OrderStatus) =>
                 handleStatusUpdate(orderId, newStatus as any)
               }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ProductAllergenResponseDTO } from '@/types/dtos/productAllergen';
-import { allergenIcons, AllergenCode } from './icons/AllergenIcons';
+import { allergenIcons, AllergenCode } from '../icons/AllergenIcons';
 import { LanguageCode } from '@/constants/languages';
 
 interface AllergenDisplayProps {

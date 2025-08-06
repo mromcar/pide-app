@@ -54,12 +54,31 @@
   flex-wrap: wrap;
 }
 
-.category-nav-item {
+/* Botones de navegación de categorías para admin */
+.category-nav-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  color: var(--color-text);
+  font-weight: normal;
+  text-decoration: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   max-width: 120px;
+}
+
+.category-nav-button:hover {
+  color: var(--color-primary);
+}
+
+.category-nav-button.active {
+  font-weight: bold;
+  color: var(--color-primary);
 }
 
 .category-nav-item:not(:has(img)) {

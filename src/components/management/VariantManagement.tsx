@@ -7,13 +7,13 @@ import type { Product } from '@/types/entities/product'
 import type { LanguageCode } from '@/constants/languages'
 
 interface VariantManagementProps {
-  establishmentId: string
-  language: LanguageCode
+  establishment_id: string
+  language_code: LanguageCode
 }
 
 // Componente principal
-export function VariantManagement({ establishmentId, language }: VariantManagementProps) {
-  const { t } = useTranslation(language)
+export function VariantManagement({ establishment_id, language_code }: VariantManagementProps) {
+  const { t } = useTranslation(language_code)
   const [variants, setVariants] = useState<ProductVariant[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -23,14 +23,14 @@ export function VariantManagement({ establishmentId, language }: VariantManageme
 
   useEffect(() => {
     fetchData()
-  }, [establishmentId])
+  }, [establishment_id])
 
   const fetchData = async () => {
     try {
       setLoading(true)
       const [variantsRes, productsRes] = await Promise.all([
-        fetch(`/api/restaurants/${establishmentId}/menu/variants`),
-        fetch(`/api/restaurants/${establishmentId}/menu/products`),
+        fetch(`/api/restaurants/${establishment_id}/menu/variants`),
+        fetch(`/api/restaurants/${establishment_id}/menu/products`),
       ])
 
       if (variantsRes.ok && productsRes.ok) {
@@ -48,12 +48,12 @@ export function VariantManagement({ establishmentId, language }: VariantManageme
     }
   }
 
-  const handleDeleteVariant = async (variantId: number) => {
+  const handleDeleteVariant = async (variant_id: number) => {
     if (!confirm('¿Estás seguro de que quieres eliminar esta variante?')) return
 
     try {
       const response = await fetch(
-        `/api/restaurants/${establishmentId}/menu/variants/${variantId}`,
+        `/api/restaurants/${establishment_id}/menu/variants/${variant_id}`,
         {
           method: 'DELETE',
         }
@@ -114,7 +114,7 @@ export function VariantManagement({ establishmentId, language }: VariantManageme
           <div key={variant.variant_id} className="variant-card">
             <div className="variant-info">
               <h3>{variant.variant_description}</h3>
-              <p className="variant-price">${variant.price}</p>
+              <p className="variant-price">${variant.price.toString()}</p>
               <p className="variant-sku">SKU: {variant.sku}</p>
               <span
                 className={`status-badge ${
@@ -152,8 +152,8 @@ export function VariantManagement({ establishmentId, language }: VariantManageme
         <VariantForm
           variant={editingVariant}
           products={products}
-          establishmentId={establishmentId}
-          language={language}
+          establishment_id={establishment_id}
+          language_code={language_code}
           onSubmit={async (data) => {
             // Handle form submission
             await fetchData()
@@ -176,13 +176,14 @@ interface VariantFormData {
   price: string
   sku?: string
   is_active: boolean
+  establishment_id: string
 }
 
 interface VariantFormProps {
   variant: ProductVariant | null
   products: Product[]
-  establishmentId: string
-  language: LanguageCode
+  establishment_id: string
+  language_code: LanguageCode
   onSubmit: (data: VariantFormData) => void
   onCancel: () => void
 }
@@ -190,25 +191,25 @@ interface VariantFormProps {
 function VariantForm({
   variant,
   products,
-  establishmentId,
-  language,
+  establishment_id,
+  language_code,
   onSubmit,
   onCancel,
 }: VariantFormProps) {
-  const { t } = useTranslation(language)
+  const { t } = useTranslation(language_code)
   const [formData, setFormData] = useState({
     product_id: variant?.product_id || products[0]?.product_id || '',
     variant_description: variant?.variant_description || '',
     price: variant?.price?.toString() || '',
     sku: variant?.sku || '',
     is_active: variant?.is_active ?? true,
+    establishment_id,
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSubmit({
       ...formData,
-      establishment_id: establishmentId,
       price: parseFloat(formData.price),
     })
   }
@@ -249,14 +250,11 @@ function VariantForm({
 
           <div className="form-group">
             <label>{t.establishmentAdmin.menuManagement.variants.price}</label>
-            // ✅ Convertir Decimal a string para mostrar
-            <span>{variant.price.toString()}</span> // ✅ En lugar de solo {variant.price}
-            
-            // ✅ Convertir number a string para inputs
-            <input 
-              type="text" 
-              value={formData.price.toString()} // ✅ Convertir a string
-              onChange={(e) => setFormData({...formData, price: parseFloat(e.target.value) || 0})}
+            <input
+              type="text"
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              required
             />
           </div>
 

@@ -4,7 +4,7 @@ import '../../styles/globals.css'
 import SessionWrapper from '@/components/auth/SessionWrapper'
 import { CartProvider } from '@/lib/cart-context'
 import { LanguageCode } from '@/constants/languages'
-import ConditionalNavbar from '@/components/ConditionalNavbar'
+import ConditionalNavbar from '@/components/common/ConditionalNavbar'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

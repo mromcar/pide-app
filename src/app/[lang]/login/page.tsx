@@ -4,18 +4,18 @@ import { LanguageCode } from '@/constants/languages'
 import { getTranslation } from '@/translations'
 
 interface LoginPageProps {
-  params: {
+  params: Promise<{
     lang: LanguageCode
-  }
+  }>
 }
 
 export default async function LoginPage({ params }: LoginPageProps) {
-  const { lang } = params
+  const { lang } = await params
   const translations = await getTranslation(lang)
 
   return (
     <>
-      <LoginRedirect />
+      <LoginRedirect lang={lang} />
       <LoginPageClient translations={translations} lang={lang} />
     </>
   )

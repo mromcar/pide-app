@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react'
 import { LanguageCode } from '@/constants/languages'
 import { getTranslation } from '@/translations'
 import { UserRole } from '@prisma/client'
-import MainMenu from './MainMenu'
+import MainMenu from '../menu/MainMenu'
 
 interface LoginRedirectProps {
   lang: LanguageCode

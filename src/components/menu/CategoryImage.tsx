@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCategoryImageUrlIfExists } from '../utils/imageUtils';
+import { getCategoryImageUrlIfExists } from '../../utils/imageUtils';
 
 interface CategoryImageProps {
   categoryId: number;

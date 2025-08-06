@@ -5,7 +5,12 @@ import { useRouter } from 'next/navigation'
 import { LanguageCode } from '@/constants/languages'
 import { getTranslation } from '@/translations'
 import { useCart } from '@/lib/cart-context'
-import type { OrderWithDetails, OrderItemWithDetails, OrderItemTranslation, OrderItemVariantTranslation } from '@/types/orderConfirmation'
+import type {
+  OrderWithDetails,
+  OrderItemWithDetails,
+  OrderItemTranslation,
+  OrderItemVariantTranslation,
+} from '@/types/orderConfirmation'
 
 interface OrderConfirmationProps {
   lang: LanguageCode
@@ -213,6 +218,3 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
     </div>
   )
 }
-const translation = item.translations?.find(
-  (t: { language_code: string; name: string }) => t.language_code === lang // ✅ Usar tipo correcto
-)

@@ -86,9 +86,3 @@ export default function QuantitySelector({ product, variant, lang }: QuantitySel
     </div>
   )
 }
-
-// ✅ Agregar image_url a ProductResponseDTO o usar una propiedad alternativa
-<img 
-  src={product.image_url || '/images/products/default.jpg'} // ✅ Agregar fallback
-  alt={product.name}
-/>
