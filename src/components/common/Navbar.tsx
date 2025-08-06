@@ -13,7 +13,7 @@ interface NavbarProps {
 export default function Navbar({ lang }: NavbarProps) {
   const { cartItems, restaurantId } = useCart()
   const t = getTranslation(lang)
-  const totalItems = cartItems.reduce(
+  const totalItems = (cartItems ?? []).reduce(
     (sum: number, item: { quantity: number }) => sum + item.quantity,
     0
   )

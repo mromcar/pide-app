@@ -9,35 +9,35 @@ import type { LanguageCode } from '@/constants/languages'
 
 export default function EmployeeManagementPage() {
   const params = useParams()
-  const language_code = params.lang as LanguageCode
-  const { t } = useTranslation(language_code)
+  const languageCode = params.lang as LanguageCode
+  const { t } = useTranslation(languageCode)
 
-  const establishment_id = params.id as string
+  const establishmentId = params.id as string
 
   const navigationItems = [
     {
       id: 'dashboard',
       label: t.establishmentAdmin.navigation.dashboard,
       icon: '🏠',
-      path: `/admin/establishment/${establishment_id}`,
+      path: `/admin/establishment/${establishmentId}`,
     },
     {
       id: 'menu',
       label: t.establishmentAdmin.navigation.menuManagement,
       icon: '📋',
-      path: `/admin/establishment/${establishment_id}/menu`,
+      path: `/admin/establishment/${establishmentId}/menu`,
     },
     {
       id: 'employees',
       label: t.establishmentAdmin.navigation.employeeManagement,
       icon: '👥',
-      path: `/admin/establishment/${establishment_id}/employees`,
+      path: `/admin/establishment/${establishmentId}/employees`,
     },
     {
       id: 'orders',
       label: t.establishmentAdmin.navigation.orderSupervision,
       icon: '📦',
-      path: `/admin/establishment/${establishment_id}/orders`,
+      path: `/admin/establishment/${establishmentId}/orders`,
     },
   ]
 
@@ -49,8 +49,6 @@ export default function EmployeeManagementPage() {
         navigationItems={navigationItems}
         activeSection="employees"
       >
-        <EmployeeManagement establishment_id={establishment_id} language_code={language_code} />
+        <EmployeeManagement establishmentId={establishmentId} languageCode={languageCode} />
       </AdminLayout>
     </ProtectedPage>
-  )
-}

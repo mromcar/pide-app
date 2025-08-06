@@ -4,23 +4,23 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
 export type CartItem = {
-  variant_id: number
-  product_name: string
-  variant_description: string
+  variantId: number
+  productName: string
+  variantDescription: string
   price: number
   quantity: number
   notes?: string
-  image_url?: string
+  imageUrl?: string
 }
 
 interface ProductToAdd {
-  variant_id: number
-  product_name: string
-  variant_description: string
+  variantId: number
+  productName: string
+  variantDescription: string
   price: number
   quantity?: number
   notes?: string
-  image_url?: string
+  imageUrl?: string
 }
 
 export interface CartContextType {
@@ -69,10 +69,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (newItem: CartItem) => {
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.variant_id === newItem.variant_id)
+      const existingItem = prevItems.find((item) => item.variantId === newItem.variantId)
       if (existingItem) {
         return prevItems.map((item) =>
-          item.variant_id === newItem.variant_id
+          item.variantId === newItem.variantId
             ? { ...item, quantity: item.quantity + newItem.quantity }
             : item
         )
@@ -83,24 +83,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addProduct = (product: ProductToAdd) => {
     const cartItem: CartItem = {
-      variant_id: product.variant_id,
-      product_name: product.product_name,
-      variant_description: product.variant_description,
+      variantId: product.variantId,
+      productName: product.productName,
+      variantDescription: product.variantDescription,
       price: product.price,
       quantity: product.quantity || 1,
       notes: product.notes,
-      image_url: product.image_url
+      imageUrl: product.imageUrl,
     }
     addToCart(cartItem)
   }
 
   const removeFromCart = (variantId: number) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.variant_id !== variantId))
+    setCartItems((prevItems) => prevItems.filter((item) => item.variantId !== variantId))
   }
 
   const updateCartItemQuantity = (variantId: number, quantity: number) => {
     setCartItems((prevItems) =>
-      prevItems.map((item) => (item.variant_id === variantId ? { ...item, quantity } : item))
+      prevItems.map((item) => (item.variantId === variantId ? { ...item, quantity } : item))
     )
   }
 

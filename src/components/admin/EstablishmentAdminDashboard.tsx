@@ -8,44 +8,44 @@ import { Establishment } from '@/types/establishment'
 
 interface EstablishmentAdminDashboardProps {
   establishment: Establishment | null
-  establishment_id: string
-  language_code: LanguageCode
+  establishmentId: string
+  languageCode: LanguageCode
 }
 
 export function EstablishmentAdminDashboard({
   establishment,
-  establishment_id,
-  language_code,
+  establishmentId,
+  languageCode,
 }: EstablishmentAdminDashboardProps) {
   const router = useRouter()
-  const { t } = useTranslation(language_code)
+  const { t } = useTranslation(languageCode)
   const [activeSection, setActiveSection] = useState('dashboard')
 
   const navigationItems = [
     {
       id: 'dashboard',
       label: t.establishmentAdmin.navigation.dashboard,
-      path: `/${language_code}/admin/establishment/${establishment_id}`,
+      path: `/${languageCode}/admin/establishment/${establishmentId}`,
     },
     {
       id: 'menu',
       label: t.establishmentAdmin.navigation.menuManagement,
-      path: `/${language_code}/admin/establishment/${establishment_id}/menu`,
+      path: `/${languageCode}/admin/establishment/${establishmentId}/menu`,
     },
     {
       id: 'staff',
       label: t.establishmentAdmin.navigation.staffManagement,
-      path: `/${language_code}/admin/establishment/${establishment_id}/staff`,
+      path: `/${languageCode}/admin/establishment/${establishmentId}/staff`,
     },
     {
       id: 'orders',
       label: t.establishmentAdmin.navigation.orderSupervision,
-      path: `/${language_code}/admin/establishment/${establishment_id}/orders`,
+      path: `/${languageCode}/admin/establishment/${establishmentId}/orders`,
     },
     {
       id: 'settings',
       label: t.establishmentAdmin.navigation.settings,
-      path: `/${language_code}/admin/establishment/${establishment_id}/settings`,
+      path: `/${languageCode}/admin/establishment/${establishmentId}/settings`,
     },
   ]
 
@@ -60,7 +60,7 @@ export function EstablishmentAdminDashboard({
         {/* Nombre del restaurante */}
         <div className="menu-page-header">
           <h1 className="menu-page-title">
-            {establishment?.name || (language_code === 'es' ? 'Establecimiento' : 'Establishment')}
+            {establishment?.name || (languageCode === 'es' ? 'Establecimiento' : 'Establishment')}
           </h1>
         </div>
 
@@ -84,7 +84,7 @@ export function EstablishmentAdminDashboard({
           </div>
           <div style={{ textAlign: 'center', padding: '3rem 0' }}>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '1rem' }}>
-              {language_code === 'es'
+              {languageCode === 'es'
                 ? 'Selecciona una opción del menú superior para comenzar a gestionar tu establecimiento.'
                 : 'Select an option from the menu above to start managing your establishment.'}
             </p>

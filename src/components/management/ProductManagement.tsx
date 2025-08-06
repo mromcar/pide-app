@@ -8,12 +8,12 @@ import type { ProductVariant } from '@/types/entities/productVariant'
 import type { LanguageCode } from '@/constants/languages'
 
 interface ProductManagementProps {
-  establishment_id: string
-  language_code: LanguageCode
+  establishmentId: string
+  languageCode: LanguageCode
 }
 
-export function ProductManagement({ establishment_id, language_code }: ProductManagementProps) {
-  const { t } = useTranslation(language_code)
+export function ProductManagement({ establishmentId, languageCode }: ProductManagementProps) {
+  const { t } = useTranslation(languageCode)
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -24,14 +24,14 @@ export function ProductManagement({ establishment_id, language_code }: ProductMa
 
   useEffect(() => {
     fetchData()
-  }, [establishment_id])
+  }, [establishmentId])
 
   const fetchData = async () => {
     try {
       setLoading(true)
       const [productsRes, categoriesRes] = await Promise.all([
-        fetch(`/api/restaurants/${establishment_id}/menu/products`),
-        fetch(`/api/restaurants/${establishment_id}/menu/categories`),
+        fetch(`/api/restaurants/${establishmentId}/menu/products`),
+        fetch(`/api/restaurants/${establishmentId}/menu/categories`),
       ])
 
       if (productsRes.ok && categoriesRes.ok) {
@@ -49,22 +49,22 @@ export function ProductManagement({ establishment_id, language_code }: ProductMa
     }
   }
 
-  const toggleProductExpansion = (product_id: number) => {
+  const toggleProductExpansion = (productId: number) => {
     const newExpanded = new Set(expandedProducts)
-    if (newExpanded.has(product_id)) {
-      newExpanded.delete(product_id)
+    if (newExpanded.has(productId)) {
+      newExpanded.delete(productId)
     } else {
-      newExpanded.add(product_id)
+      newExpanded.add(productId)
     }
     setExpandedProducts(newExpanded)
   }
 
-  const handleDeleteProduct = async (product_id: number) => {
+  const handleDeleteProduct = async (productId: number) => {
     if (!confirm(t.establishmentAdmin.menuManagement.products.confirmDelete)) return
 
     try {
       const response = await fetch(
-        `/api/restaurants/${establishment_id}/menu/products/${product_id}`,
+        `/api/restaurants/${establishmentId}/menu/products/${productId}`,
         {
           method: 'DELETE',
         }
@@ -80,7 +80,7 @@ export function ProductManagement({ establishment_id, language_code }: ProductMa
   const filteredProducts =
     selectedCategory === 'all'
       ? products
-      : products.filter((product) => product.category_id.toString() === selectedCategory)
+      : products.filter((product) => product.categoryId.toString() === selectedCategory)
 
   if (loading) {
     return (
@@ -111,7 +111,7 @@ export function ProductManagement({ establishment_id, language_code }: ProductMa
           >
             <option value="all">Todas las categorías</option>
             {categories.map((category) => (
-              <option key={category.category_id} value={category.category_id.toString()}>
+              <option key={category.categoryId} value={category.categoryId.toString()}>
                 {category.name}
               </option>
             ))}
@@ -122,27 +122,27 @@ export function ProductManagement({ establishment_id, language_code }: ProductMa
       {/* Products List */}
       <div className="products-grid">
         {filteredProducts.map((product) => (
-          <div key={product.product_id} className="product-card">
+          <div key={product.productId} className="product-card">
             <div className="product-header">
               <div className="product-info">
-                {product.image_url && (
-                  <img src={product.image_url} alt={product.name} className="product-image" />
+                {product.imageUrl && (
+                  <img src={product.imageUrl} alt={product.name} className="product-image" />
                 )}
                 <div className="product-details">
                   <h3>{product.name}</h3>
                   <p className="product-description">{product.description}</p>
                   <span className="product-category">
-                    {categories.find((c) => c.category_id === product.category_id)?.name}
+                    {categories.find((c) => c.categoryId === product.categoryId)?.name}
                   </span>
                 </div>
               </div>
 
               <div className="product-actions">
                 <button
-                  onClick={() => toggleProductExpansion(product.product_id)}
+                  onClick={() => toggleProductExpansion(product.productId)}
                   className="btn btn-secondary btn-sm"
                 >
-                  {expandedProducts.has(product.product_id) ? '▼' : '▶'} Variantes
+                  {expandedProducts.has(product.productId) ? '▼' : '▶'} Variantes
                 </button>
                 <button
                   onClick={() => {
@@ -154,7 +154,7 @@ export function ProductManagement({ establishment_id, language_code }: ProductMa
                   {t.establishmentAdmin.menuManagement.products.edit}
                 </button>
                 <button
-                  onClick={() => handleDeleteProduct(product.product_id)}
+                  onClick={() => handleDeleteProduct(product.productId)}
                   className="btn btn-danger btn-sm"
                 >
                   {t.establishmentAdmin.menuManagement.products.delete}
@@ -163,14 +163,14 @@ export function ProductManagement({ establishment_id, language_code }: ProductMa
             </div>
 
             {/* Variants Section */}
-            {expandedProducts.has(product.product_id) && (
+            {expandedProducts.has(product.productId) && (
               <div className="variants-section">
                 <h4>Variantes</h4>
                 {product.variants && product.variants.length > 0 ? (
                   <div className="variants-list">
                     {product.variants.map((variant) => (
-                      <div key={variant.variant_id} className="variant-item">
-                        <span className="variant-name">{variant.variant_description}</span>
+                      <div key={variant.variantId} className="variant-item">
+                        <span className="variant-name">{variant.variantDescription}</span>
                         <span className="variant-price">€{variant.price.toString()}</span>
                         <div className="variant-actions">
                           <button className="btn btn-outline btn-xs">Editar</button>
@@ -192,7 +192,7 @@ export function ProductManagement({ establishment_id, language_code }: ProductMa
                 <h5>Alérgenos:</h5>
                 <div className="allergens-list">
                   {product.allergens.map((allergen) => (
-                    <span key={allergen.allergen_id} className="allergen-tag">
+                    <span key={allergen.allergenId} className="allergen-tag">
                       {allergen.allergen?.name}
                     </span>
                   ))}
@@ -208,8 +208,8 @@ export function ProductManagement({ establishment_id, language_code }: ProductMa
         <ProductForm
           product={editingProduct}
           categories={categories}
-          establishment_id={establishment_id}
-          language_code={language_code}
+          establishmentId={establishmentId}
+          languageCode={languageCode}
           onSubmit={handleSubmit}
           onCancel={() => setShowForm(false)}
         />
@@ -221,8 +221,8 @@ export function ProductManagement({ establishment_id, language_code }: ProductMa
 interface ProductFormProps {
   product: Product | null
   categories: Category[]
-  establishment_id: string
-  language_code: LanguageCode
+  establishmentId: string
+  languageCode: LanguageCode
   onSubmit: (data: any) => void
   onCancel: () => void
 }
@@ -230,26 +230,38 @@ interface ProductFormProps {
 function ProductForm({
   product,
   categories,
-  establishment_id,
-  language_code,
+  establishmentId,
+  languageCode,
   onSubmit,
   onCancel,
 }: ProductFormProps) {
-  const { t } = useTranslation(language_code)
+  const { t } = useTranslation(languageCode)
   const [formData, setFormData] = useState({
     name: product?.name || '',
     description: product?.description || '',
     price: product?.price || 0,
-    category_id: product?.category_id || categories[0]?.category_id || '',
-    image_url: product?.image_url || '',
-    is_active: product?.is_active ?? true,
+    categoryId: product?.categoryId || categories[0]?.categoryId || '',
+    imageUrl: product?.imageUrl || '',
+    isActive: product?.isActive ?? true,
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit({
+    // Convierte a snake_case solo para la petición al backend
+    const payload = {
       ...formData,
-      establishment_id,
+      category_id: formData.categoryId,
+      image_url: formData.imageUrl,
+      is_active: formData.isActive,
+    }
+    delete payload.categoryId
+    delete payload.imageUrl
+    delete payload.isActive
+
+    onSubmit({
+      ...payload,
+      establishment_id: establishmentId,
+      language_code: languageCode,
     })
   }
 
@@ -285,12 +297,12 @@ function ProductForm({
           <div className="form-group">
             <label>{t.establishmentAdmin.menuManagement.products.category}</label>
             <select
-              value={formData.category_id}
-              onChange={(e) => setFormData({ ...formData, category_id: parseInt(e.target.value) })}
+              value={formData.categoryId}
+              onChange={(e) => setFormData({ ...formData, categoryId: parseInt(e.target.value) })}
               required
             >
               {categories.map((category) => (
-                <option key={category.category_id} value={category.category_id}>
+                <option key={category.categoryId} value={category.categoryId}>
                   {category.name}
                 </option>
               ))}
@@ -301,8 +313,8 @@ function ProductForm({
             <label>{t.establishmentAdmin.menuManagement.products.image}</label>
             <input
               type="url"
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+              value={formData.imageUrl}
+              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
               placeholder="URL de la imagen"
             />
           </div>
@@ -311,8 +323,8 @@ function ProductForm({
             <label>
               <input
                 type="checkbox"
-                checked={formData.is_active}
-                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                checked={formData.isActive}
+                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
               />
               {t.establishmentAdmin.menuManagement.products.active}
             </label>

@@ -8,18 +8,18 @@ import type { LanguageCode } from '@/constants/languages'
 // Definir la interfaz localmente para evitar conflictos
 interface CategoryFormData {
   name: string
-  image_url?: string
-  sort_order?: number
-  is_active?: boolean
+  imageUrl?: string
+  sortOrder?: number
+  isActive?: boolean
 }
 
 interface CategoryManagementProps {
-  establishment_id: string
-  language_code: LanguageCode
+  establishmentId: string
+  languageCode: LanguageCode
 }
 
-export function CategoryManagement({ establishment_id, language_code }: CategoryManagementProps) {
-  const { t } = useTranslation(language_code)
+export function CategoryManagement({ establishmentId, languageCode }: CategoryManagementProps) {
+  const { t } = useTranslation(languageCode)
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -28,12 +28,12 @@ export function CategoryManagement({ establishment_id, language_code }: Category
 
   useEffect(() => {
     fetchCategories()
-  }, [establishment_id])
+  }, [establishmentId])
 
   const fetchCategories = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/establishments/${establishment_id}/categories`)
+      const response = await fetch(`/api/establishments/${establishmentId}/categories`)
       if (response.ok) {
         const data = await response.json()
         setCategories(data)
@@ -55,9 +55,9 @@ export function CategoryManagement({ establishment_id, language_code }: Category
     setShowForm(true)
   }
 
-  const handleDeleteCategory = async (category_id: number) => {
+  const handleDeleteCategory = async (categoryId: number) => {
     try {
-      const response = await fetch(`/api/categories/${category_id}`, {
+      const response = await fetch(`/api/categories/${categoryId}`, {
         method: 'DELETE',
       })
       if (response.ok) {
@@ -72,17 +72,25 @@ export function CategoryManagement({ establishment_id, language_code }: Category
   const handleFormSubmit = async (formData: CategoryFormData) => {
     try {
       const url = editingCategory
-        ? `/api/categories/${editingCategory.category_id}`
-        : `/api/establishments/${establishment_id}/categories`
+        ? `/api/categories/${editingCategory.categoryId}`
+        : `/api/establishments/${establishmentId}/categories`
 
       const method = editingCategory ? 'PUT' : 'POST'
+
+      // Convierte a snake_case solo para la petición
+      const payload = {
+        name: formData.name,
+        image_url: formData.imageUrl,
+        sort_order: formData.sortOrder,
+        is_active: formData.isActive,
+      }
 
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
 
       if (response.ok) {
@@ -127,12 +135,12 @@ export function CategoryManagement({ establishment_id, language_code }: Category
           </thead>
           <tbody>
             {categories.map((category) => (
-              <tr key={category.category_id}>
+              <tr key={category.categoryId}>
                 <td>{category.name}</td>
                 <td>-</td>
                 <td>
-                  <span className={`status-badge ${category.is_active ? 'active' : 'inactive'}`}>
-                    {category.is_active ? 'Active' : 'Inactive'}
+                  <span className={`status-badge ${category.isActive ? 'active' : 'inactive'}`}>
+                    {category.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td>
@@ -144,7 +152,7 @@ export function CategoryManagement({ establishment_id, language_code }: Category
                       {t.establishmentAdmin.menuManagement.categories.edit}
                     </button>
                     <button
-                      onClick={() => setDeleteConfirm(category.category_id.toString())}
+                      onClick={() => setDeleteConfirm(category.categoryId.toString())}
                       className="btn-danger btn-sm"
                     >
                       {t.establishmentAdmin.menuManagement.categories.delete}
@@ -161,7 +169,7 @@ export function CategoryManagement({ establishment_id, language_code }: Category
       {showForm && (
         <CategoryForm
           category={editingCategory}
-          language_code={language_code}
+          languageCode={languageCode}
           onSubmit={handleFormSubmit}
           onCancel={() => setShowForm(false)}
         />
@@ -200,18 +208,18 @@ export function CategoryManagement({ establishment_id, language_code }: Category
 // Category Form Component
 interface CategoryFormProps {
   category: Category | null
-  language_code: LanguageCode
+  languageCode: LanguageCode
   onSubmit: (data: CategoryFormData) => void
   onCancel: () => void
 }
 
-function CategoryForm({ category, language_code, onSubmit, onCancel }: CategoryFormProps) {
-  const { t } = useTranslation(language_code)
+function CategoryForm({ category, languageCode, onSubmit, onCancel }: CategoryFormProps) {
+  const { t } = useTranslation(languageCode)
   const [formData, setFormData] = useState<CategoryFormData>({
     name: category?.name || '',
-    image_url: category?.image_url || '',
-    sort_order: category?.sort_order || 0,
-    is_active: category?.is_active ?? true,
+    imageUrl: category?.imageUrl || '',
+    sortOrder: category?.sortOrder || 0,
+    isActive: category?.isActive ?? true,
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -252,8 +260,8 @@ function CategoryForm({ category, language_code, onSubmit, onCancel }: CategoryF
             <input
               type="url"
               className="form-input"
-              value={formData.image_url || ''}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+              value={formData.imageUrl || ''}
+              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
             />
           </div>
 
@@ -262,9 +270,9 @@ function CategoryForm({ category, language_code, onSubmit, onCancel }: CategoryF
             <input
               type="number"
               className="form-input"
-              value={formData.sort_order || 0}
+              value={formData.sortOrder || 0}
               onChange={(e) =>
-                setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })
+                setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })
               }
               min="0"
             />
@@ -274,8 +282,8 @@ function CategoryForm({ category, language_code, onSubmit, onCancel }: CategoryF
             <label className="form-label flex items-center">
               <input
                 type="checkbox"
-                checked={formData.is_active ?? true}
-                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                checked={formData.isActive ?? true}
+                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                 className="mr-2"
               />
               {t.establishmentAdmin.menuManagement.categories.active}

@@ -4,17 +4,17 @@ import { createContext, useContext, useState, ReactNode } from 'react'
 import { LanguageCode, DEFAULT_LANGUAGE } from '@/constants/languages'
 
 interface LanguageContextType {
-  language: LanguageCode
-  setLanguage: (lang: LanguageCode) => void
+  languageCode: LanguageCode
+  setLanguageCode: (lang: LanguageCode) => void
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<LanguageCode>(DEFAULT_LANGUAGE)
+  const [languageCode, setLanguageCode] = useState<LanguageCode>(DEFAULT_LANGUAGE)
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage }}>
+    <LanguageContext.Provider value={{ languageCode, setLanguageCode }}>
       {children}
     </LanguageContext.Provider>
   )

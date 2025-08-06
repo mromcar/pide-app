@@ -23,7 +23,7 @@
       "error",
       {
         "selector": "property",
-        "format": ["snake_case"],
+        "format": ["camelCase", "snake_case"], // permite ambos, pero camelCase es estándar frontend
         "filter": {
           "regex": "^(className|onClick|onChange|onSubmit|onFocus|onBlur|defaultValue|autoComplete|tabIndex|aria-.*)$",
           "match": false
@@ -31,7 +31,7 @@
       },
       {
         "selector": "variable",
-        "format": ["snake_case"],
+        "format": ["camelCase", "UPPER_CASE", "PascalCase", "snake_case"], // permite camelCase y snake_case
         "filter": {
           "regex": "^(React|Component|useState|useEffect|useCallback|useMemo|useRef|useContext|useReducer|useImperativeHandle|useLayoutEffect|useDebugValue)$",
           "match": false
@@ -39,7 +39,7 @@
       },
       {
         "selector": "function",
-        "format": ["snake_case"],
+        "format": ["camelCase", "PascalCase", "snake_case"], // permite camelCase y snake_case
         "filter": {
           "regex": "^(React|Component)$",
           "match": false

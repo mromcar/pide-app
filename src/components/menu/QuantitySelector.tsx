@@ -20,22 +20,23 @@ export default function QuantitySelector({ product, variant, lang }: QuantitySel
 
   if (!variant) return null
 
-  const cartItem = cartItems.find((item) => item.variant_id === variant.variant_id)
+  // Usar camelCase para acceder a las propiedades del carrito
+  const cartItem = (cartItems ?? []).find((item) => item.variantId === variant.variantId)
   const initialQuantity = cartItem ? cartItem.quantity : 1
 
   const [quantity, setQuantity] = useState(initialQuantity)
 
-  // Función para obtener la descripción traducida de la variante - CORREGIDA
+  // Función para obtener la descripción traducida de la variante
   const getVariantDescription = (variant: ProductVariantResponseDTO) => {
     const translation = variant.translations?.find(
-      (t: ProductVariantTranslationResponseDTO) => t.language_code === lang
+      (t: ProductVariantTranslationResponseDTO) => t.languageCode === lang
     )
-    return translation?.variant_description || variant.variant_description
+    return translation?.variantDescription || variant.variantDescription
   }
 
   // Función para obtener el nombre traducido del producto
   const getProductName = (product: ProductResponseDTO) => {
-    const translation = product.translations?.find((t) => t.language_code === lang)
+    const translation = product.translations?.find((t) => t.languageCode === lang)
     return translation?.name || product.name
   }
 
@@ -51,15 +52,15 @@ export default function QuantitySelector({ product, variant, lang }: QuantitySel
     if (quantity === 0) return
 
     if (cartItem) {
-      updateCartItemQuantity(variant.variant_id, quantity)
+      updateCartItemQuantity(variant.variantId, quantity)
     } else {
       const itemToAdd: CartItem = {
-        variant_id: variant.variant_id,
-        product_name: getProductName(product),
-        variant_description: getVariantDescription(variant),
+        variantId: variant.variantId,
+        productName: getProductName(product),
+        variantDescription: getVariantDescription(variant),
         price: variant.price,
         quantity: quantity,
-        image_url: product.image_url ?? undefined,
+        imageUrl: product.imageUrl ?? undefined,
       }
       addToCart(itemToAdd)
     }

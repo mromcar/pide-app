@@ -18,8 +18,8 @@ export default function EstablishmentAdminPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const establishment_id = params.id as string
-  const language_code = DEFAULT_LANGUAGE
+  const establishmentId = params.id as string
+  const languageCode = DEFAULT_LANGUAGE
 
   useEffect(() => {
     if (status === 'loading') return
@@ -35,12 +35,13 @@ export default function EstablishmentAdminPage() {
     }
 
     fetchEstablishment()
-  }, [session, status, establishment_id])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, status, establishmentId])
 
   const fetchEstablishment = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/establishments/${establishment_id}`)
+      const response = await fetch(`/api/establishments/${establishmentId}`)
 
       if (!response.ok) {
         throw new Error('Failed to fetch establishment')
@@ -87,8 +88,8 @@ export default function EstablishmentAdminPage() {
     <ProtectedPage allowedRoles={['establishment_admin', 'general_admin']}>
       <EstablishmentAdminDashboard
         establishment={establishment}
-        establishment_id={establishment_id}
-        language_code={language_code}
+        establishmentId={establishmentId}
+        languageCode={languageCode}
       />
     </ProtectedPage>
   )

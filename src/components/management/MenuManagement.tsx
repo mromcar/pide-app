@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { CategoryManagement } from '@/components/management/CategoryManagement'
 import { ProductManagement } from '@/components/management/ProductManagement'
@@ -8,19 +7,19 @@ import { VariantManagement } from '@/components/management/VariantManagement'
 import { LanguageCode } from '@/constants/languages'
 
 interface MenuManagementProps {
-  establishment_id: string
-  active_tab: string
-  on_tab_change: (tab: string) => void
-  language_code: LanguageCode
+  establishmentId: string
+  activeTab: string
+  onTabChange: (tab: string) => void
+  languageCode: LanguageCode
 }
 
 export function MenuManagement({
-  establishment_id,
-  active_tab,
-  on_tab_change,
-  language_code,
+  establishmentId,
+  activeTab,
+  onTabChange,
+  languageCode,
 }: MenuManagementProps) {
-  const { t } = useTranslation(language_code)
+  const { t } = useTranslation(languageCode)
 
   const tabs = [
     {
@@ -47,8 +46,8 @@ export function MenuManagement({
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => on_tab_change(tab.id)}
-            className={`tab-button ${active_tab === tab.id ? 'active' : ''}`}
+            onClick={() => onTabChange(tab.id)}
+            className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
           >
             <span className="tab-icon">{tab.icon}</span>
             <span className="tab-label">{tab.label}</span>
@@ -58,14 +57,14 @@ export function MenuManagement({
 
       {/* Tab Content */}
       <div className="tab-content">
-        {active_tab === 'categories' && (
-          <CategoryManagement establishment_id={establishment_id} language_code={language_code} />
+        {activeTab === 'categories' && (
+          <CategoryManagement establishmentId={establishmentId} languageCode={languageCode} />
         )}
-        {active_tab === 'products' && (
-          <ProductManagement establishment_id={establishment_id} language_code={language_code} />
+        {activeTab === 'products' && (
+          <ProductManagement establishmentId={establishmentId} languageCode={languageCode} />
         )}
-        {active_tab === 'variants' && (
-          <VariantManagement establishment_id={establishment_id} language_code={language_code} />
+        {activeTab === 'variants' && (
+          <VariantManagement establishmentId={establishmentId} languageCode={languageCode} />
         )}
       </div>
     </div>

@@ -50,15 +50,15 @@ export async function generateMetadata({ params }: RestaurantMenuPageProps): Pro
 
 async function getMenuDataForPage(numericRestaurantId: number): Promise<MenuCategory[]> {
   const categories = await categoryApiService.getAllCategoriesByEstablishment(numericRestaurantId)
-  const activeCategories = categories.filter((cat) => cat.is_active)
+  const activeCategories = categories.filter((cat) => cat.isActive)
   const menu: MenuCategory[] = []
 
   for (const category of activeCategories) {
     const products = await productApiService.getAllProductsByRestaurant(
       numericRestaurantId,
-      category.category_id
+      category.categoryId
     )
-    const activeProducts = products.filter((prod) => prod.is_active)
+    const activeProducts = products.filter((prod) => prod.isActive)
     if (activeProducts.length > 0) {
       menu.push({ ...category, products: activeProducts })
     }

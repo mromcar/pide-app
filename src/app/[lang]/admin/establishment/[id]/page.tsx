@@ -13,13 +13,13 @@ export default function EstablishmentAdminPage() {
   const params = useParams()
   const router = useRouter()
   const { data: session, status } = useSession()
-  const language_code = params.lang as LanguageCode
-  const { t } = useTranslation(language_code)
+  const languageCode = params.lang as LanguageCode
+  const { t } = useTranslation(languageCode)
   const [establishment, setEstablishment] = useState<Establishment | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const establishment_id = params.id as string
+  const establishmentId = params.id as string
 
   useEffect(() => {
     if (status === 'loading') return
@@ -36,12 +36,12 @@ export default function EstablishmentAdminPage() {
     }
 
     fetchEstablishment()
-  }, [session, status, establishment_id])
+  }, [session, status, establishmentId])
 
   const fetchEstablishment = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/establishments/${establishment_id}`)
+      const response = await fetch(`/api/establishments/${establishmentId}`)
 
       if (!response.ok) {
         throw new Error('Failed to fetch establishment')
@@ -88,8 +88,8 @@ export default function EstablishmentAdminPage() {
     <ProtectedPage allowedRoles={['establishment_admin', 'general_admin']}>
       <EstablishmentAdminDashboard
         establishment={establishment}
-        establishment_id={establishment_id}
-        language_code={language_code}
+        establishmentId={establishmentId}
+        languageCode={languageCode}
       />
     </ProtectedPage>
   )

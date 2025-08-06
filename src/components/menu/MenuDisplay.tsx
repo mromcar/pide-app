@@ -24,13 +24,13 @@ interface MenuDisplayProps {
 
 export default function MenuDisplay({ menu, lang }: MenuDisplayProps) {
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(
-    menu.length > 0 ? menu[0].category_id : null
+    menu.length > 0 ? menu[0].categoryId : null
   )
   const t = getTranslation(lang)
   const { addProduct } = useCart()
 
   const activeCategory = useMemo(
-    () => menu.find((c) => c.category_id === activeCategoryId),
+    () => menu.find((c) => c.categoryId === activeCategoryId),
     [menu, activeCategoryId]
   )
 
@@ -44,33 +44,33 @@ export default function MenuDisplay({ menu, lang }: MenuDisplayProps) {
 
   // Función para obtener el nombre traducido del producto
   const getProductName = (product: ProductResponseDTO) => {
-    const translation = product.translations?.find((t) => t.language_code === lang)
+    const translation = product.translations?.find((t) => t.languageCode === lang)
     return translation?.name || product.name
   }
 
   // Función para obtener la descripción traducida del producto
   const getProductDescription = (product: ProductResponseDTO) => {
-    const translation = product.translations?.find((t) => t.language_code === lang)
+    const translation = product.translations?.find((t) => t.languageCode === lang)
     return translation?.description || product.description
   }
 
   // Función para obtener la descripción traducida de la variante
   const getVariantDescription = (variant: ProductVariantResponseDTO) => {
     const translation = variant.translations?.find(
-      (t: ProductVariantTranslationResponseDTO) => t.language_code === lang
+      (t: ProductVariantTranslationResponseDTO) => t.languageCode === lang
     )
-    return translation?.variant_description || variant.variant_description
+    return translation?.variantDescription || variant.variantDescription
   }
 
   return (
     <div className="app-container">
       <nav className="category-nav-container">
         {menu.map((category) => (
-          <div key={category.category_id} className="category-nav-item">
-            <CategoryImage categoryId={category.category_id} alt={category.name} className="mb-2" />
+          <div key={category.categoryId} className="category-nav-item">
+            <CategoryImage categoryId={category.categoryId} alt={category.name} className="mb-2" />
             <button
-              onClick={() => handleCategoryClick(category.category_id)}
-              className={`category-nav-button ${activeCategoryId === category.category_id ? 'active' : ''}`}
+              onClick={() => handleCategoryClick(category.categoryId)}
+              className={`category-nav-button ${activeCategoryId === category.categoryId ? 'active' : ''}`}
             >
               {category.name}
             </button>
@@ -82,10 +82,9 @@ export default function MenuDisplay({ menu, lang }: MenuDisplayProps) {
         {activeCategory && activeCategory.products.length > 0 ? (
           <div className="products-grid">
             {activeCategory.products.map((product) => (
-              // En la sección de productos, ajustar el CSS para evitar espacios vacíos:
-              <article key={product.product_id} className="product-card">
+              <article key={product.productId} className="product-card">
                 <ProductImage
-                  productId={product.product_id}
+                  productId={product.productId}
                   alt={getProductName(product)}
                   className="product-image"
                 />
@@ -108,7 +107,7 @@ export default function MenuDisplay({ menu, lang }: MenuDisplayProps) {
                   {product.variants && product.variants.length > 0 && (
                     <div className="product-variants">
                       {product.variants.map((variant) => (
-                        <div key={variant.variant_id} className="variant-option">
+                        <div key={variant.variantId} className="variant-option">
                           <div className="variant-info">
                             <span className="variant-description">
                               {getVariantDescription(variant)}

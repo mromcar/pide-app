@@ -16,16 +16,16 @@ interface EmployeeFormData {
   role: EmployeeRole
   active: boolean
   password?: string
-  establishment_id?: string // snake_case
+  establishmentId?: string // camelCase para frontend
 }
 
 interface EmployeeManagementProps {
-  establishment_id: string // snake_case
-  language_code: LanguageCode // snake_case
+  establishmentId: string // camelCase
+  languageCode: LanguageCode // camelCase
 }
 
-export function EmployeeManagement({ establishment_id, language_code }: EmployeeManagementProps) {
-  const { t } = useTranslation(language_code)
+export function EmployeeManagement({ establishmentId, languageCode }: EmployeeManagementProps) {
+  const { t } = useTranslation(languageCode)
   const [employees, setEmployees] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -36,12 +36,12 @@ export function EmployeeManagement({ establishment_id, language_code }: Employee
 
   useEffect(() => {
     fetchEmployees()
-  }, [establishment_id])
+  }, [establishmentId])
 
   const fetchEmployees = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/establishments/${establishment_id}/employees`)
+      const response = await fetch(`/api/establishments/${establishmentId}/employees`)
       if (response.ok) {
         const data = await response.json()
         setEmployees(data)
@@ -63,9 +63,9 @@ export function EmployeeManagement({ establishment_id, language_code }: Employee
     setShowForm(true)
   }
 
-  const handleDeleteEmployee = async (user_id: string) => {
+  const handleDeleteEmployee = async (userId: string) => {
     try {
-      const response = await fetch(`/api/users/${user_id}`, {
+      const response = await fetch(`/api/users/${userId}`, {
         method: 'DELETE',
       })
       if (response.ok) {
@@ -81,19 +81,22 @@ export function EmployeeManagement({ establishment_id, language_code }: Employee
     try {
       const url = editingEmployee
         ? `/api/users/${editingEmployee.user_id}`
-        : `/api/establishments/${establishment_id}/employees`
+        : `/api/establishments/${establishmentId}/employees`
 
       const method = editingEmployee ? 'PUT' : 'POST'
+
+      // Convierte a snake_case solo para la petición
+      const payload = {
+        ...formData,
+        establishment_id: establishmentId,
+      }
 
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          establishment_id, // snake_case
-        }),
+        body: JSON.stringify(payload),
       })
 
       if (response.ok) {
@@ -230,7 +233,7 @@ export function EmployeeManagement({ establishment_id, language_code }: Employee
           onSubmit={handleFormSubmit}
           onCancel={() => setEditingEmployee(null)}
           t={t}
-          establishment_id={establishment_id} // <-- snake_case
+          establishmentId={establishmentId}
         />
       )}
 
@@ -267,17 +270,17 @@ interface EmployeeFormProps {
   onSubmit: (data: EmployeeFormData) => void
   onCancel: () => void
   t: UITranslation
-  establishment_id: string // <-- snake_case
+  establishmentId: string // camelCase
 }
 
-function EmployeeForm({ employee, onSubmit, onCancel, t, establishment_id }: EmployeeFormProps) {
+function EmployeeForm({ employee, onSubmit, onCancel, t, establishmentId }: EmployeeFormProps) {
   const [formData, setFormData] = useState<EmployeeFormData>({
     name: employee?.name || '',
     email: employee?.email || '',
     role: (employee?.role as EmployeeRole) || 'waiter',
     active: employee?.active ?? true,
     password: '',
-    establishment_id, // <-- snake_case
+    establishmentId,
   })
 
   const handleSubmit = (e: React.FormEvent) => {
