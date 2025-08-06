@@ -1,0 +1,329 @@
+1. Nombre del Proyecto
+Pide
+
+2. Visión General
+Pide es una plataforma web responsive que digitaliza la gestión de cartas y pedidos en establecimientos hosteleros (restaurantes, bares, cafeterías, etc.).
+ A través de códigos QR, los clientes acceden al menú digital personalizado de un establecimiento y pueden realizar pedidos y pagos sin necesidad de intervención del personal.
+La plataforma incluye interfaces específicas para clientes, empleados, administradores de restaurante y un administrador general de sistema.
+
+3. Público objetivo
+Clientes (sin necesidad de cuenta)
+
+
+Empleados: camareros y cocineros
+
+
+Administradores de establecimiento
+
+
+Administrador general del sistema
+
+
+
+4. Principales funcionalidades
+4.1 Cliente (Frontend web sin login)
+Acceso por QR: Código único que identifica el establecimiento y la ubicación (mesa o zona).
+
+
+Visualización de la carta: Con soporte para múltiples idiomas, categorías, variantes, alérgenos, descripciones y precios.
+
+
+Creación de pedidos: Pedidos en tiempo real vinculados a una mesa y a un cliente anónimo.
+
+
+Pago opcional: Posibilidad de realizar pagos directamente desde el dispositivo (integración con TPV virtual o pasarela de pago).
+
+
+Seguimiento de estado: Actualización en tiempo real del estado del pedido.
+
+
+Gestión parcial de pedidos: Edición/cancelación limitada antes de que el pedido sea procesado.
+
+
+
+4.2 Empleado (Frontend autenticado)
+Acceso:
+Pantalla de login con autenticación basada en roles.
+
+
+Funcionalidades:
+Panel de pedidos en tiempo real: Visualización de todos los pedidos en curso del establecimiento.
+
+
+Filtros dinámicos: Por estado del pedido (pendiente, en preparación, listo, entregado) y categoría de producto.
+
+
+Gestión de pedidos: Cambiar estado según responsabilidad (ej.: “en preparación” para cocineros, “entregado” para camareros).
+
+
+Detalles del pedido: Visualización de productos, cantidades, notas del cliente, mesa o zona.
+
+
+Perfil de usuario: Edición de nombre, imagen, y preferencias básicas.
+
+
+
+4.3 Administrador de Establecimiento
+Funcionalidades:
+Gestión de empleados: Alta, modificación y baja de empleados, con asignación de rol (camarero o cocinero).
+
+
+Gestión del menú: Creación, edición y eliminación de categorías, productos y variantes.
+
+
+Supervisión de pedidos: Acceso a vista de pedidos en tiempo real con métricas de rendimiento.
+
+
+Multiestablecimiento: Un mismo administrador puede gestionar varios restaurantes y sus respectivas cartas.
+
+
+
+4.4 Administrador General (Súper Admin)
+Funcionalidades:
+Gestión de establecimientos: Crear nuevos establecimientos y asignar administradores.
+
+
+Vista global: Panel de control con estadísticas agregadas por establecimiento.
+
+
+Auditoría y trazabilidad: Opcional, permite revisar actividad en toda la plataforma.
+
+
+Control total del sistema: Puede modificar cualquier entidad o configuración global.
+
+
+
+5. Arquitectura Técnica
+5.1 Frontend
+Framework: Next.js (React)
+
+
+Estilo: TailwindCSS
+
+
+Diseño: Mobile-first, con soporte responsive para tablets y escritorio
+
+
+Internacionalización?
+
+
+5.2 Backend
+API: Next.js API Routes (RESTful)
+
+
+ORM: Prisma
+
+
+Base de datos: PostgreSQL
+
+
+Autenticación: JWT con gestión de sesiones
+OAuth para google y apple
+
+
+
+5.3 Infraestructura
+Almacenamiento: Prisma + PostgreSQL (Escalable por establecimiento)
+
+
+Escalabilidad: Multi-tenancy por establecimiento
+
+
+Observabilidad: Logs detallados, auditoría opcional por rol y acción
+
+
+CI/CD: Preparado para integración continua en Vercel o entorno Dockerizado
+
+
+
+He añadido comentarios estilo JSDoc con anotaciones Swagger. Si estás utilizando Swagger o una herramienta similar para documentar tu API, esto podría ser muy útil. Si no, puedes eliminarlos.
+
+6. Modelo de Datos (resumen)
+Entidad
+Descripción
+User
+Empleados y administradores con roles diferenciados
+Establishment
+Restaurantes con carta y configuración propia
+Category
+Categorías del menú (ej.: Entrantes, Bebidas...)
+Product
+Productos del menú asociados a una categoría
+ProductVariant
+Variantes (ej.: tamaño, sabor...) con precios distintos
+Order
+Pedido realizado por un cliente anónimo
+OrderDetail
+Detalle del pedido (productos, cantidades)
+OrderStatus
+Estado del pedido: pendiente, en preparación, listo, entregado
+Translation
+Nombre/descripcion por idioma
+
+
+7. Casos de uso clave
+7.1 Cliente
+Escanea código QR en su mesa.
+
+
+Visualiza la carta del restaurante.
+
+
+Realiza pedido desde su móvil.
+
+
+(Opcional) Paga directamente.
+
+
+Consulta estado del pedido.
+
+
+7.2 Cocinero
+Inicia sesión.
+
+
+Ve pedidos entrantes que requieren preparación.
+
+
+Marca pedidos como “en preparación” o “listo”.
+
+
+7.3 Camarero
+Inicia sesión.
+
+
+Ve pedidos que debe entregar.
+
+
+Marca pedidos como “entregado”.
+
+
+7.4 Administrador de restaurante
+Configura la carta y las variantes.
+
+
+Crea cuentas para empleados.
+
+
+Supervisa pedidos y métricas del establecimiento.
+
+
+7.5 Administrador general
+Crea y gestiona establecimientos.
+
+
+Asigna administradores.
+
+
+Accede a vistas globales, KPIs y paneles de auditoría.
+
+
+
+8. Potencial de negocio
+Mercado objetivo: Restauración independiente, franquicias, hoteles, eventos.
+
+
+Escalabilidad: Multi-tenant para gestionar desde 1 hasta miles de establecimientos.
+
+
+Modelo de ingresos: SaaS mensual, comisión por pago en plataforma o por transacción, planes con funcionalidades premium.
+
+
+Valor añadido: Optimización de tiempo de atención, reducción de errores humanos, autonomía del cliente, trazabilidad de pedidos, integración con TPV y cocina.
+
+
+### Tests de integridad
+
+- Verificar que una traducción duplicada para el mismo idioma y entidad falla.
+- Verificar que no se puede cambiar un pedido de "preparado" a "pendiente".
+- Verificar que `deleted_at` no elimina registros en cascada.
+- Verificar que `created_by` apunta a un usuario válido.
+
+## Auditoría y Trazabilidad
+
+- Todas las entidades principales (productos, variantes) incluyen `created_at`, `updated_at` y `created_by`.
+- Se conserva historial de cambios en precios y disponibilidad mediante tablas `*_history`.
+- Se usan soft deletes con el campo `deleted_at`.
+
+## Rendimiento
+
+- Se han definido índices en campos de búsqueda frecuente.
+- Se provee una vista `menu_translated` para consultas eficientes del menú según idioma y disponibilidad.
+
+## Validaciones
+
+- CHECK, UNIQUE y FOREIGN KEY garantizan integridad.
+- Se definen triggers para actualizar timestamps y almacenar historial.
+
+## Restauración
+
+- Los registros eliminados lógicamente pueden restaurarse fácilmente al dejar `deleted_at` como NULL.
+
+
+
+🧭 Flujo ideal (para UI / lógica de negocio)
+Estado actual
+Estado siguiente permitido
+pending
+preparing, cancelled
+preparing
+ready, cancelled
+ready
+delivered, cancelled
+delivered
+completed
+completed
+🚫 ningún cambio más permitido
+cancelled
+🚫 ningún cambio más permitido
+
+
+Se detecta el idioma del navegador y se redirige automáticamente (ej. a /es, /en, etc.).
+
+Si la detección falla, se muestra una página en idioma por defecto con opción para cambiarlo.
+
+
+Se instala Heroicons (Recomendado)
+
+
+. Todos los módulos están creados con sus traducciones en inglés, español y francés:
+
+✅ Módulos completados:
+
+- base - Traducciones básicas
+- auth - Autenticación (login/register)
+- navigation - Navegación (navbar, menú principal, redirecciones)
+- orders - Pedidos (carrito, checkout, confirmación, estados)
+- restaurant-menu - Menú del restaurante
+- admin - Administración del establecimiento
+✅ Archivos de utilidades:
+
+- types/ - Todas las interfaces TypeScript
+- utils/builder.ts - Constructor de traducciones
+- index.ts - Punto de entrada principal
+
+Estilos
+
+src/styles/
+├── base.css              # Estilos base y variables
+├── components/
+│   ├── buttons.css       # Todos los botones unificados
+│   ├── forms.css         # Formularios y inputs
+│   ├── navigation.css    # Navbar y navegación
+│   ├── cards.css         # Tarjetas de productos
+│   ├── cart.css          # Carrito de compras
+│   └── allergens.css     # Alérgenos
+├── pages/
+│   ├── menu.css          # Página del menú
+│   ├── admin.css         # Panel de administración
+│   ├── login.css         # Página de login
+│   └── checkout.css      # Proceso de compra
+└── utilities.css         # Clases utilitarias
+
+
+## Beneficios de esta nueva estructura:
+✅ Organización modular : Cada archivo tiene un propósito específico
+✅ Mantenibilidad : Fácil encontrar y modificar estilos específicos
+✅ Reutilización : Variables CSS centralizadas en base.css ✅ Consistencia : Diseño minimalista unificado en blanco y negro
+✅ Performance : Carga más eficiente y mejor cache
+✅ Escalabilidad : Fácil agregar nuevos componentes o páginas
