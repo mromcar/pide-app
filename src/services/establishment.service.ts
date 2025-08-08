@@ -10,55 +10,55 @@ import logger from '@/lib/logger';
 // Mapeador base a DTO (sin relaciones profundas)
 function mapToDTO(establishment: Establishment): EstablishmentResponseDTO {
   return {
-    establishmentId: establishment.establishment_id,
+    establishmentId: establishment.establishmentId,
     name: establishment.name,
-    taxId: establishment.tax_id,
+    taxId: establishment.taxId,
     address: establishment.address,
-    postalCode: establishment.postal_code,
+    postalCode: establishment.postalCode,
     city: establishment.city,
     phone1: establishment.phone1,
     phone2: establishment.phone2,
-    billingBankDetails: establishment.billing_bank_details,
-    paymentBankDetails: establishment.payment_bank_details,
-    contactPerson: establishment.contact_person,
+    billingBankDetails: establishment.billingBankDetails,
+    paymentBankDetails: establishment.paymentBankDetails,
+    contactPerson: establishment.contactPerson,
     description: establishment.description,
     website: establishment.website,
-    isActive: establishment.is_active,
-    acceptsOrders: establishment.accepts_orders,
-    createdAt: establishment.created_at?.toISOString() || null,
-    updatedAt: establishment.updated_at?.toISOString() || null,
+    isActive: establishment.isActive,
+    acceptsOrders: establishment.acceptsOrders,
+    createdAt: establishment.createdAt?.toISOString() || null,
+    updatedAt: establishment.updatedAt?.toISOString() || null,
   };
 }
 
 // Mapeador a DTO con relaciones
 function mapToDTOWithRelations(establishment: Establishment & {
   categories?: Category[],
-  establishment_administrators?: (EstablishmentAdministrator & { user?: User })[]
+  establishmentAdministrators?: (EstablishmentAdministrator & { user?: User })[]
 }): EstablishmentResponseDTO {
   return {
     ...mapToDTO(establishment),
     categories: establishment.categories?.map(cat => ({
-      categoryId: cat.category_id,
-      establishmentId: cat.establishment_id,
+      categoryId: cat.categoryId,
+      establishmentId: cat.establishmentId,
       name: cat.name,
-      imageUrl: cat.image_url,
-      sortOrder: cat.sort_order,
-      isActive: cat.is_active,
-      createdAt: cat.created_at?.toISOString() || null,
-      updatedAt: cat.updated_at?.toISOString() || null,
-      deletedAt: cat.deleted_at?.toISOString() || null,
+      imageUrl: cat.imageUrl,
+      sortOrder: cat.sortOrder,
+      isActive: cat.isActive,
+      createdAt: cat.createdAt?.toISOString() || null,
+      updatedAt: cat.updatedAt?.toISOString() || null,
+      deletedAt: cat.deletedAt?.toISOString() || null,
     } as CategoryDTO)) || [],
-    administrators: establishment.establishment_administrators
+    administrators: establishment.establishmentAdministrators
       ?.map(adminLink => {
         if (!adminLink.user) return null;
         return {
-          userId: adminLink.user.user_id,
+          userId: adminLink.user.userId,
           role: adminLink.user.role,
           name: adminLink.user.name,
           email: adminLink.user.email,
-          establishmentId: adminLink.user.establishment_id,
-          createdAt: adminLink.user.created_at?.toISOString() || null,
-          updatedAt: adminLink.user.updated_at?.toISOString() || null,
+          establishmentId: adminLink.user.establishmentId,
+          createdAt: adminLink.user.createdAt?.toISOString() || null,
+          updatedAt: adminLink.user.updatedAt?.toISOString() || null,
         } as UserResponseDTO;
       })
       .filter((admin): admin is UserResponseDTO => admin !== null) || [],
@@ -82,10 +82,10 @@ export async function getEstablishmentById(id: number): Promise<EstablishmentRes
     establishmentIdSchema.parse({ establishmentId: id });
 
     const establishment = await prisma.establishment.findUnique({
-      where: { establishment_id: id },
+      where: { establishmentId: id },
       include: {
         categories: true,
-        establishment_administrators: {
+        establishmentAdministrators: {
           include: {
             user: true,
           },
@@ -119,10 +119,10 @@ export async function updateEstablishment(id: number, data: EstablishmentUpdateD
   establishmentUpdateSchema.parse(data);
 
   const updatedEstablishment = await prisma.establishment.update({
-    where: { establishment_id: id },
+    where: { establishmentId: id },
     data: {
       ...data,
-      updated_at: new Date(),
+      updatedAt: new Date(),
     },
   });
 
@@ -134,7 +134,7 @@ export async function deleteEstablishment(id: number): Promise<EstablishmentResp
   establishmentIdSchema.parse({ establishmentId: id });
 
   const deletedEstablishment = await prisma.establishment.delete({
-    where: { establishment_id: id },
+    where: { establishmentId: id },
   });
 
   return mapToDTO(deletedEstablishment);
@@ -146,7 +146,7 @@ export async function addAdministratorToEstablishment(establishmentId: number, u
   userIdSchema.parse({ userId });
 
   // Verificar que el usuario exista y tenga el rol adecuado
-  const user = await prisma.user.findUnique({ where: { user_id: userId } });
+  const user = await prisma.user.findUnique({ where: { userId } });
   if (!user || (user.role !== UserRole.establishment_admin && user.role !== UserRole.general_admin)) {
     logger.error('User not found or does not have admin privileges.', { userId });
     return null;
@@ -154,8 +154,8 @@ export async function addAdministratorToEstablishment(establishmentId: number, u
 
   const newAdminLink = await prisma.establishmentAdministrator.create({
     data: {
-      establishment_id: establishmentId,
-      user_id: userId,
+      establishmentId,
+      userId,
     },
   });
 
@@ -169,9 +169,9 @@ export async function removeAdministratorFromEstablishment(establishmentId: numb
 
   const deletedAdminLink = await prisma.establishmentAdministrator.delete({
     where: {
-      user_id_establishment_id: {
-        user_id: userId,
-        establishment_id: establishmentId,
+      userId_establishmentId: {
+        userId,
+        establishmentId,
       },
     },
   });

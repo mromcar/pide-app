@@ -12,9 +12,9 @@ import {
   OrderItemDTO
 } from '@/types/dtos/orderItem';
 import {
-  order_id_schema,
-  create_order_schema,
-  update_order_schema
+  orderIdSchema,
+  createOrderSchema,
+  updateOrderSchema
 } from '@/schemas/order';
 import {
   orderItemCreateSchema,
@@ -33,33 +33,33 @@ interface OrderFilters {
 
 class OrderService {
   private readonly orderInclude = {
-    order_items: true,
-    order_status_history: {
-      orderBy: { changed_at: Prisma.SortOrder.asc },
+    orderItems: true,
+    statusHistory: {
+      orderBy: { changedAt: Prisma.SortOrder.asc },
     },
   };
 
   // Helper para mapear Order a OrderResponseDTO
-  private mapToDTO(order: Order & { order_items?: OrderItem[]; order_status_history?: OrderStatusHistory[] }): OrderResponseDTO {
+  private mapToDTO(order: Order & { orderItems?: OrderItem[]; statusHistory?: OrderStatusHistory[] }): OrderResponseDTO {
     return {
       ...order,
-      createdAt: order.created_at?.toISOString() || null,
-      updatedAt: order.updated_at?.toISOString() || null,
-      totalAmount: order.total_amount ? parseFloat(order.total_amount.toString()) : 0,
-      orderItems: order.order_items ? order.order_items.map((item: OrderItem) => ({
+      createdAt: order.createdAt?.toISOString() || null,
+      updatedAt: order.updatedAt?.toISOString() || null,
+      totalAmount: order.totalAmount ? parseFloat(order.totalAmount.toString()) : 0,
+      orderItems: order.orderItems ? order.orderItems.map((item: OrderItem) => ({
         ...item,
-        unitPrice: parseFloat(item.unit_price.toString())
+        unitPrice: parseFloat(item.unitPrice.toString())
       })) : [],
-      statusHistory: order.order_status_history ? order.order_status_history.map((history: OrderStatusHistory) => ({
+      statusHistory: order.statusHistory ? order.statusHistory.map((history: OrderStatusHistory) => ({
         ...history,
-        changedAt: history.changed_at?.toISOString() || null
+        changedAt: history.changedAt?.toISOString() || null
       })) : [],
     };
   }
 
   // Crear un nuevo pedido
   public async createOrder(data: OrderCreateDTO): Promise<OrderResponseDTO> {
-    create_order_schema.parse(data);
+    createOrderSchema.parse(data);
 
     const { orderItems, ...orderData } = data;
 
@@ -78,14 +78,14 @@ class OrderService {
       await prisma.orderItem.createMany({
         data: orderItems.map(item => ({
           ...item,
-          orderId: newOrder.order_id,
+          orderId: newOrder.orderId,
         })),
       });
     }
 
     await prisma.orderStatusHistory.create({
       data: {
-        orderId: newOrder.order_id,
+        orderId: newOrder.orderId,
         status: orderData.status || OrderStatus.pending,
         changedByUserId: orderData.clientUserId,
         notes: 'Order created',
@@ -93,7 +93,7 @@ class OrderService {
     });
 
     const completeOrder = await prisma.order.findUnique({
-      where: { order_id: newOrder.order_id },
+      where: { orderId: newOrder.orderId },
       include: this.orderInclude,
     });
 
@@ -102,10 +102,10 @@ class OrderService {
 
   // Obtener pedido por ID
   public async getOrderById(orderId: number): Promise<OrderResponseDTO | null> {
-    order_id_schema.parse({ order_id: orderId });
+    orderIdSchema.parse({ orderId });
 
     const order = await prisma.order.findUnique({
-      where: { order_id: orderId },
+      where: { orderId },
       include: this.orderInclude,
     });
 
@@ -118,19 +118,19 @@ class OrderService {
       include: this.orderInclude,
       where: filters ? {
         ...(filters.status && { status: filters.status }),
-        ...(filters.establishmentId && { establishment_id: filters.establishmentId }),
-        ...(filters.clientUserId && { client_user_id: filters.clientUserId }),
-        ...(filters.waiterUserId && { waiter_user_id: filters.waiterUserId })
+        ...(filters.establishmentId && { establishmentId: filters.establishmentId }),
+        ...(filters.clientUserId && { clientUserId: filters.clientUserId }),
+        ...(filters.waiterUserId && { waiterUserId: filters.waiterUserId })
       } : undefined,
-      orderBy: { created_at: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
     return orders.map(order => this.mapToDTO(order));
   }
 
   // Actualizar un pedido existente
   public async updateOrder(orderId: number, data: OrderUpdateDTO): Promise<OrderResponseDTO> {
-    order_id_schema.parse({ order_id: orderId });
-    update_order_schema.parse(data);
+    orderIdSchema.parse({ orderId });
+    updateOrderSchema.parse(data);
 
     const { orderItems, status, ...orderData } = data;
 
@@ -139,14 +139,14 @@ class OrderService {
     );
 
     const updatedOrder = await prisma.order.update({
-      where: { order_id: orderId },
+      where: { orderId },
       data: cleanOrderData,
       include: this.orderInclude,
     });
 
     if (orderItems !== undefined) {
       await prisma.orderItem.deleteMany({
-        where: { order_id: orderId },
+        where: { orderId },
       });
       if (orderItems.length > 0) {
         await prisma.orderItem.createMany({
@@ -170,7 +170,7 @@ class OrderService {
     }
 
     const finalOrder = await prisma.order.findUnique({
-      where: { order_id: orderId },
+      where: { orderId },
       include: this.orderInclude,
     });
 
@@ -183,15 +183,15 @@ class OrderService {
 
   // Eliminar un pedido
   public async deleteOrder(orderId: number): Promise<void> {
-    order_id_schema.parse({ order_id: orderId });
+    orderIdSchema.parse({ orderId });
     await prisma.order.delete({
-      where: { order_id: orderId },
+      where: { orderId },
     });
   }
 
   // Añadir un ítem a un pedido existente
   public async addOrderItem(orderId: number, itemData: OrderItemCreateDTO): Promise<OrderResponseDTO> {
-    order_id_schema.parse({ order_id: orderId });
+    orderIdSchema.parse({ orderId });
     orderItemCreateSchema.parse(itemData);
 
     await prisma.orderItem.create({
@@ -202,7 +202,7 @@ class OrderService {
     });
 
     const updatedOrder = await prisma.order.findUnique({
-      where: { order_id: orderId },
+      where: { orderId },
       include: this.orderInclude,
     });
 
@@ -218,29 +218,29 @@ class OrderService {
     orderItemUpdateSchema.parse(itemData);
 
     const updatedItem = await prisma.orderItem.update({
-      where: { order_item_id: orderItemId },
+      where: { orderItemId },
       data: itemData,
     });
 
     return {
       ...updatedItem,
-      unitPrice: parseFloat(updatedItem.unit_price.toString()),
+      unitPrice: parseFloat(updatedItem.unitPrice.toString()),
     };
   }
 
   // Eliminar un ítem de pedido
   public async deleteOrderItem(orderItemId: number): Promise<void> {
     await prisma.orderItem.delete({
-      where: { order_item_id: orderItemId },
+      where: { orderItemId },
     });
   }
 
   // Actualizar el estado de un pedido
   public async updateOrderStatus(orderId: number, newStatus: OrderStatus, changedByUserId?: number | null, notes?: string): Promise<OrderResponseDTO> {
-    order_id_schema.parse({ order_id: orderId });
+    orderIdSchema.parse({ orderId });
 
     const order = await prisma.order.findUnique({
-      where: { order_id: orderId },
+      where: { orderId },
     });
 
     if (!order) {
@@ -252,7 +252,7 @@ class OrderService {
     }
 
     const updatedOrder = await prisma.order.update({
-      where: { order_id: orderId },
+      where: { orderId },
       data: {
         status: newStatus,
       },
@@ -273,16 +273,16 @@ class OrderService {
 
   // Obtener historial de estado de un pedido
   public async getOrderStatusHistory(orderId: number): Promise<OrderStatusHistoryDTO[]> {
-    order_id_schema.parse({ order_id: orderId });
+    orderIdSchema.parse({ orderId });
 
     const history = await prisma.orderStatusHistory.findMany({
-      where: { order_id: orderId },
-      orderBy: { changed_at: Prisma.SortOrder.asc },
+      where: { orderId },
+      orderBy: { changedAt: Prisma.SortOrder.asc },
     });
 
     return history.map(h => ({
       ...h,
-      changedAt: h.changed_at?.toISOString() || null,
+      changedAt: h.changedAt?.toISOString() || null,
     }) as OrderStatusHistoryDTO);
   }
 }

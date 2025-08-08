@@ -1,6 +1,5 @@
 import { EstablishmentCreateDTO, EstablishmentUpdateDTO, EstablishmentResponseDTO } from '@/types/dtos/establishment';
 import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
-import camelcaseKeys from 'camelcase-keys';
 
 const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 const API_SERVICE_PATH = '/api/restaurants';
@@ -25,8 +24,7 @@ export async function getAllEstablishments(
       }
     );
     const data = await handleApiResponse<EstablishmentResponseDTO[]>(response);
-    // Transformar a camelCase antes de devolver
-    return camelcaseKeys(data, { deep: true }) as EstablishmentResponseDTO[];
+    return data;
   } catch (error) {
     throw handleCaughtError(error, ApiError, 'Error al obtener los establecimientos.');
   }
@@ -45,7 +43,7 @@ export async function getEstablishmentById(id: number): Promise<EstablishmentRes
     if (response.status === 404) return null;
 
     const data = await handleApiResponse<EstablishmentResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as EstablishmentResponseDTO;
+    return data;
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
       return null;
@@ -69,7 +67,7 @@ export async function createEstablishment(
     });
 
     const data = await handleApiResponse<EstablishmentResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as EstablishmentResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, ApiError, 'Error inesperado creando establecimiento.');
   }
@@ -90,7 +88,7 @@ export async function updateEstablishment(
       body: JSON.stringify(updateData),
     });
     const data = await handleApiResponse<EstablishmentResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as EstablishmentResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, ApiError, 'Error inesperado actualizando establecimiento.');
   }

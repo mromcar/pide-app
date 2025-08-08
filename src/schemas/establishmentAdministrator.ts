@@ -6,8 +6,8 @@ export const establishmentAdministratorIdSchema = z.object({
 });
 
 export const establishmentAdministratorCreateSchema = z.object({
-  user_id: z.number().int().positive(),
-  establishment_id: z.number().int().positive(),
+  userId: z.number().int().positive(),
+  establishmentId: z.number().int().positive(),
 });
 
 // No specific update schema, as it's a composite key.

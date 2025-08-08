@@ -5,7 +5,6 @@ import {
 } from '@/types/dtos/productVariant';
 import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils';
 import { VariantApiError } from '@/types/errors/variant.api.error';
-import camelcaseKeys from 'camelcase-keys';
 
 const API_BASE_URL = '/api/restaurants';
 
@@ -25,7 +24,7 @@ async function getAllVariantsByProduct(
       },
     });
     const data = await handleApiResponse<ProductVariantResponseDTO[]>(response);
-    return camelcaseKeys(data, { deep: true }) as ProductVariantResponseDTO[];
+    return data;
   } catch (error) {
     throw handleCaughtError(error, VariantApiError, 'Error de red al obtener variantes del producto.');
   }
@@ -48,7 +47,7 @@ async function getVariantById(
       },
     });
     const data = await handleApiResponse<ProductVariantResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as ProductVariantResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, VariantApiError, 'Error de red al obtener la variante.');
   }
@@ -73,7 +72,7 @@ async function createVariant(
       credentials: 'include',
     });
     const data = await handleApiResponse<ProductVariantResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as ProductVariantResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, VariantApiError, 'Error de red al crear la variante.');
   }
@@ -99,7 +98,7 @@ async function updateVariant(
       credentials: 'include',
     });
     const data = await handleApiResponse<ProductVariantResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as ProductVariantResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, VariantApiError, 'Error de red al actualizar la variante.');
   }

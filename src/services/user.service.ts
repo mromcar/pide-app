@@ -13,31 +13,31 @@ export class UserService {
   // --- Utility mappers ---
   private mapToDTO(user: User & { establishment?: Establishment | null }): UserResponseDTO {
     return {
-      userId: user.user_id,
+      userId: user.userId,
       role: user.role,
       name: user.name,
       email: user.email,
-      establishmentId: user.establishment_id,
-      createdAt: user.created_at?.toISOString() || null,
-      updatedAt: user.updated_at?.toISOString() || null,
+      establishmentId: user.establishmentId,
+      createdAt: user.createdAt?.toISOString() || null,
+      updatedAt: user.updatedAt?.toISOString() || null,
       establishment: user.establishment ? {
-        establishmentId: user.establishment.establishment_id,
+        establishmentId: user.establishment.establishmentId,
         name: user.establishment.name,
-        taxId: user.establishment.tax_id,
+        taxId: user.establishment.taxId,
         address: user.establishment.address,
-        postalCode: user.establishment.postal_code,
+        postalCode: user.establishment.postalCode,
         city: user.establishment.city,
         phone1: user.establishment.phone1,
         phone2: user.establishment.phone2,
-        billingBankDetails: user.establishment.billing_bank_details,
-        paymentBankDetails: user.establishment.payment_bank_details,
-        contactPerson: user.establishment.contact_person,
+        billingBankDetails: user.establishment.billingBankDetails,
+        paymentBankDetails: user.establishment.paymentBankDetails,
+        contactPerson: user.establishment.contactPerson,
         description: user.establishment.description,
         website: user.establishment.website,
-        isActive: user.establishment.is_active,
-        acceptsOrders: user.establishment.accepts_orders,
-        createdAt: user.establishment.created_at?.toISOString() || null,
-        updatedAt: user.establishment.updated_at?.toISOString() || null,
+        isActive: user.establishment.isActive,
+        acceptsOrders: user.establishment.acceptsOrders,
+        createdAt: user.establishment.createdAt?.toISOString() || null,
+        updatedAt: user.establishment.updatedAt?.toISOString() || null,
       } : null,
     };
   }
@@ -63,12 +63,12 @@ export class UserService {
     const newUser = await prisma.user.create({
       data: {
         ...dataWithoutPassword,
-        password_hash: hashedPassword,
+        passwordHash: hashedPassword,
       },
       include: { establishment: true },
     });
 
-    logger.info('User created successfully', { userId: newUser.user_id, email: newUser.email });
+    logger.info('User created successfully', { userId: newUser.userId, email: newUser.email });
     return this.mapToDTO(newUser);
   }
 
@@ -76,18 +76,18 @@ export class UserService {
   async createOAuthUser(data: {
     email: string;
     name?: string;
-    google_id?: string;
-    apple_id?: string;
+    googleId?: string;
+    appleId?: string;
     role?: UserRole;
-    establishment_id?: number;
+    establishmentId?: number;
   }): Promise<UserResponseDTO> {
     // Verificar si el usuario ya existe por email o OAuth ID
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
           { email: data.email },
-          ...(data.google_id ? [{ google_id: data.google_id }] : []),
-          ...(data.apple_id ? [{ apple_id: data.apple_id }] : []),
+          ...(data.googleId ? [{ googleId: data.googleId }] : []),
+          ...(data.appleId ? [{ appleId: data.appleId }] : []),
         ]
       }
     });
@@ -95,11 +95,11 @@ export class UserService {
     if (existingUser) {
       // Si existe, actualizar con los datos OAuth si es necesario
       const updateData: any = {};
-      if (data.google_id && !existingUser.google_id) {
-        updateData.google_id = data.google_id;
+      if (data.googleId && !existingUser.googleId) {
+        updateData.googleId = data.googleId;
       }
-      if (data.apple_id && !existingUser.apple_id) {
-        updateData.apple_id = data.apple_id;
+      if (data.appleId && !existingUser.appleId) {
+        updateData.appleId = data.appleId;
       }
       if (data.name && !existingUser.name) {
         updateData.name = data.name;
@@ -107,7 +107,7 @@ export class UserService {
 
       if (Object.keys(updateData).length > 0) {
         const updatedUser = await prisma.user.update({
-          where: { user_id: existingUser.user_id },
+          where: { userId: existingUser.userId },
           data: updateData,
           include: { establishment: true },
         });
@@ -122,16 +122,16 @@ export class UserService {
       data: {
         email: data.email,
         name: data.name || null,
-        google_id: data.google_id || null,
-        apple_id: data.apple_id || null,
+        googleId: data.googleId || null,
+        appleId: data.appleId || null,
         role: data.role || UserRole.client,
-        establishment_id: data.establishment_id || null,
-        password_hash: null, // OAuth users don't have password
+        establishmentId: data.establishmentId || null,
+        passwordHash: null, // OAuth users don't have password
       },
       include: { establishment: true },
     });
 
-    logger.info('OAuth user created successfully', { userId: newUser.user_id, email: newUser.email });
+    logger.info('OAuth user created successfully', { userId: newUser.userId, email: newUser.email });
     return this.mapToDTO(newUser);
   }
 
@@ -141,15 +141,15 @@ export class UserService {
       skip: skip,
       take: pageSize,
       include: { establishment: true },
-      orderBy: { user_id: 'asc' },
+      orderBy: { userId: 'asc' },
     });
     return users.map(user => this.mapToDTO(user));
   }
 
   async getUserById(userId: number): Promise<UserResponseDTO | null> {
-    userIdSchema.parse({ user_id: userId }); // Validate ID
+    userIdSchema.parse({ userId }); // Validate ID
     const user = await prisma.user.findUnique({
-      where: { user_id: userId },
+      where: { userId },
       include: { establishment: true },
     });
     return user ? this.mapToDTO(user) : null;
@@ -166,8 +166,8 @@ export class UserService {
   // Método para buscar usuario por OAuth ID
   async getUserByOAuthId(provider: 'google' | 'apple', oauthId: string): Promise<UserResponseDTO | null> {
     const whereClause = provider === 'google'
-      ? { google_id: oauthId }
-      : { apple_id: oauthId };
+      ? { googleId: oauthId }
+      : { appleId: oauthId };
 
     const user = await prisma.user.findUnique({
       where: whereClause,
@@ -178,7 +178,7 @@ export class UserService {
   }
 
   // Método específico para NextAuth's CredentialsProvider
-  async verifyCredentials(credentials: { email?: string; password?: string }): Promise<Omit<User, 'password_hash'> | null> {
+  async verifyCredentials(credentials: { email?: string; password?: string }): Promise<Omit<User, 'passwordHash'> | null> {
     if (!credentials?.email || !credentials.password) {
       return null;
     }
@@ -187,36 +187,36 @@ export class UserService {
       where: { email: credentials.email },
     });
 
-    if (!user || !user.password_hash) {
+    if (!user || !user.passwordHash) {
       return null; // User not found or password not set (OAuth user)
     }
 
-    const isPasswordValid = await bcrypt.compare(credentials.password, user.password_hash);
+    const isPasswordValid = await bcrypt.compare(credentials.password, user.passwordHash);
     if (!isPasswordValid) {
       return null; // Invalid password
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password_hash, ...userWithoutPassword } = user;
+    const { passwordHash, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
   async updateUser(userId: number, data: UserUpdateDTO): Promise<UserResponseDTO | null> {
-    userIdSchema.parse({ user_id: userId })
+    userIdSchema.parse({ userId })
     userUpdateSchema.parse(data)
 
     const { password, ...restOfData } = data
-    const updateData: Partial<Pick<User, 'name' | 'email' | 'establishment_id'>> & { password_hash?: string } = {
+    const updateData: Partial<Pick<User, 'name' | 'email' | 'establishmentId'>> & { passwordHash?: string } = {
       ...restOfData
     }
 
     if (password) {
-      updateData.password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+      updateData.passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     }
 
     try {
       const updatedUser = await prisma.user.update({
-        where: { user_id: userId },
+        where: { userId },
         data: updateData,
         include: { establishment: true },
       });
@@ -233,11 +233,11 @@ export class UserService {
   }
 
   async deleteUser(userId: number): Promise<UserResponseDTO | null> {
-    userIdSchema.parse({ user_id: userId }); // Validate ID
+    userIdSchema.parse({ userId }); // Validate ID
 
     try {
       const deletedUser = await prisma.user.delete({
-        where: { user_id: userId },
+        where: { userId },
         include: { establishment: true },
       });
 
@@ -261,9 +261,9 @@ export class UserService {
   async isEstablishmentAdmin(userId: number, establishmentId: number): Promise<boolean> {
     const adminRecord = await prisma.establishmentAdministrator.findUnique({
       where: {
-        user_id_establishment_id: {
-          user_id: userId,
-          establishment_id: establishmentId,
+        userId_establishmentId: {
+          userId,
+          establishmentId,
         },
       },
     });
@@ -294,10 +294,13 @@ export class UserService {
 
     try {
       const adminRecord = await prisma.establishmentAdministrator.create({
-        data,
+        data: {
+          userId: data.userId,
+          establishmentId: data.establishmentId,
+        },
       });
 
-      logger.info('Admin assigned to establishment', { userId: data.user_id, establishmentId: data.establishment_id });
+      logger.info('Admin assigned to establishment', { userId: data.userId, establishmentId: data.establishmentId });
       return adminRecord;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -312,9 +315,9 @@ export class UserService {
     try {
       const removedAdmin = await prisma.establishmentAdministrator.delete({
         where: {
-          user_id_establishment_id: {
-            user_id: userId,
-            establishment_id: establishmentId,
+          userId_establishmentId: {
+            userId,
+            establishmentId,
           },
         },
       });
@@ -332,7 +335,7 @@ export class UserService {
 
   async getEstablishmentAdmins(establishmentId: number): Promise<UserResponseDTO[]> {
     const adminRecords = await prisma.establishmentAdministrator.findMany({
-      where: { establishment_id: establishmentId },
+      where: { establishmentId },
       include: {
         user: {
           include: { establishment: true }
@@ -352,7 +355,7 @@ export class UserService {
     const users = await prisma.user.findMany({
       where: { role },
       include: { establishment: true },
-      orderBy: { created_at: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
 
     return users.map(user => this.mapToDTO(user));
@@ -360,9 +363,9 @@ export class UserService {
 
   async getUsersByEstablishment(establishmentId: number): Promise<UserResponseDTO[]> {
     const users = await prisma.user.findMany({
-      where: { establishment_id: establishmentId },
+      where: { establishmentId },
       include: { establishment: true },
-      orderBy: { created_at: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
 
     return users.map(user => this.mapToDTO(user));
@@ -378,7 +381,7 @@ export class UserService {
       },
       include: { establishment: true },
       take: limit,
-      orderBy: { created_at: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
 
     return users.map(user => this.mapToDTO(user));

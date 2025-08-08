@@ -1,7 +1,6 @@
 import type { CategoryCreateDTO, CategoryUpdateDTO, CategoryDTO } from '@/types/dtos/category';
 import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils';
 import { CategoryApiError } from '@/types/errors/category.api.error';
-import camelcaseKeys from 'camelcase-keys';
 
 const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 const API_SERVICE_PATH = '/api/restaurants';
@@ -16,8 +15,7 @@ async function getAllCategoriesByEstablishment(restaurantId: number): Promise<Ca
       headers: { 'Content-Type': 'application/json' },
     });
     const data = await handleApiResponse<{ categories: CategoryDTO[] }>(response);
-    // Transformar a camelCase antes de devolver
-    return camelcaseKeys(data?.categories || [], { deep: true }) as CategoryDTO[];
+    return data?.categories || [];
   } catch (error) {
     throw handleCaughtError(error, CategoryApiError, 'Error al obtener las categorías.');
   }
@@ -34,8 +32,7 @@ async function createCategory(restaurantId: number, categoryData: CategoryCreate
       body: JSON.stringify(categoryData),
     });
     const data = await handleApiResponse<{ category: CategoryDTO }>(response);
-    // Transformar a camelCase antes de devolver
-    return camelcaseKeys(data.category, { deep: true }) as CategoryDTO;
+    return data.category;
   } catch (error) {
     throw handleCaughtError(error, CategoryApiError, 'Error inesperado creando categoría.');
   }
@@ -52,8 +49,7 @@ async function updateCategory(restaurantId: number, categoryId: number, updateDa
       body: JSON.stringify(updateData),
     });
     const data = await handleApiResponse<{ category: CategoryDTO }>(response);
-    // Transformar a camelCase antes de devolver
-    return camelcaseKeys(data.category, { deep: true }) as CategoryDTO;
+    return data.category;
   } catch (error) {
     throw handleCaughtError(error, CategoryApiError, 'Error inesperado actualizando categoría.');
   }
@@ -69,11 +65,7 @@ async function deleteCategory(restaurantId: number, categoryId: number): Promise
       headers: { 'Content-Type': 'application/json' },
     });
     const data = await handleApiResponse<{ message: string; category?: CategoryDTO }>(response);
-    // Transformar a camelCase la categoría eliminada si existe
-    return {
-      ...data,
-      category: data.category ? camelcaseKeys(data.category, { deep: true }) as CategoryDTO : undefined,
-    };
+    return data;
   } catch (error) {
     throw handleCaughtError(error, CategoryApiError, 'Error inesperado eliminando categoría.');
   }

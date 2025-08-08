@@ -8,277 +8,277 @@ datasource db {
 }
 
 model Establishment {
-  establishment_id             Int                          @id @default(autoincrement())
-  name                         String                       @db.VarChar(255)
-  tax_id                       String?                      @unique @db.VarChar(20)
-  address                      String?
-  postal_code                  String?                      @db.VarChar(10)
-  city                         String?                      @db.VarChar(100)
-  phone1                       String?                      @db.VarChar(20)
-  phone2                       String?                      @db.VarChar(20)
-  billing_bank_details         String?
-  payment_bank_details         String?
-  contact_person               String?                      @db.VarChar(255)
-  description                  String?
-  website                      String?                      @db.VarChar(255)
-  is_active                    Boolean?                     @default(true)
-  accepts_orders               Boolean                      @default(true)
-  created_at                   DateTime?                    @default(now()) @db.Timestamp(6)
-  updated_at                   DateTime?                    @default(now()) @db.Timestamp(6)
-  categories                   Category[]
-  establishment_administrators EstablishmentAdministrator[]
-  product_variants             ProductVariant[]
-  products                     Product[]
-  users                        User[]
-  orders                       Order[]
+  establishmentId             Int                          @id @default(autoincrement()) @map("establishment_id")
+  name                        String                       @db.VarChar(255)
+  taxId                       String?                      @unique @map("tax_id") @db.VarChar(20)
+  address                     String?
+  postalCode                  String?                      @map("postal_code") @db.VarChar(10)
+  city                        String?                      @db.VarChar(100)
+  phone1                      String?                      @db.VarChar(20)
+  phone2                      String?                      @db.VarChar(20)
+  billingBankDetails          String?                      @map("billing_bank_details")
+  paymentBankDetails          String?                      @map("payment_bank_details")
+  contactPerson               String?                      @map("contact_person") @db.VarChar(255)
+  description                 String?
+  website                     String?                      @db.VarChar(255)
+  isActive                    Boolean?                     @default(true) @map("is_active")
+  acceptsOrders               Boolean                      @default(true) @map("accepts_orders")
+  createdAt                   DateTime?                    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                   DateTime?                    @default(now()) @map("updated_at") @db.Timestamp(6)
+  categories                  Category[]
+  establishmentAdministrators EstablishmentAdministrator[] @relation("AdminEstablishment")
+  productVariants             ProductVariant[]
+  products                    Product[]
+  users                       User[]
+  orders                      Order[]
 
   @@map("establishments")
 }
 
 model User {
-  user_id                      Int                          @id @default(autoincrement())
-  role                         UserRole
-  name                         String?                      @db.VarChar(255)
-  email                        String                       @unique @db.VarChar(255)
-  password_hash                String?                      @db.VarChar(255)
-  establishment_id             Int?
-  google_id                    String?                      @unique
-  apple_id                     String?                      @unique // Mantener pero no usar por ahora
-  created_at                   DateTime?                    @default(now()) @db.Timestamp(6)
-  updated_at                   DateTime?                    @default(now()) @db.Timestamp(6)
-  establishment_administrators EstablishmentAdministrator[]
-  product_variants_created     ProductVariant[]             @relation("VariantCreator")
-  created_products             Product[]                    @relation("ProductCreator")
-  establishment                Establishment?               @relation(fields: [establishment_id], references: [establishment_id], onUpdate: NoAction, map: "fk_user_establishment")
-  product_history_entries      ProductHistory[]
-  client_orders                Order[]                      @relation("ClientOrders")
-  waiter_orders                Order[]                      @relation("WaiterOrders")
-  order_status_changes         OrderStatusHistory[]         @relation("OrderStatusChanges")
+  userId                      Int                          @id @default(autoincrement()) @map("user_id")
+  role                        UserRole
+  name                        String?                      @db.VarChar(255)
+  email                       String                       @unique @db.VarChar(255)
+  passwordHash                String?                      @map("password_hash") @db.VarChar(255)
+  establishmentId             Int?                         @map("establishment_id")
+  googleId                    String?                      @unique @map("google_id")
+  appleId                     String?                      @unique @map("apple_id")
+  createdAt                   DateTime?                    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                   DateTime?                    @default(now()) @map("updated_at") @db.Timestamp(6)
+  establishmentAdministrators EstablishmentAdministrator[] @relation("AdminUser")
+  productVariantsCreated      ProductVariant[]             @relation("VariantCreator")
+  createdProducts             Product[]                    @relation("ProductCreator")
+  establishment               Establishment?               @relation(fields: [establishmentId], references: [establishmentId], onUpdate: NoAction, map: "fk_user_establishment")
+  productHistoryEntries       ProductHistory[]
+  clientOrders                Order[]                      @relation("ClientOrders")
+  waiterOrders                Order[]                      @relation("WaiterOrders")
+  orderStatusChanges          OrderStatusHistory[]         @relation("OrderStatusChanges")
 
   @@map("users")
 }
 
 model EstablishmentAdministrator {
-  user_id          Int
-  establishment_id Int
-  establishment    Establishment @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_ea_establishment")
-  user             User          @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_ea_user")
+  userId          Int           @map("user_id")
+  establishmentId Int           @map("establishment_id")
+  establishment   Establishment @relation("AdminEstablishment", fields: [establishmentId], references: [establishmentId], onDelete: Cascade, onUpdate: NoAction, map: "fk_ea_establishment")
+  user            User          @relation("AdminUser", fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "fk_ea_user")
 
-  @@id([user_id, establishment_id])
+  @@id([userId, establishmentId])
   @@map("establishment_administrators")
 }
 
 model Category {
-  category_id      Int                   @id @default(autoincrement())
-  establishment_id Int
-  name             String                @db.VarChar(255)
-  sort_order       Int?                  @default(0)
-  is_active        Boolean?              @default(true)
-  created_at       DateTime?             @default(now()) @db.Timestamp(6)
-  updated_at       DateTime?             @default(now()) @db.Timestamp(6)
-  deleted_at       DateTime?             @db.Timestamp(6)
-  establishment    Establishment         @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_category_establishment")
-  translations     CategoryTranslation[]
-  products         Product[]
+  categoryId      Int                   @id @default(autoincrement()) @map("category_id")
+  establishmentId Int                   @map("establishment_id")
+  name            String                @db.VarChar(255)
+  sortOrder       Int?                  @default(0) @map("sort_order")
+  isActive        Boolean?              @default(true) @map("is_active")
+  createdAt       DateTime?             @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime?             @default(now()) @map("updated_at") @db.Timestamp(6)
+  deletedAt       DateTime?             @map("deleted_at") @db.Timestamp(6)
+  establishment   Establishment         @relation(fields: [establishmentId], references: [establishmentId], onDelete: Cascade, onUpdate: NoAction, map: "fk_category_establishment")
+  translations    CategoryTranslation[]
+  products        Product[]
 
   @@map("categories")
 }
 
 model CategoryTranslation {
-  translation_id Int      @id @default(autoincrement())
-  category_id    Int
-  language_code  String   @db.VarChar(10)
-  name           String   @db.VarChar(255)
-  category       Category @relation(fields: [category_id], references: [category_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_category")
+  translationId Int      @id @default(autoincrement()) @map("translation_id")
+  categoryId    Int      @map("category_id")
+  languageCode  String   @map("language_code") @db.VarChar(10)
+  name          String   @db.VarChar(255)
+  category      Category @relation(fields: [categoryId], references: [categoryId], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_category")
 
-  @@unique([category_id, language_code], map: "unique_category_language")
+  @@unique([categoryId, languageCode], map: "unique_category_language")
   @@map("category_translations")
 }
 
 model Product {
-  product_id         Int                  @id @default(autoincrement())
-  establishment_id   Int
-  category_id        Int
-  name               String               @db.VarChar(255)
-  description        String?
-  sort_order         Int?                 @default(0)
-  is_active          Boolean?             @default(true)
-  responsible_role   UserRole?
-  created_by_user_id Int?
-  created_at         DateTime?            @default(now()) @db.Timestamp(6)
-  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
-  deleted_at         DateTime?            @db.Timestamp(6)
-  allergens          ProductAllergen[]
-  history            ProductHistory[]
-  translations       ProductTranslation[]
-  variants           ProductVariant[]
-  category           Category             @relation(fields: [category_id], references: [category_id], onUpdate: NoAction, map: "fk_product_category")
-  creator            User?                @relation("ProductCreator", fields: [created_by_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_creator")
-  establishment      Establishment        @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_product_establishment")
+  productId       Int                  @id @default(autoincrement()) @map("product_id")
+  establishmentId Int                  @map("establishment_id")
+  categoryId      Int                  @map("category_id")
+  name            String               @db.VarChar(255)
+  description     String?
+  sortOrder       Int?                 @default(0) @map("sort_order")
+  isActive        Boolean?             @default(true) @map("is_active")
+  responsibleRole UserRole?            @map("responsible_role")
+  createdByUserId Int?                 @map("created_by_user_id")
+  createdAt       DateTime?            @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime?            @default(now()) @map("updated_at") @db.Timestamp(6)
+  deletedAt       DateTime?            @map("deleted_at") @db.Timestamp(6)
+  allergens       ProductAllergen[]
+  history         ProductHistory[]
+  translations    ProductTranslation[]
+  variants        ProductVariant[]
+  category        Category             @relation(fields: [categoryId], references: [categoryId], onUpdate: NoAction, map: "fk_product_category")
+  creator         User?                @relation("ProductCreator", fields: [createdByUserId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_product_creator")
+  establishment   Establishment        @relation(fields: [establishmentId], references: [establishmentId], onDelete: Cascade, onUpdate: NoAction, map: "fk_product_establishment")
 
   @@map("products")
 }
 
 model ProductTranslation {
-  translation_id Int     @id @default(autoincrement())
-  product_id     Int
-  language_code  String  @db.VarChar(10)
-  name           String  @db.VarChar(255)
-  description    String?
-  product        Product @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_product")
+  translationId Int     @id @default(autoincrement()) @map("translation_id")
+  productId     Int     @map("product_id")
+  languageCode  String  @map("language_code") @db.VarChar(10)
+  name          String  @db.VarChar(255)
+  description   String?
+  product       Product @relation(fields: [productId], references: [productId], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_product")
 
-  @@unique([product_id, language_code], map: "unique_product_language")
+  @@unique([productId, languageCode], map: "unique_product_language")
   @@map("product_translations")
 }
 
 model ProductHistory {
   id          Int      @id @default(autoincrement())
-  product_id  Int
+  productId   Int      @map("product_id")
   name        String?
   description String?
-  is_active   Boolean?
-  changed_at  DateTime @default(now())
-  action_type String
+  isActive    Boolean? @map("is_active")
+  changedAt   DateTime @default(now()) @map("changed_at")
+  actionType  String   @map("action_type")
   details     Json?
-  user_id     Int?
+  userId      Int?     @map("user_id")
 
-  product Product @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
-  user    User?   @relation(fields: [user_id], references: [user_id], onDelete: SetNull)
+  product Product @relation(fields: [productId], references: [productId], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [userId], onDelete: SetNull)
 
   @@map("product_history")
 }
 
 model ProductVariant {
-  variant_id          Int                         @id @default(autoincrement())
-  product_id          Int
-  establishment_id    Int
-  variant_description String                      @db.VarChar(100)
-  price               Decimal                     @db.Decimal(10, 2)
-  sku                 String?                     @unique @db.VarChar(50)
-  sort_order          Int?                        @default(0)
-  is_active           Boolean?                    @default(true)
-  created_by_user_id  Int?
-  created_at          DateTime?                   @default(now()) @db.Timestamp(6)
-  updated_at          DateTime?                   @default(now()) @db.Timestamp(6)
-  deleted_at          DateTime?                   @db.Timestamp(6)
-  history             ProductVariantHistory[]
-  translations        ProductVariantTranslation[]
-  order_items         OrderItem[]
-  creator             User?                       @relation("VariantCreator", fields: [created_by_user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
-  establishment       Establishment               @relation(fields: [establishment_id], references: [establishment_id], onDelete: Cascade, onUpdate: NoAction)
-  product             Product                     @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+  variantId          Int                         @id @default(autoincrement()) @map("variant_id")
+  productId          Int                         @map("product_id")
+  establishmentId    Int                         @map("establishment_id")
+  variantDescription String                      @map("variant_description") @db.VarChar(100)
+  price              Decimal                     @db.Decimal(10, 2)
+  sku                String?                     @unique @db.VarChar(50)
+  sortOrder          Int?                        @default(0) @map("sort_order")
+  isActive           Boolean?                    @default(true) @map("is_active")
+  createdByUserId    Int?                        @map("created_by_user_id")
+  createdAt          DateTime?                   @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt          DateTime?                   @default(now()) @map("updated_at") @db.Timestamp(6)
+  deletedAt          DateTime?                   @map("deleted_at") @db.Timestamp(6)
+  history            ProductVariantHistory[]
+  translations       ProductVariantTranslation[]
+  orderItems         OrderItem[]
+  creator            User?                       @relation("VariantCreator", fields: [createdByUserId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  establishment      Establishment               @relation(fields: [establishmentId], references: [establishmentId], onDelete: Cascade, onUpdate: NoAction)
+  product            Product                     @relation(fields: [productId], references: [productId], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([product_id, variant_description])
+  @@unique([productId, variantDescription])
   @@map("product_variants")
 }
 
 model ProductVariantTranslation {
-  translation_id      Int            @id @default(autoincrement())
-  variant_id          Int
-  language_code       String         @db.VarChar(10)
-  variant_description String         @db.VarChar(255)
-  variant             ProductVariant @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade, onUpdate: NoAction)
+  translationId      Int            @id @default(autoincrement()) @map("translation_id")
+  variantId          Int            @map("variant_id")
+  languageCode       String         @map("language_code") @db.VarChar(10)
+  variantDescription String         @map("variant_description") @db.VarChar(255)
+  variant            ProductVariant @relation(fields: [variantId], references: [variantId], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([variant_id, language_code])
+  @@unique([variantId, languageCode])
   @@map("product_variant_translations")
 }
 
 model ProductVariantHistory {
-  id                  Int             @id @default(autoincrement())
-  variant_id          Int?
-  variant_description String?
-  price               Decimal?        @db.Decimal(10, 2)
-  is_active           Boolean?
-  updated_at          DateTime?       @default(now()) @db.Timestamp(6)
-  variant             ProductVariant? @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade, onUpdate: NoAction)
+  id                 Int             @id @default(autoincrement())
+  variantId          Int?            @map("variant_id")
+  variantDescription String?         @map("variant_description")
+  price              Decimal?        @db.Decimal(10, 2)
+  isActive           Boolean?        @map("is_active")
+  updatedAt          DateTime?       @default(now()) @map("updated_at") @db.Timestamp(6)
+  variant            ProductVariant? @relation(fields: [variantId], references: [variantId], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("product_variant_history")
 }
 
 model Allergen {
-  allergen_id       Int                   @id @default(autoincrement())
-  code              String                @unique @db.VarChar(20)
-  name              String                @db.VarChar(100)
-  description       String?
-  icon_url          String?               @db.VarChar(255)
-  is_major_allergen Boolean?              @default(true)
-  translations      AllergenTranslation[]
-  product_allergens ProductAllergen[]
+  allergenId       Int                   @id @default(autoincrement()) @map("allergen_id")
+  code             String                @unique @db.VarChar(20)
+  name             String                @db.VarChar(100)
+  description      String?
+  iconUrl          String?               @map("icon_url") @db.VarChar(255)
+  isMajorAllergen  Boolean?              @default(true) @map("is_major_allergen")
+  translations     AllergenTranslation[]
+  productAllergens ProductAllergen[]
 
   @@map("allergens")
 }
 
 model AllergenTranslation {
-  translation_id Int      @id @default(autoincrement())
-  allergen_id    Int
-  language_code  String   @db.VarChar(10)
-  name           String   @db.VarChar(100)
-  description    String?
-  allergen       Allergen @relation(fields: [allergen_id], references: [allergen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_allergen")
+  translationId Int      @id @default(autoincrement()) @map("translation_id")
+  allergenId    Int      @map("allergen_id")
+  languageCode  String   @map("language_code") @db.VarChar(10)
+  name          String   @db.VarChar(100)
+  description   String?
+  allergen      Allergen @relation(fields: [allergenId], references: [allergenId], onDelete: Cascade, onUpdate: NoAction, map: "fk_translation_allergen")
 
-  @@unique([allergen_id, language_code], map: "unique_allergen_language")
+  @@unique([allergenId, languageCode], map: "unique_allergen_language")
   @@map("allergen_translations")
 }
 
 model ProductAllergen {
-  product_id  Int
-  allergen_id Int
-  allergen    Allergen @relation(fields: [allergen_id], references: [allergen_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_allergen")
-  product     Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_product")
+  productId  Int      @map("product_id")
+  allergenId Int      @map("allergen_id")
+  allergen   Allergen @relation(fields: [allergenId], references: [allergenId], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_allergen")
+  product    Product  @relation(fields: [productId], references: [productId], onDelete: Cascade, onUpdate: NoAction, map: "fk_pa_product")
 
-  @@id([product_id, allergen_id])
+  @@id([productId, allergenId])
   @@map("product_allergens")
 }
 
 model Order {
-  order_id         Int         @id @default(autoincrement())
-  establishment_id Int
-  client_user_id   Int?
-  waiter_user_id   Int?
-  table_number     String?     @db.VarChar(20)
-  status           OrderStatus @default(pending)
-  total_amount     Decimal     @default(0.00) @db.Decimal(10, 2)
-  payment_method   String?     @db.VarChar(50)
-  payment_status   String?     @default("unpaid") @db.VarChar(20)
-  order_type       String?     @db.VarChar(50)
-  notes            String?
-  created_at       DateTime    @default(now()) @db.Timestamp(6)
-  updated_at       DateTime    @default(now()) @db.Timestamp(6)
+  orderId         Int         @id @default(autoincrement()) @map("order_id")
+  establishmentId Int         @map("establishment_id")
+  clientUserId    Int?        @map("client_user_id")
+  waiterUserId    Int?        @map("waiter_user_id")
+  tableNumber     String?     @map("table_number") @db.VarChar(20)
+  status          OrderStatus @default(pending)
+  totalAmount     Decimal     @default(0.00) @map("total_amount") @db.Decimal(10, 2)
+  paymentMethod   String?     @map("payment_method") @db.VarChar(50)
+  paymentStatus   String?     @default("unpaid") @map("payment_status") @db.VarChar(20)
+  orderType       String?     @map("order_type") @db.VarChar(50)
+  notes           String?
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
 
-  establishment  Establishment        @relation(fields: [establishment_id], references: [establishment_id], onDelete: Restrict, onUpdate: NoAction)
-  client_user    User?                @relation("ClientOrders", fields: [client_user_id], references: [user_id], onDelete: SetNull, onUpdate: NoAction)
-  waiter_user    User?                @relation("WaiterOrders", fields: [waiter_user_id], references: [user_id], onDelete: SetNull, onUpdate: NoAction)
-  order_items    OrderItem[]
-  status_history OrderStatusHistory[]
+  establishment Establishment        @relation(fields: [establishmentId], references: [establishmentId], onDelete: Restrict, onUpdate: NoAction)
+  clientUser    User?                @relation("ClientOrders", fields: [clientUserId], references: [userId], onDelete: SetNull, onUpdate: NoAction)
+  waiterUser    User?                @relation("WaiterOrders", fields: [waiterUserId], references: [userId], onDelete: SetNull, onUpdate: NoAction)
+  orderItems    OrderItem[]
+  statusHistory OrderStatusHistory[]
 
   @@map("orders")
 }
 
 model OrderItem {
-  order_item_id Int              @id @default(autoincrement())
-  order_id      Int
-  variant_id    Int
-  quantity      Int              @default(1)
-  unit_price    Decimal          @db.Decimal(10, 2)
-  status        OrderItemStatus? @default(pending)
-  notes         String?
+  orderItemId Int              @id @default(autoincrement()) @map("order_item_id")
+  orderId     Int              @map("order_id")
+  variantId   Int              @map("variant_id")
+  quantity    Int              @default(1)
+  unitPrice   Decimal          @map("unit_price") @db.Decimal(10, 2)
+  status      OrderItemStatus? @default(pending)
+  notes       String?
 
-  order   Order          @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction)
-  variant ProductVariant @relation(fields: [variant_id], references: [variant_id], onDelete: Restrict, onUpdate: NoAction)
+  order   Order          @relation(fields: [orderId], references: [orderId], onDelete: Cascade, onUpdate: NoAction)
+  variant ProductVariant @relation(fields: [variantId], references: [variantId], onDelete: Restrict, onUpdate: NoAction)
 
   @@map("order_items")
 }
 
 model OrderStatusHistory {
-  history_id         Int         @id @default(autoincrement())
-  order_id           Int
-  status             OrderStatus
-  changed_by_user_id Int?
-  changed_at         DateTime    @default(now()) @db.Timestamp(6)
-  notes              String?
+  historyId       Int         @id @default(autoincrement()) @map("history_id")
+  orderId         Int         @map("order_id")
+  status          OrderStatus
+  changedByUserId Int?        @map("changed_by_user_id")
+  changedAt       DateTime    @default(now()) @map("changed_at") @db.Timestamp(6)
+  notes           String?
 
-  order           Order @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction)
-  changed_by_user User? @relation("OrderStatusChanges", fields: [changed_by_user_id], references: [user_id], onDelete: SetNull, onUpdate: NoAction)
+  order         Order @relation(fields: [orderId], references: [orderId], onDelete: Cascade, onUpdate: NoAction)
+  changedByUser User? @relation("OrderStatusChanges", fields: [changedByUserId], references: [userId], onDelete: SetNull, onUpdate: NoAction)
 
   @@map("order_status_history")
 }

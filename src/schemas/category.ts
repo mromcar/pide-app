@@ -6,17 +6,17 @@ export const categoryIdSchema = z.object({
 });
 
 export const categoryCreateSchema = z.object({
-  establishment_id: z.number().int().positive(),
+  establishmentId: z.number().int().positive(),
   name: z.string().min(1).max(255),
-  sort_order: z.number().int().optional().nullable(),
-  is_active: z.boolean().optional().nullable(),
+  sortOrder: z.number().int().optional().nullable(),
+  isActive: z.boolean().optional().nullable(),
   translations: z.array(categoryTranslationCreateSchema).optional(),
 });
 
 export const categoryUpdateSchema = z.object({
   name: z.string().min(1).max(255).optional(),
-  sort_order: z.number().int().optional().nullable(),
-  is_active: z.boolean().optional().nullable(),
+  sortOrder: z.number().int().optional().nullable(),
+  isActive: z.boolean().optional().nullable(),
   translations: z.array(categoryTranslationCreateSchema).optional(),
 });
 

@@ -8,16 +8,16 @@ export const orderItemIdSchema = z.object({
 const orderItemStatusEnum = z.nativeEnum(OrderItemStatus);
 
 export const orderItemCreateSchema = z.object({
-  variant_id: z.number().int().positive(),
+  variantId: z.number().int().positive(),
   quantity: z.number().int().positive(), // CHECK (quantity > 0)
-  unit_price: z.number().positive(), // Prisma Decimal
+  unitPrice: z.number().positive(), // Prisma Decimal
   notes: z.string().optional().nullable(),
   status: orderItemStatusEnum.optional(), // Default: 'pending'
 });
 
 export const orderItemUpdateSchema = z.object({
   quantity: z.number().int().positive().optional(),
-  unit_price: z.number().positive().optional(),
+  unitPrice: z.number().positive().optional(),
   status: orderItemStatusEnum.optional(),
   notes: z.string().optional().nullable(),
 });

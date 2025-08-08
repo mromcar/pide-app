@@ -30,22 +30,22 @@ export async function POST(request: Request) {
 
     const order = await prisma.order.create({
       data: {
-        establishment_id: establishmentId,
-        table_number: tableNumber,
+        establishmentId: establishmentId,
+        tableNumber: tableNumber,
         notes,
-        total_amount: totalAmount,
+        totalAmount: totalAmount,
         status: 'pending',
-        order_items: {
+        orderItems: {
           create: items.map(item => ({
-            variant_id: item.variantId,
+            variantId: item.variantId,
             quantity: item.quantity,
-            unit_price: item.unitPrice,
+            unitPrice: item.unitPrice,
             status: 'pending',
           })),
         },
       },
       include: {
-        order_items: true,
+        orderItems: true,
       },
     });
 

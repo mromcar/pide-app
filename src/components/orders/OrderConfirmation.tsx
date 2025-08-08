@@ -29,32 +29,19 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        console.log('Fetching order with ID:', orderId)
-        console.log('Restaurant ID:', restaurantId)
-
-        // Usar la nueva API pública
         const response = await fetch(`/api/orders/${orderId}`)
-        console.log('Fetch response status:', response.status)
-
         if (response.ok) {
           const orderData: OrderWithDetails = await response.json()
-          console.log('Order data received:', orderData)
           setOrder(orderData)
-          // Asegurar que el restaurantId esté configurado en el carrito
-          setRestaurantId(orderData.establishment_id)
+          setRestaurantId(orderData.establishmentId)
         } else {
-          const errorText = await response.text()
-          console.error('Failed to fetch order:', response.status, errorText)
           setError('Order not found')
-          // Si hay error, redirigir al menú después de 3 segundos
           setTimeout(() => {
             router.push(`/${lang}/restaurant/${restaurantId}/menu`)
           }, 3000)
         }
       } catch (error) {
-        console.error('Error fetching order:', error)
         setError('Failed to load order')
-        // Si hay error, redirigir al menú después de 3 segundos
         setTimeout(() => {
           router.push(`/${lang}/restaurant/${restaurantId}/menu`)
         }, 3000)
@@ -62,29 +49,25 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
         setLoading(false)
       }
     }
-
     fetchOrder()
   }, [orderId, restaurantId, router, lang, setRestaurantId])
 
   const handleOrderAgain = () => {
-    // Redirigir al menú del restaurante
     router.push(`/${lang}/restaurant/${restaurantId}/menu`)
   }
 
   const getProductName = (item: OrderItemWithDetails): string => {
-    // Obtener el nombre del producto desde las traducciones
     const translation = item.variant?.product?.translations?.find(
-      (t: OrderItemTranslation) => t.language_code === lang
+      (t: OrderItemTranslation) => t.languageCode === lang
     )
-    return translation?.name || item.variant?.product?.name || `Product ${item.variant_id}`
+    return translation?.name || item.variant?.product?.name || `Product ${item.variantId}`
   }
 
   const getVariantDescription = (item: OrderItemWithDetails): string | undefined => {
-    // Obtener la descripción de la variante desde las traducciones
     const translation = item.variant?.translations?.find(
-      (t: OrderItemVariantTranslation) => t.language_code === lang
+      (t: OrderItemVariantTranslation) => t.languageCode === lang
     )
-    return translation?.variant_description || item.variant?.variant_description
+    return translation?.variantDescription || item.variant?.variantDescription
   }
 
   if (loading) {
@@ -142,15 +125,15 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
 
         <div className="order-confirmation-card">
           <div className="order-confirmation-card-header">
-            <h2 className="order-confirmation-order-title">Order #{order.order_id}</h2>
-            {order.table_number && (
-              <p className="order-confirmation-table">Table: {order.table_number}</p>
+            <h2 className="order-confirmation-order-title">Order #{order.orderId}</h2>
+            {order.tableNumber && (
+              <p className="order-confirmation-table">Table: {order.tableNumber}</p>
             )}
             <p className="order-confirmation-status">
               Status: {t.orderStatus?.[order.status.toLowerCase()] || order.status}
             </p>
             <p className="order-confirmation-date">
-              {new Date(order.created_at).toLocaleString(
+              {new Date(order.createdAt).toLocaleString(
                 lang === 'es' ? 'es-ES' : lang === 'fr' ? 'fr-FR' : 'en-US'
               )}
             </p>
@@ -160,7 +143,7 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
             <h3 className="order-confirmation-items-title">
               {t.orderSummary?.title || 'Order Items:'}:
             </h3>
-            {order.order_items?.map((item: OrderItemWithDetails, index: number) => (
+            {order.orderItems?.map((item: OrderItemWithDetails, index: number) => (
               <div key={index} className="order-confirmation-item">
                 <div className="order-confirmation-item-info">
                   <p className="order-confirmation-item-name">{getProductName(item)}</p>
@@ -172,18 +155,18 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
                   </p>
                 </div>
                 <p className="order-confirmation-item-price">
-                  {(Number(item.unit_price) * item.quantity).toFixed(2)}€
+                  {(Number(item.unitPrice) * item.quantity).toFixed(2)}€
                 </p>
               </div>
             ))}
           </div>
 
-          {order.total_amount && (
+          {order.totalAmount && (
             <div className="order-confirmation-total">
               <div className="order-confirmation-total-row">
                 <span className="order-confirmation-total-label">{t.cart?.total || 'Total'}:</span>
                 <span className="order-confirmation-total-amount">
-                  {Number(order.total_amount).toFixed(2)}€
+                  {Number(order.totalAmount).toFixed(2)}€
                 </span>
               </div>
             </div>

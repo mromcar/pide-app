@@ -5,7 +5,6 @@ import { jsonOk, jsonError } from "@/utils/api";
 import { ZodError } from "zod";
 import { NextRequest } from 'next/server';
 import { UserRole } from '@/types/enums';
-import camelcaseKeys from 'camelcase-keys';
 
 const allergenService = new AllergenService();
 
@@ -21,15 +20,7 @@ export async function PUT(request: NextRequest, { params }: { params: AllergenRo
     const body = await request.json();
     const validatedData = updateAllergenSchema.parse(body);
 
-    // Convierte las traducciones a camelCase si existen
-    const camelCaseData = {
-      ...validatedData,
-      translations: validatedData.translations
-        ? validatedData.translations.map(t => camelcaseKeys(t))
-        : undefined,
-    };
-
-    const allergen = await allergenService.updateAllergen(allergenIdNum, camelCaseData);
+    const allergen = await allergenService.updateAllergen(allergenIdNum, validatedData);
     if (!allergen) {
       return jsonError('Allergen not found.', 404);
     }

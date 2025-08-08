@@ -42,12 +42,6 @@ export default function Cart({ lang }: CartProps) {
   }
 
   const handleSubmitOrder = async () => {
-    // Eliminar esta validación que hace obligatorio el número de mesa
-    // if (!tableNumber.trim()) {
-    //   setError('Por favor, introduce el número de mesa')
-    //   return
-    // }
-
     setIsLoading(true)
     setIsSubmittingOrder(true)
     setError(null)
@@ -60,16 +54,16 @@ export default function Cart({ lang }: CartProps) {
       }
 
       const orderItems = cartItems.map((item) => ({
-        variant_id: item.variant_id,
+        variantId: item.variantId,
         quantity: item.quantity,
-        unit_price: item.price,
+        unitPrice: item.price,
       }))
 
       console.log('Order Items to send:', orderItems)
 
       const requestBody = {
-        establishment_id: restaurantId,
-        table_number: tableNumber,
+        establishmentId: restaurantId,
+        tableNumber,
         notes: orderNotes,
         items: orderItems,
       }
@@ -95,16 +89,16 @@ export default function Cart({ lang }: CartProps) {
 
       const order = await response.json()
       console.log('Order created successfully:', order)
-      console.log('Order ID:', order.order_id)
-      console.log('Order ID type:', typeof order.order_id)
+      console.log('Order ID:', order.orderId)
+      console.log('Order ID type:', typeof order.orderId)
       console.log('Order object keys:', Object.keys(order))
 
       // Verificar inmediatamente si el pedido existe
       console.log('Verificando si el pedido existe...')
-      const verifyResponse = await fetch(`/api/orders/${order.order_id}`)
+      const verifyResponse = await fetch(`/api/orders/${order.orderId}`)
       console.log('Verify response status:', verifyResponse.status)
 
-      const redirectUrl = `/${lang}/order/${order.order_id}?restaurantId=${restaurantId}`
+      const redirectUrl = `/${lang}/order/${order.orderId}?restaurantId=${restaurantId}`
       console.log('Redirecting to:', redirectUrl)
 
       // Limpiar el carrito y redirigir
@@ -113,13 +107,12 @@ export default function Cart({ lang }: CartProps) {
     } catch (err) {
       console.error('Error submitting order:', err)
       setError('Error al enviar el pedido')
-      setIsSubmittingOrder(false) // Reset en caso de error
+      setIsSubmittingOrder(false)
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Modificar la condición para mostrar el carrito vacío
   if (cartItems.length === 0 && !isSubmittingOrder) {
     return (
       <div className="cart-container">
@@ -129,7 +122,6 @@ export default function Cart({ lang }: CartProps) {
     )
   }
 
-  // Si está enviando el pedido, mostrar estado de carga
   if (isSubmittingOrder) {
     return (
       <div className="cart-container">
@@ -150,23 +142,23 @@ export default function Cart({ lang }: CartProps) {
         <div>
           <ul className="cart-items-list">
             {cartItems.map((item) => (
-              <li key={item.variant_id} className="cart-item">
+              <li key={item.variantId} className="cart-item">
                 <div className="cart-item-info">
-                  <span className="cart-item-name">{item.product_name}</span>
-                  {item.variant_description && (
-                    <span className="cart-item-variant">{item.variant_description}</span>
+                  <span className="cart-item-name">{item.productName}</span>
+                  {item.variantDescription && (
+                    <span className="cart-item-variant">{item.variantDescription}</span>
                   )}
                 </div>
                 <div className="quantity-selector-persistent">
                   <button
-                    onClick={() => handleDecrease(item.variant_id, item.quantity)}
+                    onClick={() => handleDecrease(item.variantId, item.quantity)}
                     className="quantity-button"
                   >
                     -
                   </button>
                   <span className="quantity-display">{item.quantity}</span>
                   <button
-                    onClick={() => handleIncrease(item.variant_id, item.quantity)}
+                    onClick={() => handleIncrease(item.variantId, item.quantity)}
                     className="quantity-button"
                   >
                     +

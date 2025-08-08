@@ -5,11 +5,10 @@ import {
 } from '@/types/dtos/order';
 import { OrderItemCreateDTO, OrderItemUpdateDTO } from '@/types/dtos/orderItem';
 import { OrderStatusHistoryCreateDTO } from '@/types/dtos/orderStatusHistory';
-import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils';
+import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
 import { PaymentApiError } from '@/types/errors/payment.api.error';
 import { OrderApiError } from '@/types/errors/order.api.error';
 import { OrderStatus } from '@prisma/client';
-import camelcaseKeys from 'camelcase-keys';
 
 // Tipos para los DTOs de pagos
 interface PaymentCreateDTO {
@@ -57,7 +56,7 @@ export async function createClientOrder(
       credentials: 'include',
     });
     const data = await handleApiResponse<OrderResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as OrderResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, OrderApiError, 'Error de red al crear el pedido.');
   }
@@ -76,7 +75,7 @@ export async function getClientOrderById(
     });
     if (response.status === 404) return null;
     const data = await handleApiResponse<OrderResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as OrderResponseDTO;
+    return data;
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) return null;
     throw handleCaughtError(error, OrderApiError, 'Error de red al obtener el pedido.');
@@ -99,7 +98,7 @@ export async function getAllEmployeeOrders(
       credentials: 'include',
     });
     const data = await handleApiResponse<OrderResponseDTO[]>(response);
-    return camelcaseKeys(data, { deep: true }) as OrderResponseDTO[];
+    return data;
   } catch (error) {
     throw handleCaughtError(error, OrderApiError, 'Error de red al obtener los pedidos.');
   }
@@ -119,7 +118,7 @@ export async function updateOrderStatusByEmployee(
       credentials: 'include',
     });
     const data = await handleApiResponse<OrderResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as OrderResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, OrderApiError, 'Error de red al actualizar el estado del pedido.');
   }
@@ -139,7 +138,7 @@ export async function updateFullOrderByEmployee(
       credentials: 'include',
     });
     const data = await handleApiResponse<OrderResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as OrderResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, OrderApiError, 'Error de red al actualizar el pedido.');
   }
@@ -159,8 +158,7 @@ async function createPayment(paymentData: PaymentCreateDTO): Promise<PaymentResp
       credentials: 'include',
     });
     const data = await handleApiResponse<PaymentResponseDTO>(response);
-    // Transformar a camelCase antes de devolver
-    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al procesar el pago.');
   }
@@ -179,7 +177,7 @@ async function getPaymentStatus(paymentId: string): Promise<PaymentResponseDTO> 
       credentials: 'include',
     });
     const data = await handleApiResponse<PaymentResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al obtener el estado del pago.');
   }
@@ -199,7 +197,7 @@ async function refundPayment(paymentId: string, amount?: number): Promise<Paymen
       credentials: 'include',
     });
     const data = await handleApiResponse<PaymentResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al procesar el reembolso.');
   }
@@ -218,7 +216,7 @@ async function getOrderPayments(orderId: number): Promise<PaymentResponseDTO[]> 
       credentials: 'include',
     });
     const data = await handleApiResponse<PaymentResponseDTO[]>(response);
-    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO[];
+    return data;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al obtener el historial de pagos del pedido.');
   }

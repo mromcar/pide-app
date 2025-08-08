@@ -27,7 +27,6 @@ export class AllergenService {
 
   // Helper para mapear Allergen a AllergenResponseDTO en camelCase
   private mapToDTO(allergen: Allergen & { translations?: AllergenTranslation[] }): AllergenResponseDTO {
-    // Prisma ya devuelve camelCase, así que solo casteamos
     return {
       ...allergen,
       translations: allergen.translations ? allergen.translations.map(t => ({ ...t })) : [],
@@ -43,15 +42,15 @@ export class AllergenService {
     const newAllergen = await prisma.allergen.create({
       data: {
         ...allergenData,
-        translations: {
+        translations: translations && translations.length > 0 ? {
           createMany: {
-            data: translations ? translations.map(t => ({
-              language_code: t.language_code,
+            data: translations.map(t => ({
+              languageCode: t.languageCode,
               name: t.name || '',
               description: t.description || null,
-            })) : [],
+            })),
           },
-        },
+        } : undefined,
       },
       include: this.allergenInclude,
     });
@@ -61,10 +60,10 @@ export class AllergenService {
 
   // Obtener alérgeno por ID
   public async getAllergenById(allergenId: number): Promise<AllergenResponseDTO | null> {
-    allergenIdSchema.parse({ allergen_id: allergenId });
+    allergenIdSchema.parse({ allergenId });
 
     const allergen = await prisma.allergen.findUnique({
-      where: { allergen_id: allergenId },
+      where: { allergenId },
       include: this.allergenInclude,
     });
 
@@ -81,26 +80,26 @@ export class AllergenService {
 
   // Actualizar un alérgeno existente
   public async updateAllergen(allergenId: number, data: UpdateAllergenDTO): Promise<AllergenResponseDTO> {
-    allergenIdSchema.parse({ allergen_id: allergenId });
+    allergenIdSchema.parse({ allergenId });
     updateAllergenSchema.parse(data);
 
     const { translations, ...allergenData } = data;
 
     const updatedAllergen = await prisma.allergen.update({
-      where: { allergen_id: allergenId },
+      where: { allergenId },
       data: allergenData,
       include: this.allergenInclude,
     });
 
     // Manejar traducciones: eliminar, actualizar, crear
     if (translations !== undefined) {
-      const existingTranslationIds = translations.filter(t => t.translation_id).map(t => t.translation_id);
+      const existingTranslationIds = translations.filter(t => t.translationId).map(t => t.translationId);
 
       // Eliminar traducciones que ya no están en el input
       await prisma.allergenTranslation.deleteMany({
         where: {
-          allergen_id: allergenId,
-          translation_id: {
+          allergenId,
+          translationId: {
             notIn: existingTranslationIds as number[],
           },
         },
@@ -108,12 +107,12 @@ export class AllergenService {
 
       // Actualizar o crear traducciones
       for (const translation of translations) {
-        if (translation.translation_id) {
+        if (translation.translationId) {
           updateAllergenTranslationSchema.parse(translation);
           await prisma.allergenTranslation.update({
-            where: { translation_id: translation.translation_id, allergen_id: allergenId },
+            where: { translationId: translation.translationId, allergenId },
             data: {
-              language_code: translation.language_code,
+              languageCode: translation.languageCode,
               name: translation.name || '',
               description: translation.description || null,
             },
@@ -125,7 +124,7 @@ export class AllergenService {
               ...translation,
               name: translation.name || '',
               description: translation.description || null,
-              allergen_id: allergenId,
+              allergenId,
             },
           });
         }
@@ -134,7 +133,7 @@ export class AllergenService {
 
     // Obtener el alérgeno actualizado con todas sus traducciones
     const finalAllergen = await prisma.allergen.findUnique({
-      where: { allergen_id: allergenId },
+      where: { allergenId },
       include: this.allergenInclude,
     });
 
@@ -147,10 +146,10 @@ export class AllergenService {
 
   // Eliminar un alérgeno
   public async deleteAllergen(allergenId: number): Promise<void> {
-    allergenIdSchema.parse({ allergen_id: allergenId });
+    allergenIdSchema.parse({ allergenId });
 
     await prisma.allergen.delete({
-      where: { allergen_id: allergenId },
+      where: { allergenId },
     });
   }
 }

@@ -2,7 +2,6 @@
 import { UserCreateDTO, UserUpdateDTO, UserResponseDTO } from '@/types/dtos/user';
 import { UserApiError } from '@/types/errors/user.api.error';
 import { handleApiError } from '@/utils/apiUtils';
-import camelcaseKeys from 'camelcase-keys';
 
 const USER_API_BASE_URL = '/api/users';
 
@@ -17,7 +16,7 @@ export async function getUserById(userId: number): Promise<UserResponseDTO> {
       throw new UserApiError(errorData.message || `Failed to fetch user with ID ${userId}`, response.status, errorData.details);
     }
     const data = await response.json();
-    return camelcaseKeys(data, { deep: true }) as UserResponseDTO;
+    return data as UserResponseDTO;
   } catch (error) {
     return handleApiError(error, UserApiError, 'An unexpected error occurred while fetching the user.');
   }
@@ -34,7 +33,7 @@ export async function getAllUsers(page: number = 1, pageSize: number = 10): Prom
       throw new UserApiError(errorData.message || 'Failed to fetch users', response.status, errorData.details);
     }
     const data = await response.json();
-    return camelcaseKeys(data, { deep: true }) as UserResponseDTO[];
+    return data as UserResponseDTO[];
   } catch (error) {
     return handleApiError(error, UserApiError, 'An unexpected error occurred while fetching users.');
   }
@@ -57,7 +56,7 @@ export async function createUser(userData: UserCreateDTO): Promise<UserResponseD
       throw new UserApiError(errorData.message || 'Failed to create user', response.status, errorData.details);
     }
     const data = await response.json();
-    return camelcaseKeys(data, { deep: true }) as UserResponseDTO;
+    return data as UserResponseDTO;
   } catch (error) {
     return handleApiError(error, UserApiError, 'An unexpected error occurred while creating the user.');
   }
@@ -80,7 +79,7 @@ export async function updateUser(userId: number, userData: UserUpdateDTO): Promi
       throw new UserApiError(errorData.message || `Failed to update user with ID ${userId}`, response.status, errorData.details);
     }
     const data = await response.json();
-    return camelcaseKeys(data, { deep: true }) as UserResponseDTO;
+    return data as UserResponseDTO;
   } catch (error) {
     return handleApiError(error, UserApiError, 'An unexpected error occurred while updating the user.');
   }
@@ -98,16 +97,12 @@ export async function deleteUser(userId: number): Promise<void> {
       const errorData = await response.json().catch(() => ({ message: 'Failed to delete user' }));
       throw new UserApiError(errorData.message || `Failed to delete user with ID ${userId}`, response.status, errorData.details);
     }
-    // Si esperas el usuario eliminado, puedes devolverlo en camelCase aquí
+    // Si esperas el usuario eliminado, puedes devolverlo aquí tipado como UserResponseDTO
     // const data = await response.json();
-    // return camelcaseKeys(data, { deep: true }) as UserResponseDTO;
+    // return data as UserResponseDTO;
   } catch (error) {
     return handleApiError(error, UserApiError, 'An unexpected error occurred while deleting the user.');
   }
 }
 
-// Potentially add other user-related API functions here, for example:
-// - assignRoleToUser(userId: number, role: UserRole)
-// - removeRoleFromUser(userId: number, role: UserRole)
-// - assignUserToEstablishment(userId: number, establishmentId: number)
-// etc.
+// Puedes agregar aquí otras funciones relacionadas con usuarios si lo necesitas.

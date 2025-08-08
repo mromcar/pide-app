@@ -7,12 +7,12 @@ import { ordersTranslations } from '../modules/orders'
 import { adminTranslations } from '../modules/admin'
 
 export function buildTranslations(lang: string): UITranslation {
-  const base = baseTranslations[lang]
-  const navigation = navigationTranslations[lang]
-  const auth = authTranslations[lang]
-  const menu = restaurantMenuTranslations[lang]
-  const orders = ordersTranslations[lang]
-  const admin = adminTranslations[lang]
+  const base = baseTranslations[lang as keyof typeof baseTranslations]
+  const navigation = navigationTranslations[lang as keyof typeof navigationTranslations]
+  const auth = authTranslations[lang as keyof typeof authTranslations]
+  const menu = restaurantMenuTranslations[lang as keyof typeof restaurantMenuTranslations]
+  const orders = ordersTranslations[lang as keyof typeof ordersTranslations]
+  const admin = adminTranslations[lang as keyof typeof adminTranslations]
 
   return {
     // Base translations

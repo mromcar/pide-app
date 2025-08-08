@@ -18,23 +18,23 @@ import logger from '@/lib/logger';
 
 function mapToTranslationDTO(translation: CategoryTranslation): CategoryTranslationDTO {
   return {
-    translationId: translation.translation_id,
-    categoryId: translation.category_id,
-    languageCode: translation.language_code,
+    translationId: translation.translationId,
+    categoryId: translation.categoryId,
+    languageCode: translation.languageCode,
     name: translation.name,
   };
 }
 
 function mapToDTO(category: Category & { translations: CategoryTranslation[] }): CategoryDTO {
   return {
-    categoryId: category.category_id,
-    establishmentId: category.establishment_id,
+    categoryId: category.categoryId,
+    establishmentId: category.establishmentId,
     name: category.name,
-    sortOrder: category.sort_order,
-    isActive: category.is_active,
-    createdAt: category.created_at?.toISOString() ?? null,
-    updatedAt: category.updated_at?.toISOString() ?? null,
-    deletedAt: category.deleted_at?.toISOString() ?? null,
+    sortOrder: category.sortOrder,
+    isActive: category.isActive,
+    createdAt: category.createdAt?.toISOString() ?? null,
+    updatedAt: category.updatedAt?.toISOString() ?? null,
+    deletedAt: category.deletedAt?.toISOString() ?? null,
     translations: category.translations.map(mapToTranslationDTO),
   };
 }
@@ -51,7 +51,7 @@ export async function createCategory(data: CategoryCreateInput): Promise<Categor
       ...categoryData,
       translations: translations && translations.length > 0 ? {
         createMany: {
-          data: translations.map(t => ({ language_code: t.language_code, name: t.name })),
+          data: translations.map(t => ({ languageCode: t.languageCode, name: t.name })),
         },
       } : undefined,
     },
@@ -68,13 +68,13 @@ export async function getAllCategoriesByEstablishment(
   const skip = (page - 1) * pageSize;
   const categories = await prisma.category.findMany({
     where: {
-      establishment_id: establishmentId,
-      deleted_at: null,
+      establishmentId: establishmentId,
+      deletedAt: null,
     },
     skip: skip,
     take: pageSize,
     include: { translations: true },
-    orderBy: { sort_order: 'asc' },
+    orderBy: { sortOrder: 'asc' },
   });
   return categories.map(mapToDTO);
 }
@@ -83,8 +83,8 @@ export async function getCategoryById(categoryId: number): Promise<CategoryDTO |
   categoryIdSchema.parse({ categoryId });
   const category = await prisma.category.findUnique({
     where: {
-      category_id: categoryId,
-      deleted_at: null,
+      categoryId: categoryId,
+      deletedAt: null,
     },
     include: { translations: true },
   });
@@ -93,7 +93,7 @@ export async function getCategoryById(categoryId: number): Promise<CategoryDTO |
 
 export async function updateCategory(
   categoryId: number,
-  restaurantId: number,
+  establishmentId: number,
   data: CategoryUpdateInput
 ): Promise<CategoryDTO | null> {
   categoryIdSchema.parse({ categoryId });
@@ -104,28 +104,28 @@ export async function updateCategory(
   try {
     const updatedCategory = await prisma.$transaction(async (tx) => {
       const existingCategory = await tx.category.findUnique({
-        where: { category_id: categoryId },
+        where: { categoryId: categoryId },
       });
 
-      if (!existingCategory || existingCategory.establishment_id !== restaurantId) {
+      if (!existingCategory || existingCategory.establishmentId !== establishmentId) {
         return null;
       }
 
       await tx.category.update({
-        where: { category_id: categoryId },
+        where: { categoryId: categoryId },
         data: categoryData,
       });
 
       if (translations) {
         await tx.categoryTranslation.deleteMany({
-          where: { category_id: categoryId },
+          where: { categoryId: categoryId },
         });
 
         if (translations.length > 0) {
           await tx.categoryTranslation.createMany({
             data: translations.map(t => ({
-              category_id: categoryId,
-              language_code: t.language_code,
+              categoryId: categoryId,
+              languageCode: t.languageCode,
               name: t.name,
             })),
           });
@@ -133,7 +133,7 @@ export async function updateCategory(
       }
 
       const result = await tx.category.findUnique({
-        where: { category_id: categoryId },
+        where: { categoryId: categoryId },
         include: { translations: true },
       });
       if (!result) throw new Error('Category not found after update transaction.');
@@ -153,21 +153,21 @@ export async function updateCategory(
 
 export async function deleteCategory(
   categoryId: number,
-  restaurantId: number
+  establishmentId: number
 ): Promise<CategoryDTO | null> {
   categoryIdSchema.parse({ categoryId });
   try {
     const existingCategory = await prisma.category.findUnique({
-      where: { category_id: categoryId },
+      where: { categoryId: categoryId },
     });
 
-    if (!existingCategory || existingCategory.establishment_id !== restaurantId) {
+    if (!existingCategory || existingCategory.establishmentId !== establishmentId) {
       return null;
     }
 
     const category = await prisma.category.update({
-      where: { category_id: categoryId },
-      data: { deleted_at: new Date() },
+      where: { categoryId: categoryId },
+      data: { deletedAt: new Date() },
       include: { translations: true },
     });
     return mapToDTO(category);
@@ -184,24 +184,24 @@ export async function deleteCategory(
 
 export async function addOrUpdateCategoryTranslation(
   categoryId: number,
-  translationData: { language_code: string; name: string } & Partial<Pick<CategoryTranslationUpdateDTO, 'translation_id'>>
+  translationData: { languageCode: string; name: string } & Partial<Pick<CategoryTranslationUpdateDTO, 'translationId'>>
 ): Promise<CategoryTranslationDTO | null> {
-  if (!translationData.language_code || !translationData.name) {
+  if (!translationData.languageCode || !translationData.name) {
     throw new Error('Language code and name are required for category translation upsert.');
   }
 
   try {
     const translation = await prisma.categoryTranslation.upsert({
       where: {
-        category_id_language_code: {
-          category_id: categoryId,
-          language_code: translationData.language_code,
+        categoryId_languageCode: {
+          categoryId: categoryId,
+          languageCode: translationData.languageCode,
         },
       },
       update: { name: translationData.name },
       create: {
-        category_id: categoryId,
-        language_code: translationData.language_code,
+        categoryId: categoryId,
+        languageCode: translationData.languageCode,
         name: translationData.name,
       },
     });
@@ -225,18 +225,18 @@ export class CategoryService {
     return getCategoryById(categoryId);
   }
 
-  async updateCategory(categoryId: number, data: CategoryUpdateInput & { establishment_id: number }): Promise<CategoryDTO | null> {
-    return updateCategory(categoryId, data.establishment_id, data);
+  async updateCategory(categoryId: number, data: CategoryUpdateInput & { establishmentId: number }): Promise<CategoryDTO | null> {
+    return updateCategory(categoryId, data.establishmentId, data);
   }
 
-  async deleteCategory(categoryId: number, restaurantId: number): Promise<boolean> {
-    const result = await deleteCategory(categoryId, restaurantId);
+  async deleteCategory(categoryId: number, establishmentId: number): Promise<boolean> {
+    const result = await deleteCategory(categoryId, establishmentId);
     return result !== null;
   }
 
   async addOrUpdateCategoryTranslation(
     categoryId: number,
-    translationData: { language_code: string; name: string } & Partial<Pick<CategoryTranslationUpdateDTO, 'translation_id'>>
+    translationData: { languageCode: string; name: string } & Partial<Pick<CategoryTranslationUpdateDTO, 'translationId'>>
   ): Promise<CategoryTranslationDTO | null> {
     return addOrUpdateCategoryTranslation(categoryId, translationData);
   }

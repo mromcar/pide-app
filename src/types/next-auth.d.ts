@@ -6,20 +6,20 @@ declare module 'next-auth' {
     id: string // Changed from number to string
     email: string
     role: UserRole
-    establishment_id?: number | null
+    establishmentId?: number | null
   }
 
   interface Session {
     user: User & {
       id: string // Changed from number to string
       role: UserRole
-      establishment_id?: number | null
+      establishmentId?: number | null
     }
   }
 
   interface JWT {
     id: string // Changed from number to string
     role: UserRole
-    establishment_id?: number | null
+    establishmentId?: number | null
   }
 }

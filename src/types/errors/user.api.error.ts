@@ -1,13 +1,11 @@
 // src/types/errors/user.api.error.ts
-import { ApiError } from '@/utils/apiUtils'; // Importar la clase base
+import { ApiError } from '@/utils/apiUtils';
 
 // Clase base para errores de usuario
 export class UserApiError extends ApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'UserApiError';
-
-    // Asegurar que el prototipo se establece correctamente para la clase derivada
     Object.setPrototypeOf(this, UserApiError.prototype);
   }
 }
@@ -15,7 +13,7 @@ export class UserApiError extends ApiError {
 // Errores específicos de API
 export class OrderApiError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'OrderApiError';
     Object.setPrototypeOf(this, OrderApiError.prototype);
   }
@@ -23,7 +21,7 @@ export class OrderApiError extends UserApiError {
 
 export class PaymentApiError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'PaymentApiError';
     Object.setPrototypeOf(this, PaymentApiError.prototype);
   }
@@ -31,7 +29,7 @@ export class PaymentApiError extends UserApiError {
 
 export class ValidationApiError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'ValidationApiError';
     Object.setPrototypeOf(this, ValidationApiError.prototype);
   }
@@ -39,7 +37,7 @@ export class ValidationApiError extends UserApiError {
 
 export class SecurityApiError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'SecurityApiError';
     Object.setPrototypeOf(this, SecurityApiError.prototype);
   }
@@ -47,7 +45,7 @@ export class SecurityApiError extends UserApiError {
 
 export class NetworkApiError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'NetworkApiError';
     Object.setPrototypeOf(this, NetworkApiError.prototype);
   }
@@ -55,7 +53,7 @@ export class NetworkApiError extends UserApiError {
 
 export class FileApiError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'FileApiError';
     Object.setPrototypeOf(this, FileApiError.prototype);
   }
@@ -64,7 +62,7 @@ export class FileApiError extends UserApiError {
 // Errores generales (sin sufijo "Api" para compatibilidad)
 export class GeneralError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'GeneralError';
     Object.setPrototypeOf(this, GeneralError.prototype);
   }
@@ -72,7 +70,7 @@ export class GeneralError extends UserApiError {
 
 export class ValidationError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'ValidationError';
     Object.setPrototypeOf(this, ValidationError.prototype);
   }
@@ -80,7 +78,7 @@ export class ValidationError extends UserApiError {
 
 export class SecurityError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'SecurityError';
     Object.setPrototypeOf(this, SecurityError.prototype);
   }
@@ -88,7 +86,7 @@ export class SecurityError extends UserApiError {
 
 export class NetworkError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'NetworkError';
     Object.setPrototypeOf(this, NetworkError.prototype);
   }
@@ -96,7 +94,7 @@ export class NetworkError extends UserApiError {
 
 export class FileError extends UserApiError {
   constructor(message: string, statusCode: number, details?: unknown) {
-    super(message, statusCode, details);
+    super(message, statusCode, details as string | Record<string, unknown> | null | undefined);
     this.name = 'FileError';
     Object.setPrototypeOf(this, FileError.prototype);
   }

@@ -6,7 +6,6 @@ import {
 } from '@/types/dtos/product';
 import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
 import { ProductApiError } from '@/types/errors/product.api.error';
-import camelcaseKeys from 'camelcase-keys';
 
 const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 const API_SERVICE_PATH = '/api/restaurants';
@@ -35,8 +34,7 @@ async function getAllProductsByRestaurant(
       },
     });
     const result = await handleApiResponse<ProductResponseDTO[]>(response);
-    // Transformar a camelCase antes de devolver
-    return camelcaseKeys(result, { deep: true }) as ProductResponseDTO[];
+    return result;
   } catch (error) {
     throw handleCaughtError(error, ProductApiError, 'Error de red al obtener productos.');
   }
@@ -60,7 +58,7 @@ async function getProductById(
     if (response.status === 404) return null;
 
     const result = await handleApiResponse<ProductWithRelationsResponseDTO>(response);
-    return camelcaseKeys(result, { deep: true }) as ProductWithRelationsResponseDTO;
+    return result;
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
         return null;
@@ -85,7 +83,7 @@ async function createProduct(
       body: JSON.stringify(productData),
     });
     const result = await handleApiResponse<ProductResponseDTO>(response);
-    return camelcaseKeys(result, { deep: true }) as ProductResponseDTO;
+    return result;
   } catch (error) {
     throw handleCaughtError(error, ProductApiError, 'Error de red al crear el producto.');
   }
@@ -108,7 +106,7 @@ async function updateProduct(
       body: JSON.stringify(productData),
     });
     const result = await handleApiResponse<ProductResponseDTO>(response);
-    return camelcaseKeys(result, { deep: true }) as ProductResponseDTO;
+    return result;
   } catch (error) {
     throw handleCaughtError(error, ProductApiError, 'Error de red al actualizar el producto.');
   }

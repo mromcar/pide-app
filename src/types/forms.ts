@@ -1,30 +1,30 @@
 export interface CategoryFormData {
   name: string
-  image_url?: string
-  sort_order?: number
-  is_active?: boolean
+  imageUrl?: string
+  sortOrder?: number
+  isActive?: boolean
 }
 
 export interface ProductFormData {
   name: string
   description?: string
-  category_id: number
-  image_url?: string
-  sort_order?: number
-  is_active?: boolean
-  responsible_role?: string
+  categoryId: number
+  imageUrl?: string
+  sortOrder?: number
+  isActive?: boolean
+  responsibleRole?: string
 }
 
 export interface VariantFormData {
-  product_id: number
-  variant_description: string
+  productId: number
+  variantDescription: string
   price: string
   sku?: string
-  is_active: boolean
+  isActive: boolean
 }
 
 export interface OrderFormData {
-  table_number?: string
+  tableNumber?: string
   notes?: string
-  order_type?: string
+  orderType?: string
 }

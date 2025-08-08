@@ -5,13 +5,13 @@ export const categoryTranslationIdSchema = z.object({
 });
 
 export const categoryTranslationCreateSchema = z.object({
-  language_code: z.string().min(2).max(10),
+  languageCode: z.string().min(2).max(10),
   name: z.string().min(1).max(255),
 });
 
 export const categoryTranslationUpdateSchema = z.object({
-  translation_id: z.number().int().positive().optional(), // For identifying the translation to update
-  language_code: z.string().min(2).max(10).optional(),
+  translationId: z.number().int().positive().optional(), // For identifying the translation to update
+  languageCode: z.string().min(2).max(10).optional(),
   name: z.string().min(1).max(255).optional(),
 });
 

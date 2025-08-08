@@ -8,9 +8,9 @@ export const orderStatusHistoryIdSchema = z.object({
 const orderStatusEnum = z.nativeEnum(OrderStatus);
 
 export const orderStatusHistoryCreateSchema = z.object({
-  order_id: z.number().int().positive(),
+  orderId: z.number().int().positive(),
   status: orderStatusEnum,
-  changed_by_user_id: z.number().int().positive().optional().nullable(),
+  changedByUserId: z.number().int().positive().optional().nullable(),
   notes: z.string().optional().nullable(),
 });
 

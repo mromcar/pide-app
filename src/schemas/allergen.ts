@@ -1,12 +1,12 @@
 import { z } from 'zod';
-import { createAllergenTranslationSchema, updateAllergenTranslationSchema } from './allergenTranslation'; // Importación actualizada
+import { createAllergenTranslationSchema, updateAllergenTranslationSchema } from './allergenTranslation';
 
 export const baseAllergenSchema = z.object({
   name: z.string().min(1, "Name is required"),
   code: z.string().min(1, "Code is required"),
-  is_major_allergen: z.boolean(),
+  isMajorAllergen: z.boolean(),
   description: z.string().nullable().optional().transform(e => e === undefined ? null : e),
-  icon_url: z.string().url("Invalid URL format").nullable().optional().transform(e => e === undefined ? null : e), // Transformación añadida aquí
+  iconUrl: z.string().url("Invalid URL format").nullable().optional().transform(e => e === undefined ? null : e),
 });
 
 export const createAllergenSchema = baseAllergenSchema.extend({
@@ -18,5 +18,5 @@ export const updateAllergenSchema = baseAllergenSchema.extend({
 });
 
 export const allergenIdSchema = z.object({
-  allergen_id: z.coerce.number().int().positive(),
+  allergenId: z.coerce.number().int().positive(),
 });

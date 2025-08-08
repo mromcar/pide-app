@@ -26,9 +26,9 @@ type ProductWithDetails = Product & {
 export class ProductService {
   private mapToTranslationDTO(translation: ProductTranslation): ProductTranslationResponseDTO {
     return {
-      translationId: translation.translation_id,
-      productId: translation.product_id,
-      languageCode: translation.language_code,
+      translationId: translation.translationId,
+      productId: translation.productId,
+      languageCode: translation.languageCode,
       name: translation.name,
       description: translation.description,
     };
@@ -36,8 +36,8 @@ export class ProductService {
 
   private mapToAllergenTranslationDTO(translation: AllergenTranslation): AllergenTranslationResponseDTO {
     return {
-      translationId: translation.translation_id,
-      languageCode: translation.language_code,
+      translationId: translation.translationId,
+      languageCode: translation.languageCode,
       name: translation.name,
       description: translation.description,
     };
@@ -45,15 +45,15 @@ export class ProductService {
 
   private mapToAllergenDTO(productAllergen: ProductAllergen & { allergen?: AllergenWithTranslations }): ProductAllergenResponseDTO {
     return {
-      productId: productAllergen.product_id,
-      allergenId: productAllergen.allergen_id,
+      productId: productAllergen.productId,
+      allergenId: productAllergen.allergenId,
       allergen: productAllergen.allergen ? {
-        allergenId: productAllergen.allergen.allergen_id,
+        allergenId: productAllergen.allergen.allergenId,
         code: productAllergen.allergen.code,
         name: productAllergen.allergen.name,
         description: productAllergen.allergen.description,
-        iconUrl: productAllergen.allergen.icon_url,
-        isMajorAllergen: productAllergen.allergen.is_major_allergen,
+        iconUrl: productAllergen.allergen.iconUrl,
+        isMajorAllergen: productAllergen.allergen.isMajorAllergen,
         translations: productAllergen.allergen.translations?.map(this.mapToAllergenTranslationDTO) || [],
       } : undefined,
     };
@@ -63,55 +63,55 @@ export class ProductService {
     const detailsJson = history.details as Prisma.JsonObject | null;
     return {
       id: history.id,
-      productId: history.product_id,
+      productId: history.productId,
       name: (detailsJson?.name as string) || history.name || '',
       description: (detailsJson?.description as string) || history.description || null,
-      isActive: typeof (detailsJson?.is_active) === 'boolean' ? (detailsJson.is_active as boolean) : history.is_active ?? false,
-      changedAt: history.changed_at ? history.changed_at.toISOString() : new Date(0).toISOString(),
-      actionType: history.action_type,
-      userId: history.user_id,
+      isActive: typeof (detailsJson?.isActive) === 'boolean' ? (detailsJson.isActive as boolean) : history.isActive ?? false,
+      changedAt: history.changedAt ? history.changedAt.toISOString() : new Date(0).toISOString(),
+      actionType: history.actionType,
+      userId: history.userId,
       userName: history.user?.name,
     };
   }
 
   private mapVariantToDTO(variant: ProductVariant & { translations?: ProductVariantTranslation[] }): ProductVariantResponseDTO {
     return {
-      variantId: variant.variant_id,
-      productId: variant.product_id,
-      establishmentId: variant.establishment_id,
-      variantDescription: variant.variant_description,
+      variantId: variant.variantId,
+      productId: variant.productId,
+      establishmentId: variant.establishmentId,
+      variantDescription: variant.variantDescription,
       price: parseFloat(variant.price.toString()),
       sku: variant.sku,
-      sortOrder: variant.sort_order,
-      isActive: variant.is_active ?? true,
-      createdByUserId: variant.created_by_user_id,
-      createdAt: variant.created_at?.toISOString() || null,
-      updatedAt: variant.updated_at?.toISOString() || null,
-      deletedAt: variant.deleted_at?.toISOString() || null,
+      sortOrder: variant.sortOrder,
+      isActive: variant.isActive ?? true,
+      createdByUserId: variant.createdByUserId,
+      createdAt: variant.createdAt?.toISOString() || null,
+      updatedAt: variant.updatedAt?.toISOString() || null,
+      deletedAt: variant.deletedAt?.toISOString() || null,
       translations: variant.translations?.map(vt => ({
-        translationId: vt.translation_id,
-        variantId: vt.variant_id,
-        languageCode: vt.language_code,
-        variantDescription: vt.variant_description,
+        translationId: vt.translationId,
+        variantId: vt.variantId,
+        languageCode: vt.languageCode,
+        variantDescription: vt.variantDescription,
       })) || [],
     };
   }
 
   private mapToDTO(product: ProductWithDetails): ProductResponseDTO {
     return {
-      productId: product.product_id,
-      establishmentId: product.establishment_id,
-      categoryId: product.category_id,
+      productId: product.productId,
+      establishmentId: product.establishmentId,
+      categoryId: product.categoryId,
       categoryName: product.category?.name,
       name: product.name,
       description: product.description,
-      sortOrder: product.sort_order,
-      isActive: product.is_active ?? true,
-      responsibleRole: product.responsible_role as UserRole | null,
-      createdByUserId: product.created_by_user_id,
-      createdAt: product.created_at?.toISOString() || null,
-      updatedAt: product.updated_at?.toISOString() || null,
-      deletedAt: product.deleted_at?.toISOString() || null,
+      sortOrder: product.sortOrder,
+      isActive: product.isActive ?? true,
+      responsibleRole: product.responsibleRole as UserRole | null,
+      createdByUserId: product.createdByUserId,
+      createdAt: product.createdAt?.toISOString() || null,
+      updatedAt: product.updatedAt?.toISOString() || null,
+      deletedAt: product.deletedAt?.toISOString() || null,
       translations: product.translations?.map(this.mapToTranslationDTO) || [],
       allergens: product.allergens?.map(pa => this.mapToAllergenDTO(pa)) || [],
       variants: product.variants?.map(v => this.mapVariantToDTO(v)) || [],
@@ -132,8 +132,8 @@ export class ProductService {
 
   private get variantInclude() {
     return {
-      where: { deleted_at: null },
-      orderBy: { sort_order: Prisma.SortOrder.asc },
+      where: { deletedAt: null },
+      orderBy: { sortOrder: Prisma.SortOrder.asc },
       include: {
         translations: true,
       },
@@ -142,20 +142,20 @@ export class ProductService {
 
   async createProduct(data: ProductCreateInput, userId?: number): Promise<ProductResponseDTO> {
     const parsedData = productCreateSchema.parse(data);
-    const { translations, allergen_ids, ...productData } = parsedData;
+    const { translations, allergenIds, ...productData } = parsedData;
 
     const newProduct = await prisma.product.create({
       data: {
         ...productData,
-        created_by_user_id: userId,
+        createdByUserId: userId,
         translations: translations && translations.length > 0 ? {
           createMany: {
-            data: translations.map(t => ({ language_code: t.language_code, name: t.name, description: t.description })),
+            data: translations.map(t => ({ languageCode: t.languageCode, name: t.name, description: t.description })),
           },
         } : undefined,
-        allergens: allergen_ids && allergen_ids.length > 0 ? {
+        allergens: allergenIds && allergenIds.length > 0 ? {
           createMany: {
-            data: allergen_ids.map((allergen_id: number) => ({ allergen_id })),
+            data: allergenIds.map((allergenId: number) => ({ allergenId })),
           },
         } : undefined,
       },
@@ -169,13 +169,13 @@ export class ProductService {
 
     await prisma.productHistory.create({
       data: {
-        product_id: newProduct.product_id,
+        productId: newProduct.productId,
         name: newProduct.name,
         description: newProduct.description,
-        is_active: newProduct.is_active,
-        action_type: 'CREATE',
-        user_id: userId,
-        details: { ...productData, translations, allergen_ids } as unknown as Prisma.JsonObject,
+        isActive: newProduct.isActive,
+        actionType: 'CREATE',
+        userId: userId,
+        details: { ...productData, translations, allergenIds } as unknown as Prisma.JsonObject,
       },
     });
 
@@ -189,12 +189,12 @@ export class ProductService {
     categoryId?: number
   ): Promise<ProductResponseDTO[]> {
     const where: Prisma.ProductWhereInput = {
-      establishment_id: establishmentId,
-      deleted_at: null,
+      establishmentId: establishmentId,
+      deletedAt: null,
     };
 
     if (categoryId) {
-      where.category_id = categoryId;
+      where.categoryId = categoryId;
     }
 
     const products = await prisma.product.findMany({
@@ -208,7 +208,7 @@ export class ProductService {
         variants: this.variantInclude,
       },
       orderBy: [
-        { sort_order: 'asc' },
+        { sortOrder: 'asc' },
         { name: 'asc' },
       ]
     });
@@ -216,9 +216,9 @@ export class ProductService {
   }
 
   async getProductById(productId: number): Promise<ProductResponseDTO | null> {
-    productIdSchema.parse({ product_id: productId });
+    productIdSchema.parse({ productId });
     const product = await prisma.product.findUnique({
-      where: { product_id: productId, deleted_at: null },
+      where: { productId: productId, deletedAt: null },
       include: {
         translations: true,
         allergens: this.allergenInclude,
@@ -230,12 +230,12 @@ export class ProductService {
   }
 
   async updateProduct(productId: number, data: ProductUpdateInput, userId?: number): Promise<ProductResponseDTO | null> {
-    productIdSchema.parse({ product_id: productId });
+    productIdSchema.parse({ productId });
     const parsedData = productUpdateSchema.parse(data);
-    const { translations, allergen_ids: allergenIdsToSet, ...productData } = parsedData;
+    const { translations, allergenIds: allergenIdsToSet, ...productData } = parsedData;
 
     const existingProduct = await prisma.product.findUnique({
-      where: { product_id: productId, deleted_at: null },
+      where: { productId: productId, deletedAt: null },
       include: { allergens: true }
     });
 
@@ -244,19 +244,19 @@ export class ProductService {
     }
 
     const updatedProduct = await prisma.product.update({
-      where: { product_id: productId },
+      where: { productId: productId },
       data: {
         ...productData,
         translations: translations ? {
-          deleteMany: { product_id: productId },
+          deleteMany: { productId: productId },
           createMany: {
-            data: translations.map(t => ({ language_code: t.language_code, name: t.name, description: t.description })),
+            data: translations.map(t => ({ languageCode: t.languageCode, name: t.name, description: t.description })),
           },
         } : undefined,
         allergens: allergenIdsToSet !== undefined ? {
-          deleteMany: { product_id: productId },
+          deleteMany: { productId: productId },
           createMany: {
-            data: allergenIdsToSet.map((allergen_id: number) => ({ allergen_id })),
+            data: allergenIdsToSet.map((allergenId: number) => ({ allergenId })),
           },
         } : undefined,
       },
@@ -270,12 +270,12 @@ export class ProductService {
 
     await prisma.productHistory.create({
       data: {
-        product_id: updatedProduct.product_id,
+        productId: updatedProduct.productId,
         name: updatedProduct.name,
         description: updatedProduct.description,
-        is_active: updatedProduct.is_active,
-        action_type: 'UPDATE',
-        user_id: userId,
+        isActive: updatedProduct.isActive,
+        actionType: 'UPDATE',
+        userId: userId,
         details: { ...parsedData } as unknown as Prisma.JsonObject,
       },
     });
@@ -284,15 +284,15 @@ export class ProductService {
   }
 
   async deleteProduct(productId: number, userId?: number): Promise<ProductResponseDTO | null> {
-    productIdSchema.parse({ product_id: productId });
+    productIdSchema.parse({ productId });
     const existingProduct = await prisma.product.findUnique({
-        where: { product_id: productId, deleted_at: null },
+        where: { productId: productId, deletedAt: null },
     });
     if (!existingProduct) return null;
 
     const deletedProduct = await prisma.product.update({
-      where: { product_id: productId },
-      data: { deleted_at: new Date() },
+      where: { productId: productId },
+      data: { deletedAt: new Date() },
       include: {
         translations: true,
         allergens: this.allergenInclude,
@@ -303,13 +303,13 @@ export class ProductService {
 
     await prisma.productHistory.create({
       data: {
-        product_id: deletedProduct.product_id,
+        productId: deletedProduct.productId,
         name: existingProduct.name,
         description: existingProduct.description,
-        is_active: false,
-        action_type: 'DELETE',
-        user_id: userId,
-        details: { name: existingProduct.name, description: existingProduct.description, is_active: false } as unknown as Prisma.JsonObject,
+        isActive: false,
+        actionType: 'DELETE',
+        userId: userId,
+        details: { name: existingProduct.name, description: existingProduct.description, isActive: false } as unknown as Prisma.JsonObject,
       },
     });
 
@@ -317,30 +317,30 @@ export class ProductService {
   }
 
   async addOrUpdateProductTranslation(productId: number, translationData: ProductTranslationCreateDTO | ProductTranslationUpdateDTO ): Promise<ProductTranslationResponseDTO> {
-    productIdSchema.parse({ product_id: productId });
+    productIdSchema.parse({ productId });
 
     let parsedData;
-    if ('translation_id' in translationData && translationData.translation_id) {
+    if ('translationId' in translationData && translationData.translationId) {
         parsedData = productTranslationUpdateSchema.parse(translationData);
     } else {
-        parsedData = productTranslationCreateSchema.parse({...translationData, product_id: productId });
+        parsedData = productTranslationCreateSchema.parse({...translationData, productId: productId });
     }
 
-    const { language_code, name, description } = parsedData;
+    const { languageCode, name, description } = parsedData;
 
-    if (!language_code) {
+    if (!languageCode) {
         throw new Error('Language code is required for translation upsert.');
     }
 
     const translation = await prisma.productTranslation.upsert({
       where: {
-        product_id_language_code: {
-          product_id: productId,
-          language_code: language_code,
+        productId_languageCode: {
+          productId: productId,
+          languageCode: languageCode,
         },
       },
       update: { name: name, description: description },
-      create: { product_id: productId, language_code: language_code, name: name!, description: description },
+      create: { productId: productId, languageCode: languageCode, name: name!, description: description },
     });
     return this.mapToTranslationDTO(translation);
   }
@@ -348,8 +348,8 @@ export class ProductService {
   async assignAllergenToProduct(productId: number, allergenId: number): Promise<ProductAllergenResponseDTO> {
     const assignment = await prisma.productAllergen.create({
       data: {
-        product_id: productId,
-        allergen_id: allergenId,
+        productId: productId,
+        allergenId: allergenId,
       },
       include: { allergen: { include: { translations: true } } }
     });
@@ -360,9 +360,9 @@ export class ProductService {
     try {
       const unassignment = await prisma.productAllergen.delete({
         where: {
-          product_id_allergen_id: {
-            product_id: productId,
-            allergen_id: allergenId,
+          productId_allergenId: {
+            productId: productId,
+            allergenId: allergenId,
           },
         },
         include: { allergen: { include: { translations: true } } }
@@ -377,14 +377,14 @@ export class ProductService {
   }
 
   async getProductHistory(productId: number, page: number = 1, pageSize: number = 10): Promise<ProductHistoryResponseDTO[]> {
-    productIdSchema.parse({ product_id: productId });
+    productIdSchema.parse({ productId });
     const skip = (page - 1) * pageSize;
     const histories = await prisma.productHistory.findMany({
-      where: { product_id: productId },
+      where: { productId: productId },
       skip: skip,
       take: pageSize,
       orderBy: {
-        changed_at: 'desc',
+        changedAt: 'desc',
       },
       include: {
         user: { select: { name: true } }

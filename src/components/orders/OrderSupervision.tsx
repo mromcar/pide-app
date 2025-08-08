@@ -8,8 +8,8 @@ import type { LanguageCode } from '@/constants/languages'
 import { OrderResponseDTO } from '@/types/dtos/order'
 
 interface OrderSupervisionProps {
-  establishment_id: string
-  language_code: LanguageCode
+  establishmentId: string
+  languageCode: LanguageCode
 }
 
 // Definir el flujo de estados
@@ -26,8 +26,8 @@ function getNextStatus(currentStatus: OrderStatus): OrderStatus | null {
   return statusFlow[currentStatus]
 }
 
-export function OrderSupervision({ establishment_id, language_code }: OrderSupervisionProps) {
-  const { t } = useTranslation(language_code)
+export function OrderSupervision({ establishmentId, languageCode }: OrderSupervisionProps) {
+  const { t } = useTranslation(languageCode)
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | 'all'>('all')
@@ -44,7 +44,7 @@ export function OrderSupervision({ establishment_id, language_code }: OrderSuper
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [establishment_id, selectedStatus, selectedDate])
+  }, [establishmentId, selectedStatus, selectedDate])
 
   const fetchOrders = async () => {
     try {
@@ -53,7 +53,7 @@ export function OrderSupervision({ establishment_id, language_code }: OrderSuper
         ...(selectedStatus !== 'all' && { status: selectedStatus }),
       })
 
-      const response = await fetch(`/api/establishments/${establishment_id}/orders?${params}`)
+      const response = await fetch(`/api/establishments/${establishmentId}/orders?${params}`)
 
       if (response.ok) {
         const data = await response.json()
@@ -66,9 +66,9 @@ export function OrderSupervision({ establishment_id, language_code }: OrderSuper
     }
   }
 
-  const updateOrderStatus = async (order_id: string, newStatus: OrderStatus) => {
+  const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
     try {
-      const response = await fetch(`/api/orders/${order_id}/status`, {
+      const response = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -204,7 +204,7 @@ export function OrderSupervision({ establishment_id, language_code }: OrderSuper
             <div className="column-content">
               {statusOrders.map((order) => (
                 <OrderCard
-                  key={order.order_id}
+                  key={order.orderId}
                   order={order}
                   onStatusUpdate={updateOrderStatus}
                   t={t}
@@ -229,7 +229,7 @@ export function OrderSupervision({ establishment_id, language_code }: OrderSuper
 // Order Card Component
 interface OrderCardProps {
   order: Order
-  onStatusUpdate: (order_id: string, status: OrderStatus) => void
+  onStatusUpdate: (orderId: string, status: OrderStatus) => void
   t: any
 }
 
@@ -241,11 +241,11 @@ function OrderCard({ order, onStatusUpdate, t }: OrderCardProps) {
     <div className="order-card">
       <div className="card-header">
         <div className="order-info">
-          <span className="order-number">#{order.order_id}</span>
-          <span className="order-time">{new Date(order.created_at).toLocaleTimeString()}</span>
+          <span className="order-number">#{order.orderId}</span>
+          <span className="order-time">{new Date(order.createdAt).toLocaleTimeString()}</span>
         </div>
         <span className="table-number">
-          {t.checkout.tableNumber}: {order.table_number}
+          {t.checkout.tableNumber}: {order.tableNumber}
         </span>
       </div>
 
@@ -264,14 +264,14 @@ function OrderCard({ order, onStatusUpdate, t }: OrderCardProps) {
 
         <div className="order-total">
           <span className="total-label">{t.total}:</span>
-          <span className="total-amount">${order.total_amount?.toFixed(2)}</span>
+          <span className="total-amount">${order.totalAmount?.toFixed(2)}</span>
         </div>
       </div>
 
       <div className="card-actions">
         {nextStatus && (
           <button
-            onClick={() => onStatusUpdate(order.order_id.toString(), nextStatus)}
+            onClick={() => onStatusUpdate(order.orderId.toString(), nextStatus)}
             className="btn-primary btn-sm"
           >
             {t.establishmentAdmin.orderSupervision.markAs} {t.orderStatus[nextStatus]}
@@ -284,7 +284,7 @@ function OrderCard({ order, onStatusUpdate, t }: OrderCardProps) {
 
         {order.status !== OrderStatus.CANCELLED && order.status !== OrderStatus.COMPLETED && (
           <button
-            onClick={() => onStatusUpdate(order.order_id.toString(), OrderStatus.CANCELLED)}
+            onClick={() => onStatusUpdate(order.orderId.toString(), OrderStatus.CANCELLED)}
             className="btn-danger btn-sm"
           >
             {t.cancelOrder}
@@ -301,7 +301,7 @@ function OrderCard({ order, onStatusUpdate, t }: OrderCardProps) {
                 <span>
                   {item.quantity}x {item.product?.name}
                 </span>
-                <span>${(item.unit_price * item.quantity).toFixed(2)}</span>
+                <span>${(item.unitPrice * item.quantity).toFixed(2)}</span>
               </div>
             ))}
           </div>

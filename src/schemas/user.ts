@@ -2,15 +2,15 @@ import { z } from 'zod';
 import { UserRole } from '@prisma/client'; // Make sure this enum is available
 
 export const userIdSchema = z.object({
-  user_id: z.number().int().positive(),
+  userId: z.number().int().positive(),
 });
 
 export const userCreateSchema = z.object({
   role: z.nativeEnum(UserRole),
   name: z.string().min(1).max(255).nullable().optional(),
   email: z.string().email(),
-  password: z.string().min(8, 'Password must be at least 8 characters long'), // Add more password complexity rules if needed
-  establishment_id: z.number().int().positive().nullable().optional(),
+  password: z.string().min(8, 'Password must be at least 8 characters long'),
+  establishmentId: z.number().int().positive().nullable().optional(),
 });
 
 export const userUpdateSchema = z.object({
@@ -18,18 +18,18 @@ export const userUpdateSchema = z.object({
   name: z.string().min(1).max(255).nullable().optional(),
   email: z.string().email().optional(),
   password: z.string().min(8, 'Password must be at least 8 characters long').optional(),
-  establishment_id: z.number().int().positive().nullable().optional(),
-  is_active: z.boolean().optional(), // If you add is_active to User model
+  establishmentId: z.number().int().positive().nullable().optional(),
+  isActive: z.boolean().optional(), // If you add isActive to User model
 });
 
 export const userResponseSchema = z.object({
-  user_id: z.number().int().positive(),
+  userId: z.number().int().positive(),
   role: z.nativeEnum(UserRole),
   name: z.string().nullable(),
   email: z.string().email(),
-  establishment_id: z.number().int().positive().nullable(),
-  created_at: z.string().datetime().nullable(),
-  updated_at: z.string().datetime().nullable(),
+  establishmentId: z.number().int().positive().nullable(),
+  createdAt: z.string().datetime().nullable(),
+  updatedAt: z.string().datetime().nullable(),
   // establishment: establishmentResponseSchema.nullable().optional(), // Example
 });
 

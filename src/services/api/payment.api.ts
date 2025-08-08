@@ -1,6 +1,5 @@
 import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils';
 import { PaymentApiError } from '@/types/errors/payment.api.error';
-import camelcaseKeys from 'camelcase-keys'; // <-- Añade este import
 
 // Tipos para los DTOs de pagos
 interface PaymentCreateDTO {
@@ -35,8 +34,6 @@ const API_BASE_URL = '/api/payments';
 
 /**
  * Inicia un nuevo proceso de pago
- * @param paymentData - Datos necesarios para iniciar el pago
- * @returns Información del pago creado
  */
 async function createPayment(paymentData: PaymentCreateDTO): Promise<PaymentResponseDTO> {
   try {
@@ -49,7 +46,7 @@ async function createPayment(paymentData: PaymentCreateDTO): Promise<PaymentResp
       credentials: 'include',
     });
     const data = await handleApiResponse<PaymentResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al procesar el pago.');
   }
@@ -57,8 +54,6 @@ async function createPayment(paymentData: PaymentCreateDTO): Promise<PaymentResp
 
 /**
  * Obtiene el estado de un pago específico
- * @param paymentId - ID del pago
- * @returns Información actualizada del pago
  */
 async function getPaymentStatus(paymentId: string): Promise<PaymentResponseDTO> {
   try {
@@ -70,7 +65,7 @@ async function getPaymentStatus(paymentId: string): Promise<PaymentResponseDTO> 
       credentials: 'include',
     });
     const data = await handleApiResponse<PaymentResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al obtener el estado del pago.');
   }
@@ -78,9 +73,6 @@ async function getPaymentStatus(paymentId: string): Promise<PaymentResponseDTO> 
 
 /**
  * Procesa un reembolso para un pago específico
- * @param paymentId - ID del pago a reembolsar
- * @param amount - Cantidad a reembolsar (opcional, si no se especifica se reembolsa el total)
- * @returns Información del reembolso procesado
  */
 async function refundPayment(paymentId: string, amount?: number): Promise<PaymentResponseDTO> {
   try {
@@ -93,7 +85,7 @@ async function refundPayment(paymentId: string, amount?: number): Promise<Paymen
       credentials: 'include',
     });
     const data = await handleApiResponse<PaymentResponseDTO>(response);
-    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
+    return data;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al procesar el reembolso.');
   }
@@ -101,8 +93,6 @@ async function refundPayment(paymentId: string, amount?: number): Promise<Paymen
 
 /**
  * Obtiene el historial de pagos de un pedido
- * @param orderId - ID del pedido
- * @returns Lista de pagos asociados al pedido
  */
 async function getOrderPayments(orderId: number): Promise<PaymentResponseDTO[]> {
   try {
@@ -114,7 +104,7 @@ async function getOrderPayments(orderId: number): Promise<PaymentResponseDTO[]> 
       credentials: 'include',
     });
     const data = await handleApiResponse<PaymentResponseDTO[]>(response);
-    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO[];
+    return data;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al obtener el historial de pagos del pedido.');
   }

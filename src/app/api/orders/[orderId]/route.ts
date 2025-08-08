@@ -24,9 +24,9 @@ export async function GET(
     const { orderId } = validation.data;
 
     const order = await prisma.order.findUnique({
-      where: { order_id: orderId },
+      where: { orderId },
       include: {
-        order_items: {
+        orderItems: {
           include: {
             variant: {
               include: {

@@ -8,7 +8,11 @@ interface OrderFiltersProps {
   userRole: UserRole
 }
 
-export default function OrderFilters({ statusFilter, onStatusFilterChange, userRole }: OrderFiltersProps) {
+export default function OrderFilters({
+  statusFilter,
+  onStatusFilterChange,
+  userRole,
+}: OrderFiltersProps) {
   const getAvailableStatuses = () => {
     if (userRole === UserRole.cook) {
       return [OrderStatus.pending, OrderStatus.preparing]
@@ -19,14 +23,14 @@ export default function OrderFilters({ statusFilter, onStatusFilterChange, userR
   }
 
   return (
-    <div className="order-filters">
-      <select 
-        value={statusFilter} 
+    <div className="orderFilters">
+      <select
+        value={statusFilter}
         onChange={(e) => onStatusFilterChange(e.target.value as OrderStatus | 'all')}
-        className="filter-select"
+        className="filterSelect"
       >
         <option value="all">All Orders</option>
-        {getAvailableStatuses().map(status => (
+        {getAvailableStatuses().map((status) => (
           <option key={status} value={status}>
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </option>
