@@ -1,6 +1,7 @@
 import type { AllergenTranslation } from '../entities/allergenTranslation';
 
-export interface CreateAllergenTranslationDTO extends Omit<AllergenTranslation, 'translationId'> {}
+// Ahora omite tanto 'translationId' como 'allergenId'
+export interface CreateAllergenTranslationDTO extends Omit<AllergenTranslation, 'translationId' | 'allergenId'> {}
 
 export interface UpdateAllergenTranslationDTO extends Partial<CreateAllergenTranslationDTO> {
   translationId?: number; // Para identificar la traducción existente al actualizar

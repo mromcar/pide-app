@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
-import { LanguageCode } from '@/types/language'
-import { Establishment } from '@/types/establishment'
+import { LanguageCode } from '@/constants/languages'
+import { Establishment } from '@/types/entities/establishment'
 
 interface EstablishmentAdminDashboardProps {
   establishment: Establishment | null
@@ -34,7 +34,7 @@ export function EstablishmentAdminDashboard({
     },
     {
       id: 'staff',
-      label: t.establishmentAdmin.navigation.staffManagement,
+      label: t.establishmentAdmin.navigation.employeeManagement,
       path: `/${languageCode}/admin/establishment/${establishmentId}/staff`,
     },
     {

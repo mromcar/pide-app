@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
-import { EmployeeManagement } from '@/components/employee/EmployeeManagement'
+import EmployeeManagement from '@/components/employee/EmployeeManagement'
 import { ProtectedPage } from '@/components/auth/ProtectedPage'
 import { AdminLayout } from '@/components/admin/AdminLayout'
 import { DEFAULT_LANGUAGE, type LanguageCode } from '@/constants/languages'
@@ -49,7 +49,7 @@ export default function EmployeeManagementPage() {
         navigationItems={navigationItems}
         activeSection="employees"
       >
-        <EmployeeManagement establishmentId={establishmentId} languageCode={languageCode} />
+        <EmployeeManagement />
       </AdminLayout>
     </ProtectedPage>
   )

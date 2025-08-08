@@ -29,7 +29,9 @@ export const adminEn: EstablishmentAdminTranslations = {
       confirmDelete: 'Confirm Deletion',
       deleteMessage: 'Are you sure you want to delete this category?',
       cancel: 'Cancel',
-      confirm: 'Confirm'
+      confirm: 'Confirm',
+      update: 'Update Category',
+      create: 'Create Category'
     },
     products: {
       title: 'Products',

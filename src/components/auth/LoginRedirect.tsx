@@ -27,7 +27,7 @@ export default function LoginRedirect({ lang }: LoginRedirectProps) {
     // If user is authenticated, redirect based on role
     if (status === 'authenticated' && session?.user) {
       const userRole = session.user.role as UserRole
-      const establishmentId = session.user.establishment_id
+      const establishmentId = session.user.establishmentId
 
       // Redirect employees and admins to their respective dashboards
       switch (userRole) {

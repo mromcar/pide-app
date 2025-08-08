@@ -21,7 +21,7 @@ export default function AdminSidebar() {
 
   const isGeneralAdmin = user.role === UserRole.general_admin
   const isEstablishmentAdmin = user.role === UserRole.establishment_admin
-  const establishmentId = user.establishment_id
+  const establishmentId = user.establishmentId
 
   const navigationItems = [
     {
@@ -56,7 +56,9 @@ export default function AdminSidebar() {
     },
     {
       name: 'Settings',
-      href: isGeneralAdmin ? '/admin/global/settings' : `/admin/establishment/${establishmentId}/settings`,
+      href: isGeneralAdmin
+        ? '/admin/global/settings'
+        : `/admin/establishment/${establishmentId}/settings`,
       icon: Cog6ToothIcon,
       show: true,
     },
@@ -72,7 +74,7 @@ export default function AdminSidebar() {
       </div>
       <nav className="admin-sidebar-navigation">
         {navigationItems
-          .filter(item => item.show)
+          .filter((item) => item.show)
           .map((item) => {
             const isActive = pathname === item.href
             return (
@@ -80,9 +82,7 @@ export default function AdminSidebar() {
                 key={item.name}
                 href={item.href}
                 className={`admin-sidebar-link ${
-                  isActive
-                    ? 'admin-sidebar-link-active'
-                    : 'admin-sidebar-link-inactive'
+                  isActive ? 'admin-sidebar-link-active' : 'admin-sidebar-link-inactive'
                 }`}
               >
                 <item.icon className="admin-sidebar-link-icon" />

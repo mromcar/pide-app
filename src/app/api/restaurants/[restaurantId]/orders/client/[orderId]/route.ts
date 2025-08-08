@@ -6,6 +6,7 @@ import { createOrderSchema } from '@/schemas/order';
 import { UserRole } from '@/types/enums';
 import { OrderCreateDTO } from '@/types/dtos/order';
 import { z } from 'zod';
+import type { AuthToken } from '@/types/auth';
 
 // Schema para validar parámetros en camelCase
 const pathParamsSchema = z.object({
@@ -17,10 +18,13 @@ export async function POST(
   { params }: { params: { restaurantId: string } }
 ) {
   try {
-    const token = await getToken({ req });
+    const token = await getToken({ req }) as AuthToken | null;
 
     if (!token) {
       return jsonError('Unauthorized', 401);
+    }
+    if (!token.sub) {
+      return jsonError('Invalid token: missing user id', 401);
     }
 
     const { restaurantId } = params;
@@ -49,7 +53,7 @@ export async function POST(
 
     const orderData: OrderCreateDTO = {
       establishmentId: validatedRestaurantId,
-      clientUserId: parseInt(token.sub),
+      clientUserId: parseInt(token.sub, 10),
       tableNumber: validatedData.data.tableNumber,
       notes: validatedData.data.notes,
       totalAmount: validatedData.data.totalAmount ?? 0,
