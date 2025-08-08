@@ -1,11 +1,11 @@
 // src/store/orderStore.ts
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ProductVariant } from '@/types/menu'; // Asegúrate de que esta ruta sea correcta
+import { ProductVariantResponseDTO } from '@/types/dtos/productVariant';
 
 // Define el estado del carrito
 interface CartItem {
-  variant: ProductVariant;
+  variant: ProductVariantResponseDTO;
   quantity: number;
 }
 
@@ -13,7 +13,7 @@ interface OrderState {
   cartItems: CartItem[];
   tableNumber: string; // Para el número de mesa
   notes: string; // Notas generales del pedido
-  addToCart: (variant: ProductVariant, quantity: number) => void;
+  addToCart: (variant: ProductVariantResponseDTO, quantity: number) => void;
   removeFromCart: (variantId: number) => void;
   updateQuantity: (variantId: number, delta: number) => void;
   setTableNumber: (tableNumber: string) => void;
@@ -32,7 +32,7 @@ export const useOrderStore = create<OrderState>()(
       addToCart: (variant, quantity) => {
         set((state) => {
           const existingItemIndex = state.cartItems.findIndex(
-            (item) => item.variant.variant_id === variant.variant_id
+            (item) => item.variant.variantId === variant.variantId
           );
 
           if (existingItemIndex > -1) {
@@ -56,7 +56,7 @@ export const useOrderStore = create<OrderState>()(
 
       removeFromCart: (variantId) => {
         set((state) => ({
-          cartItems: state.cartItems.filter((item) => item.variant.variant_id !== variantId),
+          cartItems: state.cartItems.filter((item) => item.variant.variantId !== variantId),
         }));
       },
 
@@ -64,7 +64,7 @@ export const useOrderStore = create<OrderState>()(
         set((state) => {
           const newCartItems = state.cartItems
             .map((item) => {
-              if (item.variant.variant_id === variantId) {
+              if (item.variant.variantId === variantId) {
                 return { ...item, quantity: item.quantity + delta };
               }
               return item;

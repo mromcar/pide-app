@@ -40,6 +40,10 @@ export const registerEs: RegisterTranslations = {
   signIn: 'Iniciar sesión',
   googleButton: 'Continuar con Google',
   orDivider: 'o',
+  passwordMismatch: 'Las contraseñas no coinciden',
+  emailExists: 'Ya existe una cuenta con este correo electrónico',
+  registerError: 'No se pudo registrar. Inténtalo de nuevo.',
+  serverError: 'Error del servidor. Inténtalo de nuevo más tarde.',
   error: {
     emailExists: 'Ya existe una cuenta con este correo electrónico',
     passwordMismatch: 'Las contraseñas no coinciden',

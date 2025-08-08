@@ -78,3 +78,6 @@ export interface UpdateOrderDTO {
   orderItems?: OrderItemCreateDTO[];
 }
 
+// Exporta el tipo que necesitas
+export type { OrderStatusHistoryDTO } from './orderStatusHistory';
+

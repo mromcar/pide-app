@@ -33,6 +33,7 @@ export interface ProductResponseDTO {
   productId: number;
   establishmentId: number;
   categoryId: number;
+  categoryName?: string;
   name: string;
   description?: string | null;
   sortOrder?: number | null;

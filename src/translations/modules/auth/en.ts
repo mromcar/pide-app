@@ -40,6 +40,10 @@ export const registerEn: RegisterTranslations = {
   signIn: 'Sign in',
   googleButton: 'Continue with Google',
   orDivider: 'or',
+  passwordMismatch: 'Passwords do not match',
+  emailExists: 'An account with this email already exists',
+  registerError: 'Registration failed. Please try again.',
+  serverError: 'Server error. Please try again later.',
   error: {
     emailExists: 'An account with this email already exists',
     passwordMismatch: 'Passwords do not match',

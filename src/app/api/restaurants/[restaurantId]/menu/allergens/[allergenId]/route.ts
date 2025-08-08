@@ -16,11 +16,11 @@ interface AllergenRouteParams {
 export async function PUT(request: NextRequest, { params }: { params: AllergenRouteParams }) {
   try {
     await requireAuth(UserRole.GENERAL_ADMIN);
-    const { allergen_id: allergenIdNum } = allergenIdSchema.parse({ allergen_id: params.allergenId });
+    const { allergenId } = allergenIdSchema.parse({ allergenId: params.allergenId });
     const body = await request.json();
     const validatedData = updateAllergenSchema.parse(body);
 
-    const allergen = await allergenService.updateAllergen(allergenIdNum, validatedData);
+    const allergen = await allergenService.updateAllergen(allergenId, validatedData);
     if (!allergen) {
       return jsonError('Allergen not found.', 404);
     }
@@ -36,9 +36,9 @@ export async function PUT(request: NextRequest, { params }: { params: AllergenRo
 export async function DELETE(request: NextRequest, { params }: { params: AllergenRouteParams }) {
   try {
     await requireAuth(UserRole.GENERAL_ADMIN);
-    const { allergen_id: allergenIdNum } = allergenIdSchema.parse({ allergen_id: params.allergenId });
+    const { allergenId } = allergenIdSchema.parse({ allergenId: params.allergenId });
 
-    await allergenService.deleteAllergen(allergenIdNum);
+    await allergenService.deleteAllergen(allergenId);
     return jsonOk({ message: 'Allergen deleted successfully.' });
   } catch (error) {
     if (error instanceof ZodError) {

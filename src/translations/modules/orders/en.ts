@@ -1,9 +1,11 @@
-import { 
-  CartTranslations, 
-  CheckoutTranslations, 
-  OrderSummaryTranslations, 
-  OrderConfirmationTranslations, 
-  OrderStatusTranslations 
+import {
+  CartTranslations,
+  CheckoutTranslations,
+  OrderSummaryTranslations,
+  OrderConfirmationTranslations,
+  OrderStatusTranslations,
+  UserRoleTranslations,
+  OrderItemStatusTranslations
 } from '../../types/orders'
 
 export const cartEn: CartTranslations = {

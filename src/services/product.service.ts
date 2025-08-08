@@ -37,6 +37,7 @@ export class ProductService {
   private mapToAllergenTranslationDTO(translation: AllergenTranslation): AllergenTranslationResponseDTO {
     return {
       translationId: translation.translationId,
+      allergenId: translation.allergenId,
       languageCode: translation.languageCode,
       name: translation.name,
       description: translation.description,
@@ -391,6 +392,39 @@ export class ProductService {
       }
     });
     return histories.map(h => this.mapToHistoryDTO(h));
+  }
+
+  async getProductsByCategory(categoryId: number, languageCode: string): Promise<ProductResponseDTO[]> {
+    const products = await prisma.product.findMany({
+      where: { categoryId },
+      include: {
+        category: {
+          include: {
+            translations: {
+              where: { languageCode }
+            }
+          }
+        },
+        // ...otras relaciones si necesitas...
+      }
+    });
+
+    return products.map(product => ({
+      productId: product.productId,
+      establishmentId: product.establishmentId,
+      categoryId: product.categoryId,
+      categoryName: product.category?.translations[0]?.name ?? product.category?.name ?? '', // nombre traducido o por defecto
+      name: product.name,
+      description: product.description,
+      sortOrder: product.sortOrder,
+      isActive: product.isActive ?? true,
+      responsibleRole: product.responsibleRole,
+      createdByUserId: product.createdByUserId,
+      createdAt: product.createdAt?.toISOString() ?? null,
+      updatedAt: product.updatedAt?.toISOString() ?? null,
+      deletedAt: product.deletedAt?.toISOString() ?? null,
+      // ...otros campos...
+    }));
   }
 }
 

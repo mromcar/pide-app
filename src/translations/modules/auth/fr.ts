@@ -40,6 +40,10 @@ export const registerFr: RegisterTranslations = {
   signIn: 'Se connecter',
   googleButton: 'Continuer avec Google',
   orDivider: 'ou',
+  passwordMismatch: 'Les mots de passe ne correspondent pas',
+  emailExists: 'Un compte avec cet email existe déjà',
+  registerError: "L'inscription a échoué. Veuillez réessayer.",
+  serverError: 'Erreur serveur. Veuillez réessayer plus tard.',
   error: {
     emailExists: 'Un compte avec cet email existe déjà',
     passwordMismatch: 'Les mots de passe ne correspondent pas',

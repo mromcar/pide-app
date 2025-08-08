@@ -5,7 +5,13 @@ export * from './menu'
 export * from './orders'
 export * from './admin'
 
-// Interfaz principal que combina todos los módulos
+// Importa explícitamente los tipos usados en UITranslation
+import type { NavbarTranslations, MainMenuTranslations, RedirectTranslations } from './navigation'
+import type { CartTranslations, CheckoutTranslations, OrderSummaryTranslations, OrderConfirmationTranslations, OrderStatusTranslations } from './orders'
+import type { RestaurantMenuTranslations } from './restaurant-menu'
+import type { LoginTranslations, RegisterTranslations } from './auth'
+import type { EstablishmentAdminTranslations } from './admin'
+
 export interface UITranslation {
   // Base
   backToCategories: string
@@ -23,7 +29,7 @@ export interface UITranslation {
   updateCart: string
   loadingMenu: string
   productAllergens: string
-  
+
   // Módulos
   navbar: NavbarTranslations
   cart: CartTranslations
