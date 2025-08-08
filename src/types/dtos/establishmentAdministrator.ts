@@ -1,6 +1,6 @@
 export interface EstablishmentAdministratorCreateDTO {
-  user_id: number;
-  establishment_id: number;
+  userId: number;
+  establishmentId: number;
 }
 
 // No specific update DTO needed as it's a join table with a composite key.
@@ -8,8 +8,8 @@ export interface EstablishmentAdministratorCreateDTO {
 // or handled by cascading updates from User or Establishment if configured.
 
 export interface EstablishmentAdministratorDTO {
-  user_id: number;
-  establishment_id: number;
+  userId: number;
+  establishmentId: number;
   // Include user and establishment details if needed for responses
   // userName?: string;
   // establishmentName?: string;

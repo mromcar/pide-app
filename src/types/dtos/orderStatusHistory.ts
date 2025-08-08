@@ -1,17 +1,17 @@
 import { OrderStatus } from '@prisma/client';
 
 export interface OrderStatusHistoryCreateDTO {
-  order_id: number;
+  orderId: number;
   status: OrderStatus;
-  changed_by_user_id?: number | null;
+  changedByUserId?: number | null;
   notes?: string | null;
 }
 
 export interface OrderStatusHistoryDTO {
-  history_id: number;
-  order_id: number;
+  historyId: number;
+  orderId: number;
   status: OrderStatus;
-  changed_by_user_id?: number | null;
-  changed_at?: string | null;
+  changedByUserId?: number | null;
+  changedAt?: string | null;
   notes?: string | null;
 }

@@ -26,10 +26,10 @@ export async function GET(
 
     logger.info(`[API] Found ${categories.length} categories for restaurantId: ${restaurantId}`);
 
-    // Siempre devuelve un array bajo la clave 'categories'
+    // Devuelve los datos en camelCase
     return jsonOk({ categories });
   } catch (error) {
-    logger.error('[API] Error fetching categories:', error); // Log the full error
+    logger.error('[API] Error fetching categories:', error);
     if (error instanceof ZodError) {
       return jsonError(error.errors, 400);
     } else if (error instanceof Error) {
@@ -45,33 +45,28 @@ export async function POST(
   { params }: { params: { restaurantId: string } }
 ) {
   try {
-    await requireAuth(UserRole.general_admin); // Corregido: usar el valor correcto del enum
+    await requireAuth(UserRole.general_admin);
     const restaurantId = Number(params.restaurantId);
     if (isNaN(restaurantId)) {
       return jsonError("Invalid restaurant ID", 400);
     }
 
-    // Parse and validate request body using Zod schema
     const body = await request.json();
     const validatedData = categoryCreateSchema.parse(body);
 
-    // Create category using the service
     const category = await categoryService.createCategory({
       ...validatedData,
-      establishment_id: restaurantId,
+      establishmentId: restaurantId,
     });
 
-    // Return successful response (201 Created)
+    // Devuelve los datos en camelCase
     return jsonOk({ category }, 201);
   } catch (error) {
-    // Handle errors, including Zod validation errors
     if (error instanceof ZodError) {
       return jsonError(error.errors, 400);
     } else if (error instanceof Error) {
-      // Handle other potential errors from service or auth
       return jsonError(error.message, 500);
     } else {
-      // Handle unexpected errors
       return jsonError("An unexpected error occurred", 500);
     }
   }

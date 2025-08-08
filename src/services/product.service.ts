@@ -1,32 +1,13 @@
 import { prisma } from '@/lib/prisma';
 import { Product, ProductTranslation, ProductHistory, ProductAllergen, Prisma, UserRole, Allergen, AllergenTranslation, ProductVariant, ProductVariantTranslation } from '@prisma/client';
 import { ProductResponseDTO } from '../types/dtos/product';
-import {
-  ProductVariantResponseDTO
-} from '../types/dtos/productVariant';
-import {
-  ProductTranslationCreateDTO,
-  ProductTranslationResponseDTO,
-  ProductTranslationUpdateDTO
-} from '../types/dtos/productTranslation';
-import {
-  ProductAllergenResponseDTO
-} from '../types/dtos/productAllergen';
-import {
-  AllergenTranslationResponseDTO
-} from '../types/dtos/allergenTranslation';
-import {
-  ProductHistoryResponseDTO
-} from '../types/dtos/productHistory';
-import {
-  productCreateSchema,
-  productUpdateSchema,
-  productIdSchema,
-  ProductCreateInput,
-  ProductUpdateInput
-} from '../schemas/product';
+import { ProductVariantResponseDTO } from '../types/dtos/productVariant';
+import { ProductTranslationCreateDTO, ProductTranslationResponseDTO, ProductTranslationUpdateDTO } from '../types/dtos/productTranslation';
+import { ProductAllergenResponseDTO } from '../types/dtos/productAllergen';
+import { AllergenTranslationResponseDTO } from '../types/dtos/allergenTranslation';
+import { ProductHistoryResponseDTO } from '../types/dtos/productHistory';
+import { productCreateSchema, productUpdateSchema, productIdSchema, ProductCreateInput, ProductUpdateInput } from '../schemas/product';
 import { productTranslationCreateSchema, productTranslationUpdateSchema } from '../schemas/productTranslation';
-
 
 // Tipo para el alérgeno incluido en ProductAllergen con sus traducciones
 type AllergenWithTranslations = Allergen & { translations?: AllergenTranslation[] };
@@ -39,15 +20,15 @@ type ProductWithDetails = Product & {
   translations?: ProductTranslation[];
   allergens?: (ProductAllergen & { allergen?: AllergenWithTranslations })[];
   variants?: (ProductVariant & { translations?: ProductVariantTranslation[] })[];
-  category?: Prisma.CategoryGetPayload<{}>; // Assuming category is a simple type or adjust as needed
+  category?: Prisma.CategoryGetPayload<{}>;
 };
 
 export class ProductService {
   private mapToTranslationDTO(translation: ProductTranslation): ProductTranslationResponseDTO {
     return {
-      translation_id: translation.translation_id,
-      product_id: translation.product_id,
-      language_code: translation.language_code,
+      translationId: translation.translation_id,
+      productId: translation.product_id,
+      languageCode: translation.language_code,
       name: translation.name,
       description: translation.description,
     };
@@ -55,8 +36,8 @@ export class ProductService {
 
   private mapToAllergenTranslationDTO(translation: AllergenTranslation): AllergenTranslationResponseDTO {
     return {
-      translation_id: translation.translation_id,
-      language_code: translation.language_code,
+      translationId: translation.translation_id,
+      languageCode: translation.language_code,
       name: translation.name,
       description: translation.description,
     };
@@ -64,15 +45,15 @@ export class ProductService {
 
   private mapToAllergenDTO(productAllergen: ProductAllergen & { allergen?: AllergenWithTranslations }): ProductAllergenResponseDTO {
     return {
-      product_id: productAllergen.product_id,
-      allergen_id: productAllergen.allergen_id,
+      productId: productAllergen.product_id,
+      allergenId: productAllergen.allergen_id,
       allergen: productAllergen.allergen ? {
-        allergen_id: productAllergen.allergen.allergen_id,
+        allergenId: productAllergen.allergen.allergen_id,
         code: productAllergen.allergen.code,
         name: productAllergen.allergen.name,
         description: productAllergen.allergen.description,
-        icon_url: productAllergen.allergen.icon_url,
-        is_major_allergen: productAllergen.allergen.is_major_allergen,
+        iconUrl: productAllergen.allergen.icon_url,
+        isMajorAllergen: productAllergen.allergen.is_major_allergen,
         translations: productAllergen.allergen.translations?.map(this.mapToAllergenTranslationDTO) || [],
       } : undefined,
     };
@@ -82,59 +63,58 @@ export class ProductService {
     const detailsJson = history.details as Prisma.JsonObject | null;
     return {
       id: history.id,
-      product_id: history.product_id,
+      productId: history.product_id,
       name: (detailsJson?.name as string) || history.name || '',
       description: (detailsJson?.description as string) || history.description || null,
-      is_active: typeof (detailsJson?.is_active) === 'boolean' ? (detailsJson.is_active as boolean) : history.is_active ?? false,
-      changed_at: history.changed_at ? history.changed_at.toISOString() : new Date(0).toISOString(),
-      action_type: history.action_type,
-      user_id: history.user_id,
-      user_name: history.user?.name,
+      isActive: typeof (detailsJson?.is_active) === 'boolean' ? (detailsJson.is_active as boolean) : history.is_active ?? false,
+      changedAt: history.changed_at ? history.changed_at.toISOString() : new Date(0).toISOString(),
+      actionType: history.action_type,
+      userId: history.user_id,
+      userName: history.user?.name,
     };
   }
 
-  private mapVariantToDTO(variant: ProductVariant & { translations?: ProductVariantTranslation[] }): ProductVariantResponseDTO { // <<< Ensure ProductVariantResponseDTO is imported
+  private mapVariantToDTO(variant: ProductVariant & { translations?: ProductVariantTranslation[] }): ProductVariantResponseDTO {
     return {
-      variant_id: variant.variant_id,
-      product_id: variant.product_id,
-      establishment_id: variant.establishment_id,
-      variant_description: variant.variant_description,
+      variantId: variant.variant_id,
+      productId: variant.product_id,
+      establishmentId: variant.establishment_id,
+      variantDescription: variant.variant_description,
       price: parseFloat(variant.price.toString()),
       sku: variant.sku,
-      sort_order: variant.sort_order,
-      is_active: variant.is_active ?? true,
-      created_by_user_id: variant.created_by_user_id,
-      created_at: variant.created_at?.toISOString() || null,
-      updated_at: variant.updated_at?.toISOString() || null,
-      deleted_at: variant.deleted_at?.toISOString() || null,
+      sortOrder: variant.sort_order,
+      isActive: variant.is_active ?? true,
+      createdByUserId: variant.created_by_user_id,
+      createdAt: variant.created_at?.toISOString() || null,
+      updatedAt: variant.updated_at?.toISOString() || null,
+      deletedAt: variant.deleted_at?.toISOString() || null,
       translations: variant.translations?.map(vt => ({
-        translation_id: vt.translation_id,
-        variant_id: vt.variant_id,
-        language_code: vt.language_code,
-        variant_description: vt.variant_description,
+        translationId: vt.translation_id,
+        variantId: vt.variant_id,
+        languageCode: vt.language_code,
+        variantDescription: vt.variant_description,
       })) || [],
     };
   }
 
   private mapToDTO(product: ProductWithDetails): ProductResponseDTO {
     return {
-      product_id: product.product_id,
-      establishment_id: product.establishment_id,
-      category_id: product.category_id,
-      category_name: product.category?.name, // Safely access category name
+      productId: product.product_id,
+      establishmentId: product.establishment_id,
+      categoryId: product.category_id,
+      categoryName: product.category?.name,
       name: product.name,
       description: product.description,
-      sort_order: product.sort_order,
-      is_active: product.is_active ?? true,
-      responsible_role: product.responsible_role as UserRole | null,
-      created_by_user_id: product.created_by_user_id,
-      created_at: product.created_at?.toISOString() || null,
-      updated_at: product.updated_at?.toISOString() || null,
-      deleted_at: product.deleted_at?.toISOString() || null,
+      sortOrder: product.sort_order,
+      isActive: product.is_active ?? true,
+      responsibleRole: product.responsible_role as UserRole | null,
+      createdByUserId: product.created_by_user_id,
+      createdAt: product.created_at?.toISOString() || null,
+      updatedAt: product.updated_at?.toISOString() || null,
+      deletedAt: product.deleted_at?.toISOString() || null,
       translations: product.translations?.map(this.mapToTranslationDTO) || [],
       allergens: product.allergens?.map(pa => this.mapToAllergenDTO(pa)) || [],
-      variants: product.variants?.map(v => this.mapVariantToDTO(v)) || [], // Corrected to call this.mapVariantToDTO
-      // category: product.category ? this.mapToCategoryDTO(product.category) : undefined, // If you have a mapToCategoryDTO
+      variants: product.variants?.map(v => this.mapVariantToDTO(v)) || [],
     };
   }
 
@@ -153,7 +133,7 @@ export class ProductService {
   private get variantInclude() {
     return {
       where: { deleted_at: null },
-      orderBy: { sort_order: Prisma.SortOrder.asc }, // <<< CORRECTED: Use Prisma.SortOrder.asc
+      orderBy: { sort_order: Prisma.SortOrder.asc },
       include: {
         translations: true,
       },
@@ -175,7 +155,6 @@ export class ProductService {
         } : undefined,
         allergens: allergen_ids && allergen_ids.length > 0 ? {
           createMany: {
-            // Ensure 'data' property is used for createMany
             data: allergen_ids.map((allergen_id: number) => ({ allergen_id })),
           },
         } : undefined,
@@ -196,7 +175,7 @@ export class ProductService {
         is_active: newProduct.is_active,
         action_type: 'CREATE',
         user_id: userId,
-        details: { ...productData, translations, allergen_ids } as unknown as Prisma.JsonObject, // Use allergen_ids here as well
+        details: { ...productData, translations, allergen_ids } as unknown as Prisma.JsonObject,
       },
     });
 
@@ -225,7 +204,7 @@ export class ProductService {
       include: {
         translations: true,
         allergens: this.allergenInclude,
-        category: true, // Ensure category is included
+        category: true,
         variants: this.variantInclude,
       },
       orderBy: [
@@ -242,9 +221,9 @@ export class ProductService {
       where: { product_id: productId, deleted_at: null },
       include: {
         translations: true,
-        allergens: this.allergenInclude, // <<< CORRECTED: Use the getter directly
+        allergens: this.allergenInclude,
         category: true,
-        variants: this.variantInclude, // <<< CORRECTED: Use the getter directly
+        variants: this.variantInclude,
       },
     });
     return product ? this.mapToDTO(product as ProductWithDetails) : null;
@@ -277,7 +256,6 @@ export class ProductService {
         allergens: allergenIdsToSet !== undefined ? {
           deleteMany: { product_id: productId },
           createMany: {
-            // Ensure 'data' property is used for createMany
             data: allergenIdsToSet.map((allergen_id: number) => ({ allergen_id })),
           },
         } : undefined,
@@ -317,18 +295,18 @@ export class ProductService {
       data: { deleted_at: new Date() },
       include: {
         translations: true,
-        allergens: this.allergenInclude, // <<< CORRECTED: Use the getter directly
+        allergens: this.allergenInclude,
         category: true,
-        variants: this.variantInclude, // <<< CORRECTED: Use the getter directly
+        variants: this.variantInclude,
       }
     });
 
     await prisma.productHistory.create({
       data: {
         product_id: deletedProduct.product_id,
-        name: existingProduct.name, // Log current name before soft delete
+        name: existingProduct.name,
         description: existingProduct.description,
-        is_active: false, // Mark as inactive in history
+        is_active: false,
         action_type: 'DELETE',
         user_id: userId,
         details: { name: existingProduct.name, description: existingProduct.description, is_active: false } as unknown as Prisma.JsonObject,
@@ -389,7 +367,7 @@ export class ProductService {
         },
         include: { allergen: { include: { translations: true } } }
       });
-      return this.mapToAllergenDTO(unassignment);
+      return unassignment ? this.mapToAllergenDTO(unassignment) : null;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         return null;

@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { z } from 'zod';
-import { productVariantService } from '@/services/productVariant.service'; // Updated service import
-import { productService } from '@/services/product.service'; // Added productService import
-import { productVariantUpdateSchema, productVariantIdSchema } from '@/schemas/productVariant'; // Updated schema imports
+import { productVariantService } from '@/services/productVariant.service';
+import { productService } from '@/services/product.service';
+import { productVariantUpdateSchema } from '@/schemas/productVariant';
 import { jsonOk, jsonError } from '@/utils/api';
 import { UserRole } from '@prisma/client';
 import logger from '@/lib/logger';
@@ -75,7 +75,7 @@ export async function GET(
     }
 
     const variant = await productVariantService.getProductVariantById(variantId);
-    if (!variant || variant.establishment_id !== restaurantId) {
+    if (!variant || variant.establishmentId !== restaurantId) {
       return jsonError('Product variant not found or does not belong to this restaurant', 404);
     }
     return jsonOk(variant);
@@ -159,27 +159,27 @@ export async function PUT(
       return jsonError(validatedData.error.issues, 400);
     }
 
-    // Ensure the variant belongs to the establishment if establishment_id is being updated
-    if (validatedData.data.establishment_id && validatedData.data.establishment_id !== restaurantId) {
-      return jsonError('Cannot change establishment_id to a different restaurant.', 403);
+    // Ensure the variant belongs to the establishment if establishmentId is being updated
+    if (validatedData.data.establishmentId && validatedData.data.establishmentId !== restaurantId) {
+      return jsonError('Cannot change establishmentId to a different restaurant.', 403);
     }
 
-    // Verify that the product_id (if provided) belongs to the restaurantId
-    if (validatedData.data.product_id) {
-      const product = await productService.getProductById(validatedData.data.product_id);
-      if (!product || product.establishment_id !== restaurantId) {
+    // Verify that the productId (if provided) belongs to the restaurantId
+    if (validatedData.data.productId) {
+      const product = await productService.getProductById(validatedData.data.productId);
+      if (!product || product.establishmentId !== restaurantId) {
         return jsonError('Product not found or does not belong to this restaurant.', 400);
       }
     }
 
     const variantToUpdate = await productVariantService.getProductVariantById(variantId);
-    if (!variantToUpdate || variantToUpdate.establishment_id !== restaurantId) {
+    if (!variantToUpdate || variantToUpdate.establishmentId !== restaurantId) {
       return jsonError('Product variant not found or does not belong to this restaurant', 404);
     }
 
     const updatedVariant = await productVariantService.updateProductVariant(
       variantId,
-      { ...validatedData.data, establishment_id: restaurantId }, // Ensure establishment_id is from path param
+      { ...validatedData.data, establishmentId: restaurantId }, // Ensure establishmentId is from path param
       Number(token.sub) // userId for audit
     );
 
@@ -259,7 +259,7 @@ export async function DELETE(
     }
 
     const variantToDelete = await productVariantService.getProductVariantById(variantId);
-    if (!variantToDelete || variantToDelete.establishment_id !== restaurantId) {
+    if (!variantToDelete || variantToDelete.establishmentId !== restaurantId) {
       return jsonError('Product variant not found or does not belong to this restaurant', 404);
     }
 

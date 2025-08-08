@@ -54,7 +54,7 @@ export async function PUT(
   { params }: { params: { restaurantId: string; categoryId: string } }
 ) {
   try {
-    await requireAuth(UserRole.general_admin); // Corregido: usar el valor correcto del enum
+    await requireAuth(UserRole.general_admin);
 
     const restaurantId = Number(params.restaurantId);
     const categoryId = Number(params.categoryId);
@@ -67,13 +67,14 @@ export async function PUT(
 
     const updatedCategory = await categoryService.updateCategory(categoryId, {
       ...validatedData,
-      establishment_id: restaurantId,
+      establishmentId: restaurantId,
     });
 
     if (!updatedCategory) {
       return jsonError("Category not found", 404);
     }
 
+    // Devuelve los datos en camelCase
     return jsonOk({ category: updatedCategory });
   } catch (error) {
     if (error instanceof ZodError) {
@@ -122,7 +123,7 @@ export async function DELETE(
   { params }: { params: { restaurantId: string; categoryId: string } }
 ) {
   try {
-    await requireAuth(UserRole.general_admin); // Corregido: usar el valor correcto del enum
+    await requireAuth(UserRole.general_admin);
 
     const restaurantId = Number(params.restaurantId);
     const categoryId = Number(params.categoryId);

@@ -1,9 +1,9 @@
 import { Product } from './product';
-import { Allergen } from './allergen'; // Assuming Allergen entity exists
+import { Allergen } from './allergen';
 
 export interface ProductAllergen {
-  product_id: number;
-  allergen_id: number;
+  productId: number;
+  allergenId: number;
 
   // Relations
   product?: Product;

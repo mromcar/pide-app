@@ -53,6 +53,7 @@ export async function GET(
       return jsonError('Establishment not found', 404);
     }
 
+    // Devuelve los datos en camelCase (no uses snakecase-keys)
     return jsonOk(establishment);
 
   } catch (error: unknown) {

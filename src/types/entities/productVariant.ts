@@ -4,21 +4,21 @@ import { Product } from './product';
 import { ProductVariantHistory } from './productVariantHistory';
 import { ProductVariantTranslation } from './productVariantTranslation';
 import { User } from './user';
-// import { OrderItem } from './orderItem'; // If needed, though often OrderItem refers to ProductVariant
+// import { OrderItem } from './orderItem';
 
 export interface ProductVariant {
-  variant_id: number;
-  product_id: number;
-  establishment_id: number;
-  variant_description: string;
-  price: Prisma.Decimal; // Use Prisma.Decimal for entity type
+  variantId: number;
+  productId: number;
+  establishmentId: number;
+  variantDescription: string;
+  price: Prisma.Decimal;
   sku?: string | null;
-  sort_order?: number | null;
-  is_active?: boolean | null;
-  created_by_user_id?: number | null;
-  created_at?: Date | null;
-  updated_at?: Date | null;
-  deleted_at?: Date | null;
+  sortOrder?: number | null;
+  isActive?: boolean | null;
+  createdByUserId?: number | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+  deletedAt?: Date | null;
 
   // Relations
   product?: Product;
@@ -26,5 +26,5 @@ export interface ProductVariant {
   creator?: User | null;
   translations?: ProductVariantTranslation[];
   history?: ProductVariantHistory[];
-  // order_items?: OrderItem[];
+  // orderItems?: OrderItem[];
 }

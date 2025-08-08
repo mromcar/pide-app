@@ -25,13 +25,13 @@ export const authOptions: AuthOptions = {
           include: { establishment: true }
         });
 
-        if (!user || !user.password_hash) {
+        if (!user || !user.passwordHash) {
           return null;
         }
 
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
-          user.password_hash
+          user.passwordHash
         );
 
         if (!isPasswordValid) {
@@ -39,10 +39,10 @@ export const authOptions: AuthOptions = {
         }
 
         return {
-          id: user.user_id.toString(),
+          id: user.userId.toString(),
           email: user.email,
           role: user.role,
-          establishment_id: user.establishment_id,
+          establishmentId: user.establishmentId,
           name: user.name,
           image: null
         };
@@ -74,16 +74,16 @@ export const authOptions: AuthOptions = {
               data: {
                 email: user.email!,
                 name: user.name,
-                google_id: account.providerAccountId,
+                googleId: account.providerAccountId,
                 role: UserRole.CLIENT
               }
             });
           } else {
             // Actualizar usuario existente con Google ID si no lo tiene
-            if (!existingUser.google_id) {
+            if (!existingUser.googleId) {
               await prisma.user.update({
-                where: { user_id: existingUser.user_id },
-                data: { google_id: account.providerAccountId }
+                where: { userId: existingUser.userId },
+                data: { googleId: account.providerAccountId }
               });
             }
           }
@@ -103,9 +103,9 @@ export const authOptions: AuthOptions = {
         });
 
         if (dbUser) {
-          token.id = dbUser.user_id.toString();
+          token.id = dbUser.userId.toString();
           token.role = dbUser.role;
-          token.establishment_id = dbUser.establishment_id;
+          token.establishmentId = dbUser.establishmentId;
           token.name = dbUser.name;
           token.image = null;
         }
@@ -115,9 +115,8 @@ export const authOptions: AuthOptions = {
     async session({ session, token }: { session: Session; token: JWT }) {
       if (token) {
         session.user.id = token.id as string;
-        // In the session callback around line 117:
         session.user.role = token.role as UserRole;
-        session.user.establishment_id = token.establishment_id as number;
+        session.user.establishmentId = token.establishmentId as number;
         session.user.name = token.name as string;
         session.user.image = token.image as string;
       }

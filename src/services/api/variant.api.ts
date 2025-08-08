@@ -3,16 +3,14 @@ import {
   ProductVariantUpdateDTO,
   ProductVariantResponseDTO,
 } from '@/types/dtos/productVariant';
-import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils'; // Actualizado
+import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils';
 import { VariantApiError } from '@/types/errors/variant.api.error';
+import camelcaseKeys from 'camelcase-keys';
 
 const API_BASE_URL = '/api/restaurants';
 
 /**
  * Obtiene todas las variantes de un producto específico.
- * @param restaurantId - El ID del restaurante.
- * @param productId - El ID del producto.
- * @returns Una promesa que resuelve a un array de ProductVariantResponseDTO.
  */
 async function getAllVariantsByProduct(
   restaurantId: number,
@@ -26,7 +24,8 @@ async function getAllVariantsByProduct(
         'Content-Type': 'application/json',
       },
     });
-    return await handleApiResponse<ProductVariantResponseDTO[]>(response);
+    const data = await handleApiResponse<ProductVariantResponseDTO[]>(response);
+    return camelcaseKeys(data, { deep: true }) as ProductVariantResponseDTO[];
   } catch (error) {
     throw handleCaughtError(error, VariantApiError, 'Error de red al obtener variantes del producto.');
   }
@@ -34,10 +33,6 @@ async function getAllVariantsByProduct(
 
 /**
  * Obtiene una variante específica por su ID.
- * @param restaurantId - El ID del restaurante.
- * @param productId - El ID del producto.
- * @param variantId - El ID de la variante.
- * @returns Una promesa que resuelve a ProductVariantResponseDTO.
  */
 async function getVariantById(
   restaurantId: number,
@@ -52,7 +47,8 @@ async function getVariantById(
         'Content-Type': 'application/json',
       },
     });
-    return await handleApiResponse<ProductVariantResponseDTO>(response);
+    const data = await handleApiResponse<ProductVariantResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as ProductVariantResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, VariantApiError, 'Error de red al obtener la variante.');
   }
@@ -60,10 +56,6 @@ async function getVariantById(
 
 /**
  * Crea una nueva variante para un producto.
- * @param restaurantId - El ID del restaurante.
- * @param productId - El ID del producto.
- * @param variantData - Los datos de la variante a crear.
- * @returns Una promesa que resuelve a ProductVariantResponseDTO.
  */
 async function createVariant(
   restaurantId: number,
@@ -80,7 +72,8 @@ async function createVariant(
       body: JSON.stringify(variantData),
       credentials: 'include',
     });
-    return await handleApiResponse<ProductVariantResponseDTO>(response);
+    const data = await handleApiResponse<ProductVariantResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as ProductVariantResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, VariantApiError, 'Error de red al crear la variante.');
   }
@@ -88,11 +81,6 @@ async function createVariant(
 
 /**
  * Actualiza una variante existente.
- * @param restaurantId - El ID del restaurante.
- * @param productId - El ID del producto.
- * @param variantId - El ID de la variante.
- * @param variantData - Los datos actualizados de la variante.
- * @returns Una promesa que resuelve a ProductVariantResponseDTO.
  */
 async function updateVariant(
   restaurantId: number,
@@ -110,7 +98,8 @@ async function updateVariant(
       body: JSON.stringify(variantData),
       credentials: 'include',
     });
-    return await handleApiResponse<ProductVariantResponseDTO>(response);
+    const data = await handleApiResponse<ProductVariantResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as ProductVariantResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, VariantApiError, 'Error de red al actualizar la variante.');
   }
@@ -118,10 +107,6 @@ async function updateVariant(
 
 /**
  * Elimina una variante existente.
- * @param restaurantId - El ID del restaurante.
- * @param productId - El ID del producto.
- * @param variantId - El ID de la variante.
- * @returns Una promesa que resuelve a void.
  */
 async function deleteVariant(
   restaurantId: number,

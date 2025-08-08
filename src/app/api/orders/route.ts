@@ -3,14 +3,14 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
 const orderItemSchema = z.object({
-  variant_id: z.number(),
+  variantId: z.number(),
   quantity: z.number().min(1),
-  unit_price: z.number(),
+  unitPrice: z.number(),
 });
 
 const createOrderSchema = z.object({
-  establishment_id: z.number(),
-  table_number: z.string().optional(),
+  establishmentId: z.number(),
+  tableNumber: z.string().optional(),
   notes: z.string().optional(),
   items: z.array(orderItemSchema).min(1),
 });
@@ -24,22 +24,22 @@ export async function POST(request: Request) {
       return NextResponse.json(validation.error.errors, { status: 400 });
     }
 
-    const { establishment_id, table_number, notes, items } = validation.data;
+    const { establishmentId, tableNumber, notes, items } = validation.data;
 
-    const total_amount = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
+    const totalAmount = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
-    const order = await prisma.order.create({  // Cambiar de prisma.orders a prisma.order
+    const order = await prisma.order.create({
       data: {
-        establishment_id,
-        table_number,
+        establishment_id: establishmentId,
+        table_number: tableNumber,
         notes,
-        total_amount,
+        total_amount: totalAmount,
         status: 'pending',
         order_items: {
           create: items.map(item => ({
-            variant_id: item.variant_id,
+            variant_id: item.variantId,
             quantity: item.quantity,
-            unit_price: item.unit_price,
+            unit_price: item.unitPrice,
             status: 'pending',
           })),
         },
@@ -49,6 +49,7 @@ export async function POST(request: Request) {
       },
     });
 
+    // Devuelve los datos en camelCase (no uses snakecase-keys)
     return NextResponse.json(order, { status: 201 });
   } catch (error) {
     console.error('Failed to create order:', error);

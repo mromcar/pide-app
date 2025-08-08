@@ -52,3 +52,5 @@ export default function EmployeeManagementPage() {
         <EmployeeManagement establishmentId={establishmentId} languageCode={languageCode} />
       </AdminLayout>
     </ProtectedPage>
+  )
+}

@@ -10,23 +10,23 @@ import logger from '@/lib/logger';
 // Mapeador base a DTO (sin relaciones profundas)
 function mapToDTO(establishment: Establishment): EstablishmentResponseDTO {
   return {
-    establishment_id: establishment.establishment_id,
+    establishmentId: establishment.establishment_id,
     name: establishment.name,
-    tax_id: establishment.tax_id,
+    taxId: establishment.tax_id,
     address: establishment.address,
-    postal_code: establishment.postal_code,
+    postalCode: establishment.postal_code,
     city: establishment.city,
     phone1: establishment.phone1,
     phone2: establishment.phone2,
-    billing_bank_details: establishment.billing_bank_details,
-    payment_bank_details: establishment.payment_bank_details,
-    contact_person: establishment.contact_person,
+    billingBankDetails: establishment.billing_bank_details,
+    paymentBankDetails: establishment.payment_bank_details,
+    contactPerson: establishment.contact_person,
     description: establishment.description,
     website: establishment.website,
-    is_active: establishment.is_active,
-    accepts_orders: establishment.accepts_orders,
-    created_at: establishment.created_at?.toISOString() || null,
-    updated_at: establishment.updated_at?.toISOString() || null,
+    isActive: establishment.is_active,
+    acceptsOrders: establishment.accepts_orders,
+    createdAt: establishment.created_at?.toISOString() || null,
+    updatedAt: establishment.updated_at?.toISOString() || null,
   };
 }
 
@@ -38,30 +38,30 @@ function mapToDTOWithRelations(establishment: Establishment & {
   return {
     ...mapToDTO(establishment),
     categories: establishment.categories?.map(cat => ({
-        category_id: cat.category_id,
-        establishment_id: cat.establishment_id,
-        name: cat.name,
-        image_url: cat.image_url,
-        sort_order: cat.sort_order,
-        is_active: cat.is_active,
-        created_at: cat.created_at?.toISOString() || null,
-        updated_at: cat.updated_at?.toISOString() || null,
-        deleted_at: cat.deleted_at?.toISOString() || null,
-      } as CategoryDTO)) || [],
-      administrators: establishment.establishment_administrators
-        ?.map(adminLink => {
-          if (!adminLink.user) return null;
-          return {
-            user_id: adminLink.user.user_id,
-            role: adminLink.user.role,
-            name: adminLink.user.name,
-            email: adminLink.user.email,
-            establishment_id: adminLink.user.establishment_id,
-            created_at: adminLink.user.created_at?.toISOString() || null,
-            updated_at: adminLink.user.updated_at?.toISOString() || null,
-          } as UserResponseDTO;
-        })
-        .filter((admin): admin is UserResponseDTO => admin !== null) || [],
+      categoryId: cat.category_id,
+      establishmentId: cat.establishment_id,
+      name: cat.name,
+      imageUrl: cat.image_url,
+      sortOrder: cat.sort_order,
+      isActive: cat.is_active,
+      createdAt: cat.created_at?.toISOString() || null,
+      updatedAt: cat.updated_at?.toISOString() || null,
+      deletedAt: cat.deleted_at?.toISOString() || null,
+    } as CategoryDTO)) || [],
+    administrators: establishment.establishment_administrators
+      ?.map(adminLink => {
+        if (!adminLink.user) return null;
+        return {
+          userId: adminLink.user.user_id,
+          role: adminLink.user.role,
+          name: adminLink.user.name,
+          email: adminLink.user.email,
+          establishmentId: adminLink.user.establishment_id,
+          createdAt: adminLink.user.created_at?.toISOString() || null,
+          updatedAt: adminLink.user.updated_at?.toISOString() || null,
+        } as UserResponseDTO;
+      })
+      .filter((admin): admin is UserResponseDTO => admin !== null) || [],
   };
 }
 
@@ -73,7 +73,7 @@ export async function getAllEstablishments(page: number = 1, pageSize: number = 
     skip: skip,
     take: pageSize,
   });
-  return establishments.map(establishment => mapToDTO(establishment));
+  return establishments.map(mapToDTO);
 }
 
 // Obtener un establecimiento por ID
@@ -115,7 +115,7 @@ export async function createEstablishment(data: EstablishmentCreateDTO): Promise
 
 // Actualizar un establecimiento existente
 export async function updateEstablishment(id: number, data: EstablishmentUpdateDTO): Promise<EstablishmentResponseDTO | null> {
-  establishmentIdSchema.parse({ establishment_id: id });
+  establishmentIdSchema.parse({ establishmentId: id });
   establishmentUpdateSchema.parse(data);
 
   const updatedEstablishment = await prisma.establishment.update({
@@ -131,7 +131,7 @@ export async function updateEstablishment(id: number, data: EstablishmentUpdateD
 
 // Eliminar un establecimiento
 export async function deleteEstablishment(id: number): Promise<EstablishmentResponseDTO | null> {
-  establishmentIdSchema.parse({ establishment_id: id });
+  establishmentIdSchema.parse({ establishmentId: id });
 
   const deletedEstablishment = await prisma.establishment.delete({
     where: { establishment_id: id },
@@ -142,8 +142,8 @@ export async function deleteEstablishment(id: number): Promise<EstablishmentResp
 
 // Asignar un administrador a un establecimiento
 export async function addAdministratorToEstablishment(establishmentId: number, userId: number): Promise<EstablishmentAdministrator | null> {
-  establishmentIdSchema.parse({ establishment_id: establishmentId });
-  userIdSchema.parse({ user_id: userId });
+  establishmentIdSchema.parse({ establishmentId });
+  userIdSchema.parse({ userId });
 
   // Verificar que el usuario exista y tenga el rol adecuado
   const user = await prisma.user.findUnique({ where: { user_id: userId } });
@@ -164,8 +164,8 @@ export async function addAdministratorToEstablishment(establishmentId: number, u
 
 // Remover un administrador de un establecimiento
 export async function removeAdministratorFromEstablishment(establishmentId: number, userId: number): Promise<EstablishmentAdministrator | null> {
-  establishmentIdSchema.parse({ establishment_id: establishmentId });
-  userIdSchema.parse({ user_id: userId });
+  establishmentIdSchema.parse({ establishmentId });
+  userIdSchema.parse({ userId });
 
   const deletedAdminLink = await prisma.establishmentAdministrator.delete({
     where: {

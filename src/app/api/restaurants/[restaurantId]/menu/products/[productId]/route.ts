@@ -70,16 +70,16 @@ export async function GET(req: NextRequest, { params }: { params: { restaurantId
       return jsonError('Forbidden', 403);
     }
 
-    const product = await productService.getProductById(productId); // Corrected arguments
+    const product = await productService.getProductById(productId);
 
-    if (!product || product.establishment_id !== restaurantId) {
+    if (!product || product.establishmentId !== restaurantId) {
       return jsonError('Product not found or does not belong to the restaurant.', 404);
     }
 
+    // Devuelve los datos en camelCase
     return jsonOk(product);
   } catch (error) {
     logger.error('Error in GET product:', error);
-    // Removed: if (error instanceof ErrorResponse) return error.toNextResponse();
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);
     }
@@ -159,22 +159,20 @@ export async function PUT(req: NextRequest, { params }: { params: { restaurantId
     }
 
     // Ensure product belongs to the restaurant before updating
-    const existingProduct = await productService.getProductById(productId); // Corrected arguments
-    if (!existingProduct || existingProduct.establishment_id !== restaurantId) {
+    const existingProduct = await productService.getProductById(productId);
+    if (!existingProduct || existingProduct.establishmentId !== restaurantId) {
       return jsonError('Product not found or does not belong to the restaurant.', 404);
     }
 
     const updatedProduct = await productService.updateProduct(productId, parsedBody.data, userId);
     if (!updatedProduct) {
-      // This case might be redundant if the above check is sufficient, 
-      // but kept for safety if service method can return null for other reasons.
       return jsonError('Failed to update product or product not found.', 404);
     }
 
+    // Devuelve los datos en camelCase
     return jsonOk(updatedProduct);
   } catch (error) {
     logger.error('Error in PUT product:', error);
-    // Removed: if (error instanceof ErrorResponse) return error.toNextResponse();
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);
     }
@@ -242,21 +240,20 @@ export async function DELETE(req: NextRequest, { params }: { params: { restauran
     }
 
     // Ensure product belongs to the restaurant before deleting
-    const existingProduct = await productService.getProductById(productId); // Corrected arguments
-    if (!existingProduct || existingProduct.establishment_id !== restaurantId) {
+    const existingProduct = await productService.getProductById(productId);
+    if (!existingProduct || existingProduct.establishmentId !== restaurantId) {
       return jsonError('Product not found or does not belong to the restaurant.', 404);
     }
 
     const deletedProduct = await productService.deleteProduct(productId, userId);
     if (!deletedProduct) {
-      // This case might be redundant if the above check is sufficient
       return jsonError('Failed to delete product or product not found.', 404);
     }
 
+    // Devuelve los datos en camelCase
     return jsonOk(deletedProduct);
   } catch (error) {
     logger.error('Error in DELETE product:', error);
-    // Removed: if (error instanceof ErrorResponse) return error.toNextResponse();
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);
     }

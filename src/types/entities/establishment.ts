@@ -2,27 +2,27 @@
 // For now, we'll use placeholder types or omit them for brevity in this file.
 
 export interface Establishment {
-  establishment_id: number;
+  establishmentId: number;
   name: string;
-  tax_id?: string | null;
+  taxId?: string | null;
   address?: string | null;
-  postal_code?: string | null;
+  postalCode?: string | null;
   city?: string | null;
   phone1?: string | null;
   phone2?: string | null;
-  billing_bank_details?: string | null;
-  payment_bank_details?: string | null;
-  contact_person?: string | null;
+  billingBankDetails?: string | null;
+  paymentBankDetails?: string | null;
+  contactPerson?: string | null;
   description?: string | null;
   website?: string | null;
-  is_active?: boolean | null;
-  accepts_orders: boolean;
-  created_at?: Date | null;
-  updated_at?: Date | null;
+  isActive?: boolean | null;
+  acceptsOrders: boolean;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
   // users: User[];
-  // establishment_administrators: EstablishmentAdministrator[];
+  // establishmentAdministrators: EstablishmentAdministrator[];
   // categories: Category[];
   // products: Product[];
-  // product_variants: ProductVariant[];
+  // productVariants: ProductVariant[];
   // orders: Order[];
 }

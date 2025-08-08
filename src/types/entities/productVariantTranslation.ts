@@ -1,10 +1,10 @@
 import { ProductVariant } from './productVariant';
 
 export interface ProductVariantTranslation {
-  translation_id: number;
-  variant_id: number;
-  language_code: string;
-  variant_description: string;
+  translationId: number;
+  variantId: number;
+  languageCode: string;
+  variantDescription: string;
 
   // Relations
   variant?: ProductVariant;

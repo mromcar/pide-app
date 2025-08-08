@@ -2,13 +2,13 @@ import { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { orderService } from '@/services/order.service';
 import { jsonOk, jsonError } from '@/utils/api';
-import { create_order_schema } from '@/schemas/order';
+import { createOrderSchema } from '@/schemas/order';
 import { UserRole } from '@/types/enums';
-import { OrderCreateDTO } from '@/types/dtos/order'; // Agregar importación faltante
+import { OrderCreateDTO } from '@/types/dtos/order';
 import { z } from 'zod';
 
-const path_params_schema = z.object({
-  restaurant_id: z.coerce.number().int().positive(),
+const pathParamsSchema = z.object({
+  restaurantId: z.coerce.number().int().positive(),
 });
 
 export async function POST(
@@ -22,41 +22,38 @@ export async function POST(
       return jsonError('Unauthorized', 401);
     }
 
-    // ✅ Conversión inmediata: camelCase → snake_case
     const { restaurantId } = params;
-    const restaurant_id = parseInt(restaurantId);
-
-    const parsed_path_params = path_params_schema.safeParse({
-      restaurant_id
+    const parsedPathParams = pathParamsSchema.safeParse({
+      restaurantId: parseInt(restaurantId),
     });
 
-    if (!parsed_path_params.success) {
-      return jsonError(parsed_path_params.error.errors, 400);
+    if (!parsedPathParams.success) {
+      return jsonError(parsedPathParams.error.errors, 400);
     }
 
-    const { restaurant_id: validated_restaurant_id } = parsed_path_params.data;
+    const validatedRestaurantId = parsedPathParams.data.restaurantId;
 
     // Authorization check
     if (
       token.role !== UserRole.GENERAL_ADMIN &&
-      !(token.role === UserRole.ESTABLISHMENT_ADMIN && token.establishment_id === validated_restaurant_id)
+      !(token.role === UserRole.ESTABLISHMENT_ADMIN && token.establishment_id === validatedRestaurantId)
     ) {
       return jsonError('Forbidden', 403);
     }
 
     const body = await req.json();
-    const validated_data = create_order_schema.safeParse(body);
+    const validatedData = createOrderSchema.safeParse(body);
 
-    if (!validated_data.success) {
-      return jsonError(validated_data.error.issues, 400);
+    if (!validatedData.success) {
+      return jsonError(validatedData.error.issues, 400);
     }
 
-    // ✅ Crear orden usando los datos validados con tipo explícito
+    // Crea la orden usando camelCase en las propiedades
     const orderData: OrderCreateDTO = {
-      ...validated_data.data,
-      client_user_id: token.sub ? parseInt(token.sub) : null,
-      establishment_id: validated_restaurant_id,
-      total_amount: validated_data.data.total_amount || 0, // ✅ Asegurar que no sea undefined
+      ...validatedData.data,
+      clientUserId: token.sub ? parseInt(token.sub) : null,
+      establishmentId: validatedRestaurantId,
+      totalAmount: validatedData.data.totalAmount || 0,
     };
 
     const order = await orderService.createOrder(orderData);

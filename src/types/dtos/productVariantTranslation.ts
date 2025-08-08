@@ -1,18 +1,18 @@
 export interface ProductVariantTranslationCreateDTO {
-  language_code: string;
-  variant_description: string;
-  variant_id?: number; // Optional if created nested
+  languageCode: string;
+  variantDescription: string;
+  variantId?: number; // Optional if created nested
 }
 
 export interface ProductVariantTranslationUpdateDTO {
-  translation_id?: number;
-  language_code?: string;
-  variant_description?: string;
+  translationId?: number;
+  languageCode?: string;
+  variantDescription?: string;
 }
 
 export interface ProductVariantTranslationResponseDTO {
-  translation_id: number;
-  variant_id: number;
-  language_code: string;
-  variant_description: string;
+  translationId: number;
+  variantId: number;
+  languageCode: string;
+  variantDescription: string;
 }

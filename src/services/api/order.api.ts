@@ -5,20 +5,46 @@ import {
 } from '@/types/dtos/order';
 import { OrderItemCreateDTO, OrderItemUpdateDTO } from '@/types/dtos/orderItem';
 import { OrderStatusHistoryCreateDTO } from '@/types/dtos/orderStatusHistory';
-import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils'; // Actualizado
+import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils';
+import { PaymentApiError } from '@/types/errors/payment.api.error';
 import { OrderApiError } from '@/types/errors/order.api.error';
 import { OrderStatus } from '@prisma/client';
+import camelcaseKeys from 'camelcase-keys';
 
-// Base URLs - ajusta según tus rutas reales
+// Tipos para los DTOs de pagos
+interface PaymentCreateDTO {
+  orderId: number;
+  amount: number;
+  currency: string;
+  paymentMethod: string;
+  metadata?: Record<string, unknown>;
+}
+
+interface PaymentResponseDTO {
+  id: string;
+  orderId: number;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  paymentMethod: string;
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, unknown>;
+}
+
+enum PaymentStatus {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED'
+}
+
 const API_BASE_URL_CLIENT = (restaurantId: number) => `/api/restaurants/${restaurantId}/orders/client`;
 const API_BASE_URL_EMPLOYEE = (restaurantId: number) => `/api/restaurants/${restaurantId}/orders/employee`;
+const API_BASE_URL = '/api/payments';
 
-/**
- * Crea un nuevo pedido para un cliente.
- * @param restaurantId - El ID del restaurante.
- * @param orderData - Los datos del pedido a crear.
- * @returns Una promesa que resuelve a OrderResponseDTO.
- */
+// Crea un nuevo pedido para un cliente
 export async function createClientOrder(
   restaurantId: number,
   orderData: OrderCreateDTO
@@ -26,24 +52,18 @@ export async function createClientOrder(
   try {
     const response = await fetch(API_BASE_URL_CLIENT(restaurantId), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderData),
       credentials: 'include',
     });
-    return await handleApiResponse<OrderResponseDTO>(response);
+    const data = await handleApiResponse<OrderResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as OrderResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, OrderApiError, 'Error de red al crear el pedido.');
   }
 }
 
-/**
- * Obtiene un pedido específico por su ID para un cliente.
- * @param restaurantId - El ID del restaurante.
- * @param orderId - El ID del pedido.
- * @returns Una promesa que resuelve a OrderResponseDTO o null si no se encuentra.
- */
+// Obtiene un pedido específico por su ID para un cliente
 export async function getClientOrderById(
   restaurantId: number,
   orderId: number
@@ -51,25 +71,19 @@ export async function getClientOrderById(
   try {
     const response = await fetch(`${API_BASE_URL_CLIENT(restaurantId)}/${orderId}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     });
     if (response.status === 404) return null;
-    return await handleApiResponse<OrderResponseDTO>(response);
+    const data = await handleApiResponse<OrderResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as OrderResponseDTO;
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) return null;
     throw handleCaughtError(error, OrderApiError, 'Error de red al obtener el pedido.');
   }
 }
 
-/**
- * Obtiene todos los pedidos para un empleado (o administrador) de un restaurante.
- * @param restaurantId - El ID del restaurante.
- * @param status - (Opcional) Filtra por estado del pedido.
- * @returns Una promesa que resuelve a un array de OrderResponseDTO.
- */
+// Obtiene todos los pedidos para un empleado (o administrador) de un restaurante
 export async function getAllEmployeeOrders(
   restaurantId: number,
   status?: OrderStatus
@@ -81,24 +95,17 @@ export async function getAllEmployeeOrders(
 
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
     });
-    return await handleApiResponse<OrderResponseDTO[]>(response);
+    const data = await handleApiResponse<OrderResponseDTO[]>(response);
+    return camelcaseKeys(data, { deep: true }) as OrderResponseDTO[];
   } catch (error) {
     throw handleCaughtError(error, OrderApiError, 'Error de red al obtener los pedidos.');
   }
 }
 
-/**
- * Actualiza el estado de un pedido (empleado).
- * @param restaurantId - El ID del restaurante.
- * @param orderId - El ID del pedido.
- * @param statusUpdateData - Datos para actualizar el estado.
- * @returns Una promesa que resuelve a OrderResponseDTO.
- */
+// Actualiza el estado de un pedido (empleado)
 export async function updateOrderStatusByEmployee(
   restaurantId: number,
   orderId: number,
@@ -106,27 +113,19 @@ export async function updateOrderStatusByEmployee(
 ): Promise<OrderResponseDTO> {
   try {
     const response = await fetch(`${API_BASE_URL_EMPLOYEE(restaurantId)}/${orderId}/status`, {
-      method: 'PATCH', // O PUT, según tu API
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(statusUpdateData),
       credentials: 'include',
     });
-    return await handleApiResponse<OrderResponseDTO>(response);
+    const data = await handleApiResponse<OrderResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as OrderResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, OrderApiError, 'Error de red al actualizar el estado del pedido.');
   }
 }
 
-/**
- * Actualiza un pedido completo (empleado).
- * Esto podría ser para modificar ítems, notas, etc.
- * @param restaurantId - El ID del restaurante.
- * @param orderId - El ID del pedido.
- * @param orderData - Los datos completos para actualizar el pedido.
- * @returns Una promesa que resuelve a OrderResponseDTO.
- */
+// Actualiza un pedido completo (empleado)
 export async function updateFullOrderByEmployee(
   restaurantId: number,
   orderId: number,
@@ -135,21 +134,95 @@ export async function updateFullOrderByEmployee(
   try {
     const response = await fetch(`${API_BASE_URL_EMPLOYEE(restaurantId)}/${orderId}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderData),
       credentials: 'include',
     });
-    return await handleApiResponse<OrderResponseDTO>(response);
+    const data = await handleApiResponse<OrderResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as OrderResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, OrderApiError, 'Error de red al actualizar el pedido.');
   }
 }
 
-// Podrías añadir más funciones según las necesidades, como:
-// - Obtener pedidos de un cliente específico (si la API lo permite y es necesario desde el frontend)
-// - Funciones para añadir/actualizar/eliminar ítems de un pedido si la API lo soporta granularmente.
+/**
+ * Inicia un nuevo proceso de pago
+ */
+async function createPayment(paymentData: PaymentCreateDTO): Promise<PaymentResponseDTO> {
+  try {
+    const response = await fetch(API_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(paymentData),
+      credentials: 'include',
+    });
+    const data = await handleApiResponse<PaymentResponseDTO>(response);
+    // Transformar a camelCase antes de devolver
+    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
+  } catch (error) {
+    throw handleCaughtError(error, PaymentApiError, 'Error al procesar el pago.');
+  }
+}
+
+/**
+ * Obtiene el estado de un pago específico
+ */
+async function getPaymentStatus(paymentId: string): Promise<PaymentResponseDTO> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${paymentId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+    const data = await handleApiResponse<PaymentResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
+  } catch (error) {
+    throw handleCaughtError(error, PaymentApiError, 'Error al obtener el estado del pago.');
+  }
+}
+
+/**
+ * Procesa un reembolso para un pago específico
+ */
+async function refundPayment(paymentId: string, amount?: number): Promise<PaymentResponseDTO> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/${paymentId}/refund`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount }),
+      credentials: 'include',
+    });
+    const data = await handleApiResponse<PaymentResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
+  } catch (error) {
+    throw handleCaughtError(error, PaymentApiError, 'Error al procesar el reembolso.');
+  }
+}
+
+/**
+ * Obtiene el historial de pagos de un pedido
+ */
+async function getOrderPayments(orderId: number): Promise<PaymentResponseDTO[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/order/${orderId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    });
+    const data = await handleApiResponse<PaymentResponseDTO[]>(response);
+    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO[];
+  } catch (error) {
+    throw handleCaughtError(error, PaymentApiError, 'Error al obtener el historial de pagos del pedido.');
+  }
+}
 
 export const orderApiService = {
   createClientOrder,
@@ -157,4 +230,11 @@ export const orderApiService = {
   getAllEmployeeOrders,
   updateOrderStatusByEmployee,
   updateFullOrderByEmployee,
+};
+
+export const paymentApiService = {
+  createPayment,
+  getPaymentStatus,
+  refundPayment,
+  getOrderPayments,
 };

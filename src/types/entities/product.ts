@@ -8,19 +8,19 @@ import { ProductVariant } from './productVariant';
 import { User } from './user';
 
 export interface Product {
-  product_id: number;
-  establishment_id: number;
-  category_id: number;
+  productId: number;
+  establishmentId: number;
+  categoryId: number;
   name: string;
   description?: string | null;
-  image_url?: string | null;
-  sort_order?: number | null;
-  is_active?: boolean | null;
-  responsible_role?: UserRole | null;
-  created_by_user_id?: number | null;
-  created_at?: Date | null;
-  updated_at?: Date | null;
-  deleted_at?: Date | null;
+  imageUrl?: string | null;
+  sortOrder?: number | null;
+  isActive?: boolean | null;
+  responsibleRole?: UserRole | null;
+  createdByUserId?: number | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+  deletedAt?: Date | null;
 
   // Relations
   establishment?: Establishment;

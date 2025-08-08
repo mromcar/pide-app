@@ -1,5 +1,6 @@
 import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils';
 import { PaymentApiError } from '@/types/errors/payment.api.error';
+import camelcaseKeys from 'camelcase-keys'; // <-- Añade este import
 
 // Tipos para los DTOs de pagos
 interface PaymentCreateDTO {
@@ -47,7 +48,8 @@ async function createPayment(paymentData: PaymentCreateDTO): Promise<PaymentResp
       body: JSON.stringify(paymentData),
       credentials: 'include',
     });
-    return await handleApiResponse<PaymentResponseDTO>(response);
+    const data = await handleApiResponse<PaymentResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al procesar el pago.');
   }
@@ -67,7 +69,8 @@ async function getPaymentStatus(paymentId: string): Promise<PaymentResponseDTO> 
       },
       credentials: 'include',
     });
-    return await handleApiResponse<PaymentResponseDTO>(response);
+    const data = await handleApiResponse<PaymentResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al obtener el estado del pago.');
   }
@@ -89,7 +92,8 @@ async function refundPayment(paymentId: string, amount?: number): Promise<Paymen
       body: JSON.stringify({ amount }),
       credentials: 'include',
     });
-    return await handleApiResponse<PaymentResponseDTO>(response);
+    const data = await handleApiResponse<PaymentResponseDTO>(response);
+    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al procesar el reembolso.');
   }
@@ -109,7 +113,8 @@ async function getOrderPayments(orderId: number): Promise<PaymentResponseDTO[]> 
       },
       credentials: 'include',
     });
-    return await handleApiResponse<PaymentResponseDTO[]>(response);
+    const data = await handleApiResponse<PaymentResponseDTO[]>(response);
+    return camelcaseKeys(data, { deep: true }) as PaymentResponseDTO[];
   } catch (error) {
     throw handleCaughtError(error, PaymentApiError, 'Error al obtener el historial de pagos del pedido.');
   }

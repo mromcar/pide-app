@@ -1,14 +1,14 @@
-import { AllergenResponseDTO } from './allergen'; // Assuming AllergenResponseDTO exists
+import { AllergenResponseDTO } from './allergen';
 
 // DTO for creating the link
 export interface ProductAllergenCreateDTO {
-  product_id: number;
-  allergen_id: number;
+  productId: number;
+  allergenId: number;
 }
 
 // DTO for response, might include allergen details
 export interface ProductAllergenResponseDTO {
-  product_id: number;
-  allergen_id: number;
+  productId: number;
+  allergenId: number;
   allergen?: AllergenResponseDTO; // Optionally include full allergen details
 }

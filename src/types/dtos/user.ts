@@ -1,5 +1,5 @@
 import { UserRole } from '@prisma/client';
-import { EstablishmentResponseDTO } from './establishment'; // Assuming this exists
+import { EstablishmentResponseDTO } from './establishment';
 
 // For creating a new user
 export interface UserCreateDTO {
@@ -7,7 +7,7 @@ export interface UserCreateDTO {
   name?: string | null;
   email: string;
   password: string; // Plain password, will be hashed in the service/backend
-  establishment_id?: number | null;
+  establishmentId?: number | null;
 }
 
 // For updating an existing user
@@ -16,21 +16,20 @@ export interface UserUpdateDTO {
   name?: string | null;
   email?: string;
   password?: string; // For password changes
-  establishment_id?: number | null;
-  is_active?: boolean; // Assuming you might add an is_active field to User model
+  establishmentId?: number | null;
+  isActive?: boolean; // Assuming you might add an isActive field to User model
 }
 
 // For responses, omitting sensitive data like password_hash
 export interface UserResponseDTO {
-  user_id: number;
+  userId: number;
   role: UserRole;
   name?: string | null;
   email: string;
-  establishment_id?: number | null;
-  created_at?: string | null; // Dates as ISO strings
-  updated_at?: string | null;
-  establishment?: EstablishmentResponseDTO | null; // Example of including related data
-  // Add other relations as needed for specific use cases
+  establishmentId?: number | null;
+  createdAt?: string | null; // Dates as ISO strings
+  updatedAt?: string | null;
+  establishment?: EstablishmentResponseDTO | null;
 }
 
 // UserLoginDTO and UserLoginResponseDTO can be removed if NextAuth handles the entire login flow

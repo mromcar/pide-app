@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const userData = {
       ...body,
       role: UserRole.client, // Usar el rol 'client' por defecto
-      establishment_id: null // Los clientes no tienen establecimiento asignado inicialmente
+      establishmentId: null // camelCase para el backend y DTOs
     };
 
     const newUser = await userService.createUser(userData);
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     logger.error('Error registering user:', error);
 
-    if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
+    if (error && typeof error === 'object' && 'code' in error && (error as any).code === 'P2002') {
       return NextResponse.json({
         success: false,
         message: 'Email already exists'

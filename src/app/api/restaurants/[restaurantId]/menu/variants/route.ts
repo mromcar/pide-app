@@ -102,18 +102,19 @@ export async function GET(
     }
     const { productId, page, pageSize } = queryValidation.data;
 
-    // Further check: ensure the product actually belongs to the restaurantId
-    // This might require a quick productService.getProductById(productId) call
-    // and checking its establishment_id if not handled by productVariantService.
-    // For now, assuming productVariantService handles this or it's implicitly correct.
+    // Asegúrate de que el producto pertenece al restaurante
+    const product = await productService.getProductById(productId);
+    if (!product || product.establishmentId !== restaurantId) {
+      return jsonError('Product not found or does not belong to this restaurant.', 400);
+    }
 
     const variants = await productVariantService.getAllProductVariantsForProduct(
       productId,
       page,
       pageSize
     );
-    // Potentially filter variants by establishment_id if service doesn't do it strictly
-    const filteredVariants = variants.filter(v => v.establishment_id === restaurantId);
+    // Filtra por establecimiento si el servicio no lo hace
+    const filteredVariants = variants.filter(v => v.establishmentId === restaurantId);
 
     return jsonOk(filteredVariants);
   } catch (error: any) {
@@ -182,11 +183,11 @@ export async function POST(
     }
 
     const body = await req.json();
-    // Ensure establishment_id in body matches restaurantId from path or is set by it
+    // Usa camelCase para las propiedades internas
     const dataToValidate = {
       ...body,
-      establishment_id: restaurantId,
-      created_by_user_id: Number(token.sub)
+      establishmentId: restaurantId,
+      createdByUserId: Number(token.sub)
     };
 
     const validatedData = productVariantCreateSchema.safeParse(dataToValidate);
@@ -195,17 +196,17 @@ export async function POST(
       return jsonError(validatedData.error.issues, 400);
     }
 
-    // Verify that the product_id belongs to the restaurantId
-    if (validatedData.data.product_id) {
-      const product = await productService.getProductById(validatedData.data.product_id);
-      if (!product || product.establishment_id !== restaurantId) {
+    // Verifica que el productId pertenezca al restaurante
+    if (validatedData.data.productId) {
+      const product = await productService.getProductById(validatedData.data.productId);
+      if (!product || product.establishmentId !== restaurantId) {
         return jsonError('Product not found or does not belong to this restaurant.', 400);
       }
     }
 
     const newVariant = await productVariantService.createProductVariant(
-      validatedData.data, // establishment_id and created_by_user_id are now part of this
-      Number(token.sub) // userId for audit (already in validatedData.data but service might expect it separately)
+      validatedData.data,
+      Number(token.sub)
     );
     return jsonOk(newVariant, 201);
   } catch (error: any) {

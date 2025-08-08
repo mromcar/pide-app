@@ -55,29 +55,16 @@ const paramsSchema = z.object({
  *         description: Internal server error.
  */
 export async function GET(
-  request: NextRequest, 
+  request: NextRequest,
   { params: paramsPromise }: { params: Promise<{ restaurantId: string }> }
 ) {
   try {
-    const params = await paramsPromise; // ✅ Await params first
-    // Comentar autenticación para acceso público al menú
-    // const token = await getToken({ req: request });
-    // if (!token || !token.sub) {
-    //   return jsonError('Unauthorized', 401);
-    // }
-
+    const params = await paramsPromise;
     const paramsValidation = paramsSchema.safeParse(params);
     if (!paramsValidation.success) {
       return jsonError(paramsValidation.error.issues, 400);
     }
     const { restaurantId } = paramsValidation.data;
-
-    // Comentar verificación de autorización para acceso público
-    // const isGeneralAdmin = token.role === UserRole.general_admin;
-    // const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishment_id === restaurantId;
-    // if (!isGeneralAdmin && !isCorrectEstablishmentAdmin) {
-    //     return jsonError('Forbidden: You do not have access to this restaurant.', 403);
-    // }
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -85,9 +72,6 @@ export async function GET(
     const categoryIdString = searchParams.get('categoryId');
     const categoryId = categoryIdString ? parseInt(categoryIdString, 10) : undefined;
 
-    // Assuming getAllProducts in service is updated to accept restaurantId, page, pageSize
-    // and does not need language directly for basic product listing.
-    // Language-specific data would typically be handled by how translations are included/queried in the service.
     const products = await productService.getAllProducts(restaurantId, page, pageSize, categoryId);
     return jsonOk(products);
   } catch (error) {
@@ -148,7 +132,6 @@ export async function POST(request: NextRequest, { params }: { params: { restaur
     }
     const { restaurantId } = paramsValidation.data;
 
-    // Authorization: Ensure the admin can create products for this restaurant
     const isGeneralAdmin = token.role === UserRole.general_admin;
     const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishment_id === restaurantId;
 
@@ -157,11 +140,9 @@ export async function POST(request: NextRequest, { params }: { params: { restaur
     }
 
     const body = await request.json();
-    // Add restaurantId to the body before validation if your schema expects it
-    // Or ensure your service method correctly uses the restaurantId from the path params.
     const validatedData = productCreateSchema.safeParse({
       ...body,
-      establishment_id: restaurantId, // Ensure establishment_id is part of the data sent to service if schema requires
+      establishmentId: restaurantId, // camelCase para el backend y DTOs
     });
 
     if (!validatedData.success) {
@@ -169,7 +150,7 @@ export async function POST(request: NextRequest, { params }: { params: { restaur
     }
 
     const product = await productService.createProduct(
-      validatedData.data, // establishment_id is now part of validatedData.data
+      validatedData.data,
       userId
     );
     return jsonOk(product, 201);

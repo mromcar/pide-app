@@ -4,17 +4,15 @@ import {
   ProductResponseDTO,
   ProductWithRelationsResponseDTO,
 } from '@/types/dtos/product';
-import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils'; // Actualizado
+import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
 import { ProductApiError } from '@/types/errors/product.api.error';
+import camelcaseKeys from 'camelcase-keys';
 
 const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
-const API_SERVICE_PATH = '/api/restaurants'; // Asumiendo que los productos están bajo un restaurante
+const API_SERVICE_PATH = '/api/restaurants';
 
 /**
  * Obtiene todos los productos para un establecimiento específico.
- * @param restaurantId - El ID del restaurante.
- * @param categoryId - (Opcional) El ID de la categoría para filtrar productos.
- * @returns Una promesa que resuelve a un array de ProductResponseDTO.
  */
 async function getAllProductsByRestaurant(
   restaurantId: number,
@@ -34,13 +32,11 @@ async function getAllProductsByRestaurant(
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        // Añadir cabeceras de autenticación si son necesarias
       },
     });
-    // Asume que la API devuelve directamente ProductResponseDTO[] o un objeto que handleApiResponse puede manejar.
-    // Si la API devuelve { products: ProductResponseDTO[] }, entonces T sería { products: ProductResponseDTO[] }
-    // y harías: const result = await handleApiResponse<{ products: ProductResponseDTO[] }>(response); return result.products;
-    return await handleApiResponse<ProductResponseDTO[]>(response);
+    const result = await handleApiResponse<ProductResponseDTO[]>(response);
+    // Transformar a camelCase antes de devolver
+    return camelcaseKeys(result, { deep: true }) as ProductResponseDTO[];
   } catch (error) {
     throw handleCaughtError(error, ProductApiError, 'Error de red al obtener productos.');
   }
@@ -48,14 +44,11 @@ async function getAllProductsByRestaurant(
 
 /**
  * Obtiene un producto específico por su ID, incluyendo relaciones.
- * @param restaurantId - El ID del restaurante.
- * @param productId - El ID del producto.
- * @returns Una promesa que resuelve a ProductWithRelationsResponseDTO o null si no se encuentra.
  */
 async function getProductById(
   restaurantId: number,
   productId: number
-): Promise<ProductWithRelationsResponseDTO | null> { // O ProductResponseDTO | null
+): Promise<ProductWithRelationsResponseDTO | null> {
   try {
     const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products/${productId}`, {
       method: 'GET',
@@ -66,10 +59,11 @@ async function getProductById(
 
     if (response.status === 404) return null;
 
-    return await handleApiResponse<ProductWithRelationsResponseDTO>(response); // O ProductResponseDTO
+    const result = await handleApiResponse<ProductWithRelationsResponseDTO>(response);
+    return camelcaseKeys(result, { deep: true }) as ProductWithRelationsResponseDTO;
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
-        return null; 
+        return null;
     }
     throw handleCaughtError(error, ProductApiError, 'Error de red al obtener el producto.');
   }
@@ -77,9 +71,6 @@ async function getProductById(
 
 /**
  * Crea un nuevo producto para un establecimiento.
- * @param restaurantId - El ID del restaurante.
- * @param productData - Los datos para el nuevo producto.
- * @returns Una promesa que resuelve al ProductResponseDTO creado.
  */
 async function createProduct(
   restaurantId: number,
@@ -93,7 +84,8 @@ async function createProduct(
       },
       body: JSON.stringify(productData),
     });
-    return await handleApiResponse<ProductResponseDTO>(response);
+    const result = await handleApiResponse<ProductResponseDTO>(response);
+    return camelcaseKeys(result, { deep: true }) as ProductResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, ProductApiError, 'Error de red al crear el producto.');
   }
@@ -101,10 +93,6 @@ async function createProduct(
 
 /**
  * Actualiza un producto existente.
- * @param restaurantId - El ID del restaurante.
- * @param productId - El ID del producto a actualizar.
- * @param productData - Los datos para actualizar el producto.
- * @returns Una promesa que resuelve al ProductResponseDTO actualizado.
  */
 async function updateProduct(
   restaurantId: number,
@@ -119,7 +107,8 @@ async function updateProduct(
       },
       body: JSON.stringify(productData),
     });
-    return await handleApiResponse<ProductResponseDTO>(response);
+    const result = await handleApiResponse<ProductResponseDTO>(response);
+    return camelcaseKeys(result, { deep: true }) as ProductResponseDTO;
   } catch (error) {
     throw handleCaughtError(error, ProductApiError, 'Error de red al actualizar el producto.');
   }
@@ -127,9 +116,6 @@ async function updateProduct(
 
 /**
  * Elimina un producto.
- * @param restaurantId - El ID del restaurante.
- * @param productId - El ID del producto a eliminar.
- * @returns Una promesa que resuelve cuando el producto ha sido eliminado.
  */
 async function deleteProduct(restaurantId: number, productId: number): Promise<void> {
   try {
@@ -139,7 +125,7 @@ async function deleteProduct(restaurantId: number, productId: number): Promise<v
         'Content-Type': 'application/json',
       },
     });
-    await handleApiResponse<void>(response); // Asume 204 No Content o similar para DELETE exitoso
+    await handleApiResponse<void>(response);
   } catch (error) {
     throw handleCaughtError(error, ProductApiError, 'Error de red al eliminar el producto.');
   }

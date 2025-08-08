@@ -13,38 +13,38 @@ export class UserService {
   // --- Utility mappers ---
   private mapToDTO(user: User & { establishment?: Establishment | null }): UserResponseDTO {
     return {
-      user_id: user.user_id,
+      userId: user.user_id,
       role: user.role,
       name: user.name,
       email: user.email,
-      establishment_id: user.establishment_id,
-      created_at: user.created_at?.toISOString() || null,
-      updated_at: user.updated_at?.toISOString() || null,
+      establishmentId: user.establishment_id,
+      createdAt: user.created_at?.toISOString() || null,
+      updatedAt: user.updated_at?.toISOString() || null,
       establishment: user.establishment ? {
-        establishment_id: user.establishment.establishment_id,
+        establishmentId: user.establishment.establishment_id,
         name: user.establishment.name,
-        tax_id: user.establishment.tax_id,
+        taxId: user.establishment.tax_id,
         address: user.establishment.address,
-        postal_code: user.establishment.postal_code,
+        postalCode: user.establishment.postal_code,
         city: user.establishment.city,
         phone1: user.establishment.phone1,
         phone2: user.establishment.phone2,
-        billing_bank_details: user.establishment.billing_bank_details,
-        payment_bank_details: user.establishment.payment_bank_details,
-        contact_person: user.establishment.contact_person,
+        billingBankDetails: user.establishment.billing_bank_details,
+        paymentBankDetails: user.establishment.payment_bank_details,
+        contactPerson: user.establishment.contact_person,
         description: user.establishment.description,
         website: user.establishment.website,
-        is_active: user.establishment.is_active,
-        accepts_orders: user.establishment.accepts_orders,
-        created_at: user.establishment.created_at?.toISOString() || null,
-        updated_at: user.establishment.updated_at?.toISOString() || null,
+        isActive: user.establishment.is_active,
+        acceptsOrders: user.establishment.accepts_orders,
+        createdAt: user.establishment.created_at?.toISOString() || null,
+        updatedAt: user.establishment.updated_at?.toISOString() || null,
       } : null,
     };
   }
 
   // --- CRUD Operations ---
   async createUser(data: UserCreateDTO): Promise<UserResponseDTO> {
-    userCreateSchema.parse(data); // Validate input
+    userCreateSchema.parse(data);
 
     // Verificar si el email ya existe
     const existingUser = await prisma.user.findUnique({
@@ -280,7 +280,7 @@ export class UserService {
     }
 
     // Check if user belongs to the establishment
-    if (user.establishment_id === establishmentId) {
+    if (user.establishmentId === establishmentId) {
       return true;
     }
 

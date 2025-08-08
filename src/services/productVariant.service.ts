@@ -21,21 +21,21 @@ import { productVariantTranslationCreateSchema, productVariantTranslationUpdateS
 export class ProductVariantService {
   private mapToTranslationDTO(translation: ProductVariantTranslation): ProductVariantTranslationResponseDTO {
     return {
-      translation_id: translation.translation_id,
-      variant_id: translation.variant_id,
-      language_code: translation.language_code,
-      variant_description: translation.variant_description,
+      translationId: translation.translation_id,
+      variantId: translation.variant_id,
+      languageCode: translation.language_code,
+      variantDescription: translation.variant_description,
     };
   }
 
   private mapToHistoryDTO(history: ProductVariantHistory): ProductVariantHistoryResponseDTO {
     return {
       id: history.id,
-      variant_id: history.variant_id,
-      variant_description: history.variant_description,
+      variantId: history.variant_id,
+      variantDescription: history.variant_description,
       price: history.price !== null && history.price !== undefined ? parseFloat(history.price.toString()) : null,
-      is_active: history.is_active,
-      updated_at: history.updated_at ? history.updated_at.toISOString() : new Date(0).toISOString(),
+      isActive: history.is_active,
+      updatedAt: history.updated_at ? history.updated_at.toISOString() : new Date(0).toISOString(),
     };
   }
 
@@ -43,18 +43,18 @@ export class ProductVariantService {
     translations?: ProductVariantTranslation[],
   }): ProductVariantResponseDTO {
     return {
-      variant_id: variant.variant_id,
-      product_id: variant.product_id,
-      establishment_id: variant.establishment_id,
-      variant_description: variant.variant_description,
+      variantId: variant.variant_id,
+      productId: variant.product_id,
+      establishmentId: variant.establishment_id,
+      variantDescription: variant.variant_description,
       price: parseFloat(variant.price.toString()),
       sku: variant.sku,
-      sort_order: variant.sort_order,
-      is_active: variant.is_active ?? true,
-      created_by_user_id: variant.created_by_user_id,
-      created_at: variant.created_at?.toISOString() || null,
-      updated_at: variant.updated_at?.toISOString() || null,
-      deleted_at: variant.deleted_at?.toISOString() || null,
+      sortOrder: variant.sort_order,
+      isActive: variant.is_active ?? true,
+      createdByUserId: variant.created_by_user_id,
+      createdAt: variant.created_at?.toISOString() || null,
+      updatedAt: variant.updated_at?.toISOString() || null,
+      deletedAt: variant.deleted_at?.toISOString() || null,
       translations: variant.translations?.map(this.mapToTranslationDTO) || [],
     };
   }
@@ -66,7 +66,7 @@ export class ProductVariantService {
     const newVariant = await prisma.productVariant.create({
       data: {
         ...variantData,
-        created_by_user_id: userId, // Asignar userId si está presente
+        created_by_user_id: userId,
         translations: translations && translations.length > 0 ? {
           createMany: {
             data: translations.map(t => ({
@@ -87,7 +87,6 @@ export class ProductVariantService {
         variant_description: newVariant.variant_description,
         price: newVariant.price,
         is_active: newVariant.is_active,
-        // updated_at se establece por defecto por la BD/Prisma
       },
     });
 
@@ -141,10 +140,10 @@ export class ProductVariantService {
         ...variantData,
         translations: translations
           ? {
-              deleteMany: { variant_id: variantId }, // Delete existing translations
+              deleteMany: { variant_id: variantId },
               createMany: {
                 data: translations
-                  .filter(t => t.language_code !== undefined && t.variant_description !== undefined) // Ensure language_code and description are present
+                  .filter(t => t.language_code !== undefined && t.variant_description !== undefined)
                   .map(t => ({
                     language_code: t.language_code!,
                     variant_description: t.variant_description!,
@@ -167,7 +166,7 @@ export class ProductVariantService {
       },
     });
 
-    return this.mapToDTO(updatedVariant);
+    return updatedVariant ? this.mapToDTO(updatedVariant) : null;
   }
 
   async deleteProductVariant(variantId: number, userId?: number): Promise<ProductVariantResponseDTO | null> {
@@ -180,19 +179,18 @@ export class ProductVariantService {
 
     const deletedVariant = await prisma.productVariant.update({
       where: { variant_id: variantId },
-      data: { deleted_at: new Date() }, // Soft delete
+      data: { deleted_at: new Date() },
       include: {
         translations: true,
       }
     });
 
-    // Crear registro de historial para la eliminación (soft delete)
     await prisma.productVariantHistory.create({
       data: {
         variant_id: deletedVariant.variant_id,
-        variant_description: deletedVariant.variant_description, // Guardar el estado antes de marcar como eliminado
+        variant_description: deletedVariant.variant_description,
         price: deletedVariant.price,
-        is_active: false, // Marcar como inactivo en el historial
+        is_active: false,
       },
     });
 
@@ -242,7 +240,7 @@ export class ProductVariantService {
         updated_at: 'desc',
       },
     });
-    return histories.map(this.mapToHistoryDTO);
+    return histories.map(h => this.mapToHistoryDTO(h));
   }
 }
 

@@ -1,78 +1,78 @@
-import { CategoryDTO } from './category'; 
-import { UserResponseDTO } from './user'; 
+import { CategoryDTO } from './category';
+import { UserResponseDTO } from './user';
 
 export interface EstablishmentCreateDTO {
   name: string;
-  tax_id?: string | null;
+  taxId?: string | null;
   address?: string | null;
-  postal_code?: string | null;
+  postalCode?: string | null;
   city?: string | null;
   phone1?: string | null;
   phone2?: string | null;
-  billing_bank_details?: string | null;
-  payment_bank_details?: string | null;
-  contact_person?: string | null;
+  billingBankDetails?: string | null;
+  paymentBankDetails?: string | null;
+  contactPerson?: string | null;
   description?: string | null;
   website?: string | null;
-  is_active?: boolean | null;
-  accepts_orders?: boolean; // Optional on create, defaults to true in schema
+  isActive?: boolean | null;
+  acceptsOrders?: boolean; // Optional on create, defaults to true in schema
 }
 
 export interface EstablishmentUpdateDTO {
   name?: string;
-  tax_id?: string | null;
+  taxId?: string | null;
   address?: string | null;
-  postal_code?: string | null;
+  postalCode?: string | null;
   city?: string | null;
   phone1?: string | null;
   phone2?: string | null;
-  billing_bank_details?: string | null;
-  payment_bank_details?: string | null;
-  contact_person?: string | null;
+  billingBankDetails?: string | null;
+  paymentBankDetails?: string | null;
+  contactPerson?: string | null;
   description?: string | null;
   website?: string | null;
-  is_active?: boolean | null;
-  accepts_orders?: boolean;
+  isActive?: boolean | null;
+  acceptsOrders?: boolean;
 }
 
 export interface EstablishmentDTO {
-  establishment_id: number;
+  establishmentId: number;
   name: string;
-  tax_id?: string | null;
+  taxId?: string | null;
   address?: string | null;
-  postal_code?: string | null;
+  postalCode?: string | null;
   city?: string | null;
   phone1?: string | null;
   phone2?: string | null;
-  billing_bank_details?: string | null;
-  payment_bank_details?: string | null;
-  contact_person?: string | null;
+  billingBankDetails?: string | null;
+  paymentBankDetails?: string | null;
+  contactPerson?: string | null;
   description?: string | null;
   website?: string | null;
-  is_active?: boolean | null;
-  accepts_orders: boolean;
-  created_at?: string | null; // Dates as strings for DTOs
-  updated_at?: string | null;
+  isActive?: boolean | null;
+  acceptsOrders: boolean;
+  createdAt?: string | null; // Dates as strings for DTOs
+  updatedAt?: string | null;
 }
 
-export interface EstablishmentResponseDTO { // O el nombre que le hayas dado, ej: EstablishmentDTO
-  establishment_id: number;
+export interface EstablishmentResponseDTO {
+  establishmentId: number;
   name: string;
-  tax_id?: string | null;
+  taxId?: string | null;
   address?: string | null;
-  postal_code?: string | null;
+  postalCode?: string | null;
   city?: string | null;
   phone1?: string | null;
   phone2?: string | null;
-  billing_bank_details?: string | null;
-  payment_bank_details?: string | null;
-  contact_person?: string | null;
+  billingBankDetails?: string | null;
+  paymentBankDetails?: string | null;
+  contactPerson?: string | null;
   description?: string | null;
   website?: string | null;
-  is_active?: boolean | null;
-  accepts_orders: boolean;
-  created_at?: string | null; 
-  updated_at?: string | null;
-  categories?: CategoryDTO[]; // Añadido
-  administrators?: UserResponseDTO[]; // Añadido, asumiendo que quieres una lista de UserResponseDTO
+  isActive?: boolean | null;
+  acceptsOrders: boolean;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  categories?: CategoryDTO[];
+  administrators?: UserResponseDTO[];
 }

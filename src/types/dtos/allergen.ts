@@ -1,18 +1,16 @@
 import type { Allergen } from '../entities/allergen';
-import type { CreateAllergenTranslationDTO, UpdateAllergenTranslationDTO, AllergenTranslationResponseDTO } from './allergenTranslation'; // Importación actualizada
+import type { CreateAllergenTranslationDTO, UpdateAllergenTranslationDTO, AllergenTranslationResponseDTO } from './allergenTranslation';
 
-export interface CreateAllergenDTO extends Omit<Allergen, 'allergen_id' | 'translations' | 'product_allergens'> {
+export interface CreateAllergenDTO extends Omit<Allergen, 'allergenId' | 'translations' | 'productAllergens'> {
   translations?: CreateAllergenTranslationDTO[];
 }
 
 export interface UpdateAllergenDTO extends Partial<Omit<CreateAllergenDTO, 'translations'>> {
-  // Se espera un array de traducciones. El servicio se encargará de 
-  // crear, actualizar o eliminar según sea necesario.
-  translations?: Array<UpdateAllergenTranslationDTO>; 
+  translations?: Array<UpdateAllergenTranslationDTO>;
 }
 
 export interface AllergenResponseDTO extends Omit<Allergen, 'translations'> {
-    translations?: AllergenTranslationResponseDTO[];
+  translations?: AllergenTranslationResponseDTO[];
 }
 
 export interface AllergenListResponseDTO {
