@@ -171,7 +171,7 @@ export function VariantManagement({ establishmentId, languageCode }: VariantMana
 interface VariantFormData {
   productId: number
   variantDescription: string
-  price: string
+  price: number
   sku?: string
   isActive: boolean
   establishmentId: string
@@ -206,9 +206,9 @@ function VariantForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Convierte a snake_case solo para la petición al backend si es necesario
     onSubmit({
       ...formData,
+      productId: Number(formData.productId),
       price: parseFloat(formData.price),
     })
   }

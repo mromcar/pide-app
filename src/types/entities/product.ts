@@ -21,6 +21,7 @@ export interface Product {
   createdAt?: Date | null;
   updatedAt?: Date | null;
   deletedAt?: Date | null;
+  price: number;
 
   // Relations
   establishment?: Establishment;

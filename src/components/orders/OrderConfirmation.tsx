@@ -56,17 +56,14 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
     router.push(`/${lang}/restaurant/${restaurantId}/menu`)
   }
 
+  // CORREGIDO: No tipifiques el parámetro de .find
   const getProductName = (item: OrderItemWithDetails): string => {
-    const translation = item.variant?.product?.translations?.find(
-      (t: OrderItemTranslation) => t.languageCode === lang
-    )
+    const translation = item.variant?.product?.translations?.find((t) => t.languageCode === lang)
     return translation?.name || item.variant?.product?.name || `Product ${item.variantId}`
   }
 
   const getVariantDescription = (item: OrderItemWithDetails): string | undefined => {
-    const translation = item.variant?.translations?.find(
-      (t: OrderItemVariantTranslation) => t.languageCode === lang
-    )
+    const translation = item.variant?.translations?.find((t) => t.languageCode === lang)
     return translation?.variantDescription || item.variant?.variantDescription
   }
 
@@ -130,7 +127,9 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
               <p className="order-confirmation-table">Table: {order.tableNumber}</p>
             )}
             <p className="order-confirmation-status">
-              Status: {t.orderStatus?.[order.status.toLowerCase()] || order.status}
+              Status:{' '}
+              {t.orderStatus?.[order.status.toLowerCase() as keyof typeof t.orderStatus] ||
+                order.status}
             </p>
             <p className="order-confirmation-date">
               {new Date(order.createdAt).toLocaleString(

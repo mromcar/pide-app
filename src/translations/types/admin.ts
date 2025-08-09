@@ -28,6 +28,8 @@ export interface EstablishmentAdminTranslations {
       deleteMessage: string
       cancel: string
       confirm: string
+      update: string
+      create: string
     }
     products: {
       title: string
@@ -54,6 +56,11 @@ export interface EstablishmentAdminTranslations {
       name: string
       priceModifier: string
       active: string
+      allProducts: string
+      product: string
+      description: string
+      price: string
+      sku: string
     }
   }
   employeeManagement: {
@@ -111,6 +118,12 @@ export interface EstablishmentAdminTranslations {
     loading: string
     required: string
     optional: string
+    active: string
+    inactive: string
+    edit: string
+    delete: string
+    update: string
+    create: string
   }
   messages: {
     success: {

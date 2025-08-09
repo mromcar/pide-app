@@ -77,6 +77,15 @@ export function ProductManagement({ establishmentId, languageCode }: ProductMana
     }
   }
 
+  // NUEVO: función handleSubmit para el formulario
+  const handleSubmit = async (data: any) => {
+    // Aquí puedes hacer fetch POST o PUT según si editingProduct es null o no
+    // Por ejemplo:
+    // await fetch('/api/restaurants/...', { method: editingProduct ? 'PUT' : 'POST', body: JSON.stringify(data) })
+    setShowForm(false)
+    await fetchData()
+  }
+
   const filteredProducts =
     selectedCategory === 'all'
       ? products
@@ -248,21 +257,17 @@ function ProductForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Convierte a snake_case solo para la petición al backend
+    const { categoryId, imageUrl, isActive, ...rest } = formData
     const payload = {
-      ...formData,
-      category_id: formData.categoryId,
-      image_url: formData.imageUrl,
-      is_active: formData.isActive,
-    }
-    delete payload.categoryId
-    delete payload.imageUrl
-    delete payload.isActive
-
-    onSubmit({
-      ...payload,
+      ...rest,
+      category_id: categoryId,
+      image_url: imageUrl,
+      is_active: isActive,
       establishment_id: establishmentId,
       language_code: languageCode,
-    })
+    }
+
+    onSubmit(payload)
   }
 
   return (

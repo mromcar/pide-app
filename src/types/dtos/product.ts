@@ -46,4 +46,5 @@ export interface ProductResponseDTO {
   translations?: ProductTranslationResponseDTO[];
   allergens?: ProductAllergenResponseDTO[];
   variants?: ProductVariantResponseDTO[];
+  imageUrl?: string | null;
 }

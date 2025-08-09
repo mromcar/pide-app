@@ -57,7 +57,12 @@ export const adminFr: EstablishmentAdminTranslations = {
       delete: 'Supprimer Variante',
       name: 'Nom',
       priceModifier: 'Modificateur de Prix',
-      active: 'Actif'
+      active: 'Actif',
+      allProducts: 'Tous les produits',
+      product: 'Produit',
+      description: 'Description',
+      price: 'Prix',
+      sku: 'SKU'
     }
   },
   employeeManagement: {
@@ -114,7 +119,13 @@ export const adminFr: EstablishmentAdminTranslations = {
     saving: 'Enregistrement...',
     loading: 'Chargement...',
     required: 'Requis',
-    optional: 'Optionnel'
+    optional: 'Optionnel',
+    active: 'Actif',
+    inactive: 'Inactif',
+    edit: 'Modifier',
+    delete: 'Supprimer',
+    update: 'Mettre à jour',
+    create: 'Créer'
   },
   messages: {
     success: {
