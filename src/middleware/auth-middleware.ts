@@ -43,7 +43,7 @@ export async function requireEstablishmentAccess(establishmentId: number) {
   }
 
   // Other roles must belong to the establishment
-  if (session.user.establishment_id !== establishmentId) {
+  if (session.user.establishmentId !== establishmentId) {
     throw jsonError("Access denied to this establishment", 403)
   }
 

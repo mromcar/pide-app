@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma';
-import { Establishment, Prisma, Category, User, EstablishmentAdministrator, UserRole } from '@prisma/client';
+import { Establishment, Category, User, EstablishmentAdministrator, UserRole } from '@prisma/client';
 import { EstablishmentCreateDTO, EstablishmentUpdateDTO, EstablishmentResponseDTO } from '../types/dtos/establishment';
 import { UserResponseDTO } from '../types/dtos/user';
 import { establishmentCreateSchema, establishmentUpdateSchema, establishmentIdSchema } from '../schemas/establishment';
@@ -41,7 +41,6 @@ function mapToDTOWithRelations(establishment: Establishment & {
       categoryId: cat.categoryId,
       establishmentId: cat.establishmentId,
       name: cat.name,
-      imageUrl: cat.imageUrl,
       sortOrder: cat.sortOrder,
       isActive: cat.isActive,
       createdAt: cat.createdAt?.toISOString() || null,

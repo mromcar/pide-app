@@ -26,3 +26,15 @@ export interface CategoryDTO {
   deletedAt?: string | null;
   translations?: CategoryTranslationDTO[];
 }
+
+export interface CategoryResponseDTO {
+  categoryId: number;
+  establishmentId: number;
+  name: string;
+  description?: string | null;
+  sortOrder?: number | null;
+  isActive: boolean;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  deletedAt?: string | null;
+}

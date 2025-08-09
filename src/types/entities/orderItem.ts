@@ -1,14 +1,14 @@
 import { OrderItemStatus } from '@prisma/client';
+import type { Product } from './product';
 
 export interface OrderItem {
   orderItemId: number;
   orderId: number;
   variantId: number;
   quantity: number;
-  unitPrice: number; // Prisma Decimal
-  itemTotalPrice?: number | null; // Prisma Decimal, GENERATED ALWAYS AS in SQL
+  unitPrice: number;
+  itemTotalPrice?: number | null;
   status?: OrderItemStatus | null;
   notes?: string | null;
-  // order: Order;
-  // variant: ProductVariant;
+  product?: Product;
 }

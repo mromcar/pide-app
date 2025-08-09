@@ -94,6 +94,15 @@ export interface EstablishmentAdminTranslations {
       ready: string
       delivered: string
       cancelled: string
+      date: string
+      status: string
+      allStatuses: string
+    }
+    refresh: string
+    stats: {
+      totalOrders: string
+      activeOrders: string
+      completedOrders: string
     }
     orderDetails: {
       orderNumber: string
@@ -110,6 +119,7 @@ export interface EstablishmentAdminTranslations {
       viewDetails: string
       printOrder: string
     }
+    noOrdersInStatus: string
   }
   forms: {
     save: string

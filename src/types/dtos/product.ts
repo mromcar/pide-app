@@ -1,7 +1,8 @@
 import { UserRole } from '@prisma/client';
 import { ProductTranslationCreateDTO, ProductTranslationUpdateDTO, ProductTranslationResponseDTO } from './productTranslation';
-import { ProductAllergenCreateDTO, ProductAllergenResponseDTO } from './productAllergen';
+import { ProductAllergenResponseDTO } from './productAllergen';
 import { ProductVariantResponseDTO } from './productVariant';
+import type { CategoryResponseDTO } from './category'; // Ajusta la ruta si es necesario
 
 // --- Product DTOs ---
 export interface ProductCreateDTO {
@@ -46,5 +47,9 @@ export interface ProductResponseDTO {
   translations?: ProductTranslationResponseDTO[];
   allergens?: ProductAllergenResponseDTO[];
   variants?: ProductVariantResponseDTO[];
-  imageUrl?: string | null;
+}
+
+
+export interface ProductWithRelationsResponseDTO extends ProductResponseDTO {
+  categories?: CategoryResponseDTO[];
 }

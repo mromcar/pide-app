@@ -6,11 +6,6 @@ import {
   AllergenResponseDTO,
 } from '../types/dtos/allergen';
 import {
-  CreateAllergenTranslationDTO,
-  UpdateAllergenTranslationDTO,
-  AllergenTranslationResponseDTO
-} from '../types/dtos/allergenTranslation';
-import {
   createAllergenSchema,
   updateAllergenSchema,
   allergenIdSchema
@@ -85,7 +80,7 @@ export class AllergenService {
 
     const { translations, ...allergenData } = data;
 
-    const updatedAllergen = await prisma.allergen.update({
+    await prisma.allergen.update({
       where: { allergenId },
       data: allergenData,
       include: this.allergenInclude,

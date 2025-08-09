@@ -1,7 +1,7 @@
-import { OrderStatus, OrderItemStatus } from '@prisma/client';
+import { OrderStatus } from '@prisma/client';
 // import { Establishment } from './establishment';
 // import { User } from './user';
-// import { OrderItem } from './orderItem';
+import { OrderItem } from './orderItem';
 // import { OrderStatusHistory } from './orderStatusHistory';
 
 export interface Order {
@@ -19,15 +19,4 @@ export interface Order {
   createdAt: string;
   updatedAt?: string | null;
   items?: OrderItem[];
-}
-
-export interface OrderItem {
-  orderItemId: number;
-  orderId: number;
-  variantId: number;
-  quantity: number;
-  unitPrice: number;
-  itemTotalPrice?: number | null;
-  status?: OrderItemStatus | null;
-  notes?: string | null;
 }

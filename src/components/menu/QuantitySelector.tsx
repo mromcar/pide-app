@@ -60,7 +60,6 @@ export default function QuantitySelector({ product, variant, lang }: QuantitySel
         variantDescription: getVariantDescription(variant),
         price: variant.price,
         quantity: quantity,
-        imageUrl: product.imageUrl ?? undefined,
       }
       addToCart(itemToAdd)
     }

@@ -77,11 +77,7 @@ export function ProductManagement({ establishmentId, languageCode }: ProductMana
     }
   }
 
-  // NUEVO: función handleSubmit para el formulario
   const handleSubmit = async (data: any) => {
-    // Aquí puedes hacer fetch POST o PUT según si editingProduct es null o no
-    // Por ejemplo:
-    // await fetch('/api/restaurants/...', { method: editingProduct ? 'PUT' : 'POST', body: JSON.stringify(data) })
     setShowForm(false)
     await fetchData()
   }
@@ -134,9 +130,7 @@ export function ProductManagement({ establishmentId, languageCode }: ProductMana
           <div key={product.productId} className="product-card">
             <div className="product-header">
               <div className="product-info">
-                {product.imageUrl && (
-                  <img src={product.imageUrl} alt={product.name} className="product-image" />
-                )}
+                {/* ELIMINADO: Imagen del producto */}
                 <div className="product-details">
                   <h3>{product.name}</h3>
                   <p className="product-description">{product.description}</p>
@@ -250,18 +244,17 @@ function ProductForm({
     description: product?.description || '',
     price: product?.price || 0,
     categoryId: product?.categoryId || categories[0]?.categoryId || '',
-    imageUrl: product?.imageUrl || '',
+    // ELIMINADO: imageUrl
     isActive: product?.isActive ?? true,
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // Convierte a snake_case solo para la petición al backend
-    const { categoryId, imageUrl, isActive, ...rest } = formData
+    const { categoryId, isActive, ...rest } = formData
     const payload = {
       ...rest,
       category_id: categoryId,
-      image_url: imageUrl,
       is_active: isActive,
       establishment_id: establishmentId,
       language_code: languageCode,
@@ -314,15 +307,7 @@ function ProductForm({
             </select>
           </div>
 
-          <div className="form-group">
-            <label>{t.establishmentAdmin.menuManagement.products.image}</label>
-            <input
-              type="url"
-              value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              placeholder="URL de la imagen"
-            />
-          </div>
+          {/* ELIMINADO: Campo de imagen */}
 
           <div className="form-group checkbox-group">
             <label>

@@ -7,7 +7,7 @@ import { getTranslation } from '@/translations'
 import { OrderStatus } from '@prisma/client'
 
 interface OrderTrackingProps {
-  lang: string
+  lang: LanguageCode
   orderId: string
   restaurantId: string
 }

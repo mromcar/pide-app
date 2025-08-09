@@ -294,3 +294,159 @@
 [31mCan't reach database server at `ep-dry-rice-a4dpqky4-pooler.us-east-1.aws.neon.tech:5432`[39m
 
 [31mPlease make sure your database server is running at `ep-dry-rice-a4dpqky4-pooler.us-east-1.aws.neon.tech:5432`.[39m
+2025-08-09 23:55:00:550 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-09 23:55:00:550 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mCan't reach database server at `ep-dry-rice-a4dpqky4-pooler.us-east-1.aws.neon.tech:5432`[39m
+
+[31mPlease make sure your database server is running at `ep-dry-rice-a4dpqky4-pooler.us-east-1.aws.neon.tech:5432`.[39m
+2025-08-09 23:55:05:555 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-09 23:56:52:5652 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-09 23:56:52:5652 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-09 23:56:53:5653 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:01:30:130 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:01:30:130 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:01:31:131 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:01:32:132 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:01:32:132 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:01:32:132 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:03:31:331 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:03:31:331 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:03:31:331 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:03:46:346 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:03:46:346 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:03:47:347 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:04:09:49 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:04:09:49 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:04:10:410 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:05:37:537 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:05:38:538 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:05:38:538 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:05:47:547 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:05:47:547 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:05:47:547 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:05:57:557 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:05:57:557 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:05:57:557 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:06:19:619 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:06:19:619 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:06:19:619 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:07:35:735 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:07:35:735 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:07:37:737 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:08:47:847 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:08:47:847 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:08:48:848 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:08:50:850 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-08-10 00:08:50:850 [31merror[39m: [31m[API] Error fetching restaurant 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m
+2025-08-10 00:08:50:850 [31merror[39m: [31m[API] Error fetching categories: [39m
+[31mInvalid `prisma.category.findMany()` invocation:[39m
+
+
+[31mThe column `categories.image_url` does not exist in the current database.[39m

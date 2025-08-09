@@ -1,4 +1,4 @@
-import { Prisma, UserRole } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { Category } from './category';
 import { Establishment } from './establishment';
 import { ProductAllergen } from './productAllergen';
@@ -13,7 +13,6 @@ export interface Product {
   categoryId: number;
   name: string;
   description?: string | null;
-  imageUrl?: string | null;
   sortOrder?: number | null;
   isActive?: boolean | null;
   responsibleRole?: UserRole | null;

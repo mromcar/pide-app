@@ -1,7 +1,7 @@
 // src/services/api/user.api.ts
 import { UserCreateDTO, UserUpdateDTO, UserResponseDTO } from '@/types/dtos/user';
 import { UserApiError } from '@/types/errors/user.api.error';
-import { handleApiError } from '@/utils/apiUtils';
+import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils';
 
 const USER_API_BASE_URL = '/api/users';
 
@@ -18,7 +18,7 @@ export async function getUserById(userId: number): Promise<UserResponseDTO> {
     const data = await response.json();
     return data as UserResponseDTO;
   } catch (error) {
-    return handleApiError(error, UserApiError, 'An unexpected error occurred while fetching the user.');
+    return handleCaughtError(error, UserApiError, 'An unexpected error occurred while fetching the user.');
   }
 }
 
@@ -35,7 +35,7 @@ export async function getAllUsers(page: number = 1, pageSize: number = 10): Prom
     const data = await response.json();
     return data as UserResponseDTO[];
   } catch (error) {
-    return handleApiError(error, UserApiError, 'An unexpected error occurred while fetching users.');
+    return handleCaughtError(error, UserApiError, 'An unexpected error occurred while fetching users.');
   }
 }
 
@@ -58,7 +58,7 @@ export async function createUser(userData: UserCreateDTO): Promise<UserResponseD
     const data = await response.json();
     return data as UserResponseDTO;
   } catch (error) {
-    return handleApiError(error, UserApiError, 'An unexpected error occurred while creating the user.');
+    return handleCaughtError(error, UserApiError, 'An unexpected error occurred while creating the user.');
   }
 }
 
@@ -81,7 +81,7 @@ export async function updateUser(userId: number, userData: UserUpdateDTO): Promi
     const data = await response.json();
     return data as UserResponseDTO;
   } catch (error) {
-    return handleApiError(error, UserApiError, 'An unexpected error occurred while updating the user.');
+    return handleCaughtError(error, UserApiError, 'An unexpected error occurred while updating the user.');
   }
 }
 
@@ -101,7 +101,7 @@ export async function deleteUser(userId: number): Promise<void> {
     // const data = await response.json();
     // return data as UserResponseDTO;
   } catch (error) {
-    return handleApiError(error, UserApiError, 'An unexpected error occurred while deleting the user.');
+    return handleCaughtError(error, UserApiError, 'An unexpected error occurred while deleting the user.');
   }
 }
 

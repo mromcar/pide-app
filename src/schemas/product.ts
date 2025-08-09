@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { UserRole } from '@prisma/client';
-import { productTranslationCreateSchema, productTranslationUpdateSchema } from './productTranslation';
+import { productTranslationCreateSchema } from './productTranslation';
 
 export const productIdSchema = z.object({
   productId: z.coerce.number().int().positive(),

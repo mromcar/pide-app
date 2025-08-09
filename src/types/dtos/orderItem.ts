@@ -1,4 +1,5 @@
 import { OrderItemStatus } from '@prisma/client';
+import type { Product } from '../entities/product'
 
 export interface OrderItemCreateDTO {
   variantId: number;
@@ -24,4 +25,5 @@ export interface OrderItemDTO {
   itemTotalPrice?: number | null;
   status?: OrderItemStatus | null;
   notes?: string | null;
+  product?: Product;
 }

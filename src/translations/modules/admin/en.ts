@@ -95,8 +95,18 @@ export const adminEn: EstablishmentAdminTranslations = {
       preparing: 'Preparing',
       ready: 'Ready',
       delivered: 'Delivered',
-      cancelled: 'Cancelled'
+      cancelled: 'Cancelled',
+      date: 'Date',
+      status: 'Status',
+      allStatuses: 'All Statuses'
     },
+    refresh: 'Refresh',
+    stats: {
+      totalOrders: 'Total Orders',
+      activeOrders: 'Active Orders',
+      completedOrders: 'Completed Orders'
+    },
+    noOrdersInStatus: 'No orders in this status',
     orderDetails: {
       orderNumber: 'Order #',
       customer: 'Customer',

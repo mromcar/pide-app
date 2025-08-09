@@ -8,7 +8,6 @@ import type { LanguageCode } from '@/constants/languages'
 // Definir la interfaz localmente para evitar conflictos
 interface CategoryFormData {
   name: string
-  imageUrl?: string
   sortOrder?: number
   isActive?: boolean
 }
@@ -80,7 +79,6 @@ export function CategoryManagement({ establishmentId, languageCode }: CategoryMa
       // Convierte a snake_case solo para la petición
       const payload = {
         name: formData.name,
-        image_url: formData.imageUrl,
         sort_order: formData.sortOrder,
         is_active: formData.isActive,
       }
@@ -217,7 +215,6 @@ function CategoryForm({ category, languageCode, onSubmit, onCancel }: CategoryFo
   const { t } = useTranslation(languageCode)
   const [formData, setFormData] = useState<CategoryFormData>({
     name: category?.name || '',
-    imageUrl: category?.imageUrl || '',
     sortOrder: category?.sortOrder || 0,
     isActive: category?.isActive ?? true,
   })
@@ -255,15 +252,7 @@ function CategoryForm({ category, languageCode, onSubmit, onCancel }: CategoryFo
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Image URL</label>
-            <input
-              type="url"
-              className="form-input"
-              value={formData.imageUrl || ''}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-            />
-          </div>
+          {/* ELIMINADO: Campo Image URL */}
 
           <div className="form-group">
             <label className="form-label">Sort Order</label>
