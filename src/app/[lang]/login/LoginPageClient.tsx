@@ -37,7 +37,9 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
         router.push(`/${lang}/login`) // Esto activará LoginRedirect
       }
     } catch (err) {
-      setError(t.error.networkError)
+      const message =
+        err instanceof Error ? `${t.error.networkError}: ${err.message}` : t.error.networkError
+      setError(message)
     } finally {
       setIsLoading(false)
     }
@@ -49,11 +51,12 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
 
     try {
       await signIn('google', {
-        // Redirigir al login que manejará la lógica de redirección
         callbackUrl: `/${lang}/login`,
       })
     } catch (err) {
-      setError(t.error.oauthError)
+      const message =
+        err instanceof Error ? `${t.error.oauthError}: ${err.message}` : t.error.oauthError
+      setError(message)
       setIsLoading(false)
     }
   }

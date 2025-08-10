@@ -12,7 +12,8 @@ export const adminEs: EstablishmentAdminTranslations = {
     menuManagement: 'Gestión del Menú',
     employeeManagement: 'Gestión de Empleados',
     orderSupervision: 'Supervisión de Pedidos',
-    settings: 'Configuración'
+    settings: 'Configuración',
+    logout: 'Cerrar sesión'
   },
   menuManagement: {
     title: 'Gestión del Menú',
@@ -87,8 +88,8 @@ export const adminEs: EstablishmentAdminTranslations = {
     sendInvitation: 'Enviar Invitación'
   },
   orderSupervision: {
-    title: 'Supervisión de Pedidos',
-    subtitle: 'Monitorea y gestiona todos los pedidos',
+    title: 'Supervisión de pedidos',
+    subtitle: 'Supervisa y gestiona los pedidos',
     filters: {
       all: 'Todos los Pedidos',
       pending: 'Pendientes',
@@ -107,6 +108,8 @@ export const adminEs: EstablishmentAdminTranslations = {
       completedOrders: 'Pedidos completados'
     },
     noOrdersInStatus: 'No hay pedidos en este estado',
+    markAs: 'Marcar como',
+    hideDetails: 'Ocultar detalles',
     orderDetails: {
       orderNumber: 'Pedido #',
       customer: 'Cliente',

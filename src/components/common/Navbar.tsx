@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useParams } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useCart } from '@/lib/cart-context'
 import { LanguageCode } from '@/constants/languages'
 import { getTranslation } from '@/translations'

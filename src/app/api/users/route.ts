@@ -29,7 +29,14 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     logger.error('Error registering user:', error);
 
-    if (error && typeof error === 'object' && 'code' in error && (error as any).code === 'P2002') {
+    // Evita 'as any' usando type guard
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      typeof (error as { code?: unknown }).code === 'string' &&
+      (error as { code: string }).code === 'P2002'
+    ) {
       return NextResponse.json({
         success: false,
         message: 'Email already exists'

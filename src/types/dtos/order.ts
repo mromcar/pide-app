@@ -1,5 +1,5 @@
 import { OrderStatus } from '@prisma/client';
-import { OrderItemCreateDTO, OrderItemDTO, OrderItemUpdateDTO } from './orderItem';
+import { OrderItemCreateDTO, OrderItemDTO } from './orderItem';
 import { OrderStatusHistoryDTO } from './orderStatusHistory';
 
 export interface OrderCreateDTO {
@@ -78,6 +78,15 @@ export interface UpdateOrderDTO {
   orderItems?: OrderItemCreateDTO[];
 }
 
-// Exporta el tipo que necesitas
 export type { OrderStatusHistoryDTO } from './orderStatusHistory';
+
+// --- ESTA ES LA DEFINICIÓN CORRECTA Y ÚNICA ---
+export interface OrderFilters {
+  status?: OrderStatus;
+  establishmentId?: number;
+  clientUserId?: number;
+  waiterUserId?: number;
+  fromDate?: string;
+  toDate?: string;
+}
 

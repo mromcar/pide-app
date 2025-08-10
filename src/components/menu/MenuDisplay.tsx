@@ -27,7 +27,7 @@ export default function MenuDisplay({ menu, lang }: MenuDisplayProps) {
     menu.length > 0 ? menu[0].categoryId : null
   )
   const t = getTranslation(lang)
-  const { addProduct } = useCart()
+  useCart()
 
   const activeCategory = useMemo(
     () => menu.find((c) => c.categoryId === activeCategoryId),

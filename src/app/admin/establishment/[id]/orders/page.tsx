@@ -5,7 +5,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 import { OrderSupervision } from '@/components/orders/OrderSupervision'
 import { ProtectedPage } from '@/components/auth/ProtectedPage'
 import { AdminLayout } from '@/components/admin/AdminLayout'
-import { DEFAULT_LANGUAGE, type LanguageCode } from '@/constants/languages'
+import { DEFAULT_LANGUAGE } from '@/constants/languages'
 
 export default function OrderSupervisionPage() {
   const params = useParams()

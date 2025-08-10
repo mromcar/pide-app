@@ -152,8 +152,7 @@ export function VariantManagement({ establishmentId, languageCode }: VariantMana
           products={products}
           establishmentId={establishmentId}
           languageCode={languageCode}
-          onSubmit={async (data) => {
-            // Aquí deberías convertir a snake_case antes de enviar al backend si es necesario
+          onSubmit={async () => {
             await fetchData()
             setShowForm(false)
             setEditingVariant(null)

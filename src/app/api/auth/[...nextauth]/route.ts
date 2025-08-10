@@ -61,7 +61,7 @@ export const authOptions: AuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 días
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
           const existingUser = await prisma.user.findUnique({
@@ -95,7 +95,7 @@ export const authOptions: AuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user, account }: { token: JWT; user?: User; account?: any }) {
+    async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
         const dbUser = await prisma.user.findUnique({
           where: { email: user.email! },

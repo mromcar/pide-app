@@ -4,7 +4,8 @@ import {
   OrderCreateDTO,
   OrderUpdateDTO,
   OrderResponseDTO,
-  OrderStatusHistoryDTO
+  OrderStatusHistoryDTO,
+  OrderFilters // <-- Añade aquí la importación
 } from '@/types/dtos/order';
 import {
   OrderItemUpdateDTO,
@@ -20,16 +21,6 @@ import {
   orderItemCreateSchema,
   orderItemUpdateSchema
 } from '@/schemas/orderItem';
-
-// Definir tipo para filtros
-interface OrderFilters {
-  status?: OrderStatus;
-  establishmentId?: number;
-  clientUserId?: number;
-  waiterUserId?: number;
-  fromDate?: string;
-  toDate?: string;
-}
 
 class OrderService {
   private readonly orderInclude = {

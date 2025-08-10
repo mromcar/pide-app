@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { Product } from '@/types/entities/product'
 import type { Category } from '@/types/entities/category'
-import type { ProductVariant } from '@/types/entities/productVariant'
 import type { LanguageCode } from '@/constants/languages'
 
 interface ProductManagementProps {
@@ -77,7 +76,7 @@ export function ProductManagement({ establishmentId, languageCode }: ProductMana
     }
   }
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async () => {
     setShowForm(false)
     await fetchData()
   }
@@ -226,7 +225,7 @@ interface ProductFormProps {
   categories: Category[]
   establishmentId: string
   languageCode: LanguageCode
-  onSubmit: (data: any) => void
+  onSubmit: (data: unknown) => void
   onCancel: () => void
 }
 
@@ -244,7 +243,6 @@ function ProductForm({
     description: product?.description || '',
     price: product?.price || 0,
     categoryId: product?.categoryId || categories[0]?.categoryId || '',
-    // ELIMINADO: imageUrl
     isActive: product?.isActive ?? true,
   })
 
@@ -306,8 +304,6 @@ function ProductForm({
               ))}
             </select>
           </div>
-
-          {/* ELIMINADO: Campo de imagen */}
 
           <div className="form-group checkbox-group">
             <label>

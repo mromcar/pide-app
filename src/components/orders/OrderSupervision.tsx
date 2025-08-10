@@ -5,7 +5,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 import type { Order } from '@/types/entities/order'
 import { OrderStatus } from '@/types/enums'
 import type { LanguageCode } from '@/constants/languages'
-import { OrderResponseDTO } from '@/types/dtos/order'
+import type { UITranslation } from '@/translations/types'
 
 interface OrderSupervisionProps {
   establishmentId: string
@@ -32,18 +32,11 @@ export function OrderSupervision({ establishmentId, languageCode }: OrderSupervi
   const [loading, setLoading] = useState(true)
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | 'all'>('all')
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
-  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     fetchOrders()
-
-    // Auto-refresh every 30 seconds
     const interval = setInterval(fetchOrders, 30000)
-    setRefreshInterval(interval)
-
-    return () => {
-      if (interval) clearInterval(interval)
-    }
+    return () => clearInterval(interval)
   }, [establishmentId, selectedStatus, selectedDate])
 
   const fetchOrders = async () => {
@@ -82,19 +75,6 @@ export function OrderSupervision({ establishmentId, languageCode }: OrderSupervi
     } catch (error) {
       console.error('Error updating order status:', error)
     }
-  }
-
-  const getStatusColor = (status: OrderStatus) => {
-    const colors = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      confirmed: 'bg-blue-100 text-blue-800',
-      preparing: 'bg-orange-100 text-orange-800',
-      ready: 'bg-green-100 text-green-800',
-      delivered: 'bg-gray-100 text-gray-800',
-      cancelled: 'bg-red-100 text-red-800',
-      completed: 'bg-purple-100 text-purple-800',
-    }
-    return colors[status] || 'bg-gray-100 text-gray-800'
   }
 
   const getOrdersByStatus = () => {
@@ -230,7 +210,7 @@ export function OrderSupervision({ establishmentId, languageCode }: OrderSupervi
 interface OrderCardProps {
   order: Order
   onStatusUpdate: (orderId: string, status: OrderStatus) => void
-  t: any
+  t: UITranslation
 }
 
 function OrderCard({ order, onStatusUpdate, t }: OrderCardProps) {

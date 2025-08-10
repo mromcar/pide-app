@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { LanguageCode } from '@/constants/languages'
 import { getTranslation } from '@/translations'
-import { OrderStatus } from '@prisma/client'
 
 interface OrderTrackingProps {
   lang: LanguageCode
@@ -12,8 +11,14 @@ interface OrderTrackingProps {
   restaurantId: string
 }
 
+type OrderTrackingOrder = {
+  orderId: number
+  status: string
+  tableNumber?: string
+}
+
 export default function OrderTracking({ lang, orderId, restaurantId }: OrderTrackingProps) {
-  const [order, setOrder] = useState<any>(null)
+  const [order, setOrder] = useState<OrderTrackingOrder | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const t = getTranslation(lang)

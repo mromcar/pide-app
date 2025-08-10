@@ -35,7 +35,6 @@ export default function EstablishmentAdminPage() {
     }
 
     fetchEstablishment()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, status, establishmentId])
 
   const fetchEstablishment = async () => {

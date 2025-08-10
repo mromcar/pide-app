@@ -5,14 +5,13 @@ import { useTranslation } from '@/hooks/useTranslation'
 import EmployeeManagement from '@/components/employee/EmployeeManagement'
 import { ProtectedPage } from '@/components/auth/ProtectedPage'
 import { AdminLayout } from '@/components/admin/AdminLayout'
-import { DEFAULT_LANGUAGE, type LanguageCode } from '@/constants/languages'
+import { DEFAULT_LANGUAGE } from '@/constants/languages'
 
 export default function EmployeeManagementPage() {
   const params = useParams()
   const { t } = useTranslation(DEFAULT_LANGUAGE)
 
   const establishmentId = params.id as string
-  const languageCode = DEFAULT_LANGUAGE
 
   const navigationItems = [
     {

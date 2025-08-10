@@ -79,9 +79,10 @@ export async function GET(
       return jsonError('Product variant not found or does not belong to this restaurant', 404);
     }
     return jsonOk(variant);
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(`Error fetching product variant ${params.variantId}:`, error);
-    return jsonError(error.message || 'Failed to fetch product variant', 500);
+    const message = error instanceof Error ? error.message : 'Failed to fetch product variant';
+    return jsonError(message, 500);
   }
 }
 
@@ -187,12 +188,13 @@ export async function PUT(
       return jsonError('Product variant not found or failed to update', 404);
     }
     return jsonOk(updatedVariant);
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(`Error updating product variant ${params.variantId}:`, error);
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);
     }
-    return jsonError(error.message || 'Failed to update product variant', 500);
+    const message = error instanceof Error ? error.message : 'Failed to update product variant';
+    return jsonError(message, 500);
   }
 }
 
@@ -269,8 +271,9 @@ export async function DELETE(
       return jsonError('Product variant not found or failed to delete', 404);
     }
     return jsonOk({ message: 'Product variant deleted successfully' });
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error(`Error deleting product variant ${params.variantId}:`, error);
-    return jsonError(error.message || 'Failed to delete product variant', 500);
+    const message = error instanceof Error ? error.message : 'Failed to delete product variant';
+    return jsonError(message, 500);
   }
 }

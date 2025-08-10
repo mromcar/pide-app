@@ -8,11 +8,10 @@ import { UserRole } from '@prisma/client';
 
 const allergenService = new AllergenService();
 
-export async function GET(request: NextRequest, { params }: { params: { restaurantId: string } }) {
+export async function GET() {
   try {
-    const session = await requireAuth(UserRole.general_admin);
+    await requireAuth(UserRole.general_admin);
     const allergens = await allergenService.getAllAllergens();
-    // Devuelve los datos en camelCase
     return jsonOk({ allergens });
   } catch (error) {
     if (error instanceof ZodError) {
@@ -22,14 +21,13 @@ export async function GET(request: NextRequest, { params }: { params: { restaura
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { restaurantId: string } }) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await requireAuth(UserRole.general_admin);
+    await requireAuth(UserRole.general_admin);
     const body = await request.json();
     const validatedData = createAllergenSchema.parse(body);
 
     const allergen = await allergenService.createAllergen(validatedData);
-    // Devuelve los datos en camelCase
     return jsonOk({ allergen }, 201);
   } catch (error) {
     if (error instanceof ZodError) {

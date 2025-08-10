@@ -12,7 +12,8 @@ export const adminEn: EstablishmentAdminTranslations = {
     menuManagement: 'Menu Management',
     employeeManagement: 'Employee Management',
     orderSupervision: 'Order Supervision',
-    settings: 'Settings'
+    settings: 'Settings',
+    logout: 'Log out'
   },
   menuManagement: {
     title: 'Menu Management',
@@ -107,6 +108,8 @@ export const adminEn: EstablishmentAdminTranslations = {
       completedOrders: 'Completed Orders'
     },
     noOrdersInStatus: 'No orders in this status',
+    markAs: 'Mark as',
+    hideDetails: 'Hide details',
     orderDetails: {
       orderNumber: 'Order #',
       customer: 'Customer',

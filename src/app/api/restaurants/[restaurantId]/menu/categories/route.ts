@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { requireAuth } from '@/middleware/auth-middleware';
 import { UserRole } from '@prisma/client';
 import * as categoryService from '@/services/category.service';

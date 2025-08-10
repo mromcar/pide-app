@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { EstablishmentAdminDashboard } from '@/components/admin/EstablishmentAdminDashboard'
 import ProtectedPage from '@/components/auth/ProtectedPage'
@@ -85,12 +85,22 @@ export default function EstablishmentAdminPage() {
   }
 
   return (
-    <ProtectedPage allowedRoles={['establishment_admin', 'general_admin']}>
-      <EstablishmentAdminDashboard
-        establishment={establishment}
-        establishmentId={establishmentId}
-        languageCode={languageCode}
-      />
-    </ProtectedPage>
+    <>
+      <div className="flex justify-end p-4">
+        <button
+          onClick={() => signOut({ callbackUrl: `/${languageCode}/login` })}
+          className="btn btn-danger"
+        >
+          Cerrar sesión
+        </button>
+      </div>
+      <ProtectedPage allowedRoles={['establishment_admin', 'general_admin']}>
+        <EstablishmentAdminDashboard
+          establishment={establishment}
+          establishmentId={establishmentId}
+          languageCode={languageCode}
+        />
+      </ProtectedPage>
+    </>
   )
 }

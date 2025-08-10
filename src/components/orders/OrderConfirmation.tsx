@@ -5,12 +5,7 @@ import { useRouter } from 'next/navigation'
 import { LanguageCode } from '@/constants/languages'
 import { getTranslation } from '@/translations'
 import { useCart } from '@/lib/cart-context'
-import type {
-  OrderWithDetails,
-  OrderItemWithDetails,
-  OrderItemTranslation,
-  OrderItemVariantTranslation,
-} from '@/types/orderConfirmation'
+import type { OrderWithDetails, OrderItemWithDetails } from '@/types/orderConfirmation'
 
 interface OrderConfirmationProps {
   lang: LanguageCode
@@ -41,7 +36,7 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
           }, 3000)
         }
       } catch (error) {
-        setError('Failed to load order')
+        setError(error + 'Failed to load order')
         setTimeout(() => {
           router.push(`/${lang}/restaurant/${restaurantId}/menu`)
         }, 3000)

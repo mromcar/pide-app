@@ -11,6 +11,7 @@ export interface EstablishmentAdminTranslations {
     employeeManagement: string
     orderSupervision: string
     settings: string
+    logout: string
   }
   menuManagement: {
     title: string
@@ -104,6 +105,9 @@ export interface EstablishmentAdminTranslations {
       activeOrders: string
       completedOrders: string
     }
+    noOrdersInStatus: string
+    markAs: string
+    hideDetails: string
     orderDetails: {
       orderNumber: string
       customer: string
@@ -119,7 +123,6 @@ export interface EstablishmentAdminTranslations {
       viewDetails: string
       printOrder: string
     }
-    noOrdersInStatus: string
   }
   forms: {
     save: string

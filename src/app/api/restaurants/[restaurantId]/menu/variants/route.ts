@@ -117,9 +117,13 @@ export async function GET(
     const filteredVariants = variants.filter(v => v.establishmentId === restaurantId);
 
     return jsonOk(filteredVariants);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching product variants:', error);
-    return jsonError(error.message || 'Failed to fetch product variants', 500);
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Failed to fetch product variants';
+    return jsonError(message, 500);
   }
 }
 
@@ -209,12 +213,16 @@ export async function POST(
       Number(token.sub)
     );
     return jsonOk(newVariant, 201);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating product variant:', error);
     if (error instanceof z.ZodError) {
       return jsonError(error.issues, 400);
     }
-    return jsonError(error.message || 'Failed to create product variant', 500);
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Failed to create product variant';
+    return jsonError(message, 500);
   }
 }
 
