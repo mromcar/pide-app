@@ -9,8 +9,9 @@ export * from './admin'
 import type { NavbarTranslations, MainMenuTranslations, RedirectTranslations } from './navigation'
 import type { CartTranslations, CheckoutTranslations, OrderSummaryTranslations, OrderConfirmationTranslations, OrderStatusTranslations } from './orders'
 import type { RestaurantMenuTranslations } from './restaurant-menu'
-import type { LoginTranslations, RegisterTranslations } from './auth'
+import type { LoginTranslations } from './auth'
 import type { EstablishmentAdminTranslations } from './admin'
+import type { RegisterTranslations } from './register'
 
 export interface UITranslation {
   // Base

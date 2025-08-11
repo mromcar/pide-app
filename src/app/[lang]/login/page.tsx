@@ -1,4 +1,3 @@
-import LoginRedirect from '@/components/auth/LoginRedirect'
 import LoginPageClient from './LoginPageClient'
 import { LanguageCode } from '@/constants/languages'
 import { getTranslation } from '@/translations'
@@ -15,7 +14,6 @@ export default async function LoginPage({ params }: LoginPageProps) {
 
   return (
     <>
-      <LoginRedirect lang={lang} />
       <LoginPageClient translations={translations} lang={lang} />
     </>
   )

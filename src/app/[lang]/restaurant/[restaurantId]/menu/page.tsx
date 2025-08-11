@@ -5,7 +5,7 @@ import MenuPageClient from '@/components/menu/MenuPageClient'
 import { CategoryDTO } from '@/types/dtos/category'
 import { ProductResponseDTO } from '@/types/dtos/product'
 import { getTranslation } from '@/translations'
-import { LanguageCode, DEFAULT_LANGUAGE } from '@/constants/languages'
+import { LanguageCode } from '@/constants/languages'
 import type { Metadata } from 'next'
 
 interface MenuCategory extends CategoryDTO {

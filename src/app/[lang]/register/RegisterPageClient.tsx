@@ -1,17 +1,17 @@
 'use client'
 
-import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useTranslation } from '@/hooks/useTranslation'
-import { LanguageCode } from '@/constants/languages'
+import type { RegisterTranslations } from '@/translations/types/register'
+import { useState } from 'react'
 
 interface RegisterPageClientProps {
-  lang: LanguageCode
+  translations: RegisterTranslations
+  lang: string
 }
 
-export default function RegisterPageClient({ lang }: RegisterPageClientProps) {
-  const { t } = useTranslation(lang)
+export default function RegisterPageClient({ translations, lang }: RegisterPageClientProps) {
+  const t = translations
   const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
@@ -25,7 +25,6 @@ export default function RegisterPageClient({ lang }: RegisterPageClientProps) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }))
     }
@@ -35,19 +34,19 @@ export default function RegisterPageClient({ lang }: RegisterPageClientProps) {
     const newErrors: Record<string, string> = {}
 
     if (!formData.email) {
-      newErrors.email = 'Email is required'
+      newErrors.email = t.error.emailRequired
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid'
+      newErrors.email = t.error.emailInvalid
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required'
+      newErrors.password = t.error.passwordRequired
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
+      newErrors.password = t.error.passwordTooShort
     }
 
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = t.register.passwordMismatch
+      newErrors.confirmPassword = t.error.passwordMismatch
     }
 
     setErrors(newErrors)
@@ -56,19 +55,15 @@ export default function RegisterPageClient({ lang }: RegisterPageClientProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!validateForm()) return
 
     setIsLoading(true)
     setErrors({})
 
     try {
-      // Register user
       const response = await fetch('/api/users', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name || null,
           email: formData.email,
@@ -80,9 +75,9 @@ export default function RegisterPageClient({ lang }: RegisterPageClientProps) {
 
       if (!response.ok) {
         if (data.message === 'Email already exists') {
-          setErrors({ email: t.register.emailExists })
+          setErrors({ email: t.error.emailExists })
         } else {
-          setErrors({ general: t.register.registerError })
+          setErrors({ general: t.registerError })
         }
         return
       }
@@ -97,35 +92,39 @@ export default function RegisterPageClient({ lang }: RegisterPageClientProps) {
       if (result?.ok) {
         router.push(`/${lang}`)
       } else {
-        // Registration successful but auto-login failed
         router.push(`/${lang}/login?message=registered`)
       }
     } catch (error) {
-      console.error('Registration error:', error)
-      setErrors({ general: t.register.serverError })
+      setErrors({ general: t.serverError })
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleGoogleSignIn = () => {
-    // Cambiar la línea 112
     signIn('google', { callbackUrl: `/${lang}/login` })
   }
 
   return (
-    <div className="register-container">
-      <div className="register-form-container">
-        <div className="register-header">
-          <h2 className="register-title">{t.register.title}</h2>
-        </div>
-        <form className="register-form" onSubmit={handleSubmit}>
-          {errors.general && <div className="register-error-general">{errors.general}</div>}
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-bg-card">
+          <div className="login-header">
+            <h2 className="login-title">{t.title}</h2>
+            <p className="login-subtitle">{t.subtitle}</p>
+          </div>
 
-          <div className="register-input-group">
+          {errors.general && (
+            <div className="login-error">
+              <p className="login-error-text">{errors.general}</p>
+            </div>
+          )}
+
+          {/* Formulario de registro */}
+          <form className="login-form" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="name" className="register-input-label">
-                {t.register.nameLabel}
+              <label htmlFor="name" className="login-label">
+                {t.nameLabel}
               </label>
               <input
                 id="name"
@@ -133,13 +132,13 @@ export default function RegisterPageClient({ lang }: RegisterPageClientProps) {
                 type="text"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="register-input register-input-normal"
+                className="login-input"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="register-input-label">
-                {t.register.emailLabel}
+              <label htmlFor="email" className="login-label">
+                {t.emailLabel}
               </label>
               <input
                 id="email"
@@ -148,16 +147,14 @@ export default function RegisterPageClient({ lang }: RegisterPageClientProps) {
                 required
                 value={formData.email}
                 onChange={handleInputChange}
-                className={`register-input ${
-                  errors.email ? 'register-input-error' : 'register-input-normal'
-                }`}
+                className={`login-input ${errors.email ? 'login-input-error' : ''}`}
               />
-              {errors.email && <p className="register-error-text">{errors.email}</p>}
+              {errors.email && <p className="login-error-text">{errors.email}</p>}
             </div>
 
             <div>
-              <label htmlFor="password" className="register-input-label">
-                {t.register.passwordLabel}
+              <label htmlFor="password" className="login-label">
+                {t.passwordLabel}
               </label>
               <input
                 id="password"
@@ -166,16 +163,14 @@ export default function RegisterPageClient({ lang }: RegisterPageClientProps) {
                 required
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`register-input ${
-                  errors.password ? 'register-input-error' : 'register-input-normal'
-                }`}
+                className={`login-input ${errors.password ? 'login-input-error' : ''}`}
               />
-              {errors.password && <p className="register-error-text">{errors.password}</p>}
+              {errors.password && <p className="login-error-text">{errors.password}</p>}
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="register-input-label">
-                {t.register.confirmPasswordLabel}
+              <label htmlFor="confirmPassword" className="login-label">
+                {t.confirmPasswordLabel}
               </label>
               <input
                 id="confirmPassword"
@@ -184,41 +179,45 @@ export default function RegisterPageClient({ lang }: RegisterPageClientProps) {
                 required
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className={`register-input ${
-                  errors.confirmPassword ? 'register-input-error' : 'register-input-normal'
-                }`}
+                className={`login-input ${errors.confirmPassword ? 'login-input-error' : ''}`}
               />
               {errors.confirmPassword && (
-                <p className="register-error-text">{errors.confirmPassword}</p>
+                <p className="login-error-text">{errors.confirmPassword}</p>
               )}
             </div>
-          </div>
 
-          <div className="register-button-group">
-            <button type="submit" disabled={isLoading} className="register-submit-button">
-              {isLoading ? 'Creating...' : t.register.registerButton}
+            <button type="submit" disabled={isLoading} className="login-submit-btn">
+              {isLoading ? t.registering : t.registerButton}
             </button>
+          </form>
 
-            <div className="register-divider">
-              <div className="register-divider-line">
-                <div className="register-divider-border" />
-              </div>
-              <div className="register-divider-text">
-                <span className="register-divider-span">or</span>
-              </div>
+          {/* Divider */}
+          <div className="login-divider">
+            <div className="login-divider-line" />
+            <div className="login-divider-text">
+              <span className="login-divider-span">{t.orDivider}</span>
             </div>
+          </div>
 
-            <button type="button" onClick={handleGoogleSignIn} className="register-google-button">
-              {t.register.googleButton}
+          {/* Google */}
+          <div className="login-google-section">
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
+              className="login-google-btn"
+            >
+              {t.googleButton}
             </button>
           </div>
 
-          <div className="register-signin-link">
-            <a href={`/${lang}/login`} className="register-signin-anchor">
-              {t.register.signIn}
+          {/* Link a login */}
+          <div className="login-register-link">
+            <a href={`/${lang}/login`} className="login-register-anchor">
+              {t.signIn}
             </a>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   )

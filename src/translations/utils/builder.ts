@@ -5,6 +5,7 @@ import { authTranslations } from '../modules/auth'
 import { restaurantMenuTranslations } from '../modules/restaurant-menu'
 import { ordersTranslations } from '../modules/orders'
 import { adminTranslations } from '../modules/admin'
+import { registerTranslations } from '../modules/register'
 
 export function buildTranslations(lang: string): UITranslation {
   const base = baseTranslations[lang as keyof typeof baseTranslations]
@@ -13,6 +14,7 @@ export function buildTranslations(lang: string): UITranslation {
   const menu = restaurantMenuTranslations[lang as keyof typeof restaurantMenuTranslations]
   const orders = ordersTranslations[lang as keyof typeof ordersTranslations]
   const admin = adminTranslations[lang as keyof typeof adminTranslations]
+  const register = registerTranslations[lang as keyof typeof registerTranslations]
 
   return {
     // Base translations
@@ -24,7 +26,7 @@ export function buildTranslations(lang: string): UITranslation {
     redirect: navigation.redirect,
 
     login: auth.login,
-    register: auth.register,
+    register,
 
     restaurantMenu: menu,
 

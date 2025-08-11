@@ -22,38 +22,3 @@ export interface LoginTranslations {
   };
 }
 
-// Traducciones para el registro
-export interface RegisterTranslations {
-  title: string;
-  subtitle: string;
-  nameLabel: string;
-  namePlaceholder: string;
-  emailLabel: string;
-  emailPlaceholder: string;
-  passwordLabel: string;
-  passwordPlaceholder: string;
-  confirmPasswordLabel: string;
-  confirmPasswordPlaceholder: string;
-  registerButton: string;
-  registering: string;
-  alreadyHaveAccount: string;
-  signIn: string;
-  googleButton: string;
-  orDivider: string;
-  error: {
-    emailExists: string;
-    passwordMismatch: string;
-    weakPassword: string;
-    networkError: string;
-    validationError: string;
-  };
-  success: {
-    title: string;
-    message: string;
-    redirecting: string;
-  };
-  passwordMismatch: string;
-  emailExists: string;
-  registerError: string;
-  serverError: string;
-}
