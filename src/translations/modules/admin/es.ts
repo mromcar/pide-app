@@ -177,7 +177,8 @@ export const adminEs: EstablishmentAdminTranslations = {
       goBack: 'Volver'
     },
     actions: {
-      signOut: 'Cerrar Sesión'
+      signOut: 'Cerrar Sesión',
+      accountData: 'Datos de cuenta'
     },
     accessDenied: {
       title: 'Acceso Denegado',

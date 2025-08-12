@@ -1,12 +1,13 @@
 'use client'
 import { useSession, signIn } from 'next-auth/react'
 import { useEffect } from 'react'
+import { UserRole } from '@/types/enums'
 
 export function ProtectedPage({
   allowedRoles,
   children,
 }: {
-  allowedRoles: string[]
+  allowedRoles: UserRole[]
   children: React.ReactNode
 }) {
   const { data: session, status } = useSession()
@@ -16,7 +17,11 @@ export function ProtectedPage({
   }, [status])
 
   if (status === 'loading') return <div>Cargando...</div>
-  if (!session || !allowedRoles.includes(session.user.role)) return <div>No autorizado</div>
+
+  const userRole = session?.user?.role as UserRole
+  if (!session || !allowedRoles.includes(userRole)) {
+    return <div>No autorizado</div>
+  }
 
   return <>{children}</>
 }

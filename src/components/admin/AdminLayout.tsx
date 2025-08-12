@@ -3,7 +3,6 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, ReactNode } from 'react'
 import { UserRole } from '@prisma/client'
-import AdminSidebar from './AdminSidebar'
 import AdminHeader from './AdminHeader'
 
 interface NavigationItem {
@@ -22,20 +21,20 @@ interface AdminLayoutProps {
   activeSection?: string
 }
 
-export function AdminLayout({ 
-  children, 
-  requiredRoles, 
-  title, 
-  subtitle, 
-  navigationItems, 
-  activeSection 
+export function AdminLayout({
+  children,
+  requiredRoles,
+  title,
+  subtitle,
+  navigationItems,
+  activeSection,
 }: AdminLayoutProps) {
   const { data: session, status } = useSession()
   const router = useRouter()
 
   useEffect(() => {
     if (status === 'loading') return
-    
+
     if (!session) {
       router.push('/login')
       return
@@ -61,14 +60,11 @@ export function AdminLayout({
     <div className="min-h-screen bg-gray-100">
       <AdminHeader />
       <div className="flex">
-        <AdminSidebar />
         <main className="flex-1 p-6">
           {title && (
             <div className="mb-6">
               <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-              {subtitle && (
-                <p className="text-gray-600 mt-1">{subtitle}</p>
-              )}
+              {subtitle && <p className="text-gray-600 mt-1">{subtitle}</p>}
             </div>
           )}
           {navigationItems && (

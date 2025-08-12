@@ -176,6 +176,7 @@ export interface EstablishmentAdminTranslations {
     }
     actions: {
       signOut: string
+      accountData: string
     }
     accessDenied: {
       title: string

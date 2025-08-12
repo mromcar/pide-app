@@ -6,6 +6,7 @@ import { OrderSupervision } from '@/components/orders/OrderSupervision'
 import { ProtectedPage } from '@/components/auth/ProtectedPage'
 import { AdminLayout } from '@/components/admin/AdminLayout'
 import type { LanguageCode } from '@/constants/languages'
+import { UserRole } from '@/types/enums'
 
 export default function OrderSupervisionPage() {
   const params = useParams()
@@ -42,7 +43,8 @@ export default function OrderSupervisionPage() {
   ]
 
   return (
-    <ProtectedPage allowedRoles={['establishment_admin', 'general_admin']}>
+    <ProtectedPage allowedRoles={[UserRole.ESTABLISHMENT_ADMIN, UserRole.GENERAL_ADMIN]}>
+      {/* Solo admins pueden gestionar empleados */}
       <AdminLayout
         title={t.establishmentAdmin.orderSupervision.title}
         subtitle={t.establishmentAdmin.orderSupervision.subtitle}

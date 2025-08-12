@@ -97,7 +97,11 @@ export default function EstablishmentAdminPage() {
   if (loading) {
     return (
       <div className="admin-page">
-        <AdminNavbar languageCode={languageCode} establishmentId={establishmentId} />
+        <AdminNavbar
+          languageCode={languageCode}
+          establishmentId={establishmentId}
+          establishment={establishment}
+        />
         <div className="establishment-admin-loading">
           <div className="establishment-admin-loading-content">
             <div className="establishment-admin-spinner"></div>
@@ -114,7 +118,11 @@ export default function EstablishmentAdminPage() {
   if (error) {
     return (
       <div className="admin-page">
-        <AdminNavbar languageCode={languageCode} establishmentId={establishmentId} />
+        <AdminNavbar
+          languageCode={languageCode}
+          establishmentId={establishmentId}
+          establishment={establishment}
+        />
         <div className="establishment-admin-error">
           <div className="establishment-admin-error-content">
             <h1 className="establishment-admin-error-title">
@@ -143,7 +151,7 @@ export default function EstablishmentAdminPage() {
       <AdminNavbar
         languageCode={languageCode}
         establishmentId={establishmentId}
-        establishment={establishment} // Pasar el establishment
+        establishment={establishment}
       />
 
       <div className="establishment-admin-container">

@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { signOut, useSession } from 'next-auth/react'
+import { useRouter, usePathname } from 'next/navigation'
+import { useTranslation } from '@/hooks/useTranslation'
 import type { LanguageCode } from '@/constants/languages'
 import type { Establishment } from '@/types/entities/establishment'
 import { UserRole } from '@/types/enums'
@@ -9,7 +11,7 @@ import { UserRole } from '@/types/enums'
 interface AdminNavbarProps {
   languageCode: LanguageCode
   establishmentId: string
-  establishment?: Establishment | null // Añadir esta prop
+  establishment?: Establishment | null
 }
 
 export default function AdminNavbar({
@@ -18,6 +20,9 @@ export default function AdminNavbar({
   establishment,
 }: AdminNavbarProps) {
   const { data: session } = useSession()
+  const router = useRouter()
+  const pathname = usePathname()
+  const { t } = useTranslation(languageCode)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
 
   const userRole = session?.user?.role as UserRole
@@ -27,38 +32,51 @@ export default function AdminNavbar({
   const menuItems = [
     {
       href: `/${languageCode}/admin/establishment/${establishmentId}/menu`,
-      label: 'Gestión del menú',
+      label: t.establishmentAdmin.navigation.menuManagement,
       roles: [UserRole.ESTABLISHMENT_ADMIN],
     },
     {
       href: `/${languageCode}/admin/establishment/${establishmentId}/employees`,
-      label: 'Gestión de usuarios',
+      label: t.establishmentAdmin.navigation.employeeManagement,
       roles: [UserRole.ESTABLISHMENT_ADMIN],
     },
     {
       href: `/${languageCode}/admin/establishment/${establishmentId}/orders`,
-      label: 'Gestión de pedidos',
+      label: t.establishmentAdmin.navigation.orderSupervision,
       roles: [UserRole.ESTABLISHMENT_ADMIN, UserRole.WAITER, UserRole.COOK],
     },
   ]
 
   const filteredMenuItems = menuItems.filter((item) => item.roles.includes(userRole))
 
+  const handleTitleClick = () => {
+    router.push(`/${languageCode}/admin/establishment/${establishmentId}`)
+  }
+
   return (
     <nav className="admin-navbar">
       <div className="admin-navbar-container">
-        {/* Logo/Brand con nombre del establecimiento */}
+        {/* Logo/Brand clickeable con traducción */}
         <div className="admin-navbar-brand">
-          <h2>Panel de Administración del {establishmentName}</h2>
+          <h2 onClick={handleTitleClick}>
+            {t.establishmentAdmin.establishment.title} {establishmentName}
+          </h2>
         </div>
 
-        {/* Navigation Links */}
+        {/* Navigation Links con estado activo */}
         <div className="admin-navbar-menu">
-          {filteredMenuItems.map((item) => (
-            <a key={item.href} href={item.href} className="admin-navbar-link">
-              {item.label}
-            </a>
-          ))}
+          {filteredMenuItems.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                className={`admin-navbar-link ${isActive ? 'active' : ''}`}
+              >
+                {item.label}
+              </a>
+            )
+          })}
         </div>
 
         {/* Profile Menu */}
@@ -86,13 +104,13 @@ export default function AdminNavbar({
           {showProfileMenu && (
             <div className="admin-navbar-profile-menu">
               <a href={`/${languageCode}/admin/profile`} className="admin-navbar-profile-item">
-                Datos de cuenta
+                {t.establishmentAdmin.establishment.actions.accountData}
               </a>
               <button
                 onClick={() => signOut({ callbackUrl: `/${languageCode}/login` })}
                 className="admin-navbar-profile-item admin-navbar-signout"
               >
-                Cerrar sesión
+                {t.establishmentAdmin.establishment.actions.signOut}
               </button>
             </div>
           )}
