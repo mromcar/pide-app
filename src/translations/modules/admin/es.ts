@@ -166,5 +166,22 @@ export const adminEs: EstablishmentAdminTranslations = {
       orderUpdateFailed: 'Error al actualizar el pedido',
       loadingFailed: 'Error al cargar los datos'
     }
+  },
+  establishment: {
+    title: 'Administración del Establecimiento',
+    loading: 'Cargando datos del establecimiento...',
+    error: {
+      title: 'Error',
+      failedToFetch: 'Error al cargar los datos del establecimiento',
+      unknownError: 'Ha ocurrido un error desconocido',
+      goBack: 'Volver'
+    },
+    actions: {
+      signOut: 'Cerrar Sesión'
+    },
+    accessDenied: {
+      title: 'Acceso Denegado',
+      message: 'No tienes permisos para acceder a esta página'
+    }
   }
 }

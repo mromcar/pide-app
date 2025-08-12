@@ -165,4 +165,21 @@ export interface EstablishmentAdminTranslations {
       loadingFailed: string
     }
   }
+  establishment: {
+    title: string
+    loading: string
+    error: {
+      title: string
+      failedToFetch: string
+      unknownError: string
+      goBack: string
+    }
+    actions: {
+      signOut: string
+    }
+    accessDenied: {
+      title: string
+      message: string
+    }
+  }
 }

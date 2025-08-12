@@ -166,5 +166,22 @@ export const adminFr: EstablishmentAdminTranslations = {
       orderUpdateFailed: 'Échec de la mise à jour de la commande',
       loadingFailed: 'Échec du chargement des données'
     }
+  },
+  establishment: {
+    title: 'Administration de l\'Établissement',
+    loading: 'Chargement des données de l\'établissement...',
+    error: {
+      title: 'Erreur',
+      failedToFetch: 'Échec du chargement des données de l\'établissement',
+      unknownError: 'Une erreur inconnue s\'est produite',
+      goBack: 'Retour'
+    },
+    actions: {
+      signOut: 'Se Déconnecter'
+    },
+    accessDenied: {
+      title: 'Accès Refusé',
+      message: 'Vous n\'avez pas la permission d\'accéder à cette page'
+    }
   }
 }

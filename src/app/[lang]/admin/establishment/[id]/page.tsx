@@ -1,13 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { EstablishmentAdminDashboard } from '@/components/admin/EstablishmentAdminDashboard'
+import AdminNavbar from '@/components/admin/AdminNavbar'
 import ProtectedPage from '@/components/auth/ProtectedPage'
-import type { Establishment } from '@/types/entities/establishment'
 import type { LanguageCode } from '@/constants/languages'
+import type { Establishment } from '@/types/entities/establishment'
+import { UserRole } from '@/types/enums'
 
 export default function EstablishmentAdminPage() {
   const params = useParams()
@@ -15,92 +17,146 @@ export default function EstablishmentAdminPage() {
   const { data: session, status } = useSession()
   const languageCode = params.lang as LanguageCode
   const { t } = useTranslation(languageCode)
+  const establishmentId = params.id as string
+
   const [establishment, setEstablishment] = useState<Establishment | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const establishmentId = params.id as string
-
-  useEffect(() => {
-    if (status === 'loading') return
-
-    if (!session?.user) {
-      router.push('/login')
-      return
-    }
-
-    // Check if user has establishment admin role
-    if (!['establishment_admin', 'general_admin'].includes(session.user.role)) {
-      router.push('/access-denied')
-      return
-    }
-
-    fetchEstablishment()
-  }, [session, status, establishmentId])
-
-  const fetchEstablishment = async () => {
+  // Memoizar la función fetch para evitar recreaciones
+  const fetchEstablishment = useCallback(async () => {
     try {
       setLoading(true)
+      setError(null)
+
       const response = await fetch(`/api/establishments/${establishmentId}`)
 
       if (!response.ok) {
-        throw new Error('Failed to fetch establishment')
+        throw new Error(t.establishmentAdmin.establishment.error.failedToFetch)
       }
 
       const data = await response.json()
       setEstablishment(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(
+        err instanceof Error ? err.message : t.establishmentAdmin.establishment.error.unknownError
+      )
     } finally {
       setLoading(false)
     }
-  }
+  }, [
+    establishmentId,
+    t.establishmentAdmin.establishment.error.failedToFetch,
+    t.establishmentAdmin.establishment.error.unknownError,
+  ])
 
-  if (status === 'loading' || loading) {
+  // Simplificar dependencias del useEffect
+  useEffect(() => {
+    if (status === 'loading') return
+
+    if (!session?.user) {
+      router.push(`/${languageCode}/login`)
+      return
+    }
+
+    // Check if user has establishment admin role
+    const allowedRoles = [UserRole.ESTABLISHMENT_ADMIN, UserRole.WAITER, UserRole.COOK]
+    if (!allowedRoles.includes(session.user.role as UserRole)) {
+      router.push(`/${languageCode}/access-denied`)
+      return
+    }
+
+    // Verificar que el usuario pertenece a este establecimiento
+    if (
+      session.user.establishmentId?.toString() !== establishmentId &&
+      session.user.role !== UserRole.GENERAL_ADMIN
+    ) {
+      router.push(`/${languageCode}/access-denied`)
+      return
+    }
+
+    // Solo fetch si no tenemos datos del establishment
+    if (!establishment) {
+      fetchEstablishment()
+    }
+  }, [session, status, establishment, fetchEstablishment, establishmentId, languageCode, router])
+
+  // Loading state
+  if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{t.redirect.loading}</p>
+      <div className="establishment-admin-loading">
+        <div className="establishment-admin-loading-content">
+          <div className="establishment-admin-spinner"></div>
+          <p className="establishment-admin-loading-text">Cargando...</p>
         </div>
       </div>
     )
   }
 
+  // Loading establishment
+  if (loading) {
+    return (
+      <div className="admin-page">
+        <AdminNavbar languageCode={languageCode} establishmentId={establishmentId} />
+        <div className="establishment-admin-loading">
+          <div className="establishment-admin-loading-content">
+            <div className="establishment-admin-spinner"></div>
+            <p className="establishment-admin-loading-text">
+              {t.establishmentAdmin.establishment.loading}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button
-            onClick={() => router.back()}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Go Back
-          </button>
+      <div className="admin-page">
+        <AdminNavbar languageCode={languageCode} establishmentId={establishmentId} />
+        <div className="establishment-admin-error">
+          <div className="establishment-admin-error-content">
+            <h1 className="establishment-admin-error-title">
+              {t.establishmentAdmin.establishment.error.title}
+            </h1>
+            <p className="establishment-admin-error-message">{error}</p>
+            <button
+              onClick={() => fetchEstablishment()}
+              className="establishment-admin-error-button"
+            >
+              Reintentar
+            </button>
+          </div>
         </div>
       </div>
     )
+  }
+
+  // Si no hay sesión o establishment, no mostrar nada
+  if (!session?.user || !establishment) {
+    return null
   }
 
   return (
-    <>
-      <div className="flex justify-end p-4">
-        <button
-          onClick={() => signOut({ callbackUrl: `/${languageCode}/login` })}
-          className="btn btn-danger"
+    <div className="admin-page">
+      <AdminNavbar
+        languageCode={languageCode}
+        establishmentId={establishmentId}
+        establishment={establishment} // Pasar el establishment
+      />
+
+      <div className="establishment-admin-container">
+        <ProtectedPage
+          allowedRoles={[UserRole.ESTABLISHMENT_ADMIN, UserRole.WAITER, UserRole.COOK]}
         >
-          Cerrar sesión
-        </button>
+          <EstablishmentAdminDashboard
+            establishment={establishment}
+            establishmentId={establishmentId}
+            languageCode={languageCode}
+          />
+        </ProtectedPage>
       </div>
-      <ProtectedPage allowedRoles={['establishment_admin', 'general_admin']}>
-        <EstablishmentAdminDashboard
-          establishment={establishment}
-          establishmentId={establishmentId}
-          languageCode={languageCode}
-        />
-      </ProtectedPage>
-    </>
+    </div>
   )
 }

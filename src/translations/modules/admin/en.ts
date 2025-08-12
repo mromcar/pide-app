@@ -166,5 +166,22 @@ export const adminEn: EstablishmentAdminTranslations = {
       orderUpdateFailed: 'Failed to update order',
       loadingFailed: 'Failed to load data'
     }
+  },
+  establishment: {
+    title: 'Establishment Administration',
+    loading: 'Loading establishment data...',
+    error: {
+      title: 'Error',
+      failedToFetch: 'Failed to fetch establishment data',
+      unknownError: 'An unknown error occurred',
+      goBack: 'Go Back'
+    },
+    actions: {
+      signOut: 'Sign Out'
+    },
+    accessDenied: {
+      title: 'Access Denied',
+      message: 'You do not have permission to access this page'
+    }
   }
 }

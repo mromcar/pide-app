@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
 import { LanguageCode } from '@/constants/languages'
 import { Establishment } from '@/types/entities/establishment'
@@ -17,77 +15,84 @@ export function EstablishmentAdminDashboard({
   establishmentId,
   languageCode,
 }: EstablishmentAdminDashboardProps) {
-  const router = useRouter()
   const { t } = useTranslation(languageCode)
-  const [activeSection, setActiveSection] = useState('dashboard')
-
-  const navigationItems = [
-    {
-      id: 'dashboard',
-      label: t.establishmentAdmin.navigation.dashboard,
-      path: `/${languageCode}/admin/establishment/${establishmentId}`,
-    },
-    {
-      id: 'menu',
-      label: t.establishmentAdmin.navigation.menuManagement,
-      path: `/${languageCode}/admin/establishment/${establishmentId}/menu`,
-    },
-    {
-      id: 'staff',
-      label: t.establishmentAdmin.navigation.employeeManagement,
-      path: `/${languageCode}/admin/establishment/${establishmentId}/staff`,
-    },
-    {
-      id: 'orders',
-      label: t.establishmentAdmin.navigation.orderSupervision,
-      path: `/${languageCode}/admin/establishment/${establishmentId}/orders`,
-    },
-    {
-      id: 'settings',
-      label: t.establishmentAdmin.navigation.settings,
-      path: `/${languageCode}/admin/establishment/${establishmentId}/settings`,
-    },
-  ]
-
-  const handleNavigation = (path: string, sectionId: string) => {
-    setActiveSection(sectionId)
-    router.push(path)
-  }
 
   return (
-    <div className="admin-container">
-      <div className="admin-main-content">
-        {/* Nombre del restaurante */}
-        <div className="menu-page-header">
-          <h1 className="menu-page-title">
-            {establishment?.name || (languageCode === 'es' ? 'Establecimiento' : 'Establishment')}
-          </h1>
+    <div className="establishment-dashboard-content">
+      {/* Contenido principal del dashboard */}
+      <div className="admin-card">
+        <div className="admin-card-header">
+          <h2 className="admin-card-title">{t.establishmentAdmin.dashboard.overview}</h2>
         </div>
 
-        {/* Navegación horizontal estilo categorías */}
-        <div className="category-nav-container">
-          {navigationItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleNavigation(item.path, item.id)}
-              className={`category-nav-button ${activeSection === item.id ? 'active' : ''}`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Contenido principal */}
-        <div className="admin-card">
-          <div className="admin-card-header">
-            <h2 className="admin-card-title">{t.establishmentAdmin.dashboard.overview}</h2>
+        {/* Estadísticas rápidas */}
+        <div className="dashboard-stats-grid">
+          <div className="dashboard-stat-card">
+            <h3 className="dashboard-stat-title">Pedidos de Hoy</h3>
+            <p className="dashboard-stat-value">24</p>
           </div>
-          <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '1rem' }}>
-              {languageCode === 'es'
-                ? 'Selecciona una opción del menú superior para comenzar a gestionar tu establecimiento.'
-                : 'Select an option from the menu above to start managing your establishment.'}
-            </p>
+          <div className="dashboard-stat-card">
+            <h3 className="dashboard-stat-title">Pedidos Activos</h3>
+            <p className="dashboard-stat-value">8</p>
+          </div>
+          <div className="dashboard-stat-card">
+            <h3 className="dashboard-stat-title">Ingresos del Día</h3>
+            <p className="dashboard-stat-value">€342.50</p>
+          </div>
+          <div className="dashboard-stat-card">
+            <h3 className="dashboard-stat-title">Empleados Activos</h3>
+            <p className="dashboard-stat-value">6</p>
+          </div>
+        </div>
+
+        {/* Acciones rápidas */}
+        <div className="dashboard-quick-actions">
+          <h3 className="dashboard-section-title">{t.establishmentAdmin.dashboard.quickActions}</h3>
+          <div className="quick-actions-grid">
+            <a
+              href={`/${languageCode}/admin/establishment/${establishmentId}/orders`}
+              className="quick-action-card"
+            >
+              <h4>Ver Pedidos</h4>
+              <p>Gestiona los pedidos en tiempo real</p>
+            </a>
+            <a
+              href={`/${languageCode}/admin/establishment/${establishmentId}/menu`}
+              className="quick-action-card"
+            >
+              <h4>Gestionar Menú</h4>
+              <p>Actualiza productos y precios</p>
+            </a>
+            <a
+              href={`/${languageCode}/admin/establishment/${establishmentId}/employees`}
+              className="quick-action-card"
+            >
+              <h4>Equipo</h4>
+              <p>Administra empleados y roles</p>
+            </a>
+          </div>
+        </div>
+
+        {/* Información del establecimiento */}
+        <div className="establishment-info">
+          <h3 className="dashboard-section-title">Información del Establecimiento</h3>
+          <div className="establishment-details">
+            <div className="establishment-detail-item">
+              <span className="detail-label">Nombre:</span>
+              <span className="detail-value">{establishment?.name}</span>
+            </div>
+            <div className="establishment-detail-item">
+              <span className="detail-label">Dirección:</span>
+              <span className="detail-value">{establishment?.address}</span>
+            </div>
+            <div className="establishment-detail-item">
+              <span className="detail-label">Estado:</span>
+              <span
+                className={`detail-value status ${establishment?.isActive ? 'active' : 'inactive'}`}
+              >
+                {establishment?.isActive ? 'Activo' : 'Inactivo'}
+              </span>
+            </div>
           </div>
         </div>
       </div>

@@ -33,8 +33,9 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
       if (result?.error) {
         setError(t.error.invalidCredentials)
       } else {
-        // Redirigir al menú principal en lugar de a la página redundante
-        router.push(`/${lang}/login`) // Esto activará LoginRedirect
+        // Redirigir según el rol del usuario o a la página principal
+        router.push(`/${lang}`) // Esto permitirá que LoginRedirect maneje la redirección
+        router.refresh() // Forzar actualización para obtener la nueva sesión
       }
     } catch (err) {
       const message =
@@ -51,7 +52,7 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
 
     try {
       await signIn('google', {
-        callbackUrl: `/${lang}/login`,
+        callbackUrl: `/${lang}`, // Cambiar a la página principal
       })
     } catch (err) {
       const message =

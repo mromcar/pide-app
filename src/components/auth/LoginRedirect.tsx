@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { LanguageCode } from '@/constants/languages'
-import { getTranslation } from '@/translations'
 import { UserRole } from '@prisma/client'
 import MainMenu from '../menu/MainMenu'
 
@@ -15,7 +14,7 @@ interface LoginRedirectProps {
 export default function LoginRedirect({ lang }: LoginRedirectProps) {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const t = getTranslation(lang)
+  const [showAccessDenied, setShowAccessDenied] = useState(false)
 
   useEffect(() => {
     // If user is not authenticated, redirect to login
@@ -24,30 +23,39 @@ export default function LoginRedirect({ lang }: LoginRedirectProps) {
       return
     }
 
-    // If user is authenticated, redirect based on role
+    // If user is authenticated, redirect based on role and establishment
     if (status === 'authenticated' && session?.user) {
       const userRole = session.user.role as UserRole
       const establishmentId = session.user.establishmentId
 
-      // Redirect employees and admins to their respective dashboards
+      console.log('Debug session:', {
+        userRole,
+        establishmentId,
+        fullSession: session?.user,
+      })
+
+      // Check access based on your business logic
       switch (userRole) {
+        case UserRole.general_admin:
+          // General admin always has access (will implement later)
+          router.replace(`/${lang}/admin/general`)
+          break
+
+        case UserRole.establishment_admin:
         case UserRole.waiter:
         case UserRole.cook:
           if (establishmentId) {
-            router.replace(`/${lang}/employee/establishment/${establishmentId}`)
-          }
-          break
-        case UserRole.establishment_admin:
-          if (establishmentId) {
+            // Users with establishment_id can access their establishment
             router.replace(`/${lang}/admin/establishment/${establishmentId}`)
+          } else {
+            // User has no establishment_id - show access denied
+            setShowAccessDenied(true)
           }
           break
-        case UserRole.general_admin:
-          router.replace(`/${lang}/admin/general`)
-          break
+
         case UserRole.client:
         default:
-          // Clients stay on the main menu (current behavior)
+          // Clients stay on the main menu
           break
       }
     }
@@ -59,7 +67,22 @@ export default function LoginRedirect({ lang }: LoginRedirectProps) {
       <div className="login-redirect-container">
         <div className="login-redirect-loading">
           <div className="login-redirect-spinner"></div>
-          <p>{t.redirect.checkingSession}</p>
+          <p>Verificando sesión...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show access denied message
+  if (showAccessDenied) {
+    return (
+      <div className="login-redirect-container">
+        <div className="login-redirect-error">
+          <h2>Acceso Denegado</h2>
+          <p>Tu usuario no tiene asignado ningún establecimiento. Contacta con el administrador.</p>
+          <button onClick={() => router.push(`/${lang}/login`)} className="btn btn-primary">
+            Volver al Login
+          </button>
         </div>
       </div>
     )
@@ -75,7 +98,7 @@ export default function LoginRedirect({ lang }: LoginRedirectProps) {
     <div className="login-redirect-container">
       <div className="login-redirect-loading">
         <div className="login-redirect-spinner"></div>
-        <p>{t.redirect.loading}</p>
+        <p>Redirigiendo...</p>
       </div>
     </div>
   )
