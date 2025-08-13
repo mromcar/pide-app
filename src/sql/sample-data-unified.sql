@@ -15,19 +15,19 @@ VALUES
 -- PASO 2: INSERTAR USUARIOS
 -- ===================================================================
 
+-- TODOS LOS USUARIOS TIENEN LA CONTRASEÑA: miguel1234
 INSERT INTO users (role, name, email, password_hash, establishment_id)
 VALUES
-  ('establishment_admin', 'María García', 'admin@laplaza.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1),
-  ('establishment_admin', 'José Martínez', 'admin@central.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2),
-  ('establishment_admin', 'Carmen López', 'admin@rincon.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3),
-  ('waiter', 'Ana Rodríguez', 'ana@laplaza.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1),
-  ('cook', 'Luis Fernández', 'luis@laplaza.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1),
-  ('waiter', 'Pedro Sánchez', 'pedro@central.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2),
-  ('cook', 'Elena Torres', 'elena@central.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2),
-  ('client', 'Juan Cliente', 'juan@email.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL),
-  ('client', 'Laura Usuaria', 'laura@email.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL),
-  ('general_admin', 'Super Admin', 'superadmin@pideapp.com', '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL);
-
+  ('establishment_admin', 'María García', 'admin@laplaza.com', '$2b$10$Oh0fgGrpIdGIsMTZDtEGH.qtum7h6rCUfPMD3rOI/ZPlAz9XLWru6', 1),
+  ('establishment_admin', 'José Martínez', 'admin@central.com', '$2b$10$Oh0fgGrpIdGIsMTZDtEGH.qtum7h6rCUfPMD3rOI/ZPlAz9XLWru6', 2),
+  ('establishment_admin', 'Carmen López', 'admin@rincon.com', '$2b$10$Oh0fgGrpIdGIsMTZDtEGH.qtum7h6rCUfPMD3rOI/ZPlAz9XLWru6', 3),
+  ('waiter', 'Ana Rodríguez', 'ana@laplaza.com', '$2b$10$Oh0fgGrpIdGIsMTZDtEGH.qtum7h6rCUfPMD3rOI/ZPlAz9XLWru6', 1),
+  ('cook', 'Luis Fernández', 'luis@laplaza.com', '$2b$10$Oh0fgGrpIdGIsMTZDtEGH.qtum7h6rCUfPMD3rOI/ZPlAz9XLWru6', 1),
+  ('waiter', 'Pedro Sánchez', 'pedro@central.com', '$2b$10$Oh0fgGrpIdGIsMTZDtEGH.qtum7h6rCUfPMD3rOI/ZPlAz9XLWru6', 2),
+  ('cook', 'Elena Torres', 'elena@central.com', '$2b$10$Oh0fgGrpIdGIsMTZDtEGH.qtum7h6rCUfPMD3rOI/ZPlAz9XLWru6', 2),
+  ('client', 'Juan Cliente', 'juan@email.com', '$2b$10$Oh0fgGrpIdGIsMTZDtEGH.qtum7h6rCUfPMD3rOI/ZPlAz9XLWru6', NULL),
+  ('client', 'Laura Usuaria', 'laura@email.com', '$2b$10$Oh0fgGrpIdGIsMTZDtEGH.qtum7h6rCUfPMD3rOI/ZPlAz9XLWru6', NULL),
+  ('general_admin', 'Super Admin', 'superadmin@pideapp.com', '$2b$10$Oh0fgGrpIdGIsMTZDtEGH.qtum7h6rCUfPMD3rOI/ZPlAz9XLWru6', NULL);
 -- PASO 3: INSERTAR RELACIONES ADMINISTRADOR-ESTABLECIMIENTO
 -- ===================================================================
 

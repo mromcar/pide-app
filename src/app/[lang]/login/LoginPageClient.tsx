@@ -13,6 +13,7 @@ interface LoginPageClientProps {
 export default function LoginPageClient({ translations, lang }: LoginPageClientProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -33,9 +34,8 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
       if (result?.error) {
         setError(t.error.invalidCredentials)
       } else {
-        // Redirigir según el rol del usuario o a la página principal
-        router.push(`/${lang}`) // Esto permitirá que LoginRedirect maneje la redirección
-        router.refresh() // Forzar actualización para obtener la nueva sesión
+        router.push(`/${lang}`)
+        router.refresh()
       }
     } catch (err) {
       const message =
@@ -52,7 +52,7 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
 
     try {
       await signIn('google', {
-        callbackUrl: `/${lang}`, // Cambiar a la página principal
+        callbackUrl: `/${lang}`,
       })
     } catch (err) {
       const message =
@@ -101,17 +101,52 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
               <label htmlFor="password" className="login-label">
                 {t.passwordLabel}
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="login-input"
-                placeholder={t.passwordPlaceholder}
-              />
+              <div className="password-input-container">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="login-input"
+                  placeholder={t.passwordPlaceholder}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="password-toggle-btn"
+                >
+                  {showPassword ? (
+                    // Icono ojo cerrado
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    // Icono ojo abierto
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <button type="submit" disabled={isLoading} className="login-submit-btn">
@@ -127,7 +162,7 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
             </div>
           </div>
 
-          {/* Google Login - AHORA VA DESPUÉS */}
+          {/* Google Login */}
           <div className="login-google-section">
             <button onClick={handleGoogleLogin} disabled={isLoading} className="login-google-btn">
               <svg className="login-google-icon" viewBox="0 0 24 24">
