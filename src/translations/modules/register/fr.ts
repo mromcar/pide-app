@@ -21,7 +21,10 @@ export const registerFr: RegisterTranslations = {
   serverError: 'Erreur du serveur. Veuillez réessayer plus tard',
   success: {
     title: 'Compte créé avec succès !',
-    message: 'Bienvenue ! Votre compte a été créé',
+    message: 'Bienvenue à PideApp !',
+    description: 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter pour commencer à utiliser l\'application.',
+    loginButton: 'Se connecter',
+    emailLabel: 'E-mail enregistré',
     redirecting: 'Redirection...'
   },
   error: {

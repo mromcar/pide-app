@@ -20,6 +20,9 @@ export interface RegisterTranslations {
   success: {
     title: string
     message: string
+    description: string
+    loginButton: string
+    emailLabel: string
     redirecting: string
   }
   error: {

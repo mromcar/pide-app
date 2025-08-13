@@ -21,6 +21,7 @@ export default function RegisterPageClient({ translations, lang }: RegisterPageC
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
+  const [isRegistered, setIsRegistered] = useState(false) // Nuevo estado
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -82,18 +83,8 @@ export default function RegisterPageClient({ translations, lang }: RegisterPageC
         return
       }
 
-      // Auto sign in after successful registration
-      const result = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      })
-
-      if (result?.ok) {
-        router.push(`/${lang}`)
-      } else {
-        router.push(`/${lang}/login?message=registered`)
-      }
+      // Mostrar mensaje de éxito en lugar de redirigir
+      setIsRegistered(true)
     } catch (error) {
       setErrors({ general: t.serverError })
     } finally {
@@ -103,6 +94,43 @@ export default function RegisterPageClient({ translations, lang }: RegisterPageC
 
   const handleGoogleSignIn = () => {
     signIn('google', { callbackUrl: `/${lang}/login` })
+  }
+
+  const handleGoToLogin = () => {
+    router.push(`/${lang}/login`)
+  }
+
+  // Si el usuario ya se registró, mostrar mensaje de éxito
+  if (isRegistered) {
+    return (
+      <div className="login-container">
+        <div className="login-card">
+          <div className="login-bg-card">
+            <div className="login-header">
+              <div className="success-icon">✅</div>
+              <h2 className="login-title">{t.success.title}</h2>
+              <p className="login-subtitle">{t.success.message}</p>
+            </div>
+
+            <div className="success-content">
+              <p className="success-description">{t.success.description}</p>
+
+              <div className="success-actions">
+                <button onClick={handleGoToLogin} className="login-submit-btn">
+                  {t.success.loginButton}
+                </button>
+              </div>
+
+              <div className="success-info">
+                <p className="success-email">
+                  <strong>{t.success.emailLabel}:</strong> {formData.email}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

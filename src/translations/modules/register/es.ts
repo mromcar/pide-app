@@ -20,8 +20,11 @@ export const registerEs: RegisterTranslations = {
   registerError: 'El registro ha fallado. Inténtalo de nuevo.',
   serverError: 'Error del servidor. Inténtalo de nuevo más tarde.',
   success: {
-    title: '¡Cuenta creada con éxito!',
-    message: '¡Bienvenido! Tu cuenta ha sido creada',
+    title: '¡Cuenta creada exitosamente!',
+    message: '¡Bienvenido a PideApp!',
+    description: 'Tu cuenta ha sido creada correctamente. Ahora puedes iniciar sesión para comenzar a usar la aplicación.',
+    loginButton: 'Iniciar sesión',
+    emailLabel: 'Email registrado',
     redirecting: 'Redirigiendo...'
   },
   error: {
