@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
-import type { Category } from '@/types/entities/category'
+import type { CategoryDTO } from '@/types/dtos/category'
 import type { LanguageCode } from '@/constants/languages'
 
 // Definir la interfaz localmente para evitar conflictos
@@ -15,32 +15,34 @@ interface CategoryFormData {
 interface CategoryManagementProps {
   establishmentId: string
   languageCode: LanguageCode
+  categories: CategoryDTO[]
+  onCategoriesChange: (newCategories: CategoryDTO[]) => void
+  selectedCategoryId: number | null
+  onSelectCategory: (categoryId: number) => void
 }
 
-export function CategoryManagement({ establishmentId, languageCode }: CategoryManagementProps) {
+export function CategoryManagement({
+  establishmentId,
+  languageCode,
+  categories,
+  onCategoriesChange,
+  selectedCategoryId,
+  onSelectCategory,
+}: CategoryManagementProps) {
   const { t } = useTranslation(languageCode)
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [editingCategory, setEditingCategory] = useState<CategoryDTO | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
-
-  useEffect(() => {
-    fetchCategories()
-  }, [establishmentId])
 
   const fetchCategories = async () => {
     try {
-      setLoading(true)
-      const response = await fetch(`/api/establishments/${establishmentId}/categories`)
+      const response = await fetch(`/api/restaurants/${establishmentId}/menu/categories`)
       if (response.ok) {
         const data = await response.json()
-        setCategories(data)
+        onCategoriesChange(data)
       }
     } catch (error) {
       console.error('Error fetching categories:', error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -49,18 +51,25 @@ export function CategoryManagement({ establishmentId, languageCode }: CategoryMa
     setShowForm(true)
   }
 
-  const handleEditCategory = (category: Category) => {
+  const handleEditCategory = (category: CategoryDTO) => {
     setEditingCategory(category)
     setShowForm(true)
   }
 
   const handleDeleteCategory = async (categoryId: number) => {
     try {
-      const response = await fetch(`/api/categories/${categoryId}`, {
-        method: 'DELETE',
-      })
+      const response = await fetch(
+        `/api/restaurants/${establishmentId}/menu/categories/${categoryId}`,
+        {
+          method: 'DELETE',
+        }
+      )
       if (response.ok) {
-        await fetchCategories()
+        const updatedCategories = categories.filter((c) => c.categoryId !== categoryId)
+        onCategoriesChange(updatedCategories)
+        if (selectedCategoryId === categoryId && updatedCategories.length > 0) {
+          onSelectCategory(updatedCategories[0].categoryId)
+        }
         setDeleteConfirm(null)
       }
     } catch (error) {
@@ -71,16 +80,15 @@ export function CategoryManagement({ establishmentId, languageCode }: CategoryMa
   const handleFormSubmit = async (formData: CategoryFormData) => {
     try {
       const url = editingCategory
-        ? `/api/categories/${editingCategory.categoryId}`
-        : `/api/establishments/${establishmentId}/categories`
+        ? `/api/restaurants/${establishmentId}/menu/categories/${editingCategory.categoryId}`
+        : `/api/restaurants/${establishmentId}/menu/categories`
 
       const method = editingCategory ? 'PUT' : 'POST'
 
-      // Convierte a snake_case solo para la petición
       const payload = {
         name: formData.name,
-        sort_order: formData.sortOrder,
-        is_active: formData.isActive,
+        sortOrder: formData.sortOrder,
+        isActive: formData.isActive,
       }
 
       const response = await fetch(url, {
@@ -101,67 +109,45 @@ export function CategoryManagement({ establishmentId, languageCode }: CategoryMa
     }
   }
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading categories...</p>
-      </div>
-    )
-  }
-
   return (
     <div className="category-management">
       {/* Header */}
-      <div className="management-header">
-        <h2 className="management-title">{t.establishmentAdmin.menuManagement.categories.title}</h2>
-        <button onClick={handleAddCategory} className="btn-primary">
+      <div className="section-header">
+        <div>
+          <h3>{t.establishmentAdmin.menuManagement.categories.title}</h3>
+          <p className="section-subtitle">
+            {categories.length} {t.establishmentAdmin.menuManagement.categories.title.toLowerCase()}
+          </p>
+        </div>
+        <button onClick={handleAddCategory} className="btn btn-primary">
+          <span>➕</span>
           {t.establishmentAdmin.menuManagement.categories.addNew}
         </button>
       </div>
 
-      {/* Categories Table */}
-      <div className="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>{t.establishmentAdmin.menuManagement.categories.name}</th>
-              <th>{t.establishmentAdmin.menuManagement.categories.description}</th>
-              <th>{t.establishmentAdmin.menuManagement.categories.active}</th>
-              <th>{t.establishmentAdmin.menuManagement.categories.actions}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((category) => (
-              <tr key={category.categoryId}>
-                <td>{category.name}</td>
-                <td>-</td>
-                <td>
-                  <span className={`status-badge ${category.isActive ? 'active' : 'inactive'}`}>
-                    {category.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button
-                      onClick={() => handleEditCategory(category)}
-                      className="btn-secondary btn-sm"
-                    >
-                      {t.establishmentAdmin.menuManagement.categories.edit}
-                    </button>
-                    <button
-                      onClick={() => setDeleteConfirm(category.categoryId.toString())}
-                      className="btn-danger btn-sm"
-                    >
-                      {t.establishmentAdmin.menuManagement.categories.delete}
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Categories Grid */}
+      {categories.length > 0 ? (
+        <div className="categories-grid">
+          {categories.map((category) => (
+            <CategoryCard
+              key={category.categoryId}
+              category={category}
+              onEdit={() => handleEditCategory(category)}
+              onDelete={() => setDeleteConfirm(category.categoryId.toString())}
+              onSelect={() => onSelectCategory(category.categoryId)}
+              isSelected={selectedCategoryId === category.categoryId}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <h3>No hay categorías</h3>
+          <p>Crea tu primera categoría para empezar a organizar tu menú.</p>
+          <button onClick={handleAddCategory} className="btn btn-secondary">
+            Crear primera categoría
+          </button>
+        </div>
+      )}
 
       {/* Category Form Modal */}
       {showForm && (
@@ -176,22 +162,23 @@ export function CategoryManagement({ establishmentId, languageCode }: CategoryMa
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal modal-sm">
             <div className="modal-header">
-              <h3 className="modal-title">
-                {t.establishmentAdmin.menuManagement.categories.confirmDelete}
-              </h3>
+              <h3>{t.establishmentAdmin.menuManagement.categories.confirmDelete}</h3>
+              <button onClick={() => setDeleteConfirm(null)} className="modal-close">
+                ✕
+              </button>
             </div>
             <div className="modal-body">
               <p>{t.establishmentAdmin.menuManagement.categories.deleteMessage}</p>
             </div>
             <div className="modal-footer">
-              <button onClick={() => setDeleteConfirm(null)} className="btn-secondary">
+              <button onClick={() => setDeleteConfirm(null)} className="btn btn-secondary">
                 {t.establishmentAdmin.menuManagement.categories.cancel}
               </button>
               <button
                 onClick={() => handleDeleteCategory(parseInt(deleteConfirm))}
-                className="btn-danger"
+                className="btn btn-danger"
               >
                 {t.establishmentAdmin.menuManagement.categories.confirm}
               </button>
@@ -203,9 +190,58 @@ export function CategoryManagement({ establishmentId, languageCode }: CategoryMa
   )
 }
 
+// Category Card Component
+interface CategoryCardProps {
+  category: CategoryDTO
+  onEdit: () => void
+  onDelete: () => void
+  onSelect: () => void
+  isSelected: boolean
+}
+
+function CategoryCard({ category, onEdit, onDelete, onSelect, isSelected }: CategoryCardProps) {
+  return (
+    <div className={`category-card ${isSelected ? 'selected' : ''}`} onClick={onSelect}>
+      <div className="category-image-container">
+        <img
+          src={`/images/categories/${category.categoryId}.jpg`}
+          alt={category.name}
+          className="category-image"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none'
+          }}
+        />
+      </div>
+      <div className="category-info">
+        <h4 className="category-name">{category.name}</h4>
+        <div className="category-actions">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onEdit()
+            }}
+            className="btn btn-sm btn-secondary"
+          >
+            ✏️ Editar
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete()
+            }}
+            className="btn btn-sm btn-danger"
+          >
+            🗑️ Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Category Form Component
 interface CategoryFormProps {
-  category: Category | null
+  category: CategoryDTO | null
   languageCode: LanguageCode
   onSubmit: (data: CategoryFormData) => void
   onCancel: () => void
@@ -226,64 +262,64 @@ function CategoryForm({ category, languageCode, onSubmit, onCancel }: CategoryFo
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content modal-large">
+      <div className="modal modal-sm">
         <div className="modal-header">
-          <h3 className="modal-title">
+          <h3>
             {category
               ? t.establishmentAdmin.menuManagement.categories.edit
               : t.establishmentAdmin.menuManagement.categories.addNew}
           </h3>
           <button onClick={onCancel} className="modal-close">
-            ×
+            ✕
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="admin-form">
-          <div className="form-group">
-            <label className="form-label">
-              {t.establishmentAdmin.menuManagement.categories.name}
-            </label>
-            <input
-              type="text"
-              className="form-input"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
-          </div>
-
-          {/* ELIMINADO: Campo Image URL */}
-
-          <div className="form-group">
-            <label className="form-label">Sort Order</label>
-            <input
-              type="number"
-              className="form-input"
-              value={formData.sortOrder || 0}
-              onChange={(e) =>
-                setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })
-              }
-              min="0"
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label flex items-center">
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body">
+            <div className="form-field">
+              <label htmlFor="name">{t.establishmentAdmin.menuManagement.categories.name}</label>
               <input
-                type="checkbox"
-                checked={formData.isActive ?? true}
-                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                className="mr-2"
+                id="name"
+                type="text"
+                className="form-input"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+                placeholder="Ej: Entrantes, Platos principales..."
               />
-              {t.establishmentAdmin.menuManagement.categories.active}
-            </label>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="sortOrder">Orden</label>
+              <input
+                id="sortOrder"
+                type="number"
+                className="form-input"
+                value={formData.sortOrder || 0}
+                onChange={(e) =>
+                  setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })
+                }
+                min="0"
+              />
+            </div>
+
+            <div className="form-field">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={formData.isActive ?? true}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                />
+                {t.establishmentAdmin.menuManagement.categories.active}
+              </label>
+            </div>
           </div>
 
           <div className="modal-footer">
-            <button type="button" onClick={onCancel} className="btn-secondary">
+            <button type="button" onClick={onCancel} className="btn btn-secondary">
               {t.establishmentAdmin.menuManagement.categories.cancel}
             </button>
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn btn-primary">
               {category
                 ? t.establishmentAdmin.menuManagement.categories.update
                 : t.establishmentAdmin.menuManagement.categories.create}

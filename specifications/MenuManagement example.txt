@@ -1,0 +1,432 @@
+import React, { useState } from 'react';
+
+// --- Iconos (usando SVGs en línea para simplicidad) ---
+// En un proyecto real, usarías una librería como lucide-react
+const PlusCircle = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>;
+const Edit = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>;
+const Trash2 = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>;
+const X = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>;
+const UploadCloud = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>;
+const ImagePlaceholder = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>;
+
+
+// --- DATOS DE EJEMPLO (Simulando la respuesta de tu API) ---
+const mockAllergens = [
+  { id: 1, name: 'Gluten', icon: '🍞' },
+  { id: 2, name: 'Lácteos', icon: '🥛' },
+  { id: 3, name: 'Huevos', icon: '🥚' },
+  { id: 4, name: 'Pescado', icon: '🐟' },
+  { id: 5, name: 'Frutos secos', icon: '🌰' },
+  { id: 6, name: 'Soja', icon: '🌱' },
+  { id: 7, name: 'Mostaza', icon: '🌭' },
+  { id: 8, name: 'Crustáceos', icon: '🦞' },
+];
+
+const mockCategories = [
+  {
+    id: 1,
+    name: 'Entrantes',
+    imageUrl: 'https://placehold.co/600x400/f87171/ffffff?text=Entrantes',
+    products: [
+      {
+        id: 101,
+        name: 'Croquetas de Jamón Ibérico',
+        description: 'Cremosas y crujientes, con jamón de bellota 100% ibérico.',
+        imageUrl: 'https://placehold.co/600x400/fb923c/ffffff?text=Croquetas',
+        allergenIds: [1, 2, 3],
+        variants: [
+          { id: 1001, description: 'Media ración (4ud)', price: '6.50' },
+          { id: 1002, description: 'Ración completa (8ud)', price: '12.00' },
+        ],
+      },
+      {
+        id: 102,
+        name: 'Ensaladilla Rusa Tradicional',
+        description: 'Nuestra receta clásica con patata, atún, huevo y mayonesa casera.',
+        imageUrl: 'https://placehold.co/600x400/fdba74/ffffff?text=Ensaladilla',
+        allergenIds: [3, 4],
+        variants: [
+          { id: 1003, description: 'Tapa', price: '4.50' },
+          { id: 1004, description: 'Ración', price: '9.00' },
+        ],
+      },
+    ]
+  },
+  {
+    id: 2,
+    name: 'Platos Principales',
+    imageUrl: 'https://placehold.co/600x400/60a5fa/ffffff?text=Principales',
+    products: [
+      {
+        id: 201,
+        name: 'Solomillo de Ternera a la Parrilla',
+        description: '250g de solomillo de ternera gallega con patatas panaderas.',
+        imageUrl: 'https://placehold.co/600x400/38bdf8/ffffff?text=Solomillo',
+        allergenIds: [],
+        variants: [
+          { id: 2001, description: 'Plato único', price: '24.00' },
+        ],
+      }
+    ]
+  },
+  { id: 3, name: 'Postres', imageUrl: 'https://placehold.co/600x400/a78bfa/ffffff?text=Postres', products: [] },
+  { id: 4, name: 'Bebidas', imageUrl: 'https://placehold.co/600x400/c084fc/ffffff?text=Bebidas', products: [] },
+];
+
+
+// --- COMPONENTES DE LA UI ---
+
+// Modal para añadir/editar Categoría
+const CategoryModal = ({ category, onClose, onSave }) => {
+  const [name, setName] = useState(category ? category.name : '');
+  const isEditing = !!category;
+
+  const handleSave = () => {
+    // Aquí iría la lógica para guardar en la API
+    console.log('Guardando categoría:', { id: category?.id, name });
+    onSave({ ...category, name });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold text-gray-800">{isEditing ? 'Editar Categoría' : 'Nueva Categoría'}</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800"><X /></button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="category-name" className="block text-sm font-medium text-gray-700 mb-1">Nombre de la categoría</label>
+            <input
+              type="text"
+              id="category-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Ej: Postres"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Imagen de la categoría</label>
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+              <div className="space-y-1 text-center">
+                <UploadCloud />
+                <div className="flex text-sm text-gray-600">
+                  <label htmlFor="file-upload-cat" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none">
+                    <span>Sube un archivo</span>
+                    <input id="file-upload-cat" name="file-upload-cat" type="file" className="sr-only" />
+                  </label>
+                  <p className="pl-1">o arrástralo aquí</p>
+                </div>
+                <p className="text-xs text-gray-500">PNG, JPG, GIF hasta 10MB</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end space-x-3">
+          <button onClick={onClose} className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
+          <button onClick={handleSave} className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Guardar</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Modal para añadir/editar Producto
+const ProductModal = ({ product, allergensList, onClose, onSave }) => {
+  const isEditing = !!product;
+  const [name, setName] = useState(product ? product.name : '');
+  const [description, setDescription] = useState(product ? product.description : '');
+  const [variants, setVariants] = useState(product ? product.variants : [{ id: Date.now(), description: '', price: '' }]);
+  const [selectedAllergens, setSelectedAllergens] = useState(product ? new Set(product.allergenIds) : new Set());
+
+  const handleVariantChange = (index, field, value) => {
+    const newVariants = [...variants];
+    newVariants[index][field] = value;
+    setVariants(newVariants);
+  };
+
+  const addVariant = () => {
+    setVariants([...variants, { id: Date.now(), description: '', price: '' }]);
+  };
+
+  const removeVariant = (index) => {
+    const newVariants = variants.filter((_, i) => i !== index);
+    setVariants(newVariants);
+  };
+
+  const toggleAllergen = (allergenId) => {
+    const newSelection = new Set(selectedAllergens);
+    if (newSelection.has(allergenId)) {
+      newSelection.delete(allergenId);
+    } else {
+      newSelection.add(allergenId);
+    }
+    setSelectedAllergens(newSelection);
+  };
+
+  const handleSave = () => {
+    // Lógica para guardar en la API
+    console.log('Guardando producto:', { name, description, variants, allergens: Array.from(selectedAllergens) });
+    onSave();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start z-50 py-10 overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl my-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-2xl font-semibold text-gray-800">{isEditing ? 'Editar Producto' : 'Nuevo Producto'}</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800"><X /></button>
+        </div>
+
+        <div className="space-y-6">
+          {/* --- INFORMACIÓN BÁSICA --- */}
+          <div className="p-4 border rounded-md">
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Información Básica</h4>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="product-name" className="block text-sm font-medium text-gray-700 mb-1">Nombre del producto</label>
+                <input type="text" id="product-name" value={name} onChange={(e) => setName(e.target.value)} className="w-full input-style" placeholder="Ej: Tarta de Queso"/>
+              </div>
+              <div>
+                <label htmlFor="product-description" className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                <textarea id="product-description" value={description} onChange={(e) => setDescription(e.target.value)} rows="3" className="w-full input-style" placeholder="Ej: Cremosa tarta de queso al estilo neoyorquino..."></textarea>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Imagen del producto</label>
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                  <div className="space-y-1 text-center">
+                    <UploadCloud />
+                    <div className="flex text-sm text-gray-600">
+                      <label htmlFor="file-upload-prod" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500">
+                        <span>Sube un archivo</span>
+                        <input id="file-upload-prod" name="file-upload-prod" type="file" className="sr-only" />
+                      </label>
+                      <p className="pl-1">o arrástralo aquí</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* --- VARIANTES Y PRECIOS --- */}
+          <div className="p-4 border rounded-md">
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Variantes y Precios</h4>
+            <div className="space-y-3">
+              {variants.map((variant, index) => (
+                <div key={variant.id} className="flex items-center space-x-2">
+                  <input type="text" value={variant.description} onChange={(e) => handleVariantChange(index, 'description', e.target.value)} className="w-2/3 input-style" placeholder="Descripción (Ej: Ración)"/>
+                  <input type="number" value={variant.price} onChange={(e) => handleVariantChange(index, 'price', e.target.value)} className="w-1/3 input-style" placeholder="Precio (€)"/>
+                  <button onClick={() => removeVariant(index)} className="text-red-500 hover:text-red-700 p-1 rounded-full"><Trash2 /></button>
+                </div>
+              ))}
+            </div>
+            <button onClick={addVariant} className="mt-3 text-sm text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
+              <PlusCircle />
+              <span>Añadir otra variante</span>
+            </button>
+          </div>
+
+          {/* --- ALÉRGENOS --- */}
+          <div className="p-4 border rounded-md">
+            <h4 className="text-lg font-medium text-gray-900 mb-3">Alérgenos</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {allergensList.map(allergen => (
+                <button
+                  key={allergen.id}
+                  onClick={() => toggleAllergen(allergen.id)}
+                  className={`flex items-center space-x-2 p-2 rounded-md border text-sm transition-colors ${selectedAllergens.has(allergen.id) ? 'bg-indigo-100 border-indigo-500 text-indigo-800' : 'bg-white border-gray-300 hover:bg-gray-50'}`}
+                >
+                  <span>{allergen.icon}</span>
+                  <span>{allergen.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 flex justify-end space-x-3">
+          <button onClick={onClose} className="bg-gray-200 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300">Cancelar</button>
+          <button onClick={handleSave} className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">Guardar Producto</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+// --- COMPONENTE PRINCIPAL DE LA PÁGINA ---
+export default function MenuManagementPage() {
+  const [categories, setCategories] = useState(mockCategories);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(mockCategories[0]?.id);
+
+  const [isCategoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+
+  const [isProductModalOpen, setProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+
+  const selectedCategory = categories.find(c => c.id === selectedCategoryId);
+
+  // --- Handlers para Categorías ---
+  const handleOpenNewCategoryModal = () => {
+    setEditingCategory(null);
+    setCategoryModalOpen(true);
+  };
+
+  const handleOpenEditCategoryModal = (category) => {
+    setEditingCategory(category);
+    setCategoryModalOpen(true);
+  };
+
+  const handleSaveCategory = (savedCategory) => {
+    // Lógica de guardado/actualización
+    setCategoryModalOpen(false);
+  };
+
+  // --- Handlers para Productos ---
+  const handleOpenNewProductModal = () => {
+    setEditingProduct(null);
+    setProductModalOpen(true);
+  };
+
+  const handleOpenEditProductModal = (product) => {
+    setEditingProduct(product);
+    setProductModalOpen(true);
+  };
+
+  const handleSaveProduct = () => {
+    // Lógica de guardado/actualización
+    setProductModalOpen(false);
+  };
+
+
+  return (
+    <div className="bg-gray-50 min-h-screen font-sans">
+      {/* --- Modales --- */}
+      {isCategoryModalOpen && <CategoryModal category={editingCategory} onClose={() => setCategoryModalOpen(false)} onSave={handleSaveCategory} />}
+      {isProductModalOpen && <ProductModal product={editingProduct} allergensList={mockAllergens} onClose={() => setProductModalOpen(false)} onSave={handleSaveProduct} />}
+
+      {/* --- Encabezado --- */}
+      <header className="bg-white shadow-sm p-4 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold text-gray-900">Gestión del Menú</h1>
+          <p className="text-sm text-gray-500">Restaurante: El Buen Sabor</p>
+        </div>
+      </header>
+
+      {/* --- Contenido Principal --- */}
+      <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+          {/* --- Columna Izquierda: Categorías --- */}
+          <aside className="lg:col-span-1">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">Categorías</h2>
+              <ul className="space-y-2">
+                {categories.map(category => (
+                  <li key={category.id}>
+                    <button
+                      onClick={() => setSelectedCategoryId(category.id)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-3 transition-colors ${selectedCategoryId === category.id ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                      {category.imageUrl ? <img src={category.imageUrl} alt={category.name} className="w-8 h-8 rounded-md object-cover"/> : <ImagePlaceholder />}
+                      <span>{category.name}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <button onClick={handleOpenNewCategoryModal} className="w-full mt-4 flex items-center justify-center space-x-2 bg-indigo-50 text-indigo-700 px-3 py-2 rounded-md hover:bg-indigo-100 transition-colors">
+                <PlusCircle />
+                <span>Nueva Categoría</span>
+              </button>
+            </div>
+          </aside>
+
+          {/* --- Columna Derecha: Productos --- */}
+          <section className="lg:col-span-3">
+            {selectedCategory ? (
+              <div className="space-y-6">
+                <div className="bg-white p-4 rounded-lg shadow flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800">{selectedCategory.name}</h2>
+                    <p className="text-sm text-gray-500">{selectedCategory.products.length} productos en esta categoría</p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button onClick={() => handleOpenEditCategoryModal(selectedCategory)} className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"><Edit /></button>
+                    <button className="p-2 text-red-500 hover:bg-red-100 rounded-full"><Trash2 /></button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {selectedCategory.products.map(product => (
+                    <div key={product.id} className="bg-white rounded-lg shadow overflow-hidden transition-shadow hover:shadow-lg">
+                      <img src={product.imageUrl} alt={product.name} className="w-full h-40 object-cover" onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/600x400/cccccc/ffffff?text=Error'; }}/>
+                      <div className="p-4">
+                        <h3 className="font-semibold text-gray-800">{product.name}</h3>
+                        <p className="text-sm text-gray-600 mt-1 h-10">{product.description}</p>
+
+                        <div className="mt-3">
+                          {product.variants.map(variant => (
+                            <div key={variant.id} className="flex justify-between text-sm">
+                              <span className="text-gray-700">{variant.description}</span>
+                              <span className="font-medium text-gray-900">{variant.price}€</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="mt-3">
+                          <p className="text-xs font-medium text-gray-500 mb-1">Alérgenos:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {product.allergenIds.length > 0 ? product.allergenIds.map(id => {
+                              const allergen = mockAllergens.find(a => a.id === id);
+                              return allergen ? <span key={id} title={allergen.name} className="text-xl">{allergen.icon}</span> : null;
+                            }) : <span className="text-xs text-gray-400">Ninguno</span>}
+                          </div>
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t flex justify-end space-x-2">
+                          <button onClick={() => handleOpenEditProductModal(product)} className="text-sm text-indigo-600 hover:text-indigo-800">Editar</button>
+                          <button className="text-sm text-red-600 hover:text-red-800">Eliminar</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button onClick={handleOpenNewProductModal} className="w-full flex items-center justify-center space-x-2 bg-white text-indigo-700 px-4 py-3 rounded-lg shadow hover:bg-gray-50 transition-colors border border-dashed border-gray-300">
+                  <PlusCircle />
+                  <span>Añadir Nuevo Producto a {selectedCategory.name}</span>
+                </button>
+
+              </div>
+            ) : (
+              <div className="bg-white p-8 rounded-lg shadow text-center">
+                <h2 className="text-xl font-medium text-gray-700">Selecciona una categoría</h2>
+                <p className="text-gray-500 mt-2">Elige una categoría de la izquierda para ver y gestionar sus productos.</p>
+              </div>
+            )}
+          </section>
+        </div>
+      </main>
+
+      <style jsx global>{`
+        .input-style {
+          display: block;
+          width: 100%;
+          padding: 0.5rem 0.75rem;
+          border: 1px solid #D1D5DB;
+          border-radius: 0.375rem;
+          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .input-style:focus {
+          outline: 2px solid transparent;
+          outline-offset: 2px;
+          border-color: #4F46E5;
+          box-shadow: 0 0 0 2px #C7D2FE;
+        }
+      `}</style>
+    </div>
+  );
+}

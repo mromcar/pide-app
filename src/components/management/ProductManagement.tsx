@@ -1,330 +1,304 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
-import type { Product } from '@/types/entities/product'
-import type { Category } from '@/types/entities/category'
 import type { LanguageCode } from '@/constants/languages'
+import type { CategoryDTO } from '@/types/dtos/category'
+import type { ProductResponseDTO } from '@/types/dtos/product'
+import type { AllergenResponseDTO } from '@/types/dtos/allergen'
+import type { ProductVariantResponseDTO } from '@/types/dtos/productVariant'
+import { ProductModal } from './ProductModal'
+
+// Extender ProductVariantResponseDTO para incluir variantDescription
+interface ProductVariantWithDescription extends ProductVariantResponseDTO {
+  variantDescription: string
+}
+
+// Extender ProductResponseDTO para usar las variantes con descripción
+interface ProductWithVariantDescriptions extends Omit<ProductResponseDTO, 'variants'> {
+  variants?: ProductVariantWithDescription[]
+}
 
 interface ProductManagementProps {
   establishmentId: string
   languageCode: LanguageCode
+  categories: CategoryDTO[]
+  selectedCategoryId: number | null
+  onSelectCategory: (categoryId: number) => void
+  allergens: AllergenResponseDTO[]
 }
 
-export function ProductManagement({ establishmentId, languageCode }: ProductManagementProps) {
+export function ProductManagement({
+  establishmentId,
+  languageCode,
+  categories,
+  selectedCategoryId,
+  onSelectCategory,
+  allergens,
+}: ProductManagementProps) {
   const { t } = useTranslation(languageCode)
-  const [products, setProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [expandedProducts, setExpandedProducts] = useState<Set<number>>(new Set())
+  const [products, setProducts] = useState<ProductWithVariantDescriptions[]>([])
+  const [loading, setLoading] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<ProductWithVariantDescriptions | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
 
-  useEffect(() => {
-    fetchData()
-  }, [establishmentId])
+  const selectedCategory = categories.find((c) => c.categoryId === selectedCategoryId)
 
-  const fetchData = async () => {
+  // Fetch products for selected category
+  const fetchProducts = useCallback(async () => {
+    if (!selectedCategoryId) return
+
     try {
       setLoading(true)
-      const [productsRes, categoriesRes] = await Promise.all([
-        fetch(`/api/restaurants/${establishmentId}/menu/products`),
-        fetch(`/api/restaurants/${establishmentId}/menu/categories`),
-      ])
-
-      if (productsRes.ok && categoriesRes.ok) {
-        const [productsData, categoriesData] = await Promise.all([
-          productsRes.json(),
-          categoriesRes.json(),
-        ])
-        setProducts(productsData)
-        setCategories(categoriesData)
+      const response = await fetch(
+        `/api/restaurants/${establishmentId}/menu/products?categoryId=${selectedCategoryId}`
+      )
+      if (response.ok) {
+        const data = await response.json()
+        setProducts(data)
       }
     } catch (error) {
-      console.error('Error fetching data:', error)
+      console.error('Error fetching products:', error)
     } finally {
       setLoading(false)
     }
+  }, [establishmentId, selectedCategoryId])
+
+  useEffect(() => {
+    fetchProducts()
+  }, [fetchProducts])
+
+  const handleAddProduct = () => {
+    setEditingProduct(null)
+    setShowModal(true)
   }
 
-  const toggleProductExpansion = (productId: number) => {
-    const newExpanded = new Set(expandedProducts)
-    if (newExpanded.has(productId)) {
-      newExpanded.delete(productId)
-    } else {
-      newExpanded.add(productId)
-    }
-    setExpandedProducts(newExpanded)
+  const handleEditProduct = (product: ProductWithVariantDescriptions) => {
+    setEditingProduct(product)
+    setShowModal(true)
   }
 
   const handleDeleteProduct = async (productId: number) => {
-    if (!confirm(t.establishmentAdmin.menuManagement.products.confirmDelete)) return
-
     try {
       const response = await fetch(
         `/api/restaurants/${establishmentId}/menu/products/${productId}`,
-        {
-          method: 'DELETE',
-        }
+        { method: 'DELETE' }
       )
       if (response.ok) {
-        await fetchData()
+        await fetchProducts()
+        setDeleteConfirm(null)
       }
     } catch (error) {
       console.error('Error deleting product:', error)
     }
   }
 
-  const handleSubmit = async () => {
-    setShowForm(false)
-    await fetchData()
-  }
-
-  const filteredProducts =
-    selectedCategory === 'all'
-      ? products
-      : products.filter((product) => product.categoryId.toString() === selectedCategory)
-
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>{t.establishmentAdmin.forms.loading}</p>
-      </div>
-    )
+  const handleModalSave = async () => {
+    await fetchProducts()
+    setShowModal(false)
+    setEditingProduct(null)
   }
 
   return (
     <div className="product-management">
-      {/* Header */}
-      <div className="management-header">
-        <div className="header-content">
-          <h2>{t.establishmentAdmin.menuManagement.products.title}</h2>
-          <button onClick={() => setShowForm(true)} className="btn btn-primary">
-            {t.establishmentAdmin.menuManagement.products.addNew}
-          </button>
-        </div>
-
-        {/* Category Filter */}
-        <div className="filter-section">
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="category-filter"
-          >
-            <option value="all">Todas las categorías</option>
-            {categories.map((category) => (
-              <option key={category.categoryId} value={category.categoryId.toString()}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Products List */}
-      <div className="products-grid">
-        {filteredProducts.map((product) => (
-          <div key={product.productId} className="product-card">
-            <div className="product-header">
-              <div className="product-info">
-                {/* ELIMINADO: Imagen del producto */}
-                <div className="product-details">
-                  <h3>{product.name}</h3>
-                  <p className="product-description">{product.description}</p>
-                  <span className="product-category">
-                    {categories.find((c) => c.categoryId === product.categoryId)?.name}
-                  </span>
-                </div>
-              </div>
-
-              <div className="product-actions">
+      {/* Category Sidebar */}
+      <div className="management-layout">
+        <aside className="management-sidebar">
+          <div className="sidebar-section">
+            <h3 className="sidebar-title">
+              {t.establishmentAdmin.menuManagement.categories.title}
+            </h3>
+            <div className="category-list">
+              {categories.map((category) => (
                 <button
-                  onClick={() => toggleProductExpansion(product.productId)}
-                  className="btn btn-secondary btn-sm"
+                  key={category.categoryId}
+                  onClick={() => onSelectCategory(category.categoryId)}
+                  className={`category-item ${
+                    selectedCategoryId === category.categoryId ? 'active' : ''
+                  }`}
                 >
-                  {expandedProducts.has(product.productId) ? '▼' : '▶'} Variantes
-                </button>
-                <button
-                  onClick={() => {
-                    setEditingProduct(product)
-                    setShowForm(true)
-                  }}
-                  className="btn btn-outline btn-sm"
-                >
-                  {t.establishmentAdmin.menuManagement.products.edit}
-                </button>
-                <button
-                  onClick={() => handleDeleteProduct(product.productId)}
-                  className="btn btn-danger btn-sm"
-                >
-                  {t.establishmentAdmin.menuManagement.products.delete}
-                </button>
-              </div>
-            </div>
-
-            {/* Variants Section */}
-            {expandedProducts.has(product.productId) && (
-              <div className="variants-section">
-                <h4>Variantes</h4>
-                {product.variants && product.variants.length > 0 ? (
-                  <div className="variants-list">
-                    {product.variants.map((variant) => (
-                      <div key={variant.variantId} className="variant-item">
-                        <span className="variant-name">{variant.variantDescription}</span>
-                        <span className="variant-price">€{variant.price.toString()}</span>
-                        <div className="variant-actions">
-                          <button className="btn btn-outline btn-xs">Editar</button>
-                          <button className="btn btn-danger btn-xs">Eliminar</button>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="category-info">
+                    <span className="category-name">{category.name}</span>
                   </div>
-                ) : (
-                  <p className="no-variants">No hay variantes para este producto</p>
-                )}
-                <button className="btn btn-secondary btn-sm mt-2">+ Añadir Variante</button>
-              </div>
-            )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
 
-            {/* Allergens Section */}
-            {product.allergens && product.allergens.length > 0 && (
-              <div className="allergens-section">
-                <h5>Alérgenos:</h5>
-                <div className="allergens-list">
-                  {product.allergens.map((allergen) => (
-                    <span key={allergen.allergenId} className="allergen-tag">
-                      {allergen.allergen?.name}
-                    </span>
+        {/* Products Content */}
+        <main className="management-content">
+          {selectedCategory ? (
+            <div className="products-section">
+              {/* Category Header */}
+              <div className="section-header">
+                <div>
+                  <h3>{selectedCategory.name}</h3>
+                  <p className="section-subtitle">
+                    {products.length}{' '}
+                    {t.establishmentAdmin.menuManagement.products.title.toLowerCase()}
+                  </p>
+                </div>
+                <button onClick={handleAddProduct} className="btn btn-primary">
+                  <span>➕</span>
+                  {t.establishmentAdmin.menuManagement.products.addNew}
+                </button>
+              </div>
+
+              {/* Products Grid */}
+              {loading ? (
+                <div className="loading-state">Cargando productos...</div>
+              ) : products.length > 0 ? (
+                <div className="products-grid">
+                  {products.map((product) => (
+                    <ProductCard
+                      key={product.productId}
+                      product={product}
+                      allergens={allergens}
+                      onEdit={() => handleEditProduct(product)}
+                      onDelete={() => setDeleteConfirm(product.productId)}
+                    />
                   ))}
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              ) : (
+                <div className="empty-state">
+                  <p>No hay productos en esta categoría</p>
+                  <button onClick={handleAddProduct} className="btn btn-secondary">
+                    Añadir primer producto
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="no-selection">
+              <h3>Selecciona una categoría</h3>
+              <p>Elige una categoría para ver y gestionar sus productos.</p>
+            </div>
+          )}
+        </main>
       </div>
 
-      {/* Product Form Modal */}
-      {showForm && (
-        <ProductForm
-          product={editingProduct}
+      {/* Product Modal */}
+      {showModal && (
+        <ProductModal
+          product={editingProduct as ProductResponseDTO | null}
           categories={categories}
+          allergens={allergens}
           establishmentId={establishmentId}
           languageCode={languageCode}
-          onSubmit={handleSubmit}
-          onCancel={() => setShowForm(false)}
+          onClose={() => setShowModal(false)}
+          onSave={handleModalSave}
         />
+      )}
+
+      {/* Delete Confirmation */}
+      {deleteConfirm && (
+        <div className="modal-overlay">
+          <div className="modal modal-sm">
+            <h3>{t.establishmentAdmin.menuManagement.products.confirmDelete}</h3>
+            <p>{t.establishmentAdmin.menuManagement.products.deleteMessage}</p>
+            <div className="modal-actions">
+              <button onClick={() => setDeleteConfirm(null)} className="btn btn-secondary">
+                {t.establishmentAdmin.menuManagement.categories.cancel}
+              </button>
+              <button onClick={() => handleDeleteProduct(deleteConfirm)} className="btn btn-danger">
+                {t.establishmentAdmin.menuManagement.categories.confirm}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
 }
 
-interface ProductFormProps {
-  product: Product | null
-  categories: Category[]
-  establishmentId: string
-  languageCode: LanguageCode
-  onSubmit: (data: unknown) => void
-  onCancel: () => void
+// Product Card Component
+interface ProductCardProps {
+  product: ProductWithVariantDescriptions
+  allergens: AllergenResponseDTO[]
+  onEdit: () => void
+  onDelete: () => void
 }
 
-function ProductForm({
-  product,
-  categories,
-  establishmentId,
-  languageCode,
-  onSubmit,
-  onCancel,
-}: ProductFormProps) {
-  const { t } = useTranslation(languageCode)
-  const [formData, setFormData] = useState({
-    name: product?.name || '',
-    description: product?.description || '',
-    price: product?.price || 0,
-    categoryId: product?.categoryId || categories[0]?.categoryId || '',
-    isActive: product?.isActive ?? true,
-  })
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Convierte a snake_case solo para la petición al backend
-    const { categoryId, isActive, ...rest } = formData
-    const payload = {
-      ...rest,
-      category_id: categoryId,
-      is_active: isActive,
-      establishment_id: establishmentId,
-      language_code: languageCode,
-    }
-
-    onSubmit(payload)
+function ProductCard({ product, allergens, onEdit, onDelete }: ProductCardProps) {
+  // Helper function to get allergen details by ID
+  const getAllergenById = (allergenId: number) => {
+    return allergens.find((allergen) => allergen.allergenId === allergenId)
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h3>
-          {product
-            ? t.establishmentAdmin.menuManagement.products.edit
-            : t.establishmentAdmin.menuManagement.products.addNew}
-        </h3>
+    <div className="product-card">
+      <div className="product-image-container">
+        <img
+          src={`/images/products/${product.productId}.jpg`}
+          alt={product.name}
+          className="product-image"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none'
+          }}
+        />
+      </div>
+      <div className="product-info">
+        <h4 className="product-name">{product.name}</h4>
+        <p className="product-description">{product.description}</p>
 
-        <form onSubmit={handleSubmit} className="product-form">
-          <div className="form-group">
-            <label>{t.establishmentAdmin.menuManagement.products.name}</label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
+        {/* Variants */}
+        {product.variants && product.variants.length > 0 && (
+          <div className="product-variants">
+            {product.variants.map((variant) => (
+              <div key={variant.variantId} className="variant-item">
+                <span className="variant-description">
+                  {variant.variantDescription || `Variante ${variant.variantId}`}
+                </span>
+                <span className="variant-price">{variant.price}€</span>
+              </div>
+            ))}
           </div>
+        )}
 
-          <div className="form-group">
-            <label>{t.establishmentAdmin.menuManagement.products.description}</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-            />
+        {/* Allergens */}
+        <div className="product-allergens">
+          <span className="allergens-label">Alérgenos:</span>
+          <div className="allergens-list">
+            {product.allergens && product.allergens.length > 0 ? (
+              product.allergens.map((productAllergen) => {
+                const allergen = getAllergenById(productAllergen.allergenId)
+                return allergen ? (
+                  <span
+                    key={productAllergen.allergenId}
+                    className="allergen-item"
+                    title={allergen.name}
+                  >
+                    {/* Usar iconUrl si existe, si no mostrar el código del alérgeno */}
+                    {allergen.iconUrl ? (
+                      <img
+                        src={allergen.iconUrl}
+                        alt={allergen.name}
+                        className="allergen-icon-img"
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                    ) : (
+                      <span className="allergen-code">{allergen.code}</span>
+                    )}
+                  </span>
+                ) : null
+              })
+            ) : (
+              <span className="no-allergens">Ninguno</span>
+            )}
           </div>
+        </div>
 
-          <div className="form-group">
-            <label>{t.establishmentAdmin.menuManagement.products.category}</label>
-            <select
-              value={formData.categoryId}
-              onChange={(e) => setFormData({ ...formData, categoryId: parseInt(e.target.value) })}
-              required
-            >
-              {categories.map((category) => (
-                <option key={category.categoryId} value={category.categoryId}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group checkbox-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={formData.isActive}
-                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              />
-              {t.establishmentAdmin.menuManagement.products.active}
-            </label>
-          </div>
-
-          <div className="form-actions">
-            <button type="button" onClick={onCancel} className="btn btn-secondary">
-              {t.establishmentAdmin.forms.cancel}
-            </button>
-            <button type="submit" className="btn btn-primary">
-              {t.establishmentAdmin.forms.save}
-            </button>
-          </div>
-        </form>
+        {/* Actions */}
+        <div className="product-actions">
+          <button onClick={onEdit} className="btn btn-sm btn-secondary">
+            ✏️ Editar
+          </button>
+          <button onClick={onDelete} className="btn btn-sm btn-danger">
+            🗑️ Eliminar
+          </button>
+        </div>
       </div>
     </div>
   )

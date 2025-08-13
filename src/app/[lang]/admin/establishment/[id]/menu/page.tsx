@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react'
 import { useTranslation } from '@/hooks/useTranslation'
 import AdminNavbar from '@/components/admin/AdminNavbar'
 import ProtectedPage from '@/components/auth/ProtectedPage'
-import MenuManagement from '@/components/admin/MenuManagement'
+import { MenuManagement } from '@/components/management/MenuManagement'
 import type { LanguageCode } from '@/constants/languages'
 import type { Establishment } from '@/types/entities/establishment'
 import { UserRole } from '@/types/enums'
@@ -172,7 +172,6 @@ export default function MenuManagementPage() {
         {/* PASO 2d: ProtectedPage con array de roles permitidos */}
         <ProtectedPage allowedRoles={[UserRole.ESTABLISHMENT_ADMIN, UserRole.GENERAL_ADMIN]}>
           <MenuManagement
-            establishment={establishment}
             establishmentId={establishmentId}
             activeTab={activeTab}
             onTabChange={setActiveTab}
