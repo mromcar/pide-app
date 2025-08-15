@@ -32,7 +32,8 @@ export const adminEs: EstablishmentAdminTranslations = {
       cancel: 'Cancelar',
       confirm: 'Confirmar',
       update: 'Actualizar Categoría',
-      create: 'Crear Categoría'
+      create: 'Crear Categoría',
+      order: 'Orden'
     },
     products: {
       title: 'Productos',
@@ -49,7 +50,10 @@ export const adminEs: EstablishmentAdminTranslations = {
       variants: 'Variantes',
       allergens: 'Alérgenos',
       confirmDelete: 'Confirmar Eliminación',
-      deleteMessage: '¿Estás seguro de que quieres eliminar este producto?'
+      deleteMessage: '¿Estás seguro de que quieres eliminar este producto?',
+      allergensLabel: 'Alérgenos:',
+      noAllergens: 'Ninguno',
+      variantNumber: 'Variante'
     },
     variants: {
       title: 'Variantes',
@@ -62,8 +66,9 @@ export const adminEs: EstablishmentAdminTranslations = {
       allProducts: 'Todos los productos',
       product: 'Producto',
       description: 'Descripción',
-      price: 'Precio',
-      sku: 'SKU'
+      price: 'Precio (€)',
+      sku: 'SKU',
+      saving: 'Guardando...'
     }
   },
   employeeManagement: {
@@ -140,6 +145,24 @@ export const adminEs: EstablishmentAdminTranslations = {
     update: 'Actualizar',
     create: 'Crear'
   },
+  placeholders: { // 👈 Nueva sección
+    categories: {
+      name: 'Ej: Entrantes, Platos principales, Postres...'
+    },
+    products: {
+      name: 'Ej: Paella Valenciana, Gazpacho Andaluz...',
+      description: 'Describe tu producto aquí...'
+    },
+    variants: {
+      description: 'Ej: Ración normal, Media ración, Pequeña...',
+      price: '0.00'
+    }
+  },
+  helpTexts: { // 👈 Nueva sección
+    variants: {
+      inactiveNotVisible: 'Las variantes inactivas no aparecerán en el menú público'
+    }
+  },
   messages: {
     success: {
       categoryCreated: 'Categoría creada exitosamente',
@@ -148,6 +171,9 @@ export const adminEs: EstablishmentAdminTranslations = {
       productCreated: 'Producto creado exitosamente',
       productUpdated: 'Producto actualizado exitosamente',
       productDeleted: 'Producto eliminado exitosamente',
+      variantCreated: 'Variante creada exitosamente',
+      variantUpdated: 'Variante actualizada exitosamente',
+      variantDeleted: 'Variante eliminada exitosamente',
       employeeCreated: 'Empleado creado exitosamente',
       employeeUpdated: 'Empleado actualizado exitosamente',
       employeeDeleted: 'Empleado eliminado exitosamente',
@@ -160,11 +186,30 @@ export const adminEs: EstablishmentAdminTranslations = {
       productCreateFailed: 'Error al crear el producto',
       productUpdateFailed: 'Error al actualizar el producto',
       productDeleteFailed: 'Error al eliminar el producto',
+      variantCreateFailed: 'Error al crear la variante',
+      variantUpdateFailed: 'Error al actualizar la variante',
+      variantDeleteFailed: 'Error al eliminar la variante',
       employeeCreateFailed: 'Error al crear el empleado',
       employeeUpdateFailed: 'Error al actualizar el empleado',
       employeeDeleteFailed: 'Error al eliminar el empleado',
       orderUpdateFailed: 'Error al actualizar el pedido',
       loadingFailed: 'Error al cargar los datos'
+    },
+    emptyStates: {
+      noCategories: 'No hay categorías disponibles',
+      noCategoriesDesc: 'Para gestionar productos, primero necesitas crear al menos una categoría.',
+      createFirstCategory: 'Crear primera categoría',
+      noProducts: 'No hay productos en esta categoría',
+      noProductsDesc: 'Añade tu primer producto para comenzar a construir tu menú.',
+      addFirstProduct: 'Añadir primer producto',
+      noVariants: 'No hay variantes',
+      noVariantsDesc: 'Añade variantes para ofrecer diferentes opciones de este producto.',
+      addFirstVariant: 'Añadir primera variante',
+      selectCategory: 'Selecciona una categoría',
+      selectCategoryDesc: 'Elige una categoría de la barra lateral para ver y gestionar sus productos.',
+      selectProduct: 'Selecciona un producto',
+      selectProductDesc: 'Elige un producto para gestionar sus variantes.',
+      helperText: '💡 Ve a la pestaña "Categorías" para crear tu primera categoría'
     }
   },
   establishment: {

@@ -9,12 +9,10 @@ import type { AllergenResponseDTO } from '@/types/dtos/allergen'
 import type { ProductVariantResponseDTO } from '@/types/dtos/productVariant'
 import { ProductModal } from './ProductModal'
 
-// Extender ProductVariantResponseDTO para incluir variantDescription
 interface ProductVariantWithDescription extends ProductVariantResponseDTO {
   variantDescription: string
 }
 
-// Extender ProductResponseDTO para usar las variantes con descripción
 interface ProductWithVariantDescriptions extends Omit<ProductResponseDTO, 'variants'> {
   variants?: ProductVariantWithDescription[]
 }
@@ -31,10 +29,10 @@ interface ProductManagementProps {
 export function ProductManagement({
   establishmentId,
   languageCode,
-  categories,
+  categories = [],
   selectedCategoryId,
   onSelectCategory,
-  allergens,
+  allergens = [],
 }: ProductManagementProps) {
   const { t } = useTranslation(languageCode)
   const [products, setProducts] = useState<ProductWithVariantDescriptions[]>([])
@@ -43,7 +41,9 @@ export function ProductManagement({
   const [editingProduct, setEditingProduct] = useState<ProductWithVariantDescriptions | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
 
-  const selectedCategory = categories.find((c) => c.categoryId === selectedCategoryId)
+  const selectedCategory = Array.isArray(categories)
+    ? categories.find((c) => c.categoryId === selectedCategoryId)
+    : null
 
   // Fetch products for selected category
   const fetchProducts = useCallback(async () => {
@@ -56,10 +56,11 @@ export function ProductManagement({
       )
       if (response.ok) {
         const data = await response.json()
-        setProducts(data)
+        setProducts(data || [])
       }
     } catch (error) {
       console.error('Error fetching products:', error)
+      setProducts([])
     } finally {
       setLoading(false)
     }
@@ -100,9 +101,23 @@ export function ProductManagement({
     setEditingProduct(null)
   }
 
+  if (!Array.isArray(categories) || categories.length === 0) {
+    return (
+      <div className="product-management">
+        <div className="no-categories-state">
+          <div className="empty-icon">📂</div>
+          <h3>{t.establishmentAdmin.messages.emptyStates.noCategories}</h3>
+          <p>{t.establishmentAdmin.messages.emptyStates.noCategoriesDesc}</p>
+          <div className="empty-actions">
+            <p className="helper-text">{t.establishmentAdmin.messages.emptyStates.helperText}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="product-management">
-      {/* Category Sidebar */}
       <div className="management-layout">
         <aside className="management-sidebar">
           <div className="sidebar-section">
@@ -127,11 +142,9 @@ export function ProductManagement({
           </div>
         </aside>
 
-        {/* Products Content */}
         <main className="management-content">
           {selectedCategory ? (
             <div className="products-section">
-              {/* Category Header */}
               <div className="section-header">
                 <div>
                   <h3>{selectedCategory.name}</h3>
@@ -146,9 +159,8 @@ export function ProductManagement({
                 </button>
               </div>
 
-              {/* Products Grid */}
               {loading ? (
-                <div className="loading-state">Cargando productos...</div>
+                <div className="loading-state">{t.establishmentAdmin.forms.loading}</div>
               ) : products.length > 0 ? (
                 <div className="products-grid">
                   {products.map((product) => (
@@ -156,6 +168,7 @@ export function ProductManagement({
                       key={product.productId}
                       product={product}
                       allergens={allergens}
+                      languageCode={languageCode} // 👈 Pasar languageCode
                       onEdit={() => handleEditProduct(product)}
                       onDelete={() => setDeleteConfirm(product.productId)}
                     />
@@ -163,23 +176,25 @@ export function ProductManagement({
                 </div>
               ) : (
                 <div className="empty-state">
-                  <p>No hay productos en esta categoría</p>
+                  <div className="empty-icon">🍽️</div>
+                  <h4>{t.establishmentAdmin.messages.emptyStates.noProducts}</h4>
+                  <p>{t.establishmentAdmin.messages.emptyStates.noProductsDesc}</p>
                   <button onClick={handleAddProduct} className="btn btn-secondary">
-                    Añadir primer producto
+                    {t.establishmentAdmin.messages.emptyStates.addFirstProduct}
                   </button>
                 </div>
               )}
             </div>
           ) : (
             <div className="no-selection">
-              <h3>Selecciona una categoría</h3>
-              <p>Elige una categoría para ver y gestionar sus productos.</p>
+              <div className="empty-icon">👈</div>
+              <h3>{t.establishmentAdmin.messages.emptyStates.selectCategory}</h3>
+              <p>{t.establishmentAdmin.messages.emptyStates.selectCategoryDesc}</p>
             </div>
           )}
         </main>
       </div>
 
-      {/* Product Modal */}
       {showModal && (
         <ProductModal
           product={editingProduct as ProductResponseDTO | null}
@@ -192,13 +207,19 @@ export function ProductManagement({
         />
       )}
 
-      {/* Delete Confirmation */}
       {deleteConfirm && (
         <div className="modal-overlay">
           <div className="modal modal-sm">
-            <h3>{t.establishmentAdmin.menuManagement.products.confirmDelete}</h3>
-            <p>{t.establishmentAdmin.menuManagement.products.deleteMessage}</p>
-            <div className="modal-actions">
+            <div className="modal-header">
+              <h3>{t.establishmentAdmin.menuManagement.products.confirmDelete}</h3>
+              <button onClick={() => setDeleteConfirm(null)} className="modal-close">
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>{t.establishmentAdmin.menuManagement.products.deleteMessage}</p>
+            </div>
+            <div className="modal-footer">
               <button onClick={() => setDeleteConfirm(null)} className="btn btn-secondary">
                 {t.establishmentAdmin.menuManagement.categories.cancel}
               </button>
@@ -213,16 +234,18 @@ export function ProductManagement({
   )
 }
 
-// Product Card Component
+// ProductCard Component corregido
 interface ProductCardProps {
   product: ProductWithVariantDescriptions
   allergens: AllergenResponseDTO[]
+  languageCode: LanguageCode
   onEdit: () => void
   onDelete: () => void
 }
 
-function ProductCard({ product, allergens, onEdit, onDelete }: ProductCardProps) {
-  // Helper function to get allergen details by ID
+function ProductCard({ product, allergens, languageCode, onEdit, onDelete }: ProductCardProps) {
+  const { t } = useTranslation(languageCode)
+
   const getAllergenById = (allergenId: number) => {
     return allergens.find((allergen) => allergen.allergenId === allergenId)
   }
@@ -249,7 +272,9 @@ function ProductCard({ product, allergens, onEdit, onDelete }: ProductCardProps)
             {product.variants.map((variant) => (
               <div key={variant.variantId} className="variant-item">
                 <span className="variant-description">
-                  {variant.variantDescription || `Variante ${variant.variantId}`}
+                  {variant.variantDescription ||
+                    `${t.establishmentAdmin.menuManagement.products.variantNumber} ${variant.variantId}`}{' '}
+                  {/* 👈 Traducido */}
                 </span>
                 <span className="variant-price">{variant.price}€</span>
               </div>
@@ -259,7 +284,9 @@ function ProductCard({ product, allergens, onEdit, onDelete }: ProductCardProps)
 
         {/* Allergens */}
         <div className="product-allergens">
-          <span className="allergens-label">Alérgenos:</span>
+          <span className="allergens-label">
+            {t.establishmentAdmin.menuManagement.products.allergensLabel}
+          </span>
           <div className="allergens-list">
             {product.allergens && product.allergens.length > 0 ? (
               product.allergens.map((productAllergen) => {
@@ -270,7 +297,6 @@ function ProductCard({ product, allergens, onEdit, onDelete }: ProductCardProps)
                     className="allergen-item"
                     title={allergen.name}
                   >
-                    {/* Usar iconUrl si existe, si no mostrar el código del alérgeno */}
                     {allergen.iconUrl ? (
                       <img
                         src={allergen.iconUrl}
@@ -285,7 +311,9 @@ function ProductCard({ product, allergens, onEdit, onDelete }: ProductCardProps)
                 ) : null
               })
             ) : (
-              <span className="no-allergens">Ninguno</span>
+              <span className="no-allergens">
+                {t.establishmentAdmin.menuManagement.products.noAllergens}
+              </span>
             )}
           </div>
         </div>
@@ -293,10 +321,10 @@ function ProductCard({ product, allergens, onEdit, onDelete }: ProductCardProps)
         {/* Actions */}
         <div className="product-actions">
           <button onClick={onEdit} className="btn btn-sm btn-secondary">
-            ✏️ Editar
+            ✏️ {t.establishmentAdmin.forms.edit}
           </button>
           <button onClick={onDelete} className="btn btn-sm btn-danger">
-            🗑️ Eliminar
+            🗑️ {t.establishmentAdmin.forms.delete}
           </button>
         </div>
       </div>

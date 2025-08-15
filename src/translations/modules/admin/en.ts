@@ -32,7 +32,8 @@ export const adminEn: EstablishmentAdminTranslations = {
       cancel: 'Cancel',
       confirm: 'Confirm',
       update: 'Update Category',
-      create: 'Create Category'
+      create: 'Create Category',
+      order: 'Order'
     },
     products: {
       title: 'Products',
@@ -49,7 +50,10 @@ export const adminEn: EstablishmentAdminTranslations = {
       variants: 'Variants',
       allergens: 'Allergens',
       confirmDelete: 'Confirm Deletion',
-      deleteMessage: 'Are you sure you want to delete this product?'
+      deleteMessage: 'Are you sure you want to delete this product?',
+      allergensLabel: 'Allergens:',
+      noAllergens: 'None',
+      variantNumber: 'Variant'
     },
     variants: {
       title: 'Variants',
@@ -62,8 +66,9 @@ export const adminEn: EstablishmentAdminTranslations = {
       allProducts: 'All Products',
       product: 'Product',
       description: 'Description',
-      price: 'Price',
-      sku: 'SKU'
+      price: 'Price (€)',
+      sku: 'SKU',
+      saving: 'Saving...'
     }
   },
   employeeManagement: {
@@ -140,6 +145,24 @@ export const adminEn: EstablishmentAdminTranslations = {
     update: 'Update',
     create: 'Create'
   },
+  placeholders: {
+    categories: {
+      name: 'Ex: Starters, Main courses, Desserts...'
+    },
+    products: {
+      name: 'Ex: Paella Valenciana, Andalusian Gazpacho...',
+      description: 'Describe your product here...'
+    },
+    variants: {
+      description: 'Ex: Normal portion, Half portion, Small...',
+      price: '0.00'
+    }
+  },
+  helpTexts: {
+    variants: {
+      inactiveNotVisible: 'Inactive variants will not appear in the public menu'
+    }
+  },
   messages: {
     success: {
       categoryCreated: 'Category created successfully',
@@ -148,6 +171,9 @@ export const adminEn: EstablishmentAdminTranslations = {
       productCreated: 'Product created successfully',
       productUpdated: 'Product updated successfully',
       productDeleted: 'Product deleted successfully',
+      variantCreated: 'Variant created successfully',
+      variantUpdated: 'Variant updated successfully',
+      variantDeleted: 'Variant deleted successfully',
       employeeCreated: 'Employee created successfully',
       employeeUpdated: 'Employee updated successfully',
       employeeDeleted: 'Employee deleted successfully',
@@ -160,11 +186,30 @@ export const adminEn: EstablishmentAdminTranslations = {
       productCreateFailed: 'Failed to create product',
       productUpdateFailed: 'Failed to update product',
       productDeleteFailed: 'Failed to delete product',
+      variantCreateFailed: 'Failed to create variant',
+      variantUpdateFailed: 'Failed to update variant',
+      variantDeleteFailed: 'Failed to delete variant',
       employeeCreateFailed: 'Failed to create employee',
       employeeUpdateFailed: 'Failed to update employee',
       employeeDeleteFailed: 'Failed to delete employee',
       orderUpdateFailed: 'Failed to update order',
       loadingFailed: 'Failed to load data'
+    },
+    emptyStates: {
+      noCategories: 'No categories available',
+      noCategoriesDesc: 'To manage products, you first need to create at least one category.',
+      createFirstCategory: 'Create first category',
+      noProducts: 'No products in this category',
+      noProductsDesc: 'Add your first product to start building your menu.',
+      addFirstProduct: 'Add first product',
+      noVariants: 'No variants',
+      noVariantsDesc: 'Add variants to offer different options for this product.',
+      addFirstVariant: 'Add first variant',
+      selectCategory: 'Select a category',
+      selectCategoryDesc: 'Choose a category from the sidebar to view and manage its products.',
+      selectProduct: 'Select a product',
+      selectProductDesc: 'Choose a product to manage its variants.',
+      helperText: '💡 Go to the "Categories" tab to create your first category'
     }
   },
   establishment: {

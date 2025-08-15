@@ -31,6 +31,7 @@ export interface EstablishmentAdminTranslations {
       confirm: string
       update: string
       create: string
+      order: string
     }
     products: {
       title: string
@@ -48,6 +49,9 @@ export interface EstablishmentAdminTranslations {
       allergens: string
       confirmDelete: string
       deleteMessage: string
+      allergensLabel: string
+      noAllergens: string
+      variantNumber: string
     }
     variants: {
       title: string
@@ -62,6 +66,7 @@ export interface EstablishmentAdminTranslations {
       description: string
       price: string
       sku: string
+      saving: string
     }
   }
   employeeManagement: {
@@ -138,6 +143,24 @@ export interface EstablishmentAdminTranslations {
     update: string
     create: string
   }
+  placeholders: { // 👈 Nueva sección
+    categories: {
+      name: string
+    }
+    products: {
+      name: string
+      description: string
+    }
+    variants: {
+      description: string
+      price: string
+    }
+  }
+  helpTexts: { // 👈 Nueva sección
+    variants: {
+      inactiveNotVisible: string
+    }
+  }
   messages: {
     success: {
       categoryCreated: string
@@ -146,6 +169,9 @@ export interface EstablishmentAdminTranslations {
       productCreated: string
       productUpdated: string
       productDeleted: string
+      variantCreated: string
+      variantUpdated: string
+      variantDeleted: string
       employeeCreated: string
       employeeUpdated: string
       employeeDeleted: string
@@ -158,11 +184,30 @@ export interface EstablishmentAdminTranslations {
       productCreateFailed: string
       productUpdateFailed: string
       productDeleteFailed: string
+      variantCreateFailed: string
+      variantUpdateFailed: string
+      variantDeleteFailed: string
       employeeCreateFailed: string
       employeeUpdateFailed: string
       employeeDeleteFailed: string
       orderUpdateFailed: string
       loadingFailed: string
+    }
+    emptyStates: {
+      noCategories: string
+      noCategoriesDesc: string
+      createFirstCategory: string
+      noProducts: string
+      noProductsDesc: string
+      addFirstProduct: string
+      noVariants: string
+      noVariantsDesc: string
+      addFirstVariant: string
+      selectCategory: string
+      selectCategoryDesc: string
+      selectProduct: string
+      selectProductDesc: string
+      helperText: string
     }
   }
   establishment: {

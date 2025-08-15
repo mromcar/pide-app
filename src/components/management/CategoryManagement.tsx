@@ -1,11 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { CategoryDTO } from '@/types/dtos/category'
 import type { LanguageCode } from '@/constants/languages'
 
-// Definir la interfaz localmente para evitar conflictos
 interface CategoryFormData {
   name: string
   sortOrder?: number
@@ -24,7 +23,7 @@ interface CategoryManagementProps {
 export function CategoryManagement({
   establishmentId,
   languageCode,
-  categories,
+  categories = [],
   onCategoriesChange,
   selectedCategoryId,
   onSelectCategory,
@@ -33,16 +32,37 @@ export function CategoryManagement({
   const [showForm, setShowForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState<CategoryDTO | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  // Debug: Log cuando se reciben las props
+  useEffect(() => {
+    console.log('🎯 CategoryManagement: Received categories prop:', categories)
+    console.log('🎯 CategoryManagement: Categories length:', categories?.length || 0)
+    console.log('🎯 CategoryManagement: Categories is array:', Array.isArray(categories))
+  }, [categories])
 
   const fetchCategories = async () => {
     try {
+      setLoading(true)
+      console.log('🔍 CategoryManagement: Fetching categories for establishment:', establishmentId)
+
       const response = await fetch(`/api/restaurants/${establishmentId}/menu/categories`)
+      console.log('📊 CategoryManagement: Response status:', response.status)
+
       if (response.ok) {
         const data = await response.json()
-        onCategoriesChange(data)
+        console.log('✅ CategoryManagement: Data received:', data)
+        console.log('📝 CategoryManagement: Calling onCategoriesChange with:', data || [])
+        onCategoriesChange(data || [])
+      } else {
+        console.error('❌ CategoryManagement: Failed to fetch categories:', response.status)
+        onCategoriesChange([])
       }
     } catch (error) {
-      console.error('Error fetching categories:', error)
+      console.error('🚨 CategoryManagement: Error fetching categories:', error)
+      onCategoriesChange([])
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -60,9 +80,7 @@ export function CategoryManagement({
     try {
       const response = await fetch(
         `/api/restaurants/${establishmentId}/menu/categories/${categoryId}`,
-        {
-          method: 'DELETE',
-        }
+        { method: 'DELETE' }
       )
       if (response.ok) {
         const updatedCategories = categories.filter((c) => c.categoryId !== categoryId)
@@ -86,16 +104,15 @@ export function CategoryManagement({
       const method = editingCategory ? 'PUT' : 'POST'
 
       const payload = {
+        establishmentId: parseInt(establishmentId),
         name: formData.name,
-        sortOrder: formData.sortOrder,
-        isActive: formData.isActive,
+        sortOrder: formData.sortOrder || categories.length + 1,
+        isActive: formData.isActive ?? true,
       }
 
       const response = await fetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
 
@@ -103,11 +120,26 @@ export function CategoryManagement({
         await fetchCategories()
         setShowForm(false)
         setEditingCategory(null)
+      } else {
+        console.error('Failed to save category:', response.status)
       }
     } catch (error) {
       console.error('Error saving category:', error)
     }
   }
+
+  if (loading) {
+    console.log('⏳ CategoryManagement: Rendering loading state')
+    return (
+      <div className="category-management">
+        <div className="loading-state">
+          <p>{t.establishmentAdmin.forms.loading}</p>
+        </div>
+      </div>
+    )
+  }
+
+  console.log('🎨 CategoryManagement: Rendering with categories:', categories?.length || 0)
 
   return (
     <div className="category-management">
@@ -116,7 +148,8 @@ export function CategoryManagement({
         <div>
           <h3>{t.establishmentAdmin.menuManagement.categories.title}</h3>
           <p className="section-subtitle">
-            {categories.length} {t.establishmentAdmin.menuManagement.categories.title.toLowerCase()}
+            {categories?.length || 0}{' '}
+            {t.establishmentAdmin.menuManagement.categories.title.toLowerCase()}
           </p>
         </div>
         <button onClick={handleAddCategory} className="btn btn-primary">
@@ -126,27 +159,39 @@ export function CategoryManagement({
       </div>
 
       {/* Categories Grid */}
-      {categories.length > 0 ? (
-        <div className="categories-grid">
-          {categories.map((category) => (
-            <CategoryCard
-              key={category.categoryId}
-              category={category}
-              onEdit={() => handleEditCategory(category)}
-              onDelete={() => setDeleteConfirm(category.categoryId.toString())}
-              onSelect={() => onSelectCategory(category.categoryId)}
-              isSelected={selectedCategoryId === category.categoryId}
-            />
-          ))}
-        </div>
+      {Array.isArray(categories) && categories.length > 0 ? (
+        <>
+          {console.log(
+            '🎨 CategoryManagement: Rendering categories grid with:',
+            categories.length,
+            'items'
+          )}
+          <div className="categories-grid">
+            {categories.map((category) => (
+              <CategoryCard
+                key={category.categoryId}
+                category={category}
+                languageCode={languageCode}
+                onEdit={() => handleEditCategory(category)}
+                onDelete={() => setDeleteConfirm(category.categoryId.toString())}
+                onSelect={() => onSelectCategory(category.categoryId)}
+                isSelected={selectedCategoryId === category.categoryId}
+              />
+            ))}
+          </div>
+        </>
       ) : (
-        <div className="empty-state">
-          <h3>No hay categorías</h3>
-          <p>Crea tu primera categoría para empezar a organizar tu menú.</p>
-          <button onClick={handleAddCategory} className="btn btn-secondary">
-            Crear primera categoría
-          </button>
-        </div>
+        <>
+          {console.log('🎨 CategoryManagement: Rendering empty state')}
+          <div className="empty-state">
+            <div className="empty-icon">📂</div>
+            <h3>{t.establishmentAdmin.messages.emptyStates.noCategories}</h3>
+            <p>{t.establishmentAdmin.messages.emptyStates.noCategoriesDesc}</p>
+            <button onClick={handleAddCategory} className="btn btn-secondary">
+              {t.establishmentAdmin.messages.emptyStates.createFirstCategory}
+            </button>
+          </div>
+        </>
       )}
 
       {/* Category Form Modal */}
@@ -193,13 +238,23 @@ export function CategoryManagement({
 // Category Card Component
 interface CategoryCardProps {
   category: CategoryDTO
+  languageCode: LanguageCode
   onEdit: () => void
   onDelete: () => void
   onSelect: () => void
   isSelected: boolean
 }
 
-function CategoryCard({ category, onEdit, onDelete, onSelect, isSelected }: CategoryCardProps) {
+function CategoryCard({
+  category,
+  languageCode,
+  onEdit,
+  onDelete,
+  onSelect,
+  isSelected,
+}: CategoryCardProps) {
+  const { t } = useTranslation(languageCode)
+
   return (
     <div className={`category-card ${isSelected ? 'selected' : ''}`} onClick={onSelect}>
       <div className="category-image-container">
@@ -222,7 +277,7 @@ function CategoryCard({ category, onEdit, onDelete, onSelect, isSelected }: Cate
             }}
             className="btn btn-sm btn-secondary"
           >
-            ✏️ Editar
+            ✏️ {t.establishmentAdmin.forms.edit}
           </button>
           <button
             onClick={(e) => {
@@ -231,7 +286,7 @@ function CategoryCard({ category, onEdit, onDelete, onSelect, isSelected }: Cate
             }}
             className="btn btn-sm btn-danger"
           >
-            🗑️ Eliminar
+            🗑️ {t.establishmentAdmin.forms.delete}
           </button>
         </div>
       </div>
@@ -285,12 +340,15 @@ function CategoryForm({ category, languageCode, onSubmit, onCancel }: CategoryFo
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                placeholder="Ej: Entrantes, Platos principales..."
+                placeholder={t.establishmentAdmin.placeholders.categories.name} // 👈 Usar traducción
               />
             </div>
 
             <div className="form-field">
-              <label htmlFor="sortOrder">Orden</label>
+              <label htmlFor="sortOrder">
+                {t.establishmentAdmin.menuManagement.categories.order}
+              </label>{' '}
+              {/* 👈 Usar traducción */}
               <input
                 id="sortOrder"
                 type="number"

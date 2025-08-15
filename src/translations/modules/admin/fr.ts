@@ -32,7 +32,8 @@ export const adminFr: EstablishmentAdminTranslations = {
       cancel: 'Annuler',
       confirm: 'Confirmer',
       update: 'Mettre à Jour la Catégorie',
-      create: 'Créer la Catégorie'
+      create: 'Créer la Catégorie',
+      order: 'Ordre'
     },
     products: {
       title: 'Produits',
@@ -49,7 +50,10 @@ export const adminFr: EstablishmentAdminTranslations = {
       variants: 'Variantes',
       allergens: 'Allergènes',
       confirmDelete: 'Confirmer la Suppression',
-      deleteMessage: 'Êtes-vous sûr de vouloir supprimer ce produit?'
+      deleteMessage: 'Êtes-vous sûr de vouloir supprimer ce produit?',
+      allergensLabel: 'Allergènes:',
+      noAllergens: 'Aucun',
+      variantNumber: 'Variante'
     },
     variants: {
       title: 'Variantes',
@@ -62,8 +66,9 @@ export const adminFr: EstablishmentAdminTranslations = {
       allProducts: 'Tous les produits',
       product: 'Produit',
       description: 'Description',
-      price: 'Prix',
-      sku: 'SKU'
+      price: 'Prix (€)',
+      sku: 'SKU',
+      saving: 'Enregistrement...'
     }
   },
   employeeManagement: {
@@ -148,6 +153,9 @@ export const adminFr: EstablishmentAdminTranslations = {
       productCreated: 'Produit créé avec succès',
       productUpdated: 'Produit mis à jour avec succès',
       productDeleted: 'Produit supprimé avec succès',
+      variantCreated: 'Variante créée avec succès',
+      variantUpdated: 'Variante mise à jour avec succès',
+      variantDeleted: 'Variante supprimée avec succès',
       employeeCreated: 'Employé créé avec succès',
       employeeUpdated: 'Employé mis à jour avec succès',
       employeeDeleted: 'Employé supprimé avec succès',
@@ -160,11 +168,30 @@ export const adminFr: EstablishmentAdminTranslations = {
       productCreateFailed: 'Échec de la création du produit',
       productUpdateFailed: 'Échec de la mise à jour du produit',
       productDeleteFailed: 'Échec de la suppression du produit',
+      variantCreateFailed: 'Échec de la création de la variante',
+      variantUpdateFailed: 'Échec de la mise à jour de la variante',
+      variantDeleteFailed: 'Échec de la suppression de la variante',
       employeeCreateFailed: 'Échec de la création de l\'employé',
       employeeUpdateFailed: 'Échec de la mise à jour de l\'employé',
       employeeDeleteFailed: 'Échec de la suppression de l\'employé',
       orderUpdateFailed: 'Échec de la mise à jour de la commande',
       loadingFailed: 'Échec du chargement des données'
+    },
+    emptyStates: {
+      noCategories: 'Aucune catégorie disponible',
+      noCategoriesDesc: 'Pour gérer des produits, vous devez d\'abord créer au moins une catégorie.',
+      createFirstCategory: 'Créer la première catégorie',
+      noProducts: 'Aucun produit dans cette catégorie',
+      noProductsDesc: 'Ajoutez votre premier produit pour commencer à construire votre menu.',
+      addFirstProduct: 'Ajouter le premier produit',
+      noVariants: 'Aucune variante',
+      noVariantsDesc: 'Ajoutez des variantes pour offrir différentes options pour ce produit.',
+      addFirstVariant: 'Ajouter la première variante',
+      selectCategory: 'Sélectionnez une catégorie',
+      selectCategoryDesc: 'Choisissez une catégorie dans la barre latérale pour voir et gérer ses produits.',
+      selectProduct: 'Sélectionnez un produit',
+      selectProductDesc: 'Choisissez un produit pour gérer ses variantes.',
+      helperText: '💡 Allez à l\'onglet "Catégories" pour créer votre première catégorie'
     }
   },
   establishment: {
@@ -183,6 +210,24 @@ export const adminFr: EstablishmentAdminTranslations = {
     accessDenied: {
       title: 'Accès Refusé',
       message: 'Vous n\'avez pas la permission d\'accéder à cette page'
+    }
+  },
+  placeholders: {
+    categories: {
+      name: 'Ex: Entrées, Plats principaux, Desserts...'
+    },
+    products: {
+      name: 'Ex: Paella Valencienne, Gaspacho Andalou...',
+      description: 'Décrivez votre produit ici...'
+    },
+    variants: {
+      description: 'Ex: Portion normale, Demi-portion, Petite...',
+      price: '0.00'
+    }
+  },
+  helpTexts: {
+    variants: {
+      inactiveNotVisible: 'Les variantes inactives n\'apparaîtront pas dans le menu public'
     }
   }
 }

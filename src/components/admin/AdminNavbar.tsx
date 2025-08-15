@@ -56,17 +56,18 @@ export default function AdminNavbar({
   return (
     <nav className="admin-navbar">
       <div className="admin-navbar-container">
-        {/* Logo/Brand clickeable con traducción */}
+        {/* Logo/Brand - Solo el nombre del establecimiento */}
         <div className="admin-navbar-brand">
-          <h2 onClick={handleTitleClick}>
-            {t.establishmentAdmin.establishment.title} {establishmentName}
+          <h2 onClick={handleTitleClick} className="establishment-title">
+            {establishmentName}
           </h2>
         </div>
 
-        {/* Navigation Links con estado activo */}
+        {/* Navigation Links con estado activo corregido */}
         <div className="admin-navbar-menu">
           {filteredMenuItems.map((item) => {
-            const isActive = pathname === item.href
+            // Mejorar la detección de ruta activa
+            const isActive = pathname.includes(item.href.split('/').pop() || '')
             return (
               <a
                 key={item.href}

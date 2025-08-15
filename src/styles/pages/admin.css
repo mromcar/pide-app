@@ -1441,3 +1441,81 @@
   outline: none;
   color: #3b82f6;
 }
+
+/* Agregar a tu archivo de estilos de admin */
+
+/* Estados vacíos mejorados */
+.no-categories-state,
+.no-selection,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--color-bg-secondary);
+  border-radius: var(--border-radius-lg);
+  border: 2px dashed var(--color-border);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.no-categories-state h3,
+.no-selection h3,
+.empty-state h3,
+.empty-state h4 {
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.no-categories-state p,
+.no-selection p,
+.empty-state p {
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+  max-width: 500px;
+}
+
+.helper-text {
+  background: var(--color-info-bg);
+  color: var(--color-info-text);
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--color-info);
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+.no-products-message {
+  text-align: center;
+  padding: 1rem;
+  color: var(--color-text-muted);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--border-radius);
+  margin: 1rem 0;
+}
+
+.no-products-message p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.no-products-message small {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+/* Loading states */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}

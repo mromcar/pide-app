@@ -1496,3 +1496,125 @@
 2025-08-13 19:08:01:81 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
 2025-08-13 19:24:39:2439 [32minfo[39m: [32mUser created successfully[39m
 2025-08-13 19:24:39:2439 [32minfo[39m: [32mNew user registered: maria@perez.com[39m
+2025-08-13 19:30:55:3055 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:30:56:3056 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:30:56:3056 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:30:57:3057 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:33:33:3333 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:33:33:3333 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:33:33:3333 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:33:34:3334 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:35:01:351 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:35:01:351 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:35:01:351 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:35:02:352 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:35:09:359 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:35:10:3510 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:35:10:3510 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:35:10:3510 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:35:51:3551 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:35:52:3552 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:35:52:3552 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:35:52:3552 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:37:16:3716 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:37:16:3716 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:37:16:3716 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:37:16:3716 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:37:49:3749 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:37:50:3750 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:37:50:3750 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:37:50:3750 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:52:22:5222 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:52:23:5223 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:52:23:5223 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:52:23:5223 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:52:52:5252 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:52:52:5252 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:52:52:5252 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:52:53:5253 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:53:22:5322 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:53:22:5322 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:53:24:5324 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:53:24:5324 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:54:00:540 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:54:01:541 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 19:54:01:541 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 19:54:01:541 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:02:09:29 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:02:09:29 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:02:09:29 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:02:10:210 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:02:25:225 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:02:25:225 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:02:26:226 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:02:26:226 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:02:42:242 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:02:42:242 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:02:42:242 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:02:42:242 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:02:54:254 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:02:54:254 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:02:55:255 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:02:56:256 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:04:49:449 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:04:49:449 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:04:49:449 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:04:50:450 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:06:07:67 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:06:07:67 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:06:15:615 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:06:16:616 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:09:04:94 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:09:04:94 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:09:05:95 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:09:05:95 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:09:19:919 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:09:19:919 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:09:20:920 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:09:21:921 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:09:32:932 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:09:33:933 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:09:33:933 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:09:33:933 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:09:45:945 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:09:46:946 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:09:46:946 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:09:46:946 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:11:59:1159 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:11:59:1159 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:11:59:1159 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:11:59:1159 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:15:27:1527 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:15:28:1528 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:15:28:1528 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:15:28:1528 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:22:37:2237 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:22:38:2238 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:23:07:237 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:23:08:238 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:24:01:241 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:24:01:241 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:24:01:241 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:24:02:242 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:24:14:2414 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:24:14:2414 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:24:14:2414 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:24:15:2415 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:30:12:3012 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:30:13:3013 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:30:22:3022 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:30:23:3023 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:30:27:3027 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:30:27:3027 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:30:27:3027 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:30:27:3027 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:31:51:3151 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:31:52:3152 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 20:31:52:3152 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 20:31:53:3153 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 23:18:28:1828 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 23:18:28:1828 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 23:18:31:1831 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 23:18:31:1831 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-13 23:18:33:1833 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
+2025-08-13 23:18:34:1834 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
