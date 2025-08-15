@@ -1,5 +1,5 @@
-import { OrderStatus } from '@/types/enums';
-import { OrderItemStatus } from '@/types/enums';
+import { OrderStatus } from '@/constants/enums';
+import { OrderItemStatus } from '@/constants/enums';
 
 export interface OrderItemTranslation {
   translationId: number;

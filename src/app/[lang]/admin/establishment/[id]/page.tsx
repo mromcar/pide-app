@@ -9,7 +9,7 @@ import AdminNavbar from '@/components/admin/AdminNavbar'
 import ProtectedPage from '@/components/auth/ProtectedPage'
 import type { LanguageCode } from '@/constants/languages'
 import type { Establishment } from '@/types/entities/establishment'
-import { UserRole } from '@/types/enums'
+import { UserRole } from '@/constants/enums'
 
 export default function EstablishmentAdminPage() {
   const params = useParams()
@@ -59,8 +59,8 @@ export default function EstablishmentAdminPage() {
       return
     }
 
-    // Check if user has establishment admin role
-    const allowedRoles = [UserRole.ESTABLISHMENT_ADMIN, UserRole.WAITER, UserRole.COOK]
+    // ✅ CORRECCIÓN: Tipar explícitamente como UserRole[]
+    const allowedRoles: UserRole[] = [UserRole.establishment_admin, UserRole.waiter, UserRole.cook]
     if (!allowedRoles.includes(session.user.role as UserRole)) {
       router.push(`/${languageCode}/access-denied`)
       return
@@ -69,7 +69,7 @@ export default function EstablishmentAdminPage() {
     // Verificar que el usuario pertenece a este establecimiento
     if (
       session.user.establishmentId?.toString() !== establishmentId &&
-      session.user.role !== UserRole.GENERAL_ADMIN
+      session.user.role !== UserRole.general_admin
     ) {
       router.push(`/${languageCode}/access-denied`)
       return
@@ -156,7 +156,7 @@ export default function EstablishmentAdminPage() {
 
       <div className="establishment-admin-container">
         <ProtectedPage
-          allowedRoles={[UserRole.ESTABLISHMENT_ADMIN, UserRole.WAITER, UserRole.COOK]}
+          allowedRoles={[UserRole.establishment_admin, UserRole.waiter, UserRole.cook]}
         >
           <EstablishmentAdminDashboard
             establishment={establishment}

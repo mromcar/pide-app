@@ -133,7 +133,7 @@ export async function POST(request: NextRequest, { params }: { params: { restaur
     const { restaurantId } = paramsValidation.data;
 
     const isGeneralAdmin = token.role === UserRole.general_admin;
-    const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishment_id === restaurantId;
+    const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishmentId === restaurantId;
 
     if (!isGeneralAdmin && !isCorrectEstablishmentAdmin) {
       return jsonError('Forbidden: You are not authorized to create products for this restaurant.', 403);

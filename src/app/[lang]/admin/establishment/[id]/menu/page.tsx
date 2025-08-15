@@ -9,7 +9,7 @@ import ProtectedPage from '@/components/auth/ProtectedPage'
 import { MenuManagement } from '@/components/management/MenuManagement'
 import type { LanguageCode } from '@/constants/languages'
 import type { Establishment } from '@/types/entities/establishment'
-import { UserRole } from '@/types/enums'
+import { UserRole } from '@/constants/enums'
 
 export default function MenuManagementPage() {
   const params = useParams()
@@ -71,17 +71,17 @@ export default function MenuManagementPage() {
 
     const userRole = session.user.role as UserRole
 
-    // PASO 2a: Array de roles permitidos para gestión de menú
-    const allowedRoles = [UserRole.ESTABLISHMENT_ADMIN, UserRole.GENERAL_ADMIN]
+    // ✅ CORRECCIÓN: Tipar explícitamente como UserRole[]
+    const allowedRoles: UserRole[] = [UserRole.establishment_admin, UserRole.general_admin]
 
-    // PASO 2b: Verificar permisos de rol
+    // ✅ Ahora TypeScript sabe que allowedRoles contiene UserRole
     if (!allowedRoles.includes(userRole)) {
       router.push(`/${languageCode}/access-denied`)
       return
     }
 
     // PASO 2c: Verificar pertenencia al establecimiento (excepto GENERAL_ADMIN)
-    const requiresEstablishmentCheck = userRole !== UserRole.GENERAL_ADMIN
+    const requiresEstablishmentCheck = userRole !== UserRole.general_admin
     if (
       requiresEstablishmentCheck &&
       session.user.establishmentId?.toString() !== establishmentId
@@ -170,7 +170,7 @@ export default function MenuManagementPage() {
 
       <div className="establishment-admin-container">
         {/* PASO 2d: ProtectedPage con array de roles permitidos */}
-        <ProtectedPage allowedRoles={[UserRole.ESTABLISHMENT_ADMIN, UserRole.GENERAL_ADMIN]}>
+        <ProtectedPage allowedRoles={[UserRole.establishment_admin, UserRole.general_admin]}>
           <MenuManagement
             establishmentId={establishmentId}
             activeTab={activeTab}

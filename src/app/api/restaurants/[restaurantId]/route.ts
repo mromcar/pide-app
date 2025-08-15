@@ -43,7 +43,7 @@ export async function GET(
   try {
     const params = await paramsPromise;
     const { restaurantId } = params;
-    // Note: restaurantId in URL maps to establishment_id internally
+    // Note: restaurantId in URL maps to establishmentId internally
     const parsedEstablishmentId = Number(restaurantId);
 
     if (isNaN(parsedEstablishmentId)) {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { orderService } from '@/services/order.service';
-import { UserRole, OrderStatus } from '@/types/enums';
+import { UserRole, OrderStatus } from '@/constants/enums';
 import { z } from 'zod';
 import type { OrderFilters } from '@/types/dtos/order';
 
@@ -39,12 +39,12 @@ export async function GET(
     const { restaurantId } = pathParamsValidation.data;
 
     // Authorization
-    const isGeneralAdmin = token.role === UserRole.GENERAL_ADMIN;
+    const isGeneralAdmin = token.role === UserRole.general_admin;
     const isRestaurantAdminOrEmployee =
-      (token.role === UserRole.ESTABLISHMENT_ADMIN ||
-        token.role === UserRole.WAITER ||
-        token.role === UserRole.COOK) &&
-      token.establishment_id === restaurantId;
+      (token.role === UserRole.establishment_admin ||
+        token.role === UserRole.waiter ||
+        token.role === UserRole.cook) &&
+      token.establishmentId === restaurantId;
 
     if (!isGeneralAdmin && !isRestaurantAdminOrEmployee) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });

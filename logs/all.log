@@ -1618,3 +1618,39 @@
 2025-08-13 23:18:31:1831 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
 2025-08-13 23:18:33:1833 [32minfo[39m: [32m[API] Fetching categories for restaurantId: 1[39m
 2025-08-13 23:18:34:1834 [32minfo[39m: [32m[API] Found 3 categories for restaurantId: 1[39m
+2025-08-15 15:39:05:395 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-08-15 15:39:10:3910 [31merror[39m: [31m[PUBLIC API] Error in getPublicMenuComplete: Cannot find module '@/lib/db'[39m
+2025-08-15 15:39:10:3910 [31merror[39m: [31m[PUBLIC API] Error fetching public menu for establishment 1: Cannot find module '@/lib/db'[39m
+2025-08-15 15:42:28:4228 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-08-15 15:42:29:4229 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m
+2025-08-15 15:53:02:532 [32minfo[39m: [32m[PUBLIC API] Fetching allergens for establishment:[39m
+2025-08-15 15:53:04:534 [32minfo[39m: [32m[PUBLIC API] Allergens retrieved successfully:[39m
+2025-08-15 15:56:10:5610 [32minfo[39m: [32m[PUBLIC API] Fetching products for establishment:[39m
+2025-08-15 15:56:12:5612 [32minfo[39m: [32m[PUBLIC API] Fetching products for establishment:[39m
+2025-08-15 15:56:12:5612 [32minfo[39m: [32m[PUBLIC API] Products retrieved successfully:[39m
+2025-08-15 15:56:14:5614 [32minfo[39m: [32m[PUBLIC API] Products retrieved successfully:[39m
+2025-08-15 15:58:18:5818 [32minfo[39m: [32m[PUBLIC API] Fetching products for establishment:[39m
+2025-08-15 15:58:20:5820 [32minfo[39m: [32m[PUBLIC API] Products retrieved successfully:[39m
+2025-08-15 15:58:23:5823 [32minfo[39m: [32m[PUBLIC API] Fetching products for establishment:[39m
+2025-08-15 15:58:24:5824 [32minfo[39m: [32m[PUBLIC API] Products retrieved successfully:[39m
+2025-08-15 19:59:19:5919 [31merror[39m: [31m[ADMIN API] Error fetching allergens for establishment 1:[39m
+2025-08-15 20:02:59:259 [32minfo[39m: [32m[DEBUG] Starting allergens API - imports successful[39m
+2025-08-15 20:02:59:259 [32minfo[39m: [32m[DEBUG] About to test requireAuth...[39m
+2025-08-15 20:02:59:259 [31merror[39m: [31m[DEBUG] FULL ERROR DETAILS:[39m
+2025-08-15 20:02:59:259 [31merror[39m: [31m[ADMIN API] Error fetching allergens for establishment 1:[39m
+2025-08-15 20:04:47:447 [32minfo[39m: [32m[DEBUG] Starting allergens API - imports successful[39m
+2025-08-15 20:04:47:447 [32minfo[39m: [32m[DEBUG] About to test requireAuth...[39m
+2025-08-15 20:04:47:447 [31merror[39m: [31m[DEBUG] FULL ERROR DETAILS:[39m
+2025-08-15 20:04:47:447 [31merror[39m: [31m[ADMIN API] Error fetching allergens for establishment 1:[39m
+2025-08-15 20:06:51:651 [32minfo[39m: [32m[DEBUG] Step 1: API started[39m
+2025-08-15 20:06:51:651 [32minfo[39m: [32m[DEBUG] Step 2: Params resolved:[39m
+2025-08-15 20:06:51:651 [32minfo[39m: [32m[DEBUG] Step 3: Testing auth import...[39m
+2025-08-15 20:06:51:651 [32minfo[39m: [32m[DEBUG] Step 4: requireAuth imported successfully[39m
+2025-08-15 20:06:51:651 [32minfo[39m: [32m[DEBUG] Step 5: UserRole imported successfully, values:[39m
+2025-08-15 20:06:51:651 [32minfo[39m: [32m[DEBUG] Step 6: Returning success without auth[39m
+2025-08-15 20:08:31:831 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-08-15 21:27:14:2714 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-08-15 21:27:15:2715 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-08-15 21:27:15:2715 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-08-15 21:27:15:2715 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-08-15 21:52:37:5237 [32minfo[39m: [32m[SUPER-ADMIN API] Authentication/Authorization failed:[39m

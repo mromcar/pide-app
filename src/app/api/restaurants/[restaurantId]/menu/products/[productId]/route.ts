@@ -64,7 +64,7 @@ export async function GET(req: NextRequest, { params }: { params: { restaurantId
 
     // Authorization: Check if user can access this restaurant's data
     const isGeneralAdmin = token.role === UserRole.general_admin;
-    const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishment_id === restaurantId;
+    const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishmentId === restaurantId;
 
     if (!isGeneralAdmin && !isCorrectEstablishmentAdmin) {
       return jsonError('Forbidden', 403);
@@ -146,7 +146,7 @@ export async function PUT(req: NextRequest, { params }: { params: { restaurantId
 
     // Authorization: Check if user can modify this restaurant's data
     const isGeneralAdmin = token.role === UserRole.general_admin;
-    const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishment_id === restaurantId;
+    const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishmentId === restaurantId;
 
     if (!isGeneralAdmin && !isCorrectEstablishmentAdmin) {
       return jsonError('Forbidden', 403);
@@ -233,7 +233,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { restauran
 
     // Authorization: Check if user can delete from this restaurant
     const isGeneralAdmin = token.role === UserRole.general_admin;
-    const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishment_id === restaurantId;
+    const isCorrectEstablishmentAdmin = token.role === UserRole.establishment_admin && token.establishmentId === restaurantId;
 
     if (!isGeneralAdmin && !isCorrectEstablishmentAdmin) {
       return jsonError('Forbidden', 403);

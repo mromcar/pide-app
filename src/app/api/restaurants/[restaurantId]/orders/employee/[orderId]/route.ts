@@ -117,7 +117,7 @@ export async function PATCH(
         (token.role === UserRole.establishment_admin ||
           token.role === UserRole.waiter ||
           token.role === UserRole.cook) &&
-        token.establishment_id === validatedRestaurantId.data.establishmentId
+        token.establishmentId === validatedRestaurantId.data.establishmentId
       );
 
     if (!authorized) {

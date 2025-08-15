@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { Order } from '@/types/entities/order'
-import { OrderStatus } from '@/types/enums'
+import { OrderStatus } from '@/constants/enums'
 import type { LanguageCode } from '@/constants/languages'
 import type { UITranslation } from '@/translations/types'
 
@@ -14,12 +14,12 @@ interface OrderSupervisionProps {
 
 // Definir el flujo de estados
 const statusFlow: Record<OrderStatus, OrderStatus | null> = {
-  [OrderStatus.PENDING]: OrderStatus.PREPARING,
-  [OrderStatus.PREPARING]: OrderStatus.READY,
-  [OrderStatus.READY]: OrderStatus.DELIVERED,
-  [OrderStatus.DELIVERED]: OrderStatus.COMPLETED,
-  [OrderStatus.COMPLETED]: null,
-  [OrderStatus.CANCELLED]: null,
+  [OrderStatus.pending]: OrderStatus.preparing,
+  [OrderStatus.preparing]: OrderStatus.ready,
+  [OrderStatus.ready]: OrderStatus.delivered,
+  [OrderStatus.delivered]: OrderStatus.completed,
+  [OrderStatus.completed]: null,
+  [OrderStatus.cancelled]: null,
 } as const
 
 function getNextStatus(currentStatus: OrderStatus): OrderStatus | null {
@@ -79,13 +79,13 @@ export function OrderSupervision({ establishmentId, languageCode }: OrderSupervi
 
   const getOrdersByStatus = () => {
     const statusGroups = {
-      pending: orders.filter((o) => o.status === OrderStatus.PENDING),
-      confirmed: orders.filter((o) => o.status === OrderStatus.PENDING),
-      preparing: orders.filter((o) => o.status === OrderStatus.PREPARING),
-      ready: orders.filter((o) => o.status === OrderStatus.READY),
-      delivered: orders.filter((o) => o.status === OrderStatus.DELIVERED),
-      cancelled: orders.filter((o) => o.status === OrderStatus.CANCELLED),
-      completed: orders.filter((o) => o.status === OrderStatus.COMPLETED),
+      pending: orders.filter((o) => o.status === OrderStatus.pending),
+      confirmed: orders.filter((o) => o.status === OrderStatus.pending),
+      preparing: orders.filter((o) => o.status === OrderStatus.preparing),
+      ready: orders.filter((o) => o.status === OrderStatus.ready),
+      delivered: orders.filter((o) => o.status === OrderStatus.delivered),
+      cancelled: orders.filter((o) => o.status === OrderStatus.cancelled),
+      completed: orders.filter((o) => o.status === OrderStatus.completed),
     }
     return statusGroups
   }
@@ -262,9 +262,9 @@ function OrderCard({ order, onStatusUpdate, t }: OrderCardProps) {
           {showDetails ? t.establishmentAdmin.orderSupervision.hideDetails : t.viewDetails}
         </button>
 
-        {order.status !== OrderStatus.CANCELLED && order.status !== OrderStatus.COMPLETED && (
+        {order.status !== OrderStatus.cancelled && order.status !== OrderStatus.completed && (
           <button
-            onClick={() => onStatusUpdate(order.orderId.toString(), OrderStatus.CANCELLED)}
+            onClick={() => onStatusUpdate(order.orderId.toString(), OrderStatus.cancelled)}
             className="btn-danger btn-sm"
           >
             {t.cancelOrder}

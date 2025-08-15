@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { ProductVariant, ProductVariantTranslation, ProductVariantHistory, Prisma } from '@prisma/client';
+import { ProductVariant, ProductVariantTranslation, ProductVariantHistory } from '@prisma/client';
 import {
   ProductVariantCreateDTO,
   ProductVariantUpdateDTO,
@@ -67,6 +67,7 @@ export class ProductVariantService {
       data: {
         ...variantData,
         createdByUserId: userId,
+        ...(userId && { updatedByUserId: userId }),
         translations: translations && translations.length > 0 ? {
           createMany: {
             data: translations.map(t => ({
@@ -138,6 +139,7 @@ export class ProductVariantService {
       where: { variantId },
       data: {
         ...variantData,
+        ...(userId && { updatedByUserId: userId }),
         translations: translations
           ? {
               deleteMany: { variantId },
@@ -179,7 +181,11 @@ export class ProductVariantService {
 
     const deletedVariant = await prisma.productVariant.update({
       where: { variantId },
-      data: { deletedAt: new Date() },
+      data: {
+        deletedAt: new Date(),
+        // ✅ CORRECCIÓN: Agregar userId para auditoría del soft delete
+        ...(userId && { deletedByUserId: userId }),
+      },
       include: {
         translations: true,
       }
@@ -191,6 +197,8 @@ export class ProductVariantService {
         variantDescription: deletedVariant.variantDescription,
         price: deletedVariant.price,
         isActive: false,
+        // ✅ CORRECCIÓN: Agregar userId para auditoría del historial
+        ...(userId && { updatedByUserId: userId }),
       },
     });
 

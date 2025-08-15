@@ -3,7 +3,7 @@ import { getToken } from 'next-auth/jwt';
 import { orderService } from '@/services/order.service';
 import { jsonOk, jsonError } from '@/utils/api';
 import { createOrderSchema } from '@/schemas/order';
-import { UserRole } from '@/types/enums';
+import { UserRole } from '@/constants/enums';
 import { OrderCreateDTO } from '@/types/dtos/order';
 import { z } from 'zod';
 import type { AuthToken } from '@/types/auth';
@@ -38,8 +38,8 @@ export async function POST(
 
     // Authorization check
     if (
-      token.role !== UserRole.GENERAL_ADMIN &&
-      !(token.role === UserRole.ESTABLISHMENT_ADMIN && token.establishment_id === validatedRestaurantId)
+      token.role !== UserRole.general_admin &&
+      !(token.role === UserRole.establishment_admin && token.establishmentId === validatedRestaurantId)
     ) {
       return jsonError('Forbidden', 403);
     }

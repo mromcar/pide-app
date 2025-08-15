@@ -69,7 +69,7 @@ export async function GET(
     // Authorization check
     if (
       token.role !== UserRole.general_admin &&
-      (token.role !== UserRole.establishment_admin || token.establishment_id !== restaurantId)
+      (token.role !== UserRole.establishment_admin || token.establishmentId !== restaurantId)
     ) {
       return jsonError('Forbidden', 403);
     }
@@ -148,7 +148,7 @@ export async function PUT(
     // Authorization check
     if (
       token.role !== UserRole.general_admin &&
-      (token.role !== UserRole.establishment_admin || token.establishment_id !== restaurantId)
+      (token.role !== UserRole.establishment_admin || token.establishmentId !== restaurantId)
     ) {
       return jsonError('Forbidden', 403);
     }
@@ -255,7 +255,7 @@ export async function DELETE(
     // Authorization check
     if (
       token.role !== UserRole.general_admin &&
-      (token.role !== UserRole.establishment_admin || token.establishment_id !== restaurantId)
+      (token.role !== UserRole.establishment_admin || token.establishmentId !== restaurantId)
     ) {
       return jsonError('Forbidden', 403);
     }

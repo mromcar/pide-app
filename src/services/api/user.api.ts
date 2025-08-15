@@ -1,7 +1,7 @@
 // src/services/api/user.api.ts
 import { UserCreateDTO, UserUpdateDTO, UserResponseDTO } from '@/types/dtos/user';
 import { UserApiError } from '@/types/errors/user.api.error';
-import { handleApiResponse, handleCaughtError } from '@/utils/apiUtils';
+import { handleCaughtError } from '@/utils/apiUtils';
 
 const USER_API_BASE_URL = '/api/users';
 

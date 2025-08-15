@@ -20,7 +20,7 @@ type ProductWithDetails = Product & {
   translations?: ProductTranslation[];
   allergens?: (ProductAllergen & { allergen?: AllergenWithTranslations })[];
   variants?: (ProductVariant & { translations?: ProductVariantTranslation[] })[];
-  category?: Prisma.CategoryGetPayload<{}>;
+  category?: Prisma.CategoryGetPayload<Record<string, never>>;
 };
 
 export class ProductService {

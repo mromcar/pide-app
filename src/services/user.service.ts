@@ -57,8 +57,9 @@ export class UserService {
 
     const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
-    // Excluir el campo 'password' del objeto data
-    const { password, ...dataWithoutPassword } = data;
+    // ✅ CORRECCIÓN: Usar eslint-disable para la variable descartada
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _, ...dataWithoutPassword } = data;
 
     const newUser = await prisma.user.create({
       data: {
@@ -72,7 +73,39 @@ export class UserService {
     return this.mapToDTO(newUser);
   }
 
-  // Método específico para crear usuarios OAuth
+  async updateUser(userId: number, data: UserUpdateDTO): Promise<UserResponseDTO | null> {
+    userIdSchema.parse({ userId })
+    userUpdateSchema.parse(data)
+
+    // ✅ CORRECCIÓN 1: Usar el password en lugar de extraerlo y no usarlo
+    const { password, ...restOfData } = data
+    const updateData: Partial<Pick<User, 'name' | 'email' | 'establishmentId'>> & { passwordHash?: string } = {
+      ...restOfData
+    }
+
+    // ✅ Ahora sí usamos el password extraído
+    if (password) {
+      updateData.passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+    }
+
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { userId },
+        data: updateData,
+        include: { establishment: true },
+      });
+
+      logger.info('User updated successfully', { userId, updatedFields: Object.keys(updateData) });
+      return this.mapToDTO(updatedUser);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return null; // User not found
+      }
+      logger.error('Error updating user:', { userId, error });
+      throw error;
+    }
+  }
+
   async createOAuthUser(data: {
     email: string;
     name?: string;
@@ -93,8 +126,13 @@ export class UserService {
     });
 
     if (existingUser) {
-      // Si existe, actualizar con los datos OAuth si es necesario
-      const updateData: any = {};
+      // ✅ CORRECCIÓN 2: Tipar correctamente el updateData
+      const updateData: {
+        googleId?: string;
+        appleId?: string;
+        name?: string;
+      } = {};
+
       if (data.googleId && !existingUser.googleId) {
         updateData.googleId = data.googleId;
       }
@@ -199,37 +237,6 @@ export class UserService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { passwordHash, ...userWithoutPassword } = user;
     return userWithoutPassword;
-  }
-
-  async updateUser(userId: number, data: UserUpdateDTO): Promise<UserResponseDTO | null> {
-    userIdSchema.parse({ userId })
-    userUpdateSchema.parse(data)
-
-    const { password, ...restOfData } = data
-    const updateData: Partial<Pick<User, 'name' | 'email' | 'establishmentId'>> & { passwordHash?: string } = {
-      ...restOfData
-    }
-
-    if (password) {
-      updateData.passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    }
-
-    try {
-      const updatedUser = await prisma.user.update({
-        where: { userId },
-        data: updateData,
-        include: { establishment: true },
-      });
-
-      logger.info('User updated successfully', { userId, updatedFields: Object.keys(updateData) });
-      return this.mapToDTO(updatedUser);
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-        return null; // User not found
-      }
-      logger.error('Error updating user:', { userId, error });
-      throw error;
-    }
   }
 
   async deleteUser(userId: number): Promise<UserResponseDTO | null> {

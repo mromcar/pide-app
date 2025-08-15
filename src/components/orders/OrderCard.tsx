@@ -1,6 +1,6 @@
 'use client'
 
-import { OrderStatus } from '@/types/enums'
+import { OrderStatus } from '@/constants/enums'
 import { OrderResponseDTO } from '@/types/dtos/order'
 
 interface OrderCardProps {

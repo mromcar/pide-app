@@ -1,6 +1,6 @@
 'use client'
 
-import { OrderStatus, UserRole } from '@/types/enums'
+import { OrderStatus, UserRole } from '@/constants/enums'
 
 interface OrderFiltersProps {
   statusFilter: OrderStatus | 'all'
@@ -14,10 +14,10 @@ export default function OrderFilters({
   userRole,
 }: OrderFiltersProps) {
   const getAvailableStatuses = () => {
-    if (userRole === UserRole.COOK) {
-      return [OrderStatus.PENDING, OrderStatus.PREPARING]
-    } else if (userRole === UserRole.WAITER) {
-      return [OrderStatus.READY, OrderStatus.DELIVERED]
+    if (userRole === UserRole.cook) {
+      return [OrderStatus.pending, OrderStatus.preparing]
+    } else if (userRole === UserRole.waiter) {
+      return [OrderStatus.ready, OrderStatus.delivered]
     }
     return Object.values(OrderStatus)
   }

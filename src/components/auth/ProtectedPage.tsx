@@ -1,7 +1,7 @@
 'use client'
 import { useSession, signIn } from 'next-auth/react'
 import { useEffect } from 'react'
-import { UserRole } from '@/types/enums'
+import { UserRole } from '@/constants/enums'
 
 export function ProtectedPage({
   allowedRoles,

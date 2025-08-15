@@ -6,7 +6,7 @@ import EmployeeManagement from '@/components/employee/EmployeeManagement'
 import { ProtectedPage } from '@/components/auth/ProtectedPage'
 import { AdminLayout } from '@/components/admin/AdminLayout'
 import type { LanguageCode } from '@/constants/languages'
-import { UserRole } from '@/types/enums'
+import { UserRole } from '@/constants/enums'
 
 export default function EmployeeManagementPage() {
   const params = useParams()
@@ -43,7 +43,7 @@ export default function EmployeeManagementPage() {
   ]
 
   return (
-    <ProtectedPage allowedRoles={[UserRole.ESTABLISHMENT_ADMIN, UserRole.GENERAL_ADMIN]}>
+    <ProtectedPage allowedRoles={[UserRole.establishment_admin, UserRole.general_admin]}>
       <AdminLayout
         title={t.establishmentAdmin.employeeManagement.title}
         subtitle={t.establishmentAdmin.employeeManagement.subtitle}

@@ -85,7 +85,7 @@ export async function GET(
     // Authorization check
     if (
       token.role !== UserRole.general_admin &&
-      (token.role !== UserRole.establishment_admin || token.establishment_id !== restaurantId)
+      (token.role !== UserRole.establishment_admin || token.establishmentId !== restaurantId)
     ) {
       return jsonError('Forbidden', 403);
     }
@@ -181,7 +181,7 @@ export async function POST(
     // Authorization check
     if (
       token.role !== UserRole.general_admin &&
-      (token.role !== UserRole.establishment_admin || token.establishment_id !== restaurantId)
+      (token.role !== UserRole.establishment_admin || token.establishmentId !== restaurantId)
     ) {
       return jsonError('Forbidden', 403);
     }
@@ -235,14 +235,14 @@ export async function POST(
  *       type: object
  *       required:
  *         - product_id
- *         - establishment_id
+ *         - establishmentId
  *         - variant_description
  *         - price
  *       properties:
  *         product_id:
  *           type: integer
  *           description: ID of the product this variant belongs to.
- *         establishment_id:
+ *         establishmentId:
  *           type: integer
  *           description: ID of the establishment this variant belongs to (should match restaurantId in path).
  *         variant_description:

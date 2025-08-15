@@ -3,8 +3,6 @@ import {
   OrderUpdateDTO,
   OrderResponseDTO,
 } from '@/types/dtos/order';
-import { OrderItemCreateDTO, OrderItemUpdateDTO } from '@/types/dtos/orderItem';
-import { OrderStatusHistoryCreateDTO } from '@/types/dtos/orderStatusHistory';
 import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
 import { PaymentApiError } from '@/types/errors/payment.api.error';
 import { OrderApiError } from '@/types/errors/order.api.error';

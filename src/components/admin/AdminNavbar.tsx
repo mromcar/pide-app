@@ -6,7 +6,14 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { LanguageCode } from '@/constants/languages'
 import type { Establishment } from '@/types/entities/establishment'
-import { UserRole } from '@/types/enums'
+import { UserRole } from '@/constants/enums'
+
+// ✅ Interface tipada para mejor type safety
+interface MenuItem {
+  href: string
+  label: string
+  roles: UserRole[]
+}
 
 interface AdminNavbarProps {
   languageCode: LanguageCode
@@ -29,24 +36,26 @@ export default function AdminNavbar({
   const userName = session?.user?.name || 'Usuario'
   const establishmentName = establishment?.name || 'Establecimiento'
 
-  const menuItems = [
+  // ✅ Array tipado con interface - mucho más limpio y type-safe
+  const menuItems: MenuItem[] = [
     {
       href: `/${languageCode}/admin/establishment/${establishmentId}/menu`,
       label: t.establishmentAdmin.navigation.menuManagement,
-      roles: [UserRole.ESTABLISHMENT_ADMIN],
+      roles: [UserRole.establishment_admin],
     },
     {
       href: `/${languageCode}/admin/establishment/${establishmentId}/employees`,
       label: t.establishmentAdmin.navigation.employeeManagement,
-      roles: [UserRole.ESTABLISHMENT_ADMIN],
+      roles: [UserRole.establishment_admin],
     },
     {
       href: `/${languageCode}/admin/establishment/${establishmentId}/orders`,
       label: t.establishmentAdmin.navigation.orderSupervision,
-      roles: [UserRole.ESTABLISHMENT_ADMIN, UserRole.WAITER, UserRole.COOK],
+      roles: [UserRole.establishment_admin, UserRole.waiter, UserRole.cook],
     },
   ]
 
+  // ✅ TypeScript ahora sabe que item.roles es UserRole[]
   const filteredMenuItems = menuItems.filter((item) => item.roles.includes(userRole))
 
   const handleTitleClick = () => {
@@ -56,17 +65,16 @@ export default function AdminNavbar({
   return (
     <nav className="admin-navbar">
       <div className="admin-navbar-container">
-        {/* Logo/Brand - Solo el nombre del establecimiento */}
+        {/* Logo/Brand */}
         <div className="admin-navbar-brand">
           <h2 onClick={handleTitleClick} className="establishment-title">
             {establishmentName}
           </h2>
         </div>
 
-        {/* Navigation Links con estado activo corregido */}
+        {/* Navigation Links */}
         <div className="admin-navbar-menu">
           {filteredMenuItems.map((item) => {
-            // Mejorar la detección de ruta activa
             const isActive = pathname.includes(item.href.split('/').pop() || '')
             return (
               <a

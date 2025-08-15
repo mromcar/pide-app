@@ -9,7 +9,7 @@ export interface AuthenticatedRequest extends NextRequest {
     id: string
     email: string
     role: UserRole
-    establishment_id?: number | null
+    establishmentId?: number | null  // Cambiado a camelCase
   }
 }
 
@@ -43,7 +43,7 @@ export async function requireEstablishmentAccess(establishmentId: number) {
   }
 
   // Other roles must belong to the establishment
-  if (session.user.establishmentId !== establishmentId) {
+  if (session.user.establishmentId !== establishmentId) {  // Cambiado a camelCase
     throw jsonError("Access denied to this establishment", 403)
   }
 

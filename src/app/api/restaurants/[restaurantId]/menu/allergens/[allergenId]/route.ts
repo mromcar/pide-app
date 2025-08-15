@@ -4,7 +4,7 @@ import { updateAllergenSchema, allergenIdSchema } from '@/schemas/allergen';
 import { jsonOk, jsonError } from "@/utils/api";
 import { ZodError } from "zod";
 import { NextRequest } from 'next/server';
-import { UserRole } from '@/types/enums';
+import { UserRole } from '@/constants/enums';
 
 const allergenService = new AllergenService();
 
@@ -15,7 +15,7 @@ interface AllergenRouteParams {
 
 export async function PUT(request: NextRequest, { params }: { params: AllergenRouteParams }) {
   try {
-    await requireAuth(UserRole.GENERAL_ADMIN);
+    await requireAuth(UserRole.general_admin);
     const { allergenId } = allergenIdSchema.parse({ allergenId: params.allergenId });
     const body = await request.json();
     const validatedData = updateAllergenSchema.parse(body);
@@ -35,7 +35,7 @@ export async function PUT(request: NextRequest, { params }: { params: AllergenRo
 
 export async function DELETE(request: NextRequest, { params }: { params: AllergenRouteParams }) {
   try {
-    await requireAuth(UserRole.GENERAL_ADMIN);
+    await requireAuth(UserRole.general_admin);
     const { allergenId } = allergenIdSchema.parse({ allergenId: params.allergenId });
 
     await allergenService.deleteAllergen(allergenId);

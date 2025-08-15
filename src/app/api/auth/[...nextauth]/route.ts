@@ -5,7 +5,7 @@ import { JWT } from "next-auth/jwt";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getLoginUrl } from "@/utils/auth";
-import { UserRole } from '@/types/enums'
+import { UserRole } from '@/constants/enums'
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -75,7 +75,7 @@ export const authOptions: AuthOptions = {
                 email: user.email!,
                 name: user.name,
                 googleId: account.providerAccountId,
-                role: UserRole.CLIENT
+                role: UserRole.client
               }
             });
           } else {
