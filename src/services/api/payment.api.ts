@@ -3,11 +3,14 @@ import {
   PaymentResponseDTO,
   PaymentStatus,
 } from '@/types/dtos/payment';
-import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
+// Comentar imports no utilizados hasta que se implementen los endpoints
+// import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
+import { handleCaughtError, ApiError } from '@/utils/apiUtils';
 import { PaymentApiError } from '@/types/errors/payment.api.error';
-import { getClientApiUrl, debugApiClient } from '@/lib/api-client';
+// import { getClientApiUrl, debugApiClient } from '@/lib/api-client';
 
-const API_PAYMENTS_PATH = '/api/payments';
+// Comentar hasta que se implemente
+// const API_PAYMENTS_PATH = '/api/payments';
 
 /**
  * Creates a new payment for an order.
@@ -15,17 +18,16 @@ const API_PAYMENTS_PATH = '/api/payments';
  */
 async function createPayment(paymentData: PaymentCreateDTO): Promise<PaymentResponseDTO> {
   try {
-    console.log('🔍 PaymentAPI: Creating payment for order:', paymentData.orderId, {
+    console.log('🚧 PaymentAPI: Creating payment for order:', paymentData.orderId, {
       amount: paymentData.amount,
       currency: paymentData.currency,
       method: paymentData.paymentMethod
     })
 
-    if (process.env.NODE_ENV === 'development') {
-      debugApiClient()
-    }
-
-    // TODO: When backend is ready, implement:
+    // TODO: When backend is ready, uncomment these lines:
+    // if (process.env.NODE_ENV === 'development') {
+    //   debugApiClient()
+    // }
     // const apiUrl = getClientApiUrl(API_PAYMENTS_PATH);
     // const response = await fetch(apiUrl, {
     //   method: 'POST',
@@ -51,21 +53,19 @@ async function createPayment(paymentData: PaymentCreateDTO): Promise<PaymentResp
  */
 async function getPaymentStatus(paymentId: string): Promise<PaymentResponseDTO | null> {
   try {
-    console.log('🔍 PaymentAPI: Fetching payment status:', paymentId)
+    console.log('🚧 PaymentAPI: Fetching payment status:', paymentId)
 
-    // TODO: When backend is ready, implement:
+    // TODO: When backend is ready, uncomment these lines:
     // const apiUrl = getClientApiUrl(`${API_PAYMENTS_PATH}/${paymentId}`);
     // const response = await fetch(apiUrl, {
     //   method: 'GET',
     //   headers: { 'Content-Type': 'application/json' },
     //   credentials: 'include',
     // });
-    //
     // if (response.status === 404) {
     //   console.log('⚠️ PaymentAPI: Payment not found:', paymentId)
     //   return null;
     // }
-    //
     // const data = await handleApiResponse<PaymentResponseDTO>(response);
     // console.log('✅ PaymentAPI: Payment status loaded:', data.status)
     // return data;
@@ -87,9 +87,9 @@ async function getPaymentStatus(paymentId: string): Promise<PaymentResponseDTO |
  */
 async function refundPayment(paymentId: string, amount?: number): Promise<PaymentResponseDTO> {
   try {
-    console.log('🔍 PaymentAPI: Processing refund for payment:', paymentId, { amount })
+    console.log('🚧 PaymentAPI: Processing refund for payment:', paymentId, { amount })
 
-    // TODO: When backend is ready, implement:
+    // TODO: When backend is ready, uncomment these lines:
     // const apiUrl = getClientApiUrl(`${API_PAYMENTS_PATH}/${paymentId}/refund`);
     // const response = await fetch(apiUrl, {
     //   method: 'POST',
@@ -115,9 +115,9 @@ async function refundPayment(paymentId: string, amount?: number): Promise<Paymen
  */
 async function getOrderPayments(orderId: number): Promise<PaymentResponseDTO[]> {
   try {
-    console.log('🔍 PaymentAPI: Fetching payment history for order:', orderId)
+    console.log('🚧 PaymentAPI: Fetching payment history for order:', orderId)
 
-    // TODO: When backend is ready, implement:
+    // TODO: When backend is ready, uncomment these lines:
     // const apiUrl = getClientApiUrl(`${API_PAYMENTS_PATH}/order/${orderId}`);
     // const response = await fetch(apiUrl, {
     //   method: 'GET',
@@ -143,17 +143,18 @@ async function getOrderPayments(orderId: number): Promise<PaymentResponseDTO[]> 
 async function updatePaymentStatus(
   paymentId: string,
   status: PaymentStatus,
-  metadata?: Record<string, unknown>
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _metadata?: Record<string, unknown>
 ): Promise<PaymentResponseDTO> {
   try {
-    console.log('🔍 PaymentAPI: Updating payment status:', paymentId, { status })
+    console.log('🚧 PaymentAPI: Updating payment status:', paymentId, { status })
 
-    // TODO: When backend is ready, implement:
+    // TODO: When backend is ready, uncomment these lines:
     // const apiUrl = getClientApiUrl(`${API_PAYMENTS_PATH}/${paymentId}/status`);
     // const response = await fetch(apiUrl, {
     //   method: 'PATCH',
     //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ status, metadata }),
+    //   body: JSON.stringify({ status, metadata: _metadata }),
     //   credentials: 'include',
     // });
     // const data = await handleApiResponse<PaymentResponseDTO>(response);

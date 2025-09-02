@@ -1660,3 +1660,26 @@
 2025-08-15 22:36:37:3637 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m
 2025-08-15 22:36:55:3655 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
 2025-08-15 22:36:56:3656 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m
+2025-09-02 17:54:29:5429 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-09-02 17:54:34:5434 [31merror[39m: [31mError in getEstablishmentById:[39m
+2025-09-02 17:54:34:5434 [31merror[39m: [31m[PUBLIC API] Error fetching public menu 1: [39m
+[31mInvalid `prisma.establishment.findUnique()` invocation:[39m
+
+
+[31mCan't reach database server at `ep-dry-rice-a4dpqky4-pooler.us-east-1.aws.neon.tech:5432`[39m
+
+[31mPlease make sure your database server is running at `ep-dry-rice-a4dpqky4-pooler.us-east-1.aws.neon.tech:5432`.[39m
+2025-09-02 17:55:02:552 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-09-02 17:55:05:555 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m
+2025-09-02 17:55:16:5516 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-09-02 17:55:16:5516 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m
+2025-09-02 17:55:20:5520 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-09-02 17:55:20:5520 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m
+2025-09-02 17:58:37:5837 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-09-02 17:58:37:5837 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-09-02 17:58:37:5837 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m
+2025-09-02 17:58:39:5839 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m
+2025-09-02 17:58:43:5843 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-09-02 17:58:43:5843 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-09-02 17:58:44:5844 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m
+2025-09-02 17:58:44:5844 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m
