@@ -12,13 +12,20 @@ export const cartFr: CartTranslations = {
   title: 'Panier d\'Achat',
   empty: 'Votre panier est vide',
   total: 'Total',
-  checkout: 'Commander'
+  checkout: 'Commander',
+  // ✅ AÑADIDO: Nuevas traducciones
+  backToMenu: 'Retour au menu',
+  continueOrder: 'Continuer à commander',
+  errorEstablishmentMissing: 'ID de l\'établissement introuvable',
+  errorSubmitting: 'Erreur lors de l\'envoi de la commande',
+  notesPlaceholder: 'Notes supplémentaires (optionnel)',
 }
 
 export const checkoutFr: CheckoutTranslations = {
   title: 'Commander',
   tableNumber: 'Numéro de Table',
   notes: 'Notes Spéciales',
+  notesPlaceholder: 'Notes supplémentaires (optionnel)',
   placeOrder: 'Passer Commande',
   placingOrder: 'Passage de commande...'
 }

@@ -10,6 +10,7 @@ import type { CategoryDTO } from '@/types/dtos/category'
 import type { ProductResponseDTO } from '@/types/dtos/product'
 import type { ProductVariantResponseDTO } from '@/types/dtos/productVariant'
 import type { ProductVariantTranslationResponseDTO } from '@/types/dtos/productVariantTranslation'
+import type { EstablishmentResponseDTO } from '@/types/dtos/establishment'
 import QuantitySelector from './QuantitySelector'
 import AllergenDisplay from './AllergenDisplay'
 
@@ -17,22 +18,36 @@ interface MenuCategoryWithProducts extends CategoryDTO {
   products: ProductResponseDTO[]
 }
 
+// ✅ CAMBIO: Añadir props que faltaban
 interface MenuDisplayProps {
   menu: MenuCategoryWithProducts[]
   lang: LanguageCode
+  establishment: EstablishmentResponseDTO // ✅ AÑADIDO
+  allergens: any[] // ✅ AÑADIDO
 }
 
-export default function MenuDisplay({ menu, lang }: MenuDisplayProps) {
+// ✅ CAMBIO: Recibir props adicionales
+export default function MenuDisplay({ menu, lang, establishment, allergens }: MenuDisplayProps) {
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(
     menu.length > 0 ? menu[0].categoryId : null
   )
   const t = getTranslation(lang)
+
+  // ✅ CAMBIO: Solo llamar useCart() para tener acceso al contexto
   useCart()
 
   const activeCategory = useMemo(
     () => menu.find((c) => c.categoryId === activeCategoryId),
     [menu, activeCategoryId]
   )
+
+  // ✅ MEJORADO: Log para debugging
+  console.log('🎨 MenuDisplay: Rendering with:', {
+    establishmentName: establishment?.name,
+    categoriesCount: menu?.length || 0,
+    allergensCount: allergens?.length || 0,
+    activeCategoryId,
+  })
 
   if (!menu || menu.length === 0) {
     return <p className="menu-page-info">{t.restaurantMenu.menuNoItems}</p>

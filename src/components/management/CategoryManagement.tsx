@@ -46,14 +46,19 @@ export function CategoryManagement({
       setLoading(true)
       console.log('🔍 CategoryManagement: Fetching categories for establishment:', establishmentId)
 
-      const response = await fetch(`/api/restaurants/${establishmentId}/menu/categories`)
+      // ✅ MIGRACIÓN: Cambiar a API admin
+      const response = await fetch(`/api/admin/establishments/${establishmentId}/menu/categories`)
       console.log('📊 CategoryManagement: Response status:', response.status)
 
       if (response.ok) {
         const data = await response.json()
         console.log('✅ CategoryManagement: Data received:', data)
-        console.log('📝 CategoryManagement: Calling onCategoriesChange with:', data || [])
-        onCategoriesChange(data || [])
+        // ✅ CORRECCIÓN: Extraer categories del response
+        console.log(
+          '📝 CategoryManagement: Calling onCategoriesChange with:',
+          data.categories || []
+        )
+        onCategoriesChange(data.categories || [])
       } else {
         console.error('❌ CategoryManagement: Failed to fetch categories:', response.status)
         onCategoriesChange([])
@@ -78,8 +83,9 @@ export function CategoryManagement({
 
   const handleDeleteCategory = async (categoryId: number) => {
     try {
+      // ✅ MIGRACIÓN: Cambiar a API admin
       const response = await fetch(
-        `/api/restaurants/${establishmentId}/menu/categories/${categoryId}`,
+        `/api/admin/establishments/${establishmentId}/menu/categories/${categoryId}`,
         { method: 'DELETE' }
       )
       if (response.ok) {
@@ -97,9 +103,10 @@ export function CategoryManagement({
 
   const handleFormSubmit = async (formData: CategoryFormData) => {
     try {
+      // ✅ MIGRACIÓN: Cambiar a API admin
       const url = editingCategory
-        ? `/api/restaurants/${establishmentId}/menu/categories/${editingCategory.categoryId}`
-        : `/api/restaurants/${establishmentId}/menu/categories`
+        ? `/api/admin/establishments/${establishmentId}/menu/categories/${editingCategory.categoryId}`
+        : `/api/admin/establishments/${establishmentId}/menu/categories`
 
       const method = editingCategory ? 'PUT' : 'POST'
 

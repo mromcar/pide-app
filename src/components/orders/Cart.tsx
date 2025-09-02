@@ -17,7 +17,7 @@ export default function Cart({ lang }: CartProps) {
     updateCartItemQuantity,
     removeFromCart,
     clearCart,
-    restaurantId,
+    establishmentId,
     tableNumber,
     setTableNumber,
     orderNotes,
@@ -47,9 +47,9 @@ export default function Cart({ lang }: CartProps) {
     setError(null)
 
     try {
-      if (!restaurantId) {
-        console.error('Restaurant ID is missing')
-        setError('Restaurant ID is missing')
+      if (!establishmentId) {
+        console.error('🚨 Cart: Establishment ID is missing')
+        setError(t.cart.errorEstablishmentMissing)
         return
       }
 
@@ -59,16 +59,16 @@ export default function Cart({ lang }: CartProps) {
         unitPrice: item.price,
       }))
 
-      console.log('Order Items to send:', orderItems)
+      console.log('📦 Cart: Order items to send:', orderItems)
 
       const requestBody = {
-        establishmentId: restaurantId,
+        establishmentId,
         tableNumber,
         notes: orderNotes,
         items: orderItems,
       }
 
-      console.log('Request body:', requestBody)
+      console.log('📤 Cart: Request body:', requestBody)
 
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -78,56 +78,71 @@ export default function Cart({ lang }: CartProps) {
         body: JSON.stringify(requestBody),
       })
 
-      console.log('Response status:', response.status)
+      console.log('📊 Cart: Response status:', response.status)
 
       if (!response.ok) {
         const errorData = await response.json()
-        console.error('Order submission failed', { status: response.status, error: errorData })
-        setError(errorData.message || 'Error al enviar el pedido')
+        console.error('❌ Cart: Order submission failed', {
+          status: response.status,
+          error: errorData,
+        })
+        setError(errorData.message || t.cart.errorSubmitting)
         return
       }
 
       const order = await response.json()
-      console.log('Order created successfully:', order)
-      console.log('Order ID:', order.orderId)
-      console.log('Order ID type:', typeof order.orderId)
-      console.log('Order object keys:', Object.keys(order))
+      console.log('✅ Cart: Order created successfully:', order)
 
       // Verificar inmediatamente si el pedido existe
-      console.log('Verificando si el pedido existe...')
+      console.log('🔍 Cart: Verificando si el pedido existe...')
       const verifyResponse = await fetch(`/api/orders/${order.orderId}`)
-      console.log('Verify response status:', verifyResponse.status)
+      console.log('📊 Cart: Verify response status:', verifyResponse.status)
 
-      const redirectUrl = `/${lang}/order/${order.orderId}?restaurantId=${restaurantId}`
-      console.log('Redirecting to:', redirectUrl)
+      const redirectUrl = `/${lang}/order/${order.orderId}`
+      console.log('🔄 Cart: Redirecting to:', redirectUrl)
 
       // Limpiar el carrito y redirigir
       clearCart()
       router.push(redirectUrl)
     } catch (err) {
-      console.error('Error submitting order:', err)
-      setError('Error al enviar el pedido')
+      console.error('🚨 Cart: Error submitting order:', err)
+      setError(t.cart.errorSubmitting)
       setIsSubmittingOrder(false)
     } finally {
       setIsLoading(false)
     }
   }
 
+  // ✅ ARREGLADO: Estado vacío sin hardcoding
   if (cartItems.length === 0 && !isSubmittingOrder) {
     return (
       <div className="cart-container">
-        <h1 className="cart-title">{t.cart?.title || 'Carrito de compra'}</h1>
-        <p>{t.cart?.empty || 'Tu carrito está vacío'}</p>
+        <h1 className="cart-title">{t.cart.title}</h1>
+        <div className="cart-empty-state">
+          <div className="cart-empty-icon">🛒</div>
+          <p className="cart-empty-message">{t.cart.empty}</p>
+
+          {establishmentId && (
+            <button
+              onClick={() => router.push(`/${lang}/${establishmentId}/menu`)}
+              className="cart-back-to-menu-btn"
+            >
+              {t.cart.backToMenu}
+            </button>
+          )}
+        </div>
       </div>
     )
   }
 
+  // ✅ ARREGLADO: Estado de envío sin hardcoding
   if (isSubmittingOrder) {
     return (
       <div className="cart-container">
-        <h1 className="cart-title">{t.cart?.title || 'Carrito de compra'}</h1>
-        <div className="text-center">
-          <p>{t.checkout?.placingOrder || 'Realizando Pedido...'}</p>
+        <h1 className="cart-title">{t.cart.title}</h1>
+        <div className="cart-submitting-state">
+          <div className="cart-loading-spinner"></div>
+          <p>{t.checkout.placingOrder}</p>
         </div>
       </div>
     )
@@ -153,6 +168,7 @@ export default function Cart({ lang }: CartProps) {
                   <button
                     onClick={() => handleDecrease(item.variantId, item.quantity)}
                     className="quantity-button"
+                    aria-label={`Disminuir cantidad de ${item.productName}`}
                   >
                     -
                   </button>
@@ -160,11 +176,12 @@ export default function Cart({ lang }: CartProps) {
                   <button
                     onClick={() => handleIncrease(item.variantId, item.quantity)}
                     className="quantity-button"
+                    aria-label={`Aumentar cantidad de ${item.productName}`}
                   >
                     +
                   </button>
                 </div>
-                <span>{(item.price * item.quantity).toFixed(2)}€</span>
+                <span className="cart-item-total">{(item.price * item.quantity).toFixed(2)}€</span>
               </li>
             ))}
           </ul>
@@ -175,7 +192,6 @@ export default function Cart({ lang }: CartProps) {
             </strong>
           </div>
 
-          {/* Campos de mesa y notas */}
           <div className="cart-order-details">
             <div className="cart-field-group">
               <label htmlFor="tableNumber" className="cart-field-label">
@@ -188,6 +204,7 @@ export default function Cart({ lang }: CartProps) {
                 onChange={(e) => setTableNumber(e.target.value)}
                 placeholder={t.checkout.tableNumber}
                 className="cart-field-input"
+                required
               />
             </div>
 
@@ -199,18 +216,38 @@ export default function Cart({ lang }: CartProps) {
                 id="orderNotes"
                 value={orderNotes}
                 onChange={(e) => setOrderNotes(e.target.value)}
-                placeholder={t.checkout.notes}
+                placeholder={t.checkout.notesPlaceholder}
                 className="cart-field-textarea"
                 rows={3}
               />
             </div>
           </div>
 
-          <button onClick={handleSubmitOrder} disabled={isLoading} className="cart-place-order-btn">
+          <button
+            onClick={handleSubmitOrder}
+            disabled={isLoading || !tableNumber.trim() || !establishmentId}
+            className="cart-place-order-btn"
+            title={!tableNumber.trim() ? 'Ingresa el número de mesa' : ''}
+          >
             {isLoading ? t.checkout.placingOrder : t.checkout.placeOrder}
           </button>
 
-          {error && <p className="cart-error">{error}</p>}
+          {error && (
+            <div className="cart-error">
+              <span className="cart-error-icon">⚠️</span>
+              <p className="cart-error-message">{error}</p>
+            </div>
+          )}
+
+          {establishmentId && (
+            <button
+              onClick={() => router.push(`/${lang}/${establishmentId}/menu`)}
+              className="cart-back-to-menu-btn-secondary"
+              disabled={isLoading}
+            >
+              {t.cart.continueOrder}
+            </button>
+          )}
         </div>
       )}
     </div>

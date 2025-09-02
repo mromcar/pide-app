@@ -27,6 +27,7 @@ export function VariantManagement({
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [editingVariant, setEditingVariant] = useState<ProductVariantResponseDTO | null>(null)
+  const [loading, setLoading] = useState(false)
 
   const selectedProduct = products.find((p) => p.productId === selectedProductId)
 
@@ -35,19 +36,43 @@ export function VariantManagement({
     if (!selectedCategoryId) return
 
     try {
+      setLoading(true)
+      console.log('🔍 VariantManagement: Fetching products for category:', selectedCategoryId)
+
+      // ✅ MIGRACIÓN: Cambiar a API admin
       const response = await fetch(
-        `/api/restaurants/${establishmentId}/menu/products?categoryId=${selectedCategoryId}`
+        `/api/admin/establishments/${establishmentId}/menu/products?categoryId=${selectedCategoryId}`
       )
+      console.log('📊 VariantManagement: Products response status:', response.status)
+
       if (response.ok) {
         const data = await response.json()
-        setProducts(data || [])
-        if (data && data.length > 0) {
-          setSelectedProductId(data[0].productId)
+        console.log('✅ VariantManagement: Products data received:', data)
+
+        // ✅ CORRECCIÓN: Extraer products del response de la nueva API
+        const productsArray = Array.isArray(data.products) ? data.products : []
+        setProducts(productsArray)
+
+        console.log('🎯 VariantManagement: Products state will be set to:', productsArray)
+
+        if (productsArray.length > 0) {
+          setSelectedProductId(productsArray[0].productId)
+          console.log(
+            '🎯 VariantManagement: Setting first product as selected:',
+            productsArray[0].productId
+          )
         }
+      } else {
+        console.error('❌ VariantManagement: Failed to fetch products, status:', response.status)
+        const errorText = await response.text()
+        console.error('❌ VariantManagement: Error response:', errorText)
+        setProducts([])
       }
     } catch (error) {
-      console.error('Error fetching products:', error)
+      console.error('🚨 VariantManagement: Error fetching products:', error)
       setProducts([])
+    } finally {
+      setLoading(false)
     }
   }, [establishmentId, selectedCategoryId])
 
@@ -67,15 +92,24 @@ export function VariantManagement({
 
   const handleDeleteVariant = async (variantId: number) => {
     try {
+      console.log('🗑️ VariantManagement: Deleting variant:', variantId)
+
+      // ✅ MIGRACIÓN: Cambiar a API admin
       const response = await fetch(
-        `/api/restaurants/${establishmentId}/menu/variants/${variantId}`,
+        `/api/admin/establishments/${establishmentId}/menu/variants/${variantId}`,
         { method: 'DELETE' }
       )
+
+      console.log('📊 VariantManagement: Delete response status:', response.status)
+
       if (response.ok) {
-        fetchProducts()
+        console.log('✅ VariantManagement: Variant deleted successfully')
+        await fetchProducts() // Refresh products to update variants
+      } else {
+        console.error('❌ VariantManagement: Failed to delete variant, status:', response.status)
       }
     } catch (error) {
-      console.error('Error deleting variant:', error)
+      console.error('🚨 VariantManagement: Error deleting variant:', error)
     }
   }
 
@@ -120,7 +154,13 @@ export function VariantManagement({
           </div>
 
           {/* Products List */}
-          {products.length > 0 ? (
+          {loading ? (
+            <div className="sidebar-section">
+              <div className="loading-state">
+                <p>{t.establishmentAdmin.forms.loading}</p>
+              </div>
+            </div>
+          ) : products.length > 0 ? (
             <div className="sidebar-section">
               <h3 className="sidebar-title">
                 {t.establishmentAdmin.menuManagement.products.title}
@@ -230,7 +270,7 @@ export function VariantManagement({
   )
 }
 
-// VariantCard Component
+// VariantCard Component - sin cambios en URLs
 interface VariantCardProps {
   variant: ProductVariantResponseDTO
   languageCode: LanguageCode

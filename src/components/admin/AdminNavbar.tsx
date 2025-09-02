@@ -36,20 +36,20 @@ export default function AdminNavbar({
   const userName = session?.user?.name || 'Usuario'
   const establishmentName = establishment?.name || 'Establecimiento'
 
-  // ✅ Array tipado con interface - mucho más limpio y type-safe
+  // ✅ ACTUALIZADAS: URLs más cortas sin "establishment"
   const menuItems: MenuItem[] = [
     {
-      href: `/${languageCode}/admin/establishment/${establishmentId}/menu`,
+      href: `/${languageCode}/admin/${establishmentId}/menu`,
       label: t.establishmentAdmin.navigation.menuManagement,
       roles: [UserRole.establishment_admin],
     },
     {
-      href: `/${languageCode}/admin/establishment/${establishmentId}/employees`,
+      href: `/${languageCode}/admin/${establishmentId}/employees`,
       label: t.establishmentAdmin.navigation.employeeManagement,
       roles: [UserRole.establishment_admin],
     },
     {
-      href: `/${languageCode}/admin/establishment/${establishmentId}/orders`,
+      href: `/${languageCode}/admin/${establishmentId}/orders`,
       label: t.establishmentAdmin.navigation.orderSupervision,
       roles: [UserRole.establishment_admin, UserRole.waiter, UserRole.cook],
     },
@@ -59,7 +59,8 @@ export default function AdminNavbar({
   const filteredMenuItems = menuItems.filter((item) => item.roles.includes(userRole))
 
   const handleTitleClick = () => {
-    router.push(`/${languageCode}/admin/establishment/${establishmentId}`)
+    // ✅ ACTUALIZADA: URL más corta sin "establishment"
+    router.push(`/${languageCode}/admin/${establishmentId}`)
   }
 
   return (

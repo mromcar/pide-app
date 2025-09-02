@@ -49,22 +49,25 @@ export function EstablishmentAdminDashboard({
         <div className="dashboard-quick-actions">
           <h3 className="dashboard-section-title">{t.establishmentAdmin.dashboard.quickActions}</h3>
           <div className="quick-actions-grid">
+            {/* ✅ ACTUALIZADA: URL más corta sin "establishment" */}
             <a
-              href={`/${languageCode}/admin/establishment/${establishmentId}/orders`}
+              href={`/${languageCode}/admin/${establishmentId}/orders`}
               className="quick-action-card"
             >
               <h4>Ver Pedidos</h4>
               <p>Gestiona los pedidos en tiempo real</p>
             </a>
+            {/* ✅ ACTUALIZADA: URL más corta sin "establishment" */}
             <a
-              href={`/${languageCode}/admin/establishment/${establishmentId}/menu`}
+              href={`/${languageCode}/admin/${establishmentId}/menu`}
               className="quick-action-card"
             >
               <h4>Gestionar Menú</h4>
               <p>Actualiza productos y precios</p>
             </a>
+            {/* ✅ ACTUALIZADA: URL más corta sin "establishment" */}
             <a
-              href={`/${languageCode}/admin/establishment/${establishmentId}/employees`}
+              href={`/${languageCode}/admin/${establishmentId}/employees`}
               className="quick-action-card"
             >
               <h4>Equipo</h4>

@@ -1,108 +1,344 @@
 // src/services/api/user.api.ts
 import { UserCreateDTO, UserUpdateDTO, UserResponseDTO } from '@/types/dtos/user';
+import { UserRole } from '@prisma/client';
+import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
 import { UserApiError } from '@/types/errors/user.api.error';
-import { handleCaughtError } from '@/utils/apiUtils';
+import { getClientApiUrl, debugApiClient } from '@/lib/api-client';
 
-const USER_API_BASE_URL = '/api/users';
+const API_SUPER_ADMIN_PATH = '/api/super-admin/users';
 
 /**
- * Fetches a user by their ID.
+ * Fetches a user by their ID (super admin only).
  */
-export async function getUserById(userId: number): Promise<UserResponseDTO> {
+async function getUserById(userId: number): Promise<UserResponseDTO | null> {
   try {
-    const response = await fetch(`${USER_API_BASE_URL}/${userId}`);
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to fetch user' }));
-      throw new UserApiError(errorData.message || `Failed to fetch user with ID ${userId}`, response.status, errorData.details);
+    console.log('🔍 UserAPI: Fetching user by ID:', userId)
+
+    if (process.env.NODE_ENV === 'development') {
+      debugApiClient()
     }
-    const data = await response.json();
-    return data as UserResponseDTO;
+
+    const apiUrl = getClientApiUrl(`${API_SUPER_ADMIN_PATH}/${userId}`);
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    if (response.status === 404) {
+      console.log('⚠️ UserAPI: User not found:', userId)
+      return null;
+    }
+
+    const data = await handleApiResponse<{ user: UserResponseDTO; additionalInfo?: any; message?: string }>(response);
+
+    console.log('✅ UserAPI: User loaded:', {
+      userId: data.user.userId,
+      name: data.user.name,
+      email: data.user.email,
+      role: data.user.role
+    })
+    return data.user;
   } catch (error) {
-    return handleCaughtError(error, UserApiError, 'An unexpected error occurred while fetching the user.');
+    if (error instanceof ApiError && error.status === 404) {
+      return null;
+    }
+    console.error('❌ UserAPI: Error fetching user:', error)
+    throw handleCaughtError(error, UserApiError, 'Failed to fetch user');
   }
 }
 
 /**
- * Fetches all users, with optional pagination.
+ * Fetches all users with optional filters and pagination (super admin only).
  */
-export async function getAllUsers(page: number = 1, pageSize: number = 10): Promise<UserResponseDTO[]> {
+async function getAllUsers(
+  page: number = 1,
+  pageSize: number = 10,
+  role?: UserRole,
+  search?: string,
+  establishmentId?: number
+): Promise<{
+  users: UserResponseDTO[];
+  pagination: { page: number; pageSize: number; total: number; totalPages: number };
+  stats: { totalUsersInSystem: number };
+  filters: { role: UserRole | null; search: string | null; establishmentId: number | null };
+}> {
   try {
-    const response = await fetch(`${USER_API_BASE_URL}?page=${page}&pageSize=${pageSize}`);
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to fetch users' }));
-      throw new UserApiError(errorData.message || 'Failed to fetch users', response.status, errorData.details);
-    }
-    const data = await response.json();
-    return data as UserResponseDTO[];
+    console.log('🔍 UserAPI: Fetching all users with filters:', {
+      page,
+      pageSize,
+      role,
+      search,
+      establishmentId
+    })
+
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', page.toString());
+    queryParams.append('pageSize', pageSize.toString());
+    if (role) queryParams.append('role', role);
+    if (search) queryParams.append('search', search);
+    if (establishmentId) queryParams.append('establishmentId', establishmentId.toString());
+
+    const apiUrl = getClientApiUrl(`${API_SUPER_ADMIN_PATH}?${queryParams.toString()}`);
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    const data = await handleApiResponse<{
+      users: UserResponseDTO[];
+      pagination: { page: number; pageSize: number; total: number; totalPages: number };
+      stats: { totalUsersInSystem: number };
+      filters: { role: UserRole | null; search: string | null; establishmentId: number | null };
+      message: string;
+    }>(response);
+
+    console.log('✅ UserAPI: Users loaded:', {
+      usersCount: data.users.length,
+      totalInSystem: data.stats.totalUsersInSystem,
+      page: data.pagination.page,
+      filters: data.filters
+    })
+    return data;
   } catch (error) {
-    return handleCaughtError(error, UserApiError, 'An unexpected error occurred while fetching users.');
+    console.error('❌ UserAPI: Error fetching users:', error)
+    throw handleCaughtError(error, UserApiError, 'Failed to fetch users');
   }
 }
 
 /**
- * Creates a new user (e.g., by an administrator).
+ * Creates a new user (super admin only).
  */
-export async function createUser(userData: UserCreateDTO): Promise<UserResponseDTO> {
+async function createUser(userData: UserCreateDTO): Promise<UserResponseDTO> {
   try {
-    const response = await fetch(USER_API_BASE_URL, {
+    console.log('🔍 UserAPI: Creating new user:', {
+      email: userData.email,
+      name: userData.name,
+      role: userData.role,
+      establishmentId: userData.establishmentId
+    })
+
+    const apiUrl = getClientApiUrl(API_SUPER_ADMIN_PATH);
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(userData),
     });
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to create user' }));
-      throw new UserApiError(errorData.message || 'Failed to create user', response.status, errorData.details);
-    }
-    const data = await response.json();
-    return data as UserResponseDTO;
+
+    const data = await handleApiResponse<{ user: UserResponseDTO; message: string }>(response);
+
+    console.log('✅ UserAPI: User created successfully:', {
+      userId: data.user.userId,
+      email: data.user.email,
+      role: data.user.role
+    })
+    return data.user;
   } catch (error) {
-    return handleCaughtError(error, UserApiError, 'An unexpected error occurred while creating the user.');
+    console.error('❌ UserAPI: Error creating user:', error)
+    throw handleCaughtError(error, UserApiError, 'Failed to create user');
   }
 }
 
 /**
- * Updates an existing user's information.
+ * Updates an existing user's information (super admin only).
  */
-export async function updateUser(userId: number, userData: UserUpdateDTO): Promise<UserResponseDTO> {
+async function updateUser(userId: number, userData: UserUpdateDTO): Promise<UserResponseDTO> {
   try {
-    const response = await fetch(`${USER_API_BASE_URL}/${userId}`, {
+    console.log('🔍 UserAPI: Updating user:', userId, {
+      email: userData.email,
+      name: userData.name,
+      role: userData.role,
+      establishmentId: userData.establishmentId
+    })
+
+    const apiUrl = getClientApiUrl(`${API_SUPER_ADMIN_PATH}/${userId}`);
+
+    const response = await fetch(apiUrl, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(userData),
     });
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to update user' }));
-      throw new UserApiError(errorData.message || `Failed to update user with ID ${userId}`, response.status, errorData.details);
-    }
-    const data = await response.json();
-    return data as UserResponseDTO;
+
+    const data = await handleApiResponse<{ user: UserResponseDTO; message: string }>(response);
+
+    console.log('✅ UserAPI: User updated successfully:', {
+      userId: data.user.userId,
+      email: data.user.email,
+      role: data.user.role
+    })
+    return data.user;
   } catch (error) {
-    return handleCaughtError(error, UserApiError, 'An unexpected error occurred while updating the user.');
+    console.error('❌ UserAPI: Error updating user:', error)
+    throw handleCaughtError(error, UserApiError, 'Failed to update user');
   }
 }
 
 /**
- * Deletes a user (e.g., by an administrator).
+ * Deletes a user (super admin only).
  */
-export async function deleteUser(userId: number): Promise<void> {
+async function deleteUser(userId: number): Promise<UserResponseDTO> {
   try {
-    const response = await fetch(`${USER_API_BASE_URL}/${userId}`, {
+    console.log('🔍 UserAPI: Deleting user:', userId)
+
+    const apiUrl = getClientApiUrl(`${API_SUPER_ADMIN_PATH}/${userId}`);
+
+    const response = await fetch(apiUrl, {
       method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
     });
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to delete user' }));
-      throw new UserApiError(errorData.message || `Failed to delete user with ID ${userId}`, response.status, errorData.details);
-    }
-    // Si esperas el usuario eliminado, puedes devolverlo aquí tipado como UserResponseDTO
-    // const data = await response.json();
-    // return data as UserResponseDTO;
+
+    const data = await handleApiResponse<{ message: string; deletedUser: UserResponseDTO }>(response);
+
+    console.log('✅ UserAPI: User deleted successfully:', {
+      userId: data.deletedUser.userId,
+      email: data.deletedUser.email
+    })
+    return data.deletedUser;
   } catch (error) {
-    return handleCaughtError(error, UserApiError, 'An unexpected error occurred while deleting the user.');
+    console.error('❌ UserAPI: Error deleting user:', error)
+    throw handleCaughtError(error, UserApiError, 'Failed to delete user');
   }
 }
 
-// Puedes agregar aquí otras funciones relacionadas con usuarios si lo necesitas.
+/**
+ * Searches users by name or email (super admin only).
+ */
+async function searchUsers(searchTerm: string, limit: number = 10): Promise<UserResponseDTO[]> {
+  try {
+    console.log('🔍 UserAPI: Searching users:', { searchTerm, limit })
+
+    const queryParams = new URLSearchParams();
+    queryParams.append('search', searchTerm);
+    queryParams.append('pageSize', limit.toString());
+
+    const apiUrl = getClientApiUrl(`${API_SUPER_ADMIN_PATH}?${queryParams.toString()}`);
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    const data = await handleApiResponse<{
+      users: UserResponseDTO[];
+      pagination: any;
+      stats: any;
+      filters: any;
+      message: string;
+    }>(response);
+
+    console.log('✅ UserAPI: User search completed:', {
+      searchTerm,
+      resultsCount: data.users.length
+    })
+    return data.users;
+  } catch (error) {
+    console.error('❌ UserAPI: Error searching users:', error)
+    throw handleCaughtError(error, UserApiError, 'Failed to search users');
+  }
+}
+
+/**
+ * Fetches users by role (super admin only).
+ */
+async function getUsersByRole(role: UserRole): Promise<UserResponseDTO[]> {
+  try {
+    console.log('🔍 UserAPI: Fetching users by role:', role)
+
+    const queryParams = new URLSearchParams();
+    queryParams.append('role', role);
+    queryParams.append('pageSize', '100'); // Get more results for role filtering
+
+    const apiUrl = getClientApiUrl(`${API_SUPER_ADMIN_PATH}?${queryParams.toString()}`);
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    const data = await handleApiResponse<{
+      users: UserResponseDTO[];
+      pagination: any;
+      stats: any;
+      filters: any;
+      message: string;
+    }>(response);
+
+    console.log('✅ UserAPI: Users by role loaded:', {
+      role,
+      usersCount: data.users.length
+    })
+    return data.users;
+  } catch (error) {
+    console.error('❌ UserAPI: Error fetching users by role:', error)
+    throw handleCaughtError(error, UserApiError, 'Failed to fetch users by role');
+  }
+}
+
+/**
+ * Fetches users by establishment (super admin only).
+ */
+async function getUsersByEstablishment(establishmentId: number): Promise<UserResponseDTO[]> {
+  try {
+    console.log('🔍 UserAPI: Fetching users by establishment:', establishmentId)
+
+    const queryParams = new URLSearchParams();
+    queryParams.append('establishmentId', establishmentId.toString());
+    queryParams.append('pageSize', '100'); // Get more results for establishment filtering
+
+    const apiUrl = getClientApiUrl(`${API_SUPER_ADMIN_PATH}?${queryParams.toString()}`);
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    const data = await handleApiResponse<{
+      users: UserResponseDTO[];
+      pagination: any;
+      stats: any;
+      filters: any;
+      message: string;
+    }>(response);
+
+    console.log('✅ UserAPI: Users by establishment loaded:', {
+      establishmentId,
+      usersCount: data.users.length
+    })
+    return data.users;
+  } catch (error) {
+    console.error('❌ UserAPI: Error fetching users by establishment:', error)
+    throw handleCaughtError(error, UserApiError, 'Failed to fetch users by establishment');
+  }
+}
+
+export const userApiService = {
+  getUserById,
+  getAllUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+  searchUsers,
+  getUsersByRole,
+  getUsersByEstablishment,
+};
+
+export {
+  getUserById,
+  getAllUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+  searchUsers,
+  getUsersByRole,
+  getUsersByEstablishment,
+};

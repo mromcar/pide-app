@@ -6,131 +6,181 @@ import {
 } from '@/types/dtos/product';
 import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
 import { ProductApiError } from '@/types/errors/product.api.error';
+import { getClientApiUrl, debugApiClient } from '@/lib/api-client';
 
-const ENV_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
-const API_SERVICE_PATH = '/api/restaurants';
+const API_MENU_PATH = '/api/menu';
+const API_ADMIN_PATH = '/api/admin/establishments';
 
 /**
- * Obtiene todos los productos para un establecimiento específico.
+ * Fetches all products for a specific establishment (public menu).
  */
-async function getAllProductsByRestaurant(
-  restaurantId: number,
+async function getAllProductsByEstablishment(
+  establishmentId: number,
   categoryId?: number
 ): Promise<ProductResponseDTO[]> {
   try {
-    let url = `${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products`;
+    console.log('🔍 ProductAPI: Fetching products for establishment:', establishmentId, { categoryId })
+
+    if (process.env.NODE_ENV === 'development') {
+      debugApiClient()
+    }
+
+    let apiPath = `${API_MENU_PATH}/${establishmentId}/products`;
     const queryParams = new URLSearchParams();
     if (categoryId) {
       queryParams.append('categoryId', categoryId.toString());
     }
     if (queryParams.toString()) {
-      url += `?${queryParams.toString()}`;
+      apiPath += `?${queryParams.toString()}`;
     }
 
-    const response = await fetch(url, {
+    const apiUrl = getClientApiUrl(apiPath);
+
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
+
     const result = await handleApiResponse<ProductResponseDTO[]>(response);
+
+    console.log('✅ ProductAPI: Products loaded:', result.length)
     return result;
   } catch (error) {
-    throw handleCaughtError(error, ProductApiError, 'Error de red al obtener productos.');
+    console.error('❌ ProductAPI: Error fetching products:', error)
+    throw handleCaughtError(error, ProductApiError, 'Failed to fetch products');
   }
 }
 
 /**
- * Obtiene un producto específico por su ID, incluyendo relaciones.
+ * Fetches a specific product by ID from public menu.
  */
 async function getProductById(
-  restaurantId: number,
+  establishmentId: number,
   productId: number
 ): Promise<ProductWithRelationsResponseDTO | null> {
   try {
-    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products/${productId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    console.log('🔍 ProductAPI: Fetching product by ID:', { establishmentId, productId })
 
-    if (response.status === 404) return null;
+    const products = await getAllProductsByEstablishment(establishmentId);
+    const product = products.find(p => p.productId === productId);
 
-    const result = await handleApiResponse<ProductWithRelationsResponseDTO>(response);
-    return result;
+    if (!product) {
+      console.log('⚠️ ProductAPI: Product not found:', productId)
+      return null;
+    }
+
+    console.log('✅ ProductAPI: Product loaded:', product.name)
+    return product as ProductWithRelationsResponseDTO;
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
-        return null;
+      return null;
     }
-    throw handleCaughtError(error, ProductApiError, 'Error de red al obtener el producto.');
+    console.error('❌ ProductAPI: Error fetching product:', error)
+    throw handleCaughtError(error, ProductApiError, 'Failed to fetch product');
   }
 }
 
 /**
- * Crea un nuevo producto para un establecimiento.
+ * Creates a new product for an establishment (admin).
  */
 async function createProduct(
-  restaurantId: number,
+  establishmentId: number,
   productData: ProductCreateDTO
 ): Promise<ProductResponseDTO> {
   try {
-    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products`, {
+    console.log('🔍 ProductAPI: Creating product for establishment:', establishmentId, productData.name)
+
+    const apiUrl = getClientApiUrl(`${API_ADMIN_PATH}/${establishmentId}/menu/products`);
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(productData),
+      credentials: 'include',
     });
+
     const result = await handleApiResponse<ProductResponseDTO>(response);
+
+    console.log('✅ ProductAPI: Product created:', result.productId)
     return result;
   } catch (error) {
-    throw handleCaughtError(error, ProductApiError, 'Error de red al crear el producto.');
+    console.error('❌ ProductAPI: Error creating product:', error)
+    throw handleCaughtError(error, ProductApiError, 'Failed to create product');
   }
 }
 
 /**
- * Actualiza un producto existente.
+ * Updates an existing product (admin).
  */
 async function updateProduct(
-  restaurantId: number,
+  establishmentId: number,
   productId: number,
   productData: ProductUpdateDTO
 ): Promise<ProductResponseDTO> {
   try {
-    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products/${productId}`, {
+    console.log('🔍 ProductAPI: Updating product:', { establishmentId, productId, productData })
+
+    const apiUrl = getClientApiUrl(`${API_ADMIN_PATH}/${establishmentId}/menu/products/${productId}`);
+
+    const response = await fetch(apiUrl, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(productData),
+      credentials: 'include',
     });
+
     const result = await handleApiResponse<ProductResponseDTO>(response);
+
+    console.log('✅ ProductAPI: Product updated:', result.productId)
     return result;
   } catch (error) {
-    throw handleCaughtError(error, ProductApiError, 'Error de red al actualizar el producto.');
+    console.error('❌ ProductAPI: Error updating product:', error)
+    throw handleCaughtError(error, ProductApiError, 'Failed to update product');
   }
 }
 
 /**
- * Elimina un producto.
+ * Deletes a product (admin).
  */
-async function deleteProduct(restaurantId: number, productId: number): Promise<void> {
+async function deleteProduct(establishmentId: number, productId: number): Promise<void> {
   try {
-    const response = await fetch(`${ENV_API_BASE_URL}${API_SERVICE_PATH}/${restaurantId}/menu/products/${productId}`, {
+    console.log('🔍 ProductAPI: Deleting product:', { establishmentId, productId })
+
+    const apiUrl = getClientApiUrl(`${API_ADMIN_PATH}/${establishmentId}/menu/products/${productId}`);
+
+    const response = await fetch(apiUrl, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     });
+
     await handleApiResponse<void>(response);
+
+    console.log('✅ ProductAPI: Product deleted:', productId)
   } catch (error) {
-    throw handleCaughtError(error, ProductApiError, 'Error de red al eliminar el producto.');
+    console.error('❌ ProductAPI: Error deleting product:', error)
+    throw handleCaughtError(error, ProductApiError, 'Failed to delete product');
   }
 }
 
 export const productApiService = {
-  getAllProductsByRestaurant,
+  getAllProductsByEstablishment,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+};
+
+export {
+  getAllProductsByEstablishment,
   getProductById,
   createProduct,
   updateProduct,

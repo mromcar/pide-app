@@ -7,51 +7,70 @@ import { getTranslation } from '@/translations'
 import { useCart } from '@/lib/cart-context'
 import type { OrderWithDetails, OrderItemWithDetails } from '@/types/orderConfirmation'
 
+// ✅ CAMBIO: Interface actualizada
 interface OrderConfirmationProps {
   lang: LanguageCode
   orderId: number
-  restaurantId: number
+  establishmentId: number // ✅ CAMBIO: restaurantId → establishmentId
 }
 
-export default function OrderConfirmation({ lang, orderId, restaurantId }: OrderConfirmationProps) {
+// ✅ CAMBIO: Parámetros actualizados
+export default function OrderConfirmation({
+  lang,
+  orderId,
+  establishmentId,
+}: OrderConfirmationProps) {
   const [order, setOrder] = useState<OrderWithDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const t = getTranslation(lang)
-  const { setRestaurantId } = useCart()
+  const { setEstablishmentId } = useCart()
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
+        console.log('🔍 OrderConfirmation: Fetching order:', orderId)
         const response = await fetch(`/api/orders/${orderId}`)
+
         if (response.ok) {
           const orderData: OrderWithDetails = await response.json()
+          console.log('✅ OrderConfirmation: Order data loaded:', orderData.orderId)
           setOrder(orderData)
-          setRestaurantId(orderData.establishmentId)
+          // ✅ CAMBIO: Usar nueva función del cart context
+          setEstablishmentId(orderData.establishmentId)
         } else {
-          setError('Order not found')
+          console.warn('⚠️ OrderConfirmation: Order not found:', response.status)
+          // ✅ ARREGLADO: Usar traducciones en lugar de hardcoding
+          setError(t.orderConfirmation.orderNotFound)
           setTimeout(() => {
-            router.push(`/${lang}/restaurant/${restaurantId}/menu`)
+            // ✅ CAMBIO: URL nueva sin "restaurant"
+            router.push(`/${lang}/${establishmentId}/menu`)
           }, 3000)
         }
-      } catch (error) {
-        setError(error + 'Failed to load order')
+      } catch (err) {
+        console.error('❌ OrderConfirmation: Error fetching order:', err)
+        // ✅ ARREGLADO: Usar traducciones
+        setError(t.orderConfirmation.failedToLoad)
         setTimeout(() => {
-          router.push(`/${lang}/restaurant/${restaurantId}/menu`)
+          // ✅ CAMBIO: URL nueva sin "restaurant"
+          router.push(`/${lang}/${establishmentId}/menu`)
         }, 3000)
       } finally {
         setLoading(false)
       }
     }
+
     fetchOrder()
-  }, [orderId, restaurantId, router, lang, setRestaurantId])
+    // ✅ CAMBIO: Dependencias actualizadas
+  }, [orderId, establishmentId, router, lang, setEstablishmentId, t.orderConfirmation])
 
   const handleOrderAgain = () => {
-    router.push(`/${lang}/restaurant/${restaurantId}/menu`)
+    console.log('🔄 OrderConfirmation: Redirecting to menu for establishment:', establishmentId)
+    // ✅ CAMBIO: URL nueva sin "restaurant"
+    router.push(`/${lang}/${establishmentId}/menu`)
   }
 
-  // CORREGIDO: No tipifiques el parámetro de .find
   const getProductName = (item: OrderItemWithDetails): string => {
     const translation = item.variant?.product?.translations?.find((t) => t.languageCode === lang)
     return translation?.name || item.variant?.product?.name || `Product ${item.variantId}`
@@ -62,32 +81,33 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
     return translation?.variantDescription || item.variant?.variantDescription
   }
 
+  // ✅ ARREGLADO: Estado de carga sin fallbacks hardcodeados
   if (loading) {
     return (
       <div className="page-container">
         <div className="order-confirmation-loading">
           <div className="order-confirmation-spinner"></div>
-          <p>{t.orderConfirmation?.loading || 'Loading your order...'}</p>
+          <p>{t.orderConfirmation.loading}</p>
         </div>
       </div>
     )
   }
 
+  // ✅ ARREGLADO: Estado de error sin fallbacks hardcodeados
   if (error || !order) {
     return (
       <div className="page-container">
         <div className="order-confirmation-error">
           <h1 className="order-confirmation-error-title">
-            {error === 'Order not found'
-              ? t.orderConfirmation?.orderNotFound || 'Order not found'
-              : t.orderConfirmation?.failedToLoad || 'Failed to load order'}
+            {error || t.orderConfirmation.orderNotFound}
           </h1>
-          <p>{t.orderConfirmation?.redirectingToMenu || 'Redirecting to menu...'}</p>
+          <p>{t.orderConfirmation.redirectingToMenu}</p>
           <button
-            onClick={() => router.push(`/${lang}/restaurant/${restaurantId}/menu`)}
+            // ✅ CAMBIO: URL nueva sin "restaurant"
+            onClick={() => router.push(`/${lang}/${establishmentId}/menu`)}
             className="btnMinimalista order-confirmation-back-btn"
           >
-            {t.orderConfirmation?.backToMenu || 'Back to Menu'}
+            {t.orderConfirmation.backToMenu}
           </button>
         </div>
       </div>
@@ -107,22 +127,26 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
               />
             </svg>
           </div>
-          <h1 className="order-confirmation-title">
-            {t.orderConfirmation?.title || 'Order Confirmed!'}
-          </h1>
-          <p className="order-confirmation-subtitle">
-            {t.orderConfirmation?.subtitle || 'Your order has been successfully placed'}
-          </p>
+          {/* ✅ ARREGLADO: Sin fallbacks hardcodeados */}
+          <h1 className="order-confirmation-title">{t.orderConfirmation.title}</h1>
+          <p className="order-confirmation-subtitle">{t.orderConfirmation.subtitle}</p>
         </div>
 
         <div className="order-confirmation-card">
           <div className="order-confirmation-card-header">
-            <h2 className="order-confirmation-order-title">Order #{order.orderId}</h2>
+            {/* ✅ MEJORADO: Usar traducción para "Order" */}
+            <h2 className="order-confirmation-order-title">
+              {t.orderConfirmation.orderNumber} #{order.orderId}
+            </h2>
             {order.tableNumber && (
-              <p className="order-confirmation-table">Table: {order.tableNumber}</p>
+              <p className="order-confirmation-table">
+                {/* ✅ ARREGLADO: Usar traducción */}
+                {t.orderConfirmation.tableNumber}: {order.tableNumber}
+              </p>
             )}
             <p className="order-confirmation-status">
-              Status:{' '}
+              {/* ✅ ARREGLADO: Usar traducción para "Status" */}
+              {t.orderConfirmation.status}:{' '}
               {t.orderStatus?.[order.status.toLowerCase() as keyof typeof t.orderStatus] ||
                 order.status}
             </p>
@@ -134,9 +158,8 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
           </div>
 
           <div className="order-confirmation-items">
-            <h3 className="order-confirmation-items-title">
-              {t.orderSummary?.title || 'Order Items:'}:
-            </h3>
+            {/* ✅ ARREGLADO: Eliminar ":" duplicado */}
+            <h3 className="order-confirmation-items-title">{t.orderSummary.title}</h3>
             {order.orderItems?.map((item: OrderItemWithDetails, index: number) => (
               <div key={index} className="order-confirmation-item">
                 <div className="order-confirmation-item-info">
@@ -145,7 +168,8 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
                     <p className="order-confirmation-item-variant">{getVariantDescription(item)}</p>
                   )}
                   <p className="order-confirmation-item-quantity">
-                    {t.orderSummary?.quantity || 'Quantity'}: {item.quantity}
+                    {/* ✅ ARREGLADO: Usar traducción */}
+                    {t.orderSummary.quantity}: {item.quantity}
                   </p>
                 </div>
                 <p className="order-confirmation-item-price">
@@ -158,7 +182,8 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
           {order.totalAmount && (
             <div className="order-confirmation-total">
               <div className="order-confirmation-total-row">
-                <span className="order-confirmation-total-label">{t.cart?.total || 'Total'}:</span>
+                {/* ✅ ARREGLADO: Usar traducción sin fallback */}
+                <span className="order-confirmation-total-label">{t.cart.total}:</span>
                 <span className="order-confirmation-total-amount">
                   {Number(order.totalAmount).toFixed(2)}€
                 </span>
@@ -169,7 +194,8 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
           {order.notes && (
             <div className="order-confirmation-notes">
               <p>
-                <strong>{t.checkout?.notes || 'Notes'}:</strong> {order.notes}
+                {/* ✅ ARREGLADO: Usar traducción sin fallback */}
+                <strong>{t.checkout.notes}:</strong> {order.notes}
               </p>
             </div>
           )}
@@ -180,15 +206,18 @@ export default function OrderConfirmation({ lang, orderId, restaurantId }: Order
             onClick={handleOrderAgain}
             className="btnMinimalista order-confirmation-order-again-btn"
           >
-            {t.orderConfirmation?.orderAgain || 'Order Again'}
+            {/* ✅ ARREGLADO: Sin fallback hardcodeado */}
+            {t.orderConfirmation.orderAgain}
           </button>
           <button
             onClick={() =>
-              router.push(`/${lang}/order/${orderId}/track?restaurantId=${restaurantId}`)
+              // ✅ CAMBIO: URL nueva sin query parameter, solo usar orderId
+              router.push(`/${lang}/order/${orderId}/track`)
             }
             className="btnMinimalista order-confirmation-track-btn"
           >
-            {t.orderConfirmation?.trackOrder || 'Track Order'}
+            {/* ✅ ARREGLADO: Sin fallback hardcodeado */}
+            {t.orderConfirmation.trackOrder}
           </button>
         </div>
       </div>

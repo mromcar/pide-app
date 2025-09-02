@@ -1,13 +1,14 @@
 import { RestaurantMenuTranslations } from '../../types/restaurant-menu'
 
 export const restaurantMenuFr: RestaurantMenuTranslations = {
-  title: 'Menu du Restaurant',
+  title: 'Menu de l\'Établissement',  // ✅ CAMBIO: Restaurant → Établissement
   description: 'Découvrez nos délicieuses offres',
-  invalidRestaurantIdError: 'ID de restaurant invalide',
+  // ✅ CAMBIO: restaurantId → establishmentId
+  invalidEstablishmentIdError: 'ID d\'établissement invalide',
   menuNotAvailableError: 'Menu non disponible pour le moment',
   menuNoItems: 'Aucun élément de menu disponible',
   menuNoProductsInCategory: 'Aucun produit disponible dans cette catégorie',
-  loadingMenu: 'Chargement du menu du restaurant...',
+  loadingMenu: 'Chargement du menu de l\'établissement...',  // ✅ CAMBIO
   backToCategories: 'Retour aux catégories',
   backToMenu: 'Retour au menu',
   addToCart: 'Ajouter au panier',
@@ -17,5 +18,7 @@ export const restaurantMenuFr: RestaurantMenuTranslations = {
   variants: 'Variantes',
   total: 'Total',
   notes: 'Notes',
-  productAllergens: 'Contient des allergènes'
+  productAllergens: 'Contient des allergènes',
+  // ✅ AÑADIDO: Nuevo mensaje
+  establishmentNotFound: 'Établissement non trouvé'
 }

@@ -1,4 +1,3 @@
-
 /*
 Las funciones de next-auth/react ( signIn , signOut , getSession ) tienen su propio manejo interno y no siempre devuelven un objeto Response estándar que handleApiResponse esperaría. Por lo tanto, handleApiResponse es más útil para tus propias llamadas fetch a tus endpoints de API backend. El refactor de auth.api.ts se centra más en unificar los tipos de error con ApiError y NetworkError de apiUtils.ts .
 */
@@ -10,8 +9,7 @@ import { ApiError, NetworkError, UnexpectedResponseError } from '@/utils/apiUtil
 import logger from '@/lib/logger';
 
 /**
- * Error personalizado para manejar errores específicos de autenticación.
- * Extiende ApiError para mantener consistencia con el sistema de errores de la aplicación.
+ * Error for authentication-specific issues.
  */
 export class AuthError extends ApiError {
   constructor(message: string, status: number, public code?: string, errors?: Record<string, unknown>) {
@@ -22,17 +20,12 @@ export class AuthError extends ApiError {
 }
 
 /**
- * Inicia el proceso de inicio de sesión utilizando NextAuth.
- *
- * @param credentials - Credenciales del usuario (email y contraseña).
- * @param options - Opciones de NextAuth SignInOptions, ej: redirect: false para manejar errores manualmente.
- * @returns Promise que resuelve a SignInResponse.
- * @throws {AuthError} Si la autenticación falla (ej: credenciales inválidas).
- * @throws {NetworkError} Si hay un problema de red.
- * @throws {UnexpectedResponseError} Para cualquier otro error inesperado.
+ * Initiates user login using NextAuth.
  */
 async function login(credentials: UserLoginDTO, options?: SignInOptions): Promise<SignInResponse> {
   try {
+    console.log('🔍 AuthAPI: Attempting login for user:', credentials.email)
+
     const response = await signIn('credentials', {
       ...credentials,
       redirect: options?.redirect ?? false,
@@ -40,16 +33,20 @@ async function login(credentials: UserLoginDTO, options?: SignInOptions): Promis
     });
 
     if (!response) {
-      throw new UnexpectedResponseError('Respuesta inesperada del servicio de autenticación.');
+      console.error('❌ AuthAPI: No response from authentication service')
+      throw new UnexpectedResponseError('No response from authentication service');
     }
 
     if (response.error) {
+      console.error('❌ AuthAPI: Authentication error:', response.error)
+
       if (response.error === 'CredentialsSignin') {
-        throw new AuthError('Credenciales inválidas.', response.status || 401, response.error);
+        throw new AuthError('Invalid credentials', response.status || 401, response.error);
       }
-      throw new AuthError(`Error de autenticación: ${response.error}`, response.status || 400, response.error);
+      throw new AuthError(`Authentication error: ${response.error}`, response.status || 400, response.error);
     }
 
+    console.log('✅ AuthAPI: Login successful')
     return response;
 
   } catch (error) {
@@ -57,44 +54,58 @@ async function login(credentials: UserLoginDTO, options?: SignInOptions): Promis
       throw error;
     }
     if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
-      throw new NetworkError('No se pudo conectar con el servidor.');
+      console.error('❌ AuthAPI: Network error during login')
+      throw new NetworkError('Unable to connect to server');
     }
-    logger.error('Error inesperado durante el login:', error);
-    throw new UnexpectedResponseError('Ocurrió un error inesperado durante el inicio de sesión.');
+
+    console.error('❌ AuthAPI: Unexpected error during login:', error)
+    logger.error('Unexpected error during login:', error);
+    throw new UnexpectedResponseError('Unexpected error during login');
   }
 }
 
 /**
- * Cierra la sesión del usuario actual.
- *
- * @param options - Opciones de cierre de sesión de NextAuth.
- * @throws {NetworkError} Si hay un problema de red.
- * @throws {UnexpectedResponseError} Para cualquier otro error inesperado.
+ * Logs out the current user.
  */
-export async function logout(options?: SignOutParams<true>): Promise<void> {
+async function logout(options?: SignOutParams<true>): Promise<void> {
   try {
+    console.log('🔍 AuthAPI: Logging out user')
+
     await signOut({ redirect: false, ...options });
+
+    console.log('✅ AuthAPI: Logout successful')
   } catch (error) {
     if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
-      throw new NetworkError('Error de red durante el cierre de sesión.');
+      console.error('❌ AuthAPI: Network error during logout')
+      throw new NetworkError('Network error during logout');
     }
-    logger.error('Error inesperado durante el logout:', error);
-    throw new UnexpectedResponseError('Error inesperado durante el cierre de sesión.');
+
+    console.error('❌ AuthAPI: Unexpected error during logout:', error)
+    logger.error('Unexpected error during logout:', error);
+    throw new UnexpectedResponseError('Unexpected error during logout');
   }
 }
 
 /**
- * Obtiene la sesión actual del usuario.
- *
- * @returns Promise que resuelve a la sesión actual o null si no hay sesión.
- * @throws {UnexpectedResponseError} Si ocurre un error al obtener la sesión.
+ * Gets the current user session.
  */
-export async function getCurrentSession(): Promise<Session | null> {
+async function getCurrentSession(): Promise<Session | null> {
   try {
-    return await getSession();
+    console.log('🔍 AuthAPI: Getting current session')
+
+    const session = await getSession();
+
+    if (session) {
+      console.log('✅ AuthAPI: Session found for user:', session.user?.email)
+    } else {
+      console.log('ℹ️ AuthAPI: No active session')
+    }
+
+    return session;
   } catch (error) {
-    logger.error('Error inesperado obteniendo la sesión:', error);
-    throw new UnexpectedResponseError('Error inesperado al obtener la sesión actual.');
+    console.error('❌ AuthAPI: Error getting session:', error)
+    logger.error('Error getting session:', error);
+    throw new UnexpectedResponseError('Error getting current session');
   }
 }
 
@@ -104,4 +115,6 @@ export const authApiService = {
   getCurrentSession,
   AuthError,
 };
+
+export { login, logout, getCurrentSession };
 

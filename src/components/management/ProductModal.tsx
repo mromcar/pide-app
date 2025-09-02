@@ -121,11 +121,19 @@ export function ProductModal({
         allergenIds: Array.from(selectedAllergens),
       }
 
+      // ✅ MIGRACIÓN: Cambiar a API admin
       const url = isEditing
-        ? `/api/restaurants/${establishmentId}/menu/products/${product.productId}`
-        : `/api/restaurants/${establishmentId}/menu/products`
+        ? `/api/admin/establishments/${establishmentId}/menu/products/${product.productId}`
+        : `/api/admin/establishments/${establishmentId}/menu/products`
 
       const method = isEditing ? 'PUT' : 'POST'
+
+      console.log('🔄 ProductModal: Submitting product data:', {
+        method,
+        url,
+        productData,
+        isEditing,
+      })
 
       const response = await fetch(url, {
         method,
@@ -133,13 +141,20 @@ export function ProductModal({
         body: JSON.stringify(productData),
       })
 
+      console.log('📊 ProductModal: Response status:', response.status)
+
       if (response.ok) {
+        const responseData = await response.json()
+        console.log('✅ ProductModal: Product saved successfully:', responseData)
         onSave()
       } else {
-        throw new Error('Error saving product')
+        const errorText = await response.text()
+        console.error('❌ ProductModal: Failed to save product:', response.status, errorText)
+        throw new Error(`Error saving product: ${response.status}`)
       }
     } catch (error) {
-      console.error('Error saving product:', error)
+      console.error('🚨 ProductModal: Error saving product:', error)
+      // Aquí podrías mostrar un toast/notification de error
     } finally {
       setLoading(false)
     }

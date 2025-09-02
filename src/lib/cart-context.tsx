@@ -30,8 +30,8 @@ export interface CartContextType {
   updateCartItemQuantity: (variantId: number, quantity: number) => void
   clearCart: () => void
   getCartTotal: () => number
-  restaurantId: number | null
-  setRestaurantId: (id: number | null) => void
+  establishmentId: number | null // ✅ CAMBIO: restaurantId → establishmentId
+  setEstablishmentId: (id: number | null) => void // ✅ CAMBIO: setRestaurantId → setEstablishmentId
   addProduct: (product: ProductToAdd) => void
   tableNumber: string
   setTableNumber: (tableNumber: string) => void
@@ -43,26 +43,48 @@ const CartContext = createContext<CartContextType | null>(null)
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
-  const [restaurantId, setRestaurantIdState] = useState<number | null>(null)
+  const [establishmentId, setEstablishmentIdState] = useState<number | null>(null)
   const [tableNumber, setTableNumber] = useState<string>('')
   const [orderNotes, setOrderNotes] = useState<string>('')
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedId = localStorage.getItem('currentRestaurantId')
+      // Migración automática de localStorage
+      let savedId = localStorage.getItem('currentEstablishmentId') // Nueva
+      if (!savedId) {
+        savedId = localStorage.getItem('currentRestaurantId') // Antigua (fallback)
+
+        if (savedId) {
+          console.log(
+            '🔄 CartContext: Migrating from old restaurantId to establishmentId:',
+            savedId
+          )
+          localStorage.setItem('currentEstablishmentId', savedId)
+          localStorage.removeItem('currentRestaurantId')
+        }
+      }
+
       if (savedId) {
-        setRestaurantIdState(parseInt(savedId, 10))
+        const numericId = parseInt(savedId, 10)
+        console.log('🏪 CartContext: Loading establishment ID from storage:', numericId)
+        setEstablishmentIdState(numericId)
       }
     }
   }, [])
 
-  const setRestaurantId = (id: number | null) => {
-    setRestaurantIdState(id)
+  const setEstablishmentId = (id: number | null) => {
+    console.log('🏪 CartContext: Setting establishment ID:', id)
+    setEstablishmentIdState(id)
+
     if (typeof window !== 'undefined') {
       if (id) {
-        localStorage.setItem('currentRestaurantId', id.toString())
+        localStorage.setItem('currentEstablishmentId', id.toString())
+        document.cookie = `currentEstablishmentId=${id}; path=/; max-age=${60 * 60 * 24 * 30}`
+        console.log('💾 CartContext: Establishment ID stored in localStorage and cookie:', id)
       } else {
-        localStorage.removeItem('currentRestaurantId')
+        localStorage.removeItem('currentEstablishmentId')
+        document.cookie = `currentEstablishmentId=; path=/; max-age=0`
+        console.log('🗑️ CartContext: Establishment ID removed from storage')
       }
     }
   }
@@ -123,8 +145,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         updateCartItemQuantity,
         clearCart,
         getCartTotal,
-        restaurantId,
-        setRestaurantId,
+        establishmentId,
+        setEstablishmentId,
         addProduct,
         tableNumber,
         setTableNumber,

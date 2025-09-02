@@ -33,15 +33,15 @@ export default function MainMenu({ lang }: MainMenuProps) {
       id: 'establishment_admin',
       icon: '🧑‍💼',
       titleKey: 'establishmentAdmin',
-      href: `/admin/establishment/${session.user.establishmentId}`,
+      href: `/admin/${session.user.establishmentId}`,
       roles: [UserRole.establishment_admin],
     },
     {
       id: 'employee_orders',
-      icon: '🖥️',
+      icon: '👥',
       titleKey: 'employeeOrders',
-      href: `/employee/establishment/${session.user.establishmentId}`,
-      roles: [UserRole.waiter, UserRole.cook],
+      href: `/admin/${session.user.establishmentId}/employees`,
+      roles: [UserRole.waiter, UserRole.cook, UserRole.establishment_admin],
     },
     {
       id: 'general_admin',
@@ -54,7 +54,7 @@ export default function MainMenu({ lang }: MainMenuProps) {
       id: 'restaurant_menu',
       icon: '📋',
       titleKey: 'restaurantMenu',
-      href: `/${lang}/restaurant/${session.user.establishmentId}/menu`,
+      href: `/${lang}/${session.user.establishmentId}/menu`,
       roles: [
         UserRole.client,
         UserRole.waiter,

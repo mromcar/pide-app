@@ -45,8 +45,8 @@ export default function LoginRedirect({ lang }: LoginRedirectProps) {
         case UserRole.waiter:
         case UserRole.cook:
           if (establishmentId) {
-            // Users with establishment_id can access their establishment
-            router.replace(`/${lang}/admin/establishment/${establishmentId}`)
+            // ✅ ACTUALIZADA: URL más corta sin "establishment"
+            router.replace(`/${lang}/admin/${establishmentId}`)
           } else {
             // User has no establishment_id - show access denied
             setShowAccessDenied(true)

@@ -51,15 +51,30 @@ export function ProductManagement({
 
     try {
       setLoading(true)
+      console.log('🔍 ProductManagement: Fetching products for category:', selectedCategoryId)
+
+      // ✅ MIGRACIÓN: Cambiar a API admin
       const response = await fetch(
-        `/api/restaurants/${establishmentId}/menu/products?categoryId=${selectedCategoryId}`
+        `/api/admin/establishments/${establishmentId}/menu/products?categoryId=${selectedCategoryId}`
       )
+      console.log('📊 ProductManagement: Products response status:', response.status)
+
       if (response.ok) {
         const data = await response.json()
-        setProducts(data || [])
+        console.log('✅ ProductManagement: Products data received:', data)
+
+        // ✅ CORRECCIÓN: Extraer products del response de la nueva API
+        const productsArray = Array.isArray(data.products) ? data.products : []
+        setProducts(productsArray)
+        console.log('🎯 ProductManagement: Products state will be set to:', productsArray)
+      } else {
+        console.error('❌ ProductManagement: Failed to fetch products, status:', response.status)
+        const errorText = await response.text()
+        console.error('❌ ProductManagement: Error response:', errorText)
+        setProducts([])
       }
     } catch (error) {
-      console.error('Error fetching products:', error)
+      console.error('🚨 ProductManagement: Error fetching products:', error)
       setProducts([])
     } finally {
       setLoading(false)
@@ -82,16 +97,23 @@ export function ProductManagement({
 
   const handleDeleteProduct = async (productId: number) => {
     try {
+      console.log('🗑️ ProductManagement: Deleting product:', productId)
+
+      // ✅ MIGRACIÓN: Cambiar a API admin
       const response = await fetch(
-        `/api/restaurants/${establishmentId}/menu/products/${productId}`,
+        `/api/admin/establishments/${establishmentId}/menu/products/${productId}`,
         { method: 'DELETE' }
       )
+
       if (response.ok) {
+        console.log('✅ ProductManagement: Product deleted successfully')
         await fetchProducts()
         setDeleteConfirm(null)
+      } else {
+        console.error('❌ ProductManagement: Failed to delete product, status:', response.status)
       }
     } catch (error) {
-      console.error('Error deleting product:', error)
+      console.error('🚨 ProductManagement: Error deleting product:', error)
     }
   }
 
@@ -168,7 +190,7 @@ export function ProductManagement({
                       key={product.productId}
                       product={product}
                       allergens={allergens}
-                      languageCode={languageCode} // 👈 Pasar languageCode
+                      languageCode={languageCode}
                       onEdit={() => handleEditProduct(product)}
                       onDelete={() => setDeleteConfirm(product.productId)}
                     />
@@ -234,15 +256,7 @@ export function ProductManagement({
   )
 }
 
-// ProductCard Component corregido
-interface ProductCardProps {
-  product: ProductWithVariantDescriptions
-  allergens: AllergenResponseDTO[]
-  languageCode: LanguageCode
-  onEdit: () => void
-  onDelete: () => void
-}
-
+// ProductCard Component - sin cambios en URLs
 function ProductCard({ product, allergens, languageCode, onEdit, onDelete }: ProductCardProps) {
   const { t } = useTranslation(languageCode)
 
@@ -273,8 +287,7 @@ function ProductCard({ product, allergens, languageCode, onEdit, onDelete }: Pro
               <div key={variant.variantId} className="variant-item">
                 <span className="variant-description">
                   {variant.variantDescription ||
-                    `${t.establishmentAdmin.menuManagement.products.variantNumber} ${variant.variantId}`}{' '}
-                  {/* 👈 Traducido */}
+                    `${t.establishmentAdmin.menuManagement.products.variantNumber} ${variant.variantId}`}
                 </span>
                 <span className="variant-price">{variant.price}€</span>
               </div>
@@ -330,4 +343,13 @@ function ProductCard({ product, allergens, languageCode, onEdit, onDelete }: Pro
       </div>
     </div>
   )
+}
+
+// Interface para ProductCard
+interface ProductCardProps {
+  product: ProductWithVariantDescriptions
+  allergens: AllergenResponseDTO[]
+  languageCode: LanguageCode
+  onEdit: () => void
+  onDelete: () => void
 }

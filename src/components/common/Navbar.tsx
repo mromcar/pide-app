@@ -11,7 +11,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ lang }: NavbarProps) {
-  const { cartItems, restaurantId } = useCart()
+  const { cartItems, establishmentId } = useCart()
   const t = getTranslation(lang)
   const totalItems = (cartItems ?? []).reduce(
     (sum: number, item: { quantity: number }) => sum + item.quantity,
@@ -20,8 +20,7 @@ export default function Navbar({ lang }: NavbarProps) {
 
   const pathname = usePathname()
 
-  // Redirigir directamente al menú principal en lugar de a la página redundante
-  const homeHref = restaurantId ? `/${lang}/restaurant/${restaurantId}/menu` : `/${lang}/login`
+  const homeHref = establishmentId ? `/${lang}/${establishmentId}/menu` : `/${lang}/login`
 
   const isHomePage = pathname === homeHref
   const isCartPage = pathname === `/${lang}/cart`

@@ -34,21 +34,23 @@ export function MenuManagement({
       setLoading(true)
       console.log('🔍 MenuManagement: Fetching categories for establishment:', establishmentId)
 
-      const response = await fetch(`/api/restaurants/${establishmentId}/menu/categories`)
+      // ✅ MIGRACIÓN: Cambiar a API admin
+      const response = await fetch(`/api/admin/establishments/${establishmentId}/menu/categories`)
       console.log('📊 MenuManagement: Categories response status:', response.status)
 
       if (response.ok) {
         const data = await response.json()
         console.log('✅ MenuManagement: Categories data received:', data)
         console.log(
-          '📝 MenuManagement: Data is array:',
-          Array.isArray(data),
+          '📝 MenuManagement: Data structure:',
+          'hasCategories:',
+          !!data.categories,
           'Length:',
-          data?.length
+          data.categories?.length
         )
 
-        // Forzar que sea un array
-        const categoriesArray = Array.isArray(data) ? data : []
+        // ✅ CORRECCIÓN: Extraer categories del response de la nueva API
+        const categoriesArray = Array.isArray(data.categories) ? data.categories : []
         setCategories(categoriesArray)
         console.log('🎯 MenuManagement: Categories state will be set to:', categoriesArray)
 
@@ -79,17 +81,19 @@ export function MenuManagement({
   const fetchAllergens = useCallback(async () => {
     try {
       console.log('🔍 MenuManagement: Fetching allergens')
-      const response = await fetch('/api/allergens')
+      // ✅ MIGRACIÓN: Cambiar a API admin para alérgenos del establishment
+      const response = await fetch(`/api/admin/establishments/${establishmentId}/menu/allergens`)
       if (response.ok) {
         const data = await response.json()
-        console.log('✅ MenuManagement: Allergens received:', data?.length || 0)
-        setAllergens(Array.isArray(data) ? data : [])
+        console.log('✅ MenuManagement: Allergens received:', data.allergens?.length || 0)
+        // ✅ CORRECCIÓN: Extraer allergens del response
+        setAllergens(Array.isArray(data.allergens) ? data.allergens : [])
       }
     } catch (error) {
       console.error('🚨 MenuManagement: Error fetching allergens:', error)
       setAllergens([])
     }
-  }, [])
+  }, [establishmentId])
 
   useEffect(() => {
     console.log('🚀 MenuManagement: useEffect triggered')

@@ -36,6 +36,12 @@ export function VariantModal({
 
     try {
       setLoading(true)
+      console.log('🔄 VariantModal: Submitting variant data:', {
+        isEditing,
+        productId,
+        establishmentId,
+        formData,
+      })
 
       const variantData = {
         productId,
@@ -45,11 +51,14 @@ export function VariantModal({
         isActive: formData.isActive,
       }
 
+      // ✅ MIGRACIÓN: Cambiar a API admin
       const url = isEditing
-        ? `/api/restaurants/${establishmentId}/menu/variants/${variant.variantId}`
-        : `/api/restaurants/${establishmentId}/menu/variants`
+        ? `/api/admin/establishments/${establishmentId}/menu/variants/${variant.variantId}`
+        : `/api/admin/establishments/${establishmentId}/menu/variants`
 
       const method = isEditing ? 'PUT' : 'POST'
+
+      console.log('🔄 VariantModal: Making request:', { method, url, variantData })
 
       const response = await fetch(url, {
         method,
@@ -57,14 +66,30 @@ export function VariantModal({
         body: JSON.stringify(variantData),
       })
 
+      console.log('📊 VariantModal: Response status:', response.status)
+
       if (response.ok) {
+        const responseData = await response.json()
+        console.log('✅ VariantModal: Variant saved successfully:', responseData)
         onSave()
       } else {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Error saving variant')
+        const errorText = await response.text()
+        console.error('❌ VariantModal: Failed to save variant:', response.status, errorText)
+
+        let errorMessage = 'Error saving variant'
+        try {
+          const errorData = JSON.parse(errorText)
+          errorMessage = errorData.message || errorMessage
+        } catch {
+          errorMessage = `Error ${response.status}: ${errorText}`
+        }
+
+        throw new Error(errorMessage)
       }
     } catch (error) {
-      console.error('Error saving variant:', error)
+      console.error('🚨 VariantModal: Error saving variant:', error)
+      // Aquí podrías mostrar un toast/notification de error
+      // Por ejemplo: showErrorToast(error.message)
     } finally {
       setLoading(false)
     }

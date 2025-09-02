@@ -1,14 +1,16 @@
-# Renombra archivos .tsx en src/components y src/contexts a PascalCase (solo primera letra)
-$folders = @(".\src\components", ".\src\contexts")
-foreach ($folder in $folders) {
-    Get-ChildItem -Path $folder -Recurse -Filter *.tsx | ForEach-Object {
-        $oldName = $_.Name
-        if ($oldName -match "^[a-z]") {
-            $baseName = $_.BaseName
-            $pascalName = ($baseName.Substring(0,1).ToUpper() + $baseName.Substring(1)) + $_.Extension
-            $newPath = Join-Path $_.DirectoryName $pascalName
-            Rename-Item $_.FullName $newPath
-            Write-Host "Renombrado: $oldName -> $pascalName"
-        }
-    }
+# Buscar TODAS las páginas en tu proyecto
+Write-Host "Buscando todas las páginas admin..." -ForegroundColor Cyan
+
+# Buscar páginas que contengan "admin" en la ruta
+Get-ChildItem -Path "src/app" -Recurse -Include "page.tsx" | Where-Object {
+    $_.FullName -like "*admin*"
+} | ForEach-Object {
+    $relativePath = $_.FullName.Replace((Get-Location).Path + "\", "")
+    Write-Host "  $relativePath" -ForegroundColor White
+}
+
+Write-Host "`nBuscando TODAS las páginas del proyecto..." -ForegroundColor Cyan
+Get-ChildItem -Path "src/app" -Recurse -Include "page.tsx" | ForEach-Object {
+    $relativePath = $_.FullName.Replace((Get-Location).Path + "\", "")
+    Write-Host "  $relativePath" -ForegroundColor White
 }

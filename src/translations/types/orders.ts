@@ -3,12 +3,19 @@ export interface CartTranslations {
   empty: string
   total: string
   checkout: string
+  // ✅ AÑADIDO: Nuevas traducciones necesarias
+  backToMenu: string
+  continueOrder: string
+  errorEstablishmentMissing: string
+  errorSubmitting: string
+  notesPlaceholder: string
 }
 
 export interface CheckoutTranslations {
   title: string
   tableNumber: string
   notes: string
+  notesPlaceholder: string
   placeOrder: string
   placingOrder: string
 }

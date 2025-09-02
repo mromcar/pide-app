@@ -1,7 +1,7 @@
 export interface RestaurantMenuTranslations {
   title: string
   description: string
-  invalidRestaurantIdError: string
+  invalidEstablishmentIdError: string  // Antes: invalidRestaurantIdError
   menuNotAvailableError: string
   menuNoItems: string
   menuNoProductsInCategory: string
@@ -16,4 +16,5 @@ export interface RestaurantMenuTranslations {
   total: string
   notes: string
   productAllergens: string
+  establishmentNotFound: string
 }

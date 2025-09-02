@@ -12,13 +12,20 @@ export const cartEs: CartTranslations = {
   title: 'Carrito de Compras',
   empty: 'Tu carrito está vacío',
   total: 'Total',
-  checkout: 'Finalizar Compra'
+  checkout: 'Finalizar Compra',
+  // ✅ AÑADIDO: Nuevas traducciones
+  backToMenu: 'Volver al menú',
+  continueOrder: 'Continuar pidiendo',
+  errorEstablishmentMissing: 'ID del establecimiento no encontrado',
+  errorSubmitting: 'Error al enviar el pedido',
+  notesPlaceholder: 'Notas adicionales (opcional)',
 }
 
 export const checkoutEs: CheckoutTranslations = {
   title: 'Finalizar Compra',
   tableNumber: 'Número de Mesa',
   notes: 'Notas Especiales',
+  notesPlaceholder: 'Notas adicionales (opcional)',
   placeOrder: 'Realizar Pedido',
   placingOrder: 'Realizando pedido...'
 }

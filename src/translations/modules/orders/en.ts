@@ -12,13 +12,20 @@ export const cartEn: CartTranslations = {
   title: 'Shopping Cart',
   empty: 'Your cart is empty',
   total: 'Total',
-  checkout: 'Checkout'
+  checkout: 'Checkout',
+  // ✅ AÑADIDO: Nuevas traducciones
+  backToMenu: 'Back to menu',
+  continueOrder: 'Continue ordering',
+  errorEstablishmentMissing: 'Establishment ID not found',
+  errorSubmitting: 'Error submitting order',
+  notesPlaceholder: 'Additional notes (optional)',
 }
 
 export const checkoutEn: CheckoutTranslations = {
   title: 'Checkout',
   tableNumber: 'Table Number',
   notes: 'Special Notes',
+  notesPlaceholder: 'Additional notes (optional)',
   placeOrder: 'Place Order',
   placingOrder: 'Placing order...'
 }
