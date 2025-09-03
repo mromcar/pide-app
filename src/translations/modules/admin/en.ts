@@ -90,7 +90,11 @@ export const adminEn: EstablishmentAdminTranslations = {
     confirmDelete: 'Confirm Deletion',
     deleteMessage: 'Are you sure you want to delete this employee?',
     inviteEmployee: 'Invite Employee',
-    sendInvitation: 'Send Invitation'
+    sendInvitation: 'Send Invitation',
+    loading: 'Loading employees...',
+    noEmployees: 'No employees',
+    noEmployeesDescription: 'Add employees to manage permissions and roles for your establishment.',
+    addFirstEmployee: 'Add First Employee'
   },
   orderSupervision: {
     title: 'Order Supervision',

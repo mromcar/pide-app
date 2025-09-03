@@ -17,7 +17,9 @@ export default function EstablishmentAdminPage() {
   const { data: session, status } = useSession()
   const languageCode = params.lang as LanguageCode
   const { t } = useTranslation(languageCode)
-  const establishmentId = params.id as string
+
+  // ✅ CORREGIDO: Ahora usa establishmentId en lugar de id
+  const establishmentId = params.establishmentId as string
 
   const [establishment, setEstablishment] = useState<Establishment | null>(null)
   const [loading, setLoading] = useState(true)
@@ -29,7 +31,8 @@ export default function EstablishmentAdminPage() {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/establishments/${establishmentId}`)
+      // ✅ CORREGIDO: Usar ruta de admin correcta
+      const response = await fetch(`/api/admin/establishments/${establishmentId}`)
 
       if (!response.ok) {
         throw new Error(t.establishmentAdmin.establishment.error.failedToFetch)
@@ -50,7 +53,6 @@ export default function EstablishmentAdminPage() {
     t.establishmentAdmin.establishment.error.unknownError,
   ])
 
-  // Simplificar dependencias del useEffect
   useEffect(() => {
     if (status === 'loading') return
 
@@ -59,7 +61,6 @@ export default function EstablishmentAdminPage() {
       return
     }
 
-    // ✅ CORRECCIÓN: Tipar explícitamente como UserRole[]
     const allowedRoles: UserRole[] = [UserRole.establishment_admin, UserRole.waiter, UserRole.cook]
     if (!allowedRoles.includes(session.user.role as UserRole)) {
       router.push(`/${languageCode}/access-denied`)

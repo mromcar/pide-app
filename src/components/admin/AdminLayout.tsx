@@ -1,8 +1,9 @@
 'use client'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useEffect, ReactNode } from 'react'
 import { UserRole } from '@prisma/client'
+import { LanguageCode } from '@/constants/languages'
 import AdminHeader from './AdminHeader'
 
 interface NavigationItem {
@@ -31,20 +32,26 @@ export function AdminLayout({
 }: AdminLayoutProps) {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const params = useParams()
+
+  // ✅ AGREGADO: Obtener languageCode para rutas correctas
+  const languageCode = (params?.lang as LanguageCode) || 'es'
 
   useEffect(() => {
     if (status === 'loading') return
 
     if (!session) {
-      router.push('/login')
+      // ✅ CORREGIDO: Ruta de login con languageCode
+      router.push(`/${languageCode}/login`)
       return
     }
 
     if (requiredRoles && !requiredRoles.includes(session.user.role)) {
-      router.push('/unauthorized')
+      // ✅ CORREGIDO: Ruta de unauthorized con languageCode
+      router.push(`/${languageCode}/access-denied`)
       return
     }
-  }, [session, status, router, requiredRoles])
+  }, [session, status, router, requiredRoles, languageCode])
 
   if (status === 'loading') {
     return (

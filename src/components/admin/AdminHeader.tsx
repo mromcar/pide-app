@@ -1,13 +1,19 @@
 'use client'
 import { useSession, signOut } from 'next-auth/react'
+import { useParams } from 'next/navigation'
 import { UserRole } from '@prisma/client'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { useState } from 'react'
+import type { LanguageCode } from '@/constants/languages'
 
 export default function AdminHeader() {
   const { data: session } = useSession()
+  const params = useParams()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const user = session?.user
+
+  // ✅ AGREGADO: Obtener languageCode para logout correcto
+  const languageCode = (params?.lang as LanguageCode) || 'es'
 
   if (!user) return null
 
@@ -31,11 +37,9 @@ export default function AdminHeader() {
       <div className="admin-header-wrapper">
         <div className="admin-header-flex">
           <div className="admin-header-logo-section">
-            <h1 className="admin-header-main-title">
-              Pide - Management Panel
-            </h1>
+            <h1 className="admin-header-main-title">Pide - Management Panel</h1>
           </div>
-          
+
           <div className="admin-header-actions">
             <div className="admin-header-dropdown-wrapper">
               <button
@@ -48,12 +52,17 @@ export default function AdminHeader() {
                 </div>
                 <ChevronDownIcon className="admin-header-icon" />
               </button>
-              
+
               {dropdownOpen && (
                 <div className="admin-header-menu">
                   <div className="admin-header-menu-content">
                     <button
-                      onClick={() => signOut({ callbackUrl: '/login' })}
+                      onClick={() =>
+                        signOut({
+                          // ✅ CORREGIDO: Logout con languageCode correcto
+                          callbackUrl: `/${languageCode}/login`,
+                        })
+                      }
                       className="admin-header-logout"
                     >
                       Sign Out

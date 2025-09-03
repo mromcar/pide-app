@@ -20,7 +20,8 @@ export default function MenuManagementPage() {
   const { t } = useTranslation(languageCode)
   const [activeTab, setActiveTab] = useState('categories')
 
-  const establishmentId = params.id as string
+  // ✅ CORREGIDO: Ahora usa establishmentId en lugar de id
+  const establishmentId = params.establishmentId as string
   const action = searchParams.get('action')
 
   // Estados para el establecimiento
@@ -34,7 +35,8 @@ export default function MenuManagementPage() {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/establishments/${establishmentId}`)
+      // ✅ CORREGIDO: Usar ruta de admin específica
+      const response = await fetch(`/api/admin/establishments/${establishmentId}`)
 
       if (!response.ok) {
         throw new Error(t.establishmentAdmin.establishment.error.failedToFetch)
@@ -80,7 +82,7 @@ export default function MenuManagementPage() {
       return
     }
 
-    // PASO 2c: Verificar pertenencia al establecimiento (excepto GENERAL_ADMIN)
+    // Verificar pertenencia al establecimiento (excepto GENERAL_ADMIN)
     const requiresEstablishmentCheck = userRole !== UserRole.general_admin
     if (
       requiresEstablishmentCheck &&
@@ -169,7 +171,6 @@ export default function MenuManagementPage() {
       />
 
       <div className="establishment-admin-container">
-        {/* PASO 2d: ProtectedPage con array de roles permitidos */}
         <ProtectedPage allowedRoles={[UserRole.establishment_admin, UserRole.general_admin]}>
           <MenuManagement
             establishmentId={establishmentId}

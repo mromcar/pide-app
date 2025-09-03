@@ -90,7 +90,11 @@ export const adminFr: EstablishmentAdminTranslations = {
     confirmDelete: 'Confirmer la Suppression',
     deleteMessage: 'Êtes-vous sûr de vouloir supprimer cet employé?',
     inviteEmployee: 'Inviter Employé',
-    sendInvitation: 'Envoyer Invitation'
+    sendInvitation: 'Envoyer Invitation',
+    loading: 'Chargement des employés...',
+    noEmployees: 'Aucun employé',
+    noEmployeesDescription: 'Ajoutez des employés pour gérer les permissions et rôles de votre établissement.',
+    addFirstEmployee: 'Ajouter Premier Employé'
   },
   orderSupervision: {
     title: 'Supervision des commandes',

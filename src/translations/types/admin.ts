@@ -89,6 +89,10 @@ export interface EstablishmentAdminTranslations {
     deleteMessage: string
     inviteEmployee: string
     sendInvitation: string
+    loading: string
+    noEmployees: string
+    noEmployeesDescription: string
+    addFirstEmployee: string
   }
   orderSupervision: {
     title: string
@@ -143,7 +147,7 @@ export interface EstablishmentAdminTranslations {
     update: string
     create: string
   }
-  placeholders: { // 👈 Nueva sección
+  placeholders: {
     categories: {
       name: string
     }
@@ -156,7 +160,7 @@ export interface EstablishmentAdminTranslations {
       price: string
     }
   }
-  helpTexts: { // 👈 Nueva sección
+  helpTexts: {
     variants: {
       inactiveNotVisible: string
     }

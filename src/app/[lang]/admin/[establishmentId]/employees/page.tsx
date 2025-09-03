@@ -1,13 +1,20 @@
+'use client'
+
+import { useParams } from 'next/navigation'
+import { useTranslation } from '@/hooks/useTranslation'
+import EmployeeManagement from '@/components/employee/EmployeeManagement'
+import { ProtectedPage } from '@/components/auth/ProtectedPage'
+import { AdminLayout } from '@/components/admin/AdminLayout'
+import type { LanguageCode } from '@/constants/languages'
+import { UserRole } from '@/constants/enums'
 import MenuPageClient from '@/components/menu/MenuPageClient'
 import { CategoryDTO } from '@/types/dtos/category'
 import { ProductResponseDTO } from '@/types/dtos/product'
 import { EstablishmentResponseDTO } from '@/types/dtos/establishment'
 import { AllergenResponseDTO } from '@/types/dtos/allergen'
 import { getTranslation } from '@/translations'
-import { LanguageCode } from '@/constants/languages'
-import type { Metadata } from 'next'
-import { EstablishmentMenuPageProps } from '@/types/pages'
 import { getApiUrl, debugUrls } from '@/lib/api-server'
+import type { Metadata } from 'next'
 
 interface MenuCategory extends CategoryDTO {
   products: ProductResponseDTO[]
@@ -19,10 +26,16 @@ interface MenuData {
   allergens: AllergenResponseDTO[]
 }
 
-export async function generateMetadata({ params }: EstablishmentMenuPageProps): Promise<Metadata> {
-  const resolvedParams = await params
-  const { establishmentId: establishmentIdString, lang } = resolvedParams
-  const t = getTranslation(lang as LanguageCode)
+interface MenuPageProps {
+  params: Promise<{
+    lang: LanguageCode
+    establishmentId: string
+  }>
+}
+
+export async function generateMetadata({ params }: MenuPageProps): Promise<Metadata> {
+  const { establishmentId: establishmentIdString, lang } = await params
+  const t = getTranslation(lang)
 
   let establishmentName = ''
   const numericEstablishmentId = parseInt(establishmentIdString, 10)
@@ -31,20 +44,17 @@ export async function generateMetadata({ params }: EstablishmentMenuPageProps): 
     try {
       console.log('🔍 Metadata: Fetching establishment for ID:', numericEstablishmentId)
 
+      // ✅ CORREGIDO: Usar ruta backend correcta
       const response = await fetch(getApiUrl(`/api/menu/${numericEstablishmentId}`))
 
       if (response.ok) {
         const data = await response.json()
         establishmentName = data.establishment?.name || ''
         console.log('✅ Metadata: Establishment name found:', establishmentName)
-      } else {
-        console.warn('⚠️ Metadata: Failed to fetch establishment, status:', response.status)
       }
     } catch (error) {
       console.error('❌ Metadata: Error fetching establishment:', error)
     }
-  } else {
-    console.warn('⚠️ Metadata: Invalid establishmentId:', establishmentIdString)
   }
 
   const pageTitle = establishmentName
@@ -67,12 +77,11 @@ async function getMenuDataForPage(numericEstablishmentId: number): Promise<MenuD
   try {
     console.log('🔍 MenuData: Fetching complete menu for establishment:', numericEstablishmentId)
 
+    // ✅ CORREGIDO: Usar ruta backend correcta para menú público
     const apiUrl = getApiUrl(`/api/menu/${numericEstablishmentId}`)
     const response = await fetch(apiUrl, {
       next: { revalidate: 300 }, // 5 minutos
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
     })
 
     if (!response.ok) {
@@ -80,17 +89,11 @@ async function getMenuDataForPage(numericEstablishmentId: number): Promise<MenuD
         status: response.status,
         statusText: response.statusText,
         establishmentId: numericEstablishmentId,
-        ...(process.env.NODE_ENV === 'development' && { apiUrl }),
       })
-      throw new Error(`Failed to fetch menu data: ${response.status}`)
+      return null
     }
 
     const data = await response.json()
-    console.log('✅ MenuData: Raw API response received:', {
-      hasEstablishment: !!data.establishment,
-      categoriesCount: data.categories?.length || 0,
-      allergensCount: data.allergens?.length || 0,
-    })
 
     const activeCategories: MenuCategory[] = (data.categories || [])
       .filter((cat: MenuCategory) => cat.isActive)
@@ -102,42 +105,25 @@ async function getMenuDataForPage(numericEstablishmentId: number): Promise<MenuD
       })
       .filter((cat: MenuCategory) => cat.products.length > 0)
 
-    console.log('🎯 MenuData: Processed menu data:', {
-      establishmentName: data.establishment?.name,
-      activeCategoriesCount: activeCategories.length,
-      totalProductsCount: activeCategories.reduce(
-        (sum: number, cat: MenuCategory) => sum + cat.products.length,
-        0
-      ),
-    })
-
     return {
       establishment: data.establishment,
       categories: activeCategories,
       allergens: data.allergens || [],
     }
   } catch (error) {
-    console.error('❌ MenuData: Error fetching menu:', {
-      error: error instanceof Error ? error.message : error,
-      establishmentId: numericEstablishmentId,
-      ...(process.env.NODE_ENV === 'development' && {
-        attemptedUrl: getApiUrl(`/api/menu/${numericEstablishmentId}`),
-      }),
-    })
-    throw error
+    console.error('❌ MenuData: Error fetching menu:', error)
+    return null
   }
 }
 
-export default async function EstablishmentMenuPage({ params }: EstablishmentMenuPageProps) {
-  const resolvedParams = await params
-  const { establishmentId: establishmentIdString, lang } = resolvedParams
+export default async function MenuPage({ params }: MenuPageProps) {
+  const { establishmentId: establishmentIdString, lang } = await params
   const t = getTranslation(lang)
 
   if (process.env.NODE_ENV === 'development') {
     debugUrls()
   }
 
-  console.log('🚀 MenuPage: Starting with params:', { establishmentIdString, lang })
   const numericEstablishmentId = parseInt(establishmentIdString, 10)
 
   if (isNaN(numericEstablishmentId) || numericEstablishmentId <= 0) {
@@ -160,7 +146,6 @@ export default async function EstablishmentMenuPage({ params }: EstablishmentMen
     const menuData = await getMenuDataForPage(numericEstablishmentId)
 
     if (!menuData || !menuData.establishment) {
-      console.warn('⚠️ MenuPage: No establishment found for ID:', numericEstablishmentId)
       return (
         <div className="menu-page-container menu-page-error">
           <div className="flex flex-col items-center justify-center min-h-[50vh] p-8">
@@ -176,7 +161,6 @@ export default async function EstablishmentMenuPage({ params }: EstablishmentMen
     }
 
     if (!menuData.categories || menuData.categories.length === 0) {
-      console.warn('⚠️ MenuPage: No menu items for establishment:', numericEstablishmentId)
       return (
         <div className="menu-page-container menu-page-info">
           <div className="flex flex-col items-center justify-center min-h-[50vh] p-8">
@@ -190,11 +174,6 @@ export default async function EstablishmentMenuPage({ params }: EstablishmentMen
         </div>
       )
     }
-
-    console.log('✅ MenuPage: Rendering menu with:', {
-      establishmentName: menuData.establishment.name,
-      categoriesCount: menuData.categories.length,
-    })
 
     return (
       <div className="menu-page-container">
@@ -212,11 +191,7 @@ export default async function EstablishmentMenuPage({ params }: EstablishmentMen
       </div>
     )
   } catch (error: unknown) {
-    console.error('❌ MenuPage: Error rendering page:', {
-      error: error instanceof Error ? error.message : error,
-      establishmentId: numericEstablishmentId,
-    })
-
+    console.error('❌ MenuPage: Error rendering page:', error)
     return (
       <div className="menu-page-container menu-page-error">
         <div className="flex flex-col items-center justify-center min-h-[50vh] p-8">

@@ -73,8 +73,8 @@ export const adminEs: EstablishmentAdminTranslations = {
   },
   employeeManagement: {
     title: 'Gestión de Empleados',
-    subtitle: 'Gestiona el personal de tu restaurante',
-    addEmployee: 'Añadir Empleado',
+    subtitle: 'Administra los empleados de tu establecimiento',
+    addEmployee: 'Agregar Empleado',
     editEmployee: 'Editar Empleado',
     deleteEmployee: 'Eliminar Empleado',
     name: 'Nombre',
@@ -87,10 +87,14 @@ export const adminEs: EstablishmentAdminTranslations = {
       cook: 'Cocinero',
       establishment_admin: 'Administrador'
     },
-    confirmDelete: 'Confirmar Eliminación',
+    confirmDelete: 'Confirmar eliminación',
     deleteMessage: '¿Estás seguro de que quieres eliminar este empleado?',
     inviteEmployee: 'Invitar Empleado',
-    sendInvitation: 'Enviar Invitación'
+    sendInvitation: 'Enviar Invitación',
+    loading: 'Cargando empleados...',
+    noEmployees: 'No hay empleados',
+    noEmployeesDescription: 'Agrega empleados para gestionar los permisos y roles de tu establecimiento.',
+    addFirstEmployee: 'Agregar Primer Empleado'
   },
   orderSupervision: {
     title: 'Supervisión de pedidos',

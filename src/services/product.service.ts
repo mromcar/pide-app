@@ -131,14 +131,26 @@ export class ProductService {
     };
   }
 
-  private get variantInclude() {
+  private getVariantInclude(includeInactive: boolean = false) {
+    // ✅ CORREGIDO: Cambiar `any` por tipo específico de Prisma
+    const where: Prisma.ProductVariantWhereInput = { deletedAt: null };
+
+    if (!includeInactive) {
+      where.isActive = true;
+    }
+
     return {
-      where: { deletedAt: null },
+      where,
       orderBy: { sortOrder: Prisma.SortOrder.asc },
       include: {
         translations: true,
       },
     };
+  }
+
+  // ✅ Actualizar el getter existente para mantener compatibilidad:
+  private get variantInclude() {
+    return this.getVariantInclude(false); // Solo activas por defecto
   }
 
   async createProduct(data: ProductCreateInput, userId?: number): Promise<ProductResponseDTO> {
@@ -425,6 +437,41 @@ export class ProductService {
       deletedAt: product.deletedAt?.toISOString() ?? null,
       // ...otros campos...
     }));
+  }
+
+  // ✅ Nuevo método para menú público:
+  async getPublicProducts(
+    establishmentId: number,
+    categoryId?: number
+  ): Promise<ProductResponseDTO[]> {
+    const where: Prisma.ProductWhereInput = {
+      establishmentId: establishmentId,
+      deletedAt: null,
+      isActive: true, // ✅ Solo productos activos para público
+    };
+
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+
+    const products = await prisma.product.findMany({
+      where,
+      include: {
+        translations: true,
+        allergens: this.allergenInclude,
+        category: true,
+        variants: this.getVariantInclude(false), // ✅ Solo variantes activas
+      },
+      orderBy: [
+        { sortOrder: 'asc' },
+        { name: 'asc' },
+      ]
+    });
+
+    // ✅ Filtrar productos que tienen al menos una variante activa
+    return products
+      .filter(product => product.variants && product.variants.length > 0)
+      .map(p => this.mapToDTO(p as ProductWithDetails));
   }
 }
 
