@@ -1,116 +1,139 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { useParams, useSearchParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from '@/hooks/useTranslation'
 import AdminNavbar from '@/components/admin/AdminNavbar'
 import ProtectedPage from '@/components/auth/ProtectedPage'
-import { MenuManagement } from '@/components/management/MenuManagement'
+import { MenuManagement } from '@/components/management/MenuManagement' // ✅ USAR EL EXISTENTE
 import type { LanguageCode } from '@/constants/languages'
-import type { Establishment } from '@/types/entities/establishment'
+import type { EstablishmentResponseDTO } from '@/types/dtos/establishment'
+import { getEstablishmentById } from '@/services/api/establishment.api'
 import { UserRole } from '@/constants/enums'
 
-export default function MenuManagementPage() {
-  const params = useParams()
-  const searchParams = useSearchParams()
+interface EstablishmentMenuPageProps {
+  params: Promise<{
+    lang: LanguageCode
+    establishmentId: string
+  }>
+}
+
+export default function EstablishmentMenuPage({ params }: EstablishmentMenuPageProps) {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const languageCode = params.lang as LanguageCode
-  const { t } = useTranslation(languageCode)
-  const [activeTab, setActiveTab] = useState('categories')
 
-  // ✅ CORREGIDO: Ahora usa establishmentId en lugar de id
-  const establishmentId = params.establishmentId as string
-  const action = searchParams.get('action')
+  const [resolvedParams, setResolvedParams] = useState<{
+    lang: LanguageCode
+    establishmentId: string
+  } | null>(null)
 
-  // Estados para el establecimiento
-  const [establishment, setEstablishment] = useState<Establishment | null>(null)
+  const [establishment, setEstablishment] = useState<EstablishmentResponseDTO | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState('categories') // ✅ NUEVO: Estado para tab activo
 
-  // Función para obtener datos del establecimiento
-  const fetchEstablishment = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      // ✅ CORREGIDO: Usar ruta de admin específica
-      const response = await fetch(`/api/admin/establishments/${establishmentId}`)
-
-      if (!response.ok) {
-        throw new Error(t.establishmentAdmin.establishment.error.failedToFetch)
+  // ✅ RESOLVER params de forma asíncrona
+  useEffect(() => {
+    const resolveParams = async () => {
+      try {
+        const resolved = await params
+        setResolvedParams(resolved)
+      } catch (err) {
+        console.error('❌ Error resolving params:', err)
+        setError('Failed to load page parameters')
+        setLoading(false)
       }
-
-      const data = await response.json()
-      setEstablishment(data)
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t.establishmentAdmin.establishment.error.unknownError
-      )
-    } finally {
-      setLoading(false)
     }
-  }, [
-    establishmentId,
-    t.establishmentAdmin.establishment.error.failedToFetch,
-    t.establishmentAdmin.establishment.error.unknownError,
-  ])
+    resolveParams()
+  }, [params])
 
-  // Efectos
-  useEffect(() => {
-    if (action === 'add-category') setActiveTab('categories')
-    if (action === 'add-product') setActiveTab('products')
-  }, [action])
+  const { t } = useTranslation(resolvedParams?.lang || 'en')
+
+  const fetchEstablishment = useCallback(
+    async (establishmentId: string) => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        const numericEstablishmentId = parseInt(establishmentId, 10)
+
+        if (isNaN(numericEstablishmentId) || numericEstablishmentId <= 0) {
+          throw new Error('Invalid establishment ID')
+        }
+
+        console.log('🔍 EstablishmentMenuPage: Fetching establishment:', numericEstablishmentId)
+
+        const data = await getEstablishmentById(numericEstablishmentId)
+
+        if (!data) {
+          throw new Error(t.establishmentAdmin.establishment.error.failedToFetch)
+        }
+
+        setEstablishment(data)
+        console.log('✅ EstablishmentMenuPage: Establishment loaded:', data.name)
+      } catch (err) {
+        console.error('❌ EstablishmentMenuPage: Error fetching establishment:', err)
+        setError(
+          err instanceof Error ? err.message : t.establishmentAdmin.establishment.error.unknownError
+        )
+      } finally {
+        setLoading(false)
+      }
+    },
+    [t]
+  )
 
   useEffect(() => {
+    if (!resolvedParams) return
     if (status === 'loading') return
+
+    const { lang: languageCode, establishmentId } = resolvedParams
 
     if (!session?.user) {
       router.push(`/${languageCode}/login`)
       return
     }
 
-    const userRole = session.user.role as UserRole
+    // ✅ PERMITIR también a waiter y cook ver el menú (solo lectura para algunos)
+    const allowedRoles: UserRole[] = [
+      UserRole.establishment_admin,
+      UserRole.waiter,
+      UserRole.cook,
+      UserRole.general_admin,
+    ]
 
-    // ✅ CORRECCIÓN: Tipar explícitamente como UserRole[]
-    const allowedRoles: UserRole[] = [UserRole.establishment_admin, UserRole.general_admin]
-
-    // ✅ Ahora TypeScript sabe que allowedRoles contiene UserRole
-    if (!allowedRoles.includes(userRole)) {
+    if (!allowedRoles.includes(session.user.role as UserRole)) {
       router.push(`/${languageCode}/access-denied`)
       return
     }
 
-    // Verificar pertenencia al establecimiento (excepto GENERAL_ADMIN)
-    const requiresEstablishmentCheck = userRole !== UserRole.general_admin
+    // ✅ Redirigir al establishment correcto si es necesario
     if (
-      requiresEstablishmentCheck &&
-      session.user.establishmentId?.toString() !== establishmentId
+      session.user.establishmentId?.toString() !== establishmentId &&
+      session.user.role !== UserRole.general_admin
     ) {
-      router.push(`/${languageCode}/access-denied`)
+      console.log('🚫 EstablishmentMenuPage: Wrong establishment, redirecting to correct one')
+      router.push(`/${languageCode}/admin/${session.user.establishmentId}/menu`)
       return
     }
 
-    // Fetch establishment data
-    if (!establishment) {
-      fetchEstablishment()
-    }
-  }, [session, status, establishment, fetchEstablishment, establishmentId, languageCode, router])
+    fetchEstablishment(establishmentId)
+  }, [session, status, resolvedParams, fetchEstablishment, router])
 
-  // Estados de carga y error
-  if (status === 'loading') {
+  // ✅ LOADING states
+  if (status === 'loading' || !resolvedParams) {
     return (
       <div className="establishment-admin-loading">
         <div className="establishment-admin-loading-content">
           <div className="establishment-admin-spinner"></div>
-          <p className="establishment-admin-loading-text">
-            {t.establishmentAdmin.establishment.loading}
-          </p>
+          <p className="establishment-admin-loading-text">{t.establishmentAdmin.forms.loading}</p>
         </div>
       </div>
     )
   }
+
+  const { lang: languageCode, establishmentId } = resolvedParams
 
   if (loading) {
     return (
@@ -124,7 +147,7 @@ export default function MenuManagementPage() {
           <div className="establishment-admin-loading-content">
             <div className="establishment-admin-spinner"></div>
             <p className="establishment-admin-loading-text">
-              {t.establishmentAdmin.establishment.loading}
+              {t.establishmentAdmin.menuManagement.loading}
             </p>
           </div>
         </div>
@@ -147,10 +170,10 @@ export default function MenuManagementPage() {
             </h1>
             <p className="establishment-admin-error-message">{error}</p>
             <button
-              onClick={() => fetchEstablishment()}
+              onClick={() => fetchEstablishment(establishmentId)}
               className="establishment-admin-error-button"
             >
-              Reintentar
+              {t.establishmentAdmin.forms.retry}
             </button>
           </div>
         </div>
@@ -171,7 +194,23 @@ export default function MenuManagementPage() {
       />
 
       <div className="establishment-admin-container">
-        <ProtectedPage allowedRoles={[UserRole.establishment_admin, UserRole.general_admin]}>
+        <ProtectedPage
+          allowedRoles={[
+            UserRole.establishment_admin,
+            UserRole.waiter,
+            UserRole.cook,
+            UserRole.general_admin,
+          ]}
+        >
+          {/* ✅ HEADER del menú */}
+          <div className="admin-card mb-6">
+            <div className="admin-card-header">
+              <h2 className="admin-card-title">{t.establishmentAdmin.menuManagement.title}</h2>
+              <p className="admin-card-subtitle">{establishment.name}</p>
+            </div>
+          </div>
+
+          {/* ✅ USAR el componente MenuManagement existente */}
           <MenuManagement
             establishmentId={establishmentId}
             activeTab={activeTab}

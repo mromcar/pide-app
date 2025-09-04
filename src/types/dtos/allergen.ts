@@ -6,7 +6,7 @@ export interface CreateAllergenDTO extends Omit<Allergen, 'allergenId' | 'transl
 }
 
 export interface UpdateAllergenDTO extends Partial<Omit<CreateAllergenDTO, 'translations'>> {
-  translations?: Array<UpdateAllergenTranslationDTO>;
+  translations?: UpdateAllergenTranslationDTO[];
 }
 
 export interface AllergenResponseDTO extends Omit<Allergen, 'translations'> {

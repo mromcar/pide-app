@@ -17,4 +17,19 @@ export interface RestaurantMenuTranslations {
   notes: string
   productAllergens: string
   establishmentNotFound: string
+  table: string
+  customerName: string
+  callWaiter: string
+  requestCutlery: string
+  refillDrinks: string
+  otherRequests: string
+  viewCart: string
+  searchMenu: string
+  toggleCategoryList: string
+  close: string
+  noResultsFound: string
+  tryDifferentSearch: string
+  editNameOrNumber: string
+  save: string
+  edit: string
 }

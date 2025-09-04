@@ -4,6 +4,35 @@ export interface EstablishmentAdminTranslations {
     subtitle: string
     overview: string
     quickActions: string
+    todaysOrders: string
+    activeOrders: string
+    dailyRevenue: string
+    activeEmployees: string
+    viewOrders: string
+    viewOrdersDesc: string
+    manageMenu: string
+    manageMenuDesc: string
+    manageTeam: string
+    manageTeamDesc: string
+    establishmentInfo: string
+    name: string
+    address: string
+    city: string
+    phone: string
+    website: string
+    status: string
+    acceptsOrders: string
+    createdAt: string
+    active: string
+    inactive: string
+    yes: string
+    no: string
+    notAvailable: string
+    qrCode: string
+    qrCodeDesc: string
+    menuUrl: string
+    copyUrl: string
+    previewMenu: string
   }
   navigation: {
     dashboard: string
@@ -16,6 +45,7 @@ export interface EstablishmentAdminTranslations {
   menuManagement: {
     title: string
     subtitle: string
+    loading: string
     categories: {
       title: string
       addNew: string
@@ -138,6 +168,7 @@ export interface EstablishmentAdminTranslations {
     cancel: string
     saving: string
     loading: string
+    retry: string
     required: string
     optional: string
     active: string

@@ -1,100 +1,154 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { EstablishmentAdminDashboard } from '@/components/admin/EstablishmentAdminDashboard'
 import AdminNavbar from '@/components/admin/AdminNavbar'
 import ProtectedPage from '@/components/auth/ProtectedPage'
 import type { LanguageCode } from '@/constants/languages'
-import type { Establishment } from '@/types/entities/establishment'
+import type { EstablishmentResponseDTO } from '@/types/dtos/establishment'
+import { getEstablishmentById } from '@/services/api/establishment.api'
 import { UserRole } from '@/constants/enums'
 
-export default function EstablishmentAdminPage() {
-  const params = useParams()
+interface EstablishmentAdminPageProps {
+  params: Promise<{
+    lang: LanguageCode
+    establishmentId: string
+  }>
+}
+
+export default function EstablishmentAdminPage({ params }: EstablishmentAdminPageProps) {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const languageCode = params.lang as LanguageCode
-  const { t } = useTranslation(languageCode)
 
-  // ✅ CORREGIDO: Ahora usa establishmentId en lugar de id
-  const establishmentId = params.establishmentId as string
+  const [resolvedParams, setResolvedParams] = useState<{
+    lang: LanguageCode
+    establishmentId: string
+  } | null>(null)
 
-  const [establishment, setEstablishment] = useState<Establishment | null>(null)
+  const [establishment, setEstablishment] = useState<EstablishmentResponseDTO | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Memoizar la función fetch para evitar recreaciones
-  const fetchEstablishment = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      // ✅ CORREGIDO: Usar ruta de admin correcta
-      const response = await fetch(`/api/admin/establishments/${establishmentId}`)
-
-      if (!response.ok) {
-        throw new Error(t.establishmentAdmin.establishment.error.failedToFetch)
-      }
-
-      const data = await response.json()
-      setEstablishment(data)
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t.establishmentAdmin.establishment.error.unknownError
-      )
-    } finally {
-      setLoading(false)
-    }
-  }, [
-    establishmentId,
-    t.establishmentAdmin.establishment.error.failedToFetch,
-    t.establishmentAdmin.establishment.error.unknownError,
-  ])
-
+  // ✅ RESOLVER params de forma asíncrona
   useEffect(() => {
-    if (status === 'loading') return
+    const resolveParams = async () => {
+      try {
+        const resolved = await params
+        setResolvedParams(resolved)
+      } catch (err) {
+        console.error('❌ Error resolving params:', err)
+        setError('Failed to load page parameters')
+        setLoading(false)
+      }
+    }
+    resolveParams()
+  }, [params])
 
-    if (!session?.user) {
+  const { t } = useTranslation(resolvedParams?.lang || 'en')
+
+  const fetchEstablishment = useCallback(
+    async (establishmentId: string) => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        const numericEstablishmentId = parseInt(establishmentId, 10)
+
+        if (isNaN(numericEstablishmentId) || numericEstablishmentId <= 0) {
+          throw new Error('Invalid establishment ID')
+        }
+
+        console.log('🔍 EstablishmentAdminPage: Fetching establishment:', numericEstablishmentId)
+
+        const data = await getEstablishmentById(numericEstablishmentId)
+
+        if (!data) {
+          throw new Error(t.establishmentAdmin.establishment.error.failedToFetch)
+        }
+
+        setEstablishment(data)
+        console.log('✅ EstablishmentAdminPage: Establishment loaded:', data.name)
+      } catch (err) {
+        console.error('❌ EstablishmentAdminPage: Error fetching establishment:', err)
+        setError(
+          err instanceof Error ? err.message : t.establishmentAdmin.establishment.error.unknownError
+        )
+      } finally {
+        setLoading(false)
+      }
+    },
+    [t]
+  )
+
+  // ✅ PROTECCIÓN DE RUTAS
+  useEffect(() => {
+    if (!resolvedParams) return
+
+    const { lang: languageCode, establishmentId } = resolvedParams
+
+    if (status === 'loading') {
+      return
+    }
+
+    if (status === 'unauthenticated' || !session?.user) {
+      console.log('🔒 EstablishmentAdminPage: No authenticated, redirecting to login')
       router.push(`/${languageCode}/login`)
       return
     }
 
     const allowedRoles: UserRole[] = [UserRole.establishment_admin, UserRole.waiter, UserRole.cook]
     if (!allowedRoles.includes(session.user.role as UserRole)) {
+      console.log(
+        '🚫 EstablishmentAdminPage: Insufficient permissions, redirecting to access-denied'
+      )
       router.push(`/${languageCode}/access-denied`)
       return
     }
 
-    // Verificar que el usuario pertenece a este establecimiento
     if (
       session.user.establishmentId?.toString() !== establishmentId &&
       session.user.role !== UserRole.general_admin
     ) {
-      router.push(`/${languageCode}/access-denied`)
+      console.log('🚫 EstablishmentAdminPage: Wrong establishment, redirecting to correct one')
+      router.push(`/${languageCode}/admin/${session.user.establishmentId}`)
       return
     }
 
-    // Solo fetch si no tenemos datos del establishment
-    if (!establishment) {
-      fetchEstablishment()
-    }
-  }, [session, status, establishment, fetchEstablishment, establishmentId, languageCode, router])
+    console.log(
+      '✅ EstablishmentAdminPage: User authenticated and authorized, loading establishment'
+    )
+    fetchEstablishment(establishmentId)
+  }, [session, status, resolvedParams, fetchEstablishment, router])
 
-  // Loading state
-  if (status === 'loading') {
+  // ✅ LOADING states - COMPLETAMENTE TRADUCIDOS
+  if (status === 'loading' || !resolvedParams) {
     return (
       <div className="establishment-admin-loading">
         <div className="establishment-admin-loading-content">
           <div className="establishment-admin-spinner"></div>
-          <p className="establishment-admin-loading-text">Cargando...</p>
+          <p className="establishment-admin-loading-text">{t.establishmentAdmin.forms.loading}</p>
         </div>
       </div>
     )
   }
 
-  // Loading establishment
+  if (status === 'unauthenticated' || !session?.user) {
+    return (
+      <div className="establishment-admin-loading">
+        <div className="establishment-admin-loading-content">
+          <p className="establishment-admin-loading-text">
+            {t.establishmentAdmin.establishment.loading}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const { lang: languageCode, establishmentId } = resolvedParams
+
   if (loading) {
     return (
       <div className="admin-page">
@@ -115,7 +169,6 @@ export default function EstablishmentAdminPage() {
     )
   }
 
-  // Error state
   if (error) {
     return (
       <div className="admin-page">
@@ -131,10 +184,10 @@ export default function EstablishmentAdminPage() {
             </h1>
             <p className="establishment-admin-error-message">{error}</p>
             <button
-              onClick={() => fetchEstablishment()}
+              onClick={() => fetchEstablishment(establishmentId)}
               className="establishment-admin-error-button"
             >
-              Reintentar
+              {t.establishmentAdmin.forms.save}
             </button>
           </div>
         </div>
@@ -142,8 +195,7 @@ export default function EstablishmentAdminPage() {
     )
   }
 
-  // Si no hay sesión o establishment, no mostrar nada
-  if (!session?.user || !establishment) {
+  if (!establishment) {
     return null
   }
 

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { UITranslation } from '@/translations'
+import { UserRole } from '@/constants/enums'
 
 interface LoginPageClientProps {
   translations: UITranslation
@@ -17,7 +18,51 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const { data: session } = useSession()
   const t = translations.login
+
+  // ✅ REDIRIGIR AUTOMÁTICAMENTE DESPUÉS DEL LOGIN EXITOSO
+  useEffect(() => {
+    if (session?.user) {
+      console.log('✅ LoginPageClient: User authenticated, redirecting...', {
+        userId: session.user.id,
+        role: session.user.role,
+        establishmentId: session.user.establishmentId,
+      })
+
+      // ✅ USAR LOS VALORES CORRECTOS DEL ENUM
+      switch (session.user.role) {
+        case UserRole.establishment_admin:
+        case UserRole.waiter:
+        case UserRole.cook:
+          // ✅ Redirigir al admin del establishment del usuario
+          if (session.user.establishmentId) {
+            console.log(`🏢 Redirecting to establishment admin: ${session.user.establishmentId}`)
+            router.push(`/${lang}/admin/${session.user.establishmentId}`)
+          } else {
+            console.log('⚠️ User has no establishmentId, redirecting to home')
+            router.push(`/${lang}`)
+          }
+          break
+
+        case UserRole.general_admin:
+          // ✅ General admin puede ir a cualquier establishment o dashboard general
+          console.log('👑 General admin authenticated, redirecting to general dashboard')
+          router.push(`/${lang}/super-admin`) // O donde tengas el dashboard de super admin
+          break
+
+        case UserRole.client: // ✅ CORREGIDO: client en lugar de customer
+          // ✅ Cliente normal va a la página principal
+          console.log('👤 Client authenticated, redirecting to home')
+          router.push(`/${lang}`)
+          break
+
+        default:
+          console.log('❓ Unknown role, redirecting to home')
+          router.push(`/${lang}`)
+      }
+    }
+  }, [session, router, lang])
 
   const handleCredentialsLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,20 +73,18 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
       const result = await signIn('credentials', {
         email,
         password,
-        redirect: false,
+        redirect: false, // ✅ No auto-redirect, lo manejamos manualmente
       })
 
       if (result?.error) {
         setError(t.error.invalidCredentials)
-      } else {
-        router.push(`/${lang}`)
-        router.refresh()
+        setIsLoading(false) // ✅ Solo resetear loading si hay error
       }
+      // ✅ Si no hay error, el useEffect se encargará de la redirección
     } catch (err) {
       const message =
         err instanceof Error ? `${t.error.networkError}: ${err.message}` : t.error.networkError
       setError(message)
-    } finally {
       setIsLoading(false)
     }
   }
@@ -52,14 +95,34 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
 
     try {
       await signIn('google', {
-        callbackUrl: `/${lang}`,
+        redirect: false, // ✅ También manejar Google login manualmente
       })
+      // ✅ useEffect se encargará de la redirección
     } catch (err) {
       const message =
         err instanceof Error ? `${t.error.oauthError}: ${err.message}` : t.error.oauthError
       setError(message)
       setIsLoading(false)
     }
+  }
+
+  // ✅ Si ya está autenticado, mostrar loading mientras redirige
+  if (session?.user) {
+    return (
+      <div className="login-container">
+        <div className="login-card">
+          <div className="login-bg-card">
+            <div className="login-header">
+              <h2 className="login-title">{t.title}</h2>
+              <div className="establishment-admin-loading-content">
+                <div className="establishment-admin-spinner"></div>
+                <p className="establishment-admin-loading-text">Redirigiendo...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

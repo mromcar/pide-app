@@ -3,6 +3,9 @@ import {
   EstablishmentUpdateDTO,
   EstablishmentResponseDTO,
 } from '@/types/dtos/establishment';
+import { CategoryDTO } from '@/types/dtos/category';
+import { AllergenResponseDTO } from '@/types/dtos/allergen';
+import { ProductResponseDTO } from '@/types/dtos/product';
 import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
 import { getClientApiUrl, debugApiClient } from '@/lib/api-client';
 
@@ -255,6 +258,104 @@ async function getMyEstablishments(): Promise<EstablishmentResponseDTO[]> {
   }
 }
 
+// ✅ Interface para las categorías con productos
+interface MenuCategoryWithProducts extends CategoryDTO {
+  products: ProductResponseDTO[];
+}
+
+// ✅ Interface para la respuesta completa del menú
+interface PublicMenuDataResponse {
+  establishment: EstablishmentResponseDTO | null;
+  categories: MenuCategoryWithProducts[];
+  allergens: AllergenResponseDTO[];
+}
+
+/**
+ * Fetches complete menu data for public access (QR code access).
+ * Combines establishment info with categories, products and allergens.
+ */
+async function getPublicMenuData(establishmentId: number): Promise<PublicMenuDataResponse | null> {
+  try {
+    console.log('🔍 EstablishmentAPI: Fetching complete public menu data:', establishmentId)
+
+    const apiUrl = getClientApiUrl(`/api/menu/${establishmentId}`)
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      next: { revalidate: 300 }, // 5 minutes cache for SSR
+    })
+
+    if (response.status === 404) {
+      console.log('⚠️ EstablishmentAPI: Public menu not found:', establishmentId)
+      return null
+    }
+
+    interface ApiMenuResponse {
+      establishment?: EstablishmentResponseDTO
+      establishmentId?: number
+      establishmentName?: string
+      establishmentDescription?: string
+      address?: string
+      city?: string
+      phone1?: string
+      phone2?: string
+      website?: string
+      categories: MenuCategoryWithProducts[]
+      allergens: AllergenResponseDTO[]
+    }
+
+    const data = await handleApiResponse<ApiMenuResponse>(response)
+
+    // ✅ Usar solo campos que existen en EstablishmentResponseDTO
+    const menuData: PublicMenuDataResponse = {
+      establishment: data.establishment || {
+        establishmentId: data.establishmentId || establishmentId,
+        name: data.establishmentName || '',
+        description: data.establishmentDescription || null,
+        address: data.address || null,
+        city: data.city || null,
+        phone1: data.phone1 || null,
+        phone2: data.phone2 || null,
+        website: data.website || null,
+        acceptsOrders: true,
+        isActive: true,
+        createdAt: null,
+        updatedAt: null,
+        taxId: null,
+        postalCode: null,
+        billingBankDetails: null,
+        paymentBankDetails: null,
+        contactPerson: null,
+        categories: undefined,
+        administrators: undefined,
+      },
+      categories: data.categories || [],
+      allergens: data.allergens || [],
+    }
+
+    console.log('✅ EstablishmentAPI: Public menu data loaded:', {
+      establishment: menuData.establishment?.name,
+      categoriesCount: menuData.categories.length,
+      allergensCount: menuData.allergens.length,
+    })
+
+    return menuData
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return null
+    }
+    console.error('❌ EstablishmentAPI: Error fetching public menu data:', error)
+    throw handleCaughtError(error, ApiError, 'Failed to fetch menu data')
+  }
+}
+
+// ✅ Exportar interfaces
+export type { PublicMenuDataResponse, MenuCategoryWithProducts }
+
+/**
+ * API service exports
+ */
 export const establishmentApiService = {
   getEstablishmentPublic,
   getEstablishmentById,
@@ -264,6 +365,7 @@ export const establishmentApiService = {
   deleteEstablishment,
   toggleEstablishmentStatus,
   getMyEstablishments,
+  getPublicMenuData,
 };
 
 export {
@@ -275,4 +377,5 @@ export {
   deleteEstablishment,
   toggleEstablishmentStatus,
   getMyEstablishments,
+  getPublicMenuData,
 };

@@ -20,5 +20,22 @@ export const restaurantMenuEs: RestaurantMenuTranslations = {
   notes: 'Notas',
   productAllergens: 'Contiene alérgenos',
   // ✅ AÑADIDO: Nuevo mensaje
-  establishmentNotFound: 'Establecimiento no encontrado'
+  establishmentNotFound: 'Establecimiento no encontrado',
+
+  // ✅ NUEVAS para la interfaz móvil
+  table: 'Mesa',
+  customerName: 'Nombre del Cliente',
+  callWaiter: 'Llamar Camarero',
+  requestCutlery: 'Solicitar Cubiertos',
+  refillDrinks: 'Rellenar Bebidas',
+  otherRequests: 'Otras Solicitudes',
+  viewCart: 'Ver Carrito',
+  searchMenu: 'Buscar en el menú...',
+  toggleCategoryList: 'Alternar lista de categorías',
+  close: 'Cerrar',
+  noResultsFound: 'No se encontraron resultados',
+  tryDifferentSearch: 'Prueba con otro término de búsqueda',
+  editNameOrNumber: 'Editar nombre o número de mesa',
+  save: 'Guardar',
+  edit: 'Editar',
 }

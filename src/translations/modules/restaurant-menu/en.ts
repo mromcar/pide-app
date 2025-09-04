@@ -19,6 +19,23 @@ export const restaurantMenuEn: RestaurantMenuTranslations = {
   total: 'Total',
   notes: 'Notes',
   productAllergens: 'Contains allergens',
-  // ✅ AÑADIDO: Nuevo mensaje
-  establishmentNotFound: 'Establishment not found'
+
+  establishmentNotFound: 'Establishment not found',
+
+
+  table: 'Table',
+  customerName: 'Customer Name',
+  callWaiter: 'Call Waiter',
+  requestCutlery: 'Request Cutlery',
+  refillDrinks: 'Refill Drinks',
+  otherRequests: 'Other Requests',
+  viewCart: 'View Cart',
+  searchMenu: 'Search menu items...',
+  toggleCategoryList: 'Toggle category list',
+  close: 'Close',
+  noResultsFound: 'No results found',
+  tryDifferentSearch: 'Try a different search term',
+  editNameOrNumber: 'Edit name or table number',
+  save: 'Save',
+  edit: 'Edit',
 }

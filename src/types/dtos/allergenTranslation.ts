@@ -1,11 +1,17 @@
 import type { AllergenTranslation } from '../entities/allergenTranslation';
 
-// Ahora omite tanto 'translationId' como 'allergenId'
-export interface CreateAllergenTranslationDTO extends Omit<AllergenTranslation, 'translationId' | 'allergenId'> {}
+// ✅ DTO para crear nueva traducción
+export interface CreateAllergenTranslationDTO {
+  languageCode: string;
+  name: string;
+  description?: string | null; // ✅ CORREGIR: Permitir null como en BD
+}
 
+// ✅ DTO para actualizar traducción existente
 export interface UpdateAllergenTranslationDTO extends Partial<CreateAllergenTranslationDTO> {
   translationId?: number; // Para identificar la traducción existente al actualizar
   languageCode: string;   // Requerido para identificar o crear
 }
 
-export interface AllergenTranslationResponseDTO extends AllergenTranslation {}
+// ✅ Type alias en lugar de interface vacía
+export type AllergenTranslationResponseDTO = AllergenTranslation;

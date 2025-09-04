@@ -5,7 +5,7 @@ import { signOut, useSession } from 'next-auth/react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { LanguageCode } from '@/constants/languages'
-import type { Establishment } from '@/types/entities/establishment'
+import type { EstablishmentResponseDTO } from '@/types/dtos/establishment' // ✅ CAMBIAR a DTO
 import { UserRole } from '@/constants/enums'
 
 // ✅ Interface tipada para mejor type safety
@@ -18,7 +18,7 @@ interface MenuItem {
 interface AdminNavbarProps {
   languageCode: LanguageCode
   establishmentId: string
-  establishment?: Establishment | null
+  establishment?: EstablishmentResponseDTO | null // ✅ CAMBIAR a DTO
 }
 
 export default function AdminNavbar({
