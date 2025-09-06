@@ -55,11 +55,13 @@ export const authOptions: AuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 días
+    maxAge: 24 * 60 * 60, // 24 horas en lugar de 30 días para testing
+    updateAge: 2 * 60 * 60, // Actualizar cada 2 horas
   },
   jwt: {
-    maxAge: 30 * 24 * 60 * 60, // 30 días
+    maxAge: 24 * 60 * 60, // 24 horas para testing
   },
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
@@ -96,7 +98,9 @@ export const authOptions: AuthOptions = {
       return true;
     },
     async jwt({ token, user }: { token: JWT; user?: User }) {
+      // Solo buscar usuario en BD si es la primera vez (cuando user existe)
       if (user) {
+        console.log('🔐 JWT Callback - First time, fetching user data')
         const dbUser = await prisma.user.findUnique({
           where: { email: user.email! },
           include: { establishment: true }
@@ -108,8 +112,15 @@ export const authOptions: AuthOptions = {
           token.establishmentId = dbUser.establishmentId;
           token.name = dbUser.name;
           token.image = null;
+
+          console.log('✅ JWT Token created:', {
+            id: token.id,
+            role: token.role,
+            establishmentId: token.establishmentId
+          })
         }
       }
+      // En requests posteriores, el token ya tiene toda la info
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }) {
@@ -119,13 +130,20 @@ export const authOptions: AuthOptions = {
         session.user.establishmentId = token.establishmentId as number;
         session.user.name = token.name as string;
         session.user.image = token.image as string;
+
+        console.log('✅ Session created:', {
+          id: session.user.id,
+          role: session.user.role,
+          establishmentId: session.user.establishmentId
+        })
       }
       return session;
     }
   },
   pages: {
     signIn: getLoginUrl()
-  }
+  },
+  debug: process.env.NODE_ENV === 'development'
 };
 
 const handler = NextAuth(authOptions);

@@ -27,14 +27,17 @@ export function MenuManagement({
   const [allergens, setAllergens] = useState<AllergenResponseDTO[]>([])
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
+  // ✅ SOLO AGREGAR: Estado de error
+  const [error, setError] = useState<string | null>(null)
 
-  // Fetch categories
+  // Fetch categories - MANTENER TU CÓDIGO + agregar error handling
   const fetchCategories = useCallback(async () => {
     try {
       setLoading(true)
+      // ✅ AGREGAR: Reset error
+      setError(null)
       console.log('🔍 MenuManagement: Fetching categories for establishment:', establishmentId)
 
-      // ✅ MIGRACIÓN: Cambiar a API admin
       const response = await fetch(`/api/admin/establishments/${establishmentId}/menu/categories`)
       console.log('📊 MenuManagement: Categories response status:', response.status)
 
@@ -49,12 +52,10 @@ export function MenuManagement({
           data.categories?.length
         )
 
-        // ✅ CORRECCIÓN: Extraer categories del response de la nueva API
         const categoriesArray = Array.isArray(data.categories) ? data.categories : []
         setCategories(categoriesArray)
         console.log('🎯 MenuManagement: Categories state will be set to:', categoriesArray)
 
-        // Set first category as selected if none selected
         if (categoriesArray.length > 0 && !selectedCategoryId) {
           console.log(
             '🎯 MenuManagement: Setting first category as selected:',
@@ -66,28 +67,39 @@ export function MenuManagement({
         console.error('❌ MenuManagement: Failed to fetch categories, status:', response.status)
         const errorText = await response.text()
         console.error('❌ MenuManagement: Error response:', errorText)
+        // ✅ AGREGAR: Set error state
+        setError(
+          `${t.establishmentAdmin.messages.errors.loadingCategories || 'Error al cargar categorías'}: ${response.status}`
+        )
         setCategories([])
       }
     } catch (error) {
       console.error('🚨 MenuManagement: Error fetching categories:', error)
+      // ✅ AGREGAR: Set error state
+      setError(
+        error instanceof Error
+          ? error.message
+          : t.establishmentAdmin.messages.errors.loadingCategories || 'Error al cargar categorías'
+      )
       setCategories([])
     } finally {
       setLoading(false)
       console.log('🏁 MenuManagement: Fetch categories completed')
     }
-  }, [establishmentId, selectedCategoryId])
+  }, [establishmentId, selectedCategoryId, t])
 
-  // Fetch allergens
+  // Fetch allergens - MANTENER TU CÓDIGO
   const fetchAllergens = useCallback(async () => {
     try {
       console.log('🔍 MenuManagement: Fetching allergens')
-      // ✅ MIGRACIÓN: Cambiar a API admin para alérgenos del establishment
       const response = await fetch(`/api/admin/establishments/${establishmentId}/menu/allergens`)
       if (response.ok) {
         const data = await response.json()
         console.log('✅ MenuManagement: Allergens received:', data.allergens?.length || 0)
-        // ✅ CORRECCIÓN: Extraer allergens del response
         setAllergens(Array.isArray(data.allergens) ? data.allergens : [])
+      } else {
+        console.log('⚠️ MenuManagement: Allergens request failed, continuing without them')
+        setAllergens([])
       }
     } catch (error) {
       console.error('🚨 MenuManagement: Error fetching allergens:', error)
@@ -95,24 +107,27 @@ export function MenuManagement({
     }
   }, [establishmentId])
 
+  // MANTENER TU useEffect
   useEffect(() => {
     console.log('🚀 MenuManagement: useEffect triggered')
     fetchCategories()
     fetchAllergens()
   }, [fetchCategories, fetchAllergens])
 
-  // Debug: Log cuando categories cambie
+  // MANTENER TU debug useEffect
   useEffect(() => {
     console.log('📈 MenuManagement: Categories state changed:', categories)
     console.log('📈 MenuManagement: Categories length:', categories.length)
   }, [categories])
 
+  // MANTENER TU tabs
   const tabs = [
     { id: 'categories', name: t.establishmentAdmin.menuManagement.categories.title, icon: '📂' },
     { id: 'products', name: t.establishmentAdmin.menuManagement.products.title, icon: '🍽️' },
     { id: 'variants', name: t.establishmentAdmin.menuManagement.variants.title, icon: '🔧' },
   ]
 
+  // MANTENER TUS handlers
   const handleTabChange = (tabId: string) => {
     console.log('🔄 MenuManagement: Tab changed to:', tabId)
     onTabChange?.(tabId)
@@ -123,11 +138,36 @@ export function MenuManagement({
     setCategories(newCategories)
   }
 
+  // ✅ AGREGAR: Handler de retry
+  const handleRetry = () => {
+    fetchCategories()
+    fetchAllergens()
+  }
+
+  // MANTENER TU loading state
   if (loading) {
     console.log('⏳ MenuManagement: Rendering loading state')
     return (
       <div className="menu-management-loading">
-        <p>{t.establishmentAdmin.forms.loading}</p>
+        <div className="establishment-admin-loading-content">
+          <div className="establishment-admin-spinner"></div>
+          <p className="establishment-admin-loading-text">{t.establishmentAdmin.forms.loading}</p>
+        </div>
+      </div>
+    )
+  }
+
+  // ✅ SOLO AGREGAR: Error state
+  if (error) {
+    return (
+      <div className="menu-management-error">
+        <div className="error-content">
+          <h3>{t.establishmentAdmin.messages.errors.title || 'Error'}</h3>
+          <p>{error}</p>
+          <button onClick={handleRetry} className="btn btn-primary">
+            {t.establishmentAdmin.messages.actions.retry || 'Reintentar'}
+          </button>
+        </div>
       </div>
     )
   }
@@ -139,9 +179,10 @@ export function MenuManagement({
     activeTab
   )
 
+  // MANTENER TODO TU RENDER
   return (
     <div className="menu-management">
-      {/* Tabs */}
+      {/* Tabs - MANTENER TU CÓDIGO */}
       <div className="menu-tabs">
         {tabs.map((tab) => (
           <button
@@ -155,7 +196,7 @@ export function MenuManagement({
         ))}
       </div>
 
-      {/* Content */}
+      {/* Content - MANTENER TU CÓDIGO */}
       <div className="menu-content">
         {activeTab === 'categories' && (
           <>

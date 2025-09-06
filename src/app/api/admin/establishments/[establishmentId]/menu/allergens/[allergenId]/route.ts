@@ -20,7 +20,7 @@ export async function GET(
 ) {
   try {
     // 🔒 Autenticación requerida (solo general_admin puede gestionar alérgenos globales)
-    const session = await requireAuth([UserRole.general_admin])
+    const session = await requireAuth([UserRole.general_admin, UserRole.establishment_admin])
 
     const params = await paramsPromise
     const paramsValidation = paramsSchema.safeParse(params)

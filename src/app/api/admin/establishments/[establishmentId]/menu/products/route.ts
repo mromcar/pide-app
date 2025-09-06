@@ -11,9 +11,10 @@ const paramsSchema = z.object({
   establishmentId: z.coerce.number().int().positive(),
 })
 
+// ✅ CORRECCIÓN: Hacer que los defaults funcionen correctamente
 const queryParamsSchema = z.object({
-  page: z.coerce.number().int().positive().default(1),
-  pageSize: z.coerce.number().int().positive().max(100).default(20),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
   categoryId: z.coerce.number().int().positive().optional(),
 })
 
@@ -90,18 +91,23 @@ export async function GET(
 
     const { establishmentId } = paramsValidation.data
 
-    // Validar query parameters
+    // ✅ CORRECCIÓN: Obtener valores raw de searchParams y aplicar defaults manualmente si es necesario
     const { searchParams } = new URL(request.url)
-    const queryValidation = queryParamsSchema.safeParse({
-      page: searchParams.get('page'),
-      pageSize: searchParams.get('pageSize'),
-      categoryId: searchParams.get('categoryId'),
-    })
+    const rawQueryParams = {
+      page: searchParams.get('page') || '1',
+      pageSize: searchParams.get('pageSize') || '20',
+      categoryId: searchParams.get('categoryId') || undefined,
+    }
+
+    console.log('🔍 Raw query params:', rawQueryParams)
+
+    const queryValidation = queryParamsSchema.safeParse(rawQueryParams)
 
     if (!queryValidation.success) {
       logger.warn('[ADMIN API] Invalid query parameters for products:', {
         establishmentId,
-        searchParams: Object.fromEntries(searchParams)
+        rawQueryParams,
+        errors: queryValidation.error.issues
       })
       return jsonError(queryValidation.error.issues, 400)
     }
@@ -134,8 +140,8 @@ export async function GET(
       categoryId
     })
 
-    // Devolver array directo como en la API pública, pero con paginación
-    return jsonOk(allProducts)
+    // ✅ CORRECCIÓN: Devolver en el formato esperado por el frontend
+    return jsonOk({ products: allProducts })
   } catch (error) {
     // 🔍 Manejo especial para Response objects (de jsonError)
     if (error instanceof Response) {
@@ -240,11 +246,11 @@ export async function POST(
       userId: session.user.id
     })
 
-    // 🔒 Crear producto con auditoría - agregamos createdByUserId después de la validación
+    // 🔒 Crear producto con auditoría
     const productData = {
       ...validatedData,
       establishmentId,
-      createdByUserId: parseInt(session.user.id), // Auditoría: quién creó el producto
+      createdByUserId: parseInt(session.user.id),
     }
 
     const product = await productService.createProduct(productData)
@@ -259,7 +265,7 @@ export async function POST(
   } catch (error) {
     // 🔍 Manejo especial para Response objects (de jsonError)
     if (error instanceof Response) {
-      return error // Devolver directamente la respuesta de autenticación
+      return error
     }
 
     let establishmentIdForErrorLog = 'unknown'

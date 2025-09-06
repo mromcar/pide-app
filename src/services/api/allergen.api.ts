@@ -6,7 +6,8 @@ const API_MENU_PATH = '/api/menu';
 const API_ADMIN_PATH = '/api/admin/establishments';
 
 /**
- * Fetches all available allergens for a specific establishment (public API).
+ * Fetches all available allergens (public API).
+ * Usa el endpoint público que requiere establishmentId por consistencia
  */
 async function getAllAllergens(establishmentId: number): Promise<AllergenResponseDTO[]> {
   try {
@@ -34,6 +35,30 @@ async function getAllAllergens(establishmentId: number): Promise<AllergenRespons
 }
 
 /**
+ * Fetches allergens for admin management
+ */
+async function getAllergensForAdmin(establishmentId: number): Promise<AllergenResponseDTO[]> {
+  try {
+    console.log('🔍 AllergenAPI: Fetching allergens for admin:', establishmentId)
+
+    const apiUrl = getClientApiUrl(`${API_ADMIN_PATH}/${establishmentId}/menu/allergens`);
+
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const allergens = await handleApiResponse<AllergenResponseDTO[]>(response);
+
+    console.log('✅ AllergenAPI: Admin allergens loaded:', allergens.length)
+    return Array.isArray(allergens) ? allergens : [];
+  } catch (error) {
+    console.error('❌ AllergenAPI: Error fetching admin allergens:', error)
+    throw handleCaughtError(error, ApiError, 'Failed to fetch admin allergens');
+  }
+}
+
+/**
  * Fetches a specific allergen by ID (admin API).
  */
 async function getAllergenById(establishmentId: number, allergenId: number): Promise<AllergenResponseDTO | null> {
@@ -52,10 +77,10 @@ async function getAllergenById(establishmentId: number, allergenId: number): Pro
       return null;
     }
 
-    const allergen = await handleApiResponse<AllergenResponseDTO>(response);
+    const data = await handleApiResponse<{ allergen: AllergenResponseDTO }>(response);
 
-    console.log('✅ AllergenAPI: Allergen loaded:', allergen.name)
-    return allergen;
+    console.log('✅ AllergenAPI: Allergen loaded:', data.allergen.name)
+    return data.allergen;
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
       return null;
@@ -65,34 +90,10 @@ async function getAllergenById(establishmentId: number, allergenId: number): Pro
   }
 }
 
-/**
- * Fetches allergens used by products in a specific establishment (admin API).
- */
-async function getAllergensByEstablishment(establishmentId: number): Promise<AllergenResponseDTO[]> {
-  try {
-    console.log('🔍 AllergenAPI: Fetching establishment allergens:', establishmentId)
-
-    const apiUrl = getClientApiUrl(`${API_ADMIN_PATH}/${establishmentId}/menu/allergens`);
-
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    const allergens = await handleApiResponse<AllergenResponseDTO[]>(response);
-
-    console.log('✅ AllergenAPI: Establishment allergens loaded:', allergens.length)
-    return Array.isArray(allergens) ? allergens : [];
-  } catch (error) {
-    console.error('❌ AllergenAPI: Error fetching establishment allergens:', error)
-    throw handleCaughtError(error, ApiError, 'Failed to fetch establishment allergens');
-  }
-}
-
 export const allergenApiService = {
   getAllAllergens,
+  getAllergensForAdmin,
   getAllergenById,
-  getAllergensByEstablishment,
 };
 
-export { getAllAllergens, getAllergenById, getAllergensByEstablishment };
+export { getAllAllergens, getAllergensForAdmin, getAllergenById };
