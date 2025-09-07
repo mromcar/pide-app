@@ -1,502 +1,561 @@
- A[schema.prisma] --> B[Prisma Client]
+; ✅ ARQUITECTURA ACTUALIZADA - PIDE APP
+; Aplicación de pedidos para restaurantes con QR
+; Última actualización: 2025
+
+; =============================================================================
+; FLUJO DE DATOS PRINCIPAL
+; =============================================================================
+
+A[schema.prisma] --> B[Prisma Client]
     B --> C[Types/DTOs]
     C --> D[Zod Schemas]
     D --> E[Database Services]
     E --> F[API Routes]
     F --> G[Frontend Services]
     G --> H[React Components]
+    H --> I[Styles/UI]
 
+; =============================================================================
+; CONVENCIÓN DE CÓDIGO
+; =============================================================================
 
-Database Schema Definition
+; 📋 REGLAS DE NOMENCLATURA:
+
+; Base de datos (PostgreSQL):
+; - snake_case para tablas y columnas: order_id, user_email, establishment_id
+; - snake_case para ENUMs: 'client', 'waiter', 'cook', 'establishment_admin', 'general_admin'
+
+; Backend (Node.js/TypeScript):
+; - camelCase en TODO el código: variables, funciones, DTOs, servicios, etc.
+; - Prisma mapea automáticamente de snake_case (DB) a camelCase (código)
+; - Roles en snake_case para coherencia con DB: UserRole.establishment_admin
+
+; API Responses (Backend → Frontend):
+; - Devuelve datos en camelCase
+; - Usar camelcase-keys en backend antes de devolver datos
+; - Frontend siempre recibe camelCase
+
+; Frontend (React/TypeScript):
+; - camelCase en todo: variables, props, DTOs, hooks, componentes
+; - Roles en snake_case: session.user.role === 'establishment_admin'
+
+; CSS/Estilos:
+; - kebab-case para clases CSS: .menu-management, .admin-card, .product-grid
+; - Prefijos por funcionalidad: .admin-, .menu-, .order-, .auth-
+; - Variables CSS con doble guión: --color-primary, --spacing-md
+; - Tailwind utilities como complemento, no reemplazo
+
+; 🔄 TRANSFORMACIONES:
+; - snake_case → camelCase: En backend, después de obtener datos de DB
+; - camelCase → snake_case: Solo si backend espera datos en snake_case (POST/PUT)
+
+; Ejemplo de transformación:
+; DB: { user_id: 1, establishment_id: 2, created_at: "2025-01-01" }
+; ↓ (Backend transforma con camelcase-keys)
+; API: { userId: 1, establishmentId: 2, createdAt: "2025-01-01" }
+; ↓ (Frontend recibe)
+; Frontend: const { userId, establishmentId, createdAt } = data
+
+; =============================================================================
+; 1. DATABASE SCHEMA DEFINITION
+; =============================================================================
+
 prisma/
-└── schema.prisma      # Database schema definition
-Generated Types
+├── schema.prisma      # Definición completa del modelo de datos
+└── seed.ts           # Datos iniciales (alérgenos, roles, etc.)
+
+; Generated Types (Auto-generated)
 node_modules/
 └── .prisma/
-    └── client/       # Auto-generated Prisma types
-Type Definitions
-src/types/
-├── entities/         # Database entity types
-│   ├── order.ts
-│   ├── product.ts
-│   └── ...
-├── serialized/       # API response types
-│   ├── order.ts
-│   ├── product.ts
-│   └── ...
-└── dtos/            # Input/Request types
-    ├── order.ts
-    └── product.ts
-Zod Schemas
-src/schemas/
-├── common.ts        # Shared validation rules
-├── order.ts         # Order validation schemas
-├── product.ts       # Product validation schemas
-└── ...
-Database Services
-src/services/
-├── order-service.ts  # Order CRUD operations
-├── product-service.ts
-└── ...
-API Routes
-src/
-└── app/
-    └── api/
-        ├── orders/
-        │   ├── route.ts                # /api/orders (GET, POST)
-        │   └── [orderId]/
-        │       └── route.ts            # /api/orders/:orderId (GET, PUT, DELETE)
-        ├── products/
-        │   ├── route.ts                # /api/products (GET, POST)
-        │   └── [productId]/
-        │       └── route.ts            # /api/products/:productId
-        ├── employees/
-        │   ├── route.ts                # /api/employees (GET, POST)
-        │   └── [employeeId]/
-        │       └── route.ts            # /api/employees/:employeeId
-        ├── restaurants/
-        │   ├── route.ts                # /api/restaurants (GET, POST)
-        │   └── [restaurantId]/
-        │       └── route.ts            # /api/restaurants/:restaurantId
-        └── auth/
-            └── [...nextauth]/route.ts  # Si usas NextAuth
+    └── client/       # Tipos auto-generados por Prisma
 
+; ENUMs en la base de datos:
+; CREATE TYPE "UserRole" AS ENUM ('client', 'waiter', 'cook', 'establishment_admin', 'general_admin');
+; CREATE TYPE "OrderStatus" AS ENUM ('pending', 'preparing', 'ready', 'delivered', 'cancelled', 'completed');
 
+; =============================================================================
+; 2. STYLES & UI SYSTEM - Diseño minimalista con Tailwind
+; =============================================================================
 
+src/styles/
+├── globals.css               # Imports principales y configuración Tailwind
+├── base.css                  # Variables CSS, reset, estilos base minimalistas
+├── utilities.css             # Clases utilitarias personalizadas
+├── fonts.css                 # Configuración de fuentes
+├── admin.css                 # Estilos específicos de administración
+├── components/               # Estilos por componente
+│   ├── allergens.css        # Componentes de alérgenos (.allergen-item, .allergen-grid)
+│   ├── buttons.css          # Sistema de botones (.btn, .btn-primary, .btn-secondary)
+│   ├── cards.css            # Tarjetas reutilizables (.admin-card, .product-card)
+│   ├── cart.css             # Componentes del carrito (.cart-item, .cart-summary)
+│   ├── forms.css            # Formularios (.form-group, .form-input, .form-error)
+│   └── navigation.css       # Navegación (.admin-nav, .menu-tabs, .breadcrumb)
+└── pages/                    # Estilos específicos por página
+    ├── admin.css            # Páginas de administración (.admin-dashboard)
+    ├── checkout.css         # Proceso de pago (.checkout-step, .payment-form)
+    ├── login.css            # Login/registro (.login-form, .auth-container)
+    └── menu.css             # Vista pública del menú (.menu-grid, .category-filter)
 
-Frontend Services
-src/services/api/
-├── order-api.ts     # API client functions
-└── product-api.ts
-Frontend Components
-src/components/
-└── order/
-    ├── OrderForm.tsx
-    ├── OrderList.tsx
-    └── OrderDetail.tsx
-Data Flow Example for Creating an Order:
-Schema defines structure:
-model Order {
-  id Int @id @default(autoincrement())
-  items OrderItem[]
-  // ...other fields
-}
-Types reflect schema:
-export interface CreateOrderDTO {
-  items: CreateOrderItemDTO[]
-  notes?: string
-}
-Validation schema:
-export const createOrderSchema = z.object({
-  items: z.array(orderItemSchema),
-  notes: z.string().optional()
-})
-Database service:
-export async function createOrder(data: CreateOrderDTO): Promise<Order> {
-  return prisma.order.create({
-    data: {
-      items: { create: data.items },
-      notes: data.notes
-    }
-  })
-}
-API Route:
-export async function POST(request: Request) {
-  const data = await request.json()
-  const validatedData = createOrderSchema.parse(data)
-  const order = await createOrder(validatedData)
-  return Response.json({ order })
-}
-Frontend API service:
-export async function submitOrder(orderData: CreateOrderDTO) {
-  return fetch('/api/client/orders', {
-    method: 'POST',
-    body: JSON.stringify(orderData)
-  }).then(res => res.json())
-}
-React Component:
-export function OrderForm() {
-  async function handleSubmit(data: CreateOrderDTO) {
-    try {
-      await submitOrder(data)
-      // Show success message
-    } catch (error) {
-      // Handle error
-    }
-  }
+; 🎨 SISTEMA DE DISEÑO:
 
-  return <form onSubmit={handleSubmit}>...</form>
-}
+; Variables CSS principales (src/styles/base.css):
+; --color-primary: #000        # Negro principal
+; --color-secondary: #fff      # Blanco secundario
+; --color-text: #000          # Texto principal
+; --color-text-muted: #666    # Texto secundario
+; --color-border: #e5e7eb     # Bordes estándar
+; --spacing-xs: 0.25rem       # 4px
+; --spacing-sm: 0.5rem        # 8px
+; --spacing-md: 1rem          # 16px
+; --spacing-lg: 1.5rem        # 24px
+; --spacing-xl: 2rem          # 32px
 
+; Convenciones de clases CSS:
+; .admin-*        # Componentes de administración
+; .menu-*         # Componentes de menú
+; .order-*        # Componentes de pedidos
+; .auth-*         # Componentes de autenticación
+; .product-*      # Componentes de productos
+; .category-*     # Componentes de categorías
 
-1 Schema Prisma → Tipos TypeScript
-prisma/
-├── schema.prisma       # Define el modelo de datos
+; Uso de Tailwind:
+; - Utilities para spacing: p-4, m-2, gap-4
+; - Utilities para layout: flex, grid, w-full
+; - Utilities para responsive: sm:, md:, lg:
+; - CSS personalizado para componentes complejos
 
-Generated Types
-node_modules/
-└── .prisma/
-    └── client/       # Auto-generated Prisma types
+; Ejemplo de estructura:
+; <div className="admin-card p-6">              # CSS custom + Tailwind
+;   <div className="flex items-center gap-4">   # Solo Tailwind
+;     <h2 className="admin-card-title">...</h2>  # CSS custom
+;   </div>
+; </div>
 
-
-
-2 Tipos Personalizados y DTOs
+; =============================================================================
+; 3. TYPE DEFINITIONS - Estructura por funcionalidad
+; =============================================================================
 
 src/types/
-├── dtos/
-    ├── allergen.ts
-    └── category.ts
-    └── establishment.ts
-    ├── order.ts         # CreateOrderDTO, UpdateOrderDTO
-    └── product.ts       # CreateProductDTO, UpdateProductDTO
+├── auth.ts                    # AuthGuardProps, Session types
+├── forms.ts                   # Form-related types
+├── management.ts              # MenuManagementProps, CategoryManagementProps
+├── next-auth.d.ts            # NextAuth extensions y custom session
+├── orderConfirmation.ts       # Order confirmation types
+├── pages.ts                   # Page component types
+├── dtos/                      # Input/Request types para APIs
+│   ├── allergen.ts           # AllergenResponseDTO, CreateAllergenDTO
+│   ├── category.ts           # CategoryDTO, CreateCategoryDTO
+│   ├── establishment.ts      # EstablishmentResponseDTO, UpdateEstablishmentDTO
+│   ├── order.ts             # CreateOrderDTO, UpdateOrderStatusDTO
+│   ├── product.ts           # ProductResponseDTO, CreateProductDTO
+│   ├── user.ts              # UserResponseDTO, CreateUserDTO
+│   └── ...
+├── entities/                  # Database entity types (Prisma-derived)
+│   ├── allergen.ts           # Allergen, AllergenTranslation
+│   ├── category.ts           # Category, CategoryTranslation
+│   ├── establishment.ts      # Establishment
+│   ├── order.ts             # Order, OrderItem
+│   ├── product.ts           # Product, ProductTranslation
+│   ├── user.ts              # User
+│   └── ...
+├── serialized/                # API response types (JSON-safe)
+│   ├── allergen.ts           # SerializedAllergen
+│   ├── category.ts           # SerializedCategory
+│   ├── establishment.ts      # SerializedEstablishment
+│   ├── order.ts             # SerializedOrder
+│   ├── product.ts           # SerializedProduct
+│   └── ...
+└── errors/                    # API error types específicos
+    ├── category.api.error.ts
+    ├── order.api.error.ts
+    ├── product.api.error.ts
+    └── ...
 
-
-├── entities/
-│   ├── allergen.ts      # Allergen y AllergenTranslation
-│   ├── category.ts      # Category y CategoryTranslation
-│   ├── establishement.ts      # Category y CategoryTranslation
-│   ├── order.ts       #  Order y OrderItem
-│   ├── product.ts       # Product y ProductTranslation
-│   ├── user.ts       # Product y ProductTranslation
-├── serialized/
-│   ├── category.ts      # SerializedCategory
-│   └── order.ts         # SerializedOrder
-│   ├── product.ts       # SerializedProduct
-
-├── enums.ts             # UserRole, OrderStatus, etc.
-
-
-
- import { Prisma } from '@prisma/client'
-
-// Tipos derivados de Prisma
-export type Category = Prisma.CategoryGetPayload<{
-  include: { /* ... */ }
-}>
-
-// Tipos serializados para el frontend
-export interface SerializedCategory {
-  // ...
-}
-3 Validación con Zod
+; =============================================================================
+; 4. ZOD SCHEMAS - Validación de datos
+; =============================================================================
 
 src/schemas/
-    ├── allergen.ts
-    ├── category.ts
-    ├── common.ts
-    ├── order.ts
-    ├── product.ts
+├── common.ts        # Reglas de validación compartidas
+├── allergen.ts      # Validación de alérgenos
+├── category.ts      # Validación de categorías
+├── order.ts         # CreateOrderSchema, UpdateOrderStatusSchema
+├── product.ts       # CreateProductSchema, UpdateProductSchema
+├── user.ts          # CreateUserSchema, UpdateUserSchema
+└── ...
 
-import { z } from 'zod'
-import { OrderStatus } from '@prisma/client'
+; Ejemplo de uso:
+; export const CreateOrderSchema = z.object({
+;   establishmentId: z.number(),  // ← camelCase en validación
+;   items: z.array(orderItemSchema),
+;   notes: z.string().optional()
+; })
 
-export const CreateOrderSchema = z.object({
-  establishment_id: z.number(),
-  items: z.array(z.object({
-    variant_id: z.number(),
-    quantity: z.number().positive(),
-    notes: z.string().optional()
-  })),
-  notes: z.string().optional()
-})
+; =============================================================================
+; 5. DATABASE SERVICES - Lógica de negocio (Classes)
+; =============================================================================
 
-4 Servicios de Base de Datos
 src/services/
-    ├── allergen-services.ts
-    ├── category-services.ts
-    ├── common-services.ts
-    ├── order-services.ts
-    ├── product-services.ts
+├── user.service.ts          # UserService class con CRUD
+├── allergen.service.ts      # AllergenService class
+├── category.service.ts      # CategoryService class
+├── establishment.service.ts # EstablishmentService class
+├── order.service.ts         # OrderService class
+├── product.service.ts       # ProductService class
+└── ...
 
+; Ejemplo de estructura:
+; export class OrderService {
+;   static async createOrder(data: CreateOrderDTO): Promise<Order>
+;   static async getOrdersByEstablishment(establishmentId: number)
+;   static async updateOrderStatus(orderId: number, status: OrderStatus)
+; }
 
-import { prisma } from '@/lib/prisma'
-import type { CreateOrderDTO } from '@/types/dtos'
-
-export async function createOrder(data: CreateOrderDTO) {
-  return await prisma.order.create({
-    data: {
-      // ...
-    }
-  })
-}
-
-5 API Routes
-import { CreateOrderSchema } from '@/schemas/menu'
-import { createOrder } from '@/services/menu-services'
-
-export async function POST(request: Request) {
-  const data = await request.json()
-  const validatedData = CreateOrderSchema.parse(data)
-  const order = await createOrder(validatedData)
-  // ...
-}
+; =============================================================================
+; 6. API ROUTES - Endpoints organizados por funcionalidad
+; =============================================================================
 
 src/app/api/
 ├── auth/
 │   └── [...nextauth]/
-│       └── route.ts
-├── menu/                           # Group menu-related endpoints
-│   ├── categories/
-│   │   ├── route.ts               # GET, POST categories
-│   │   └── [categoryId]/
-│   │       └── route.ts           # PUT, DELETE category
-│   ├── products/
-│   │   ├── route.ts
-│   │   └── [productId]/
-│   │       └── route.ts
-│   ├── variants/
-│   │   ├── route.ts
-│   │   └── [variantId]/
-│   │       └── route.ts
-│   └── allergens/
-│       ├── route.ts
-│       └── [allergenId]/
-│           └── route.ts
-└── orders/                        # Group order-related endpoints
-    ├── client/
-    │   ├── route.ts              # POST new order
-    │   └── [orderId]/
-    │       └── route.ts          # GET order status
-    └── employee/
-        ├── route.ts              # GET all orders, filtered
-        └── [orderId]/
-            └── route.ts          # PATCH update status
+│       └── route.ts           # NextAuth configuration
+├── admin/                     # 🔒 Admin-only endpoints (requieren autenticación)
+│   └── establishments/
+│       └── [establishmentId]/
+│           ├── route.ts       # Admin establishment management
+│           └── menu/
+│               ├── allergens/
+│               │   ├── route.ts         # GET, POST allergens (admin)
+│               │   └── [allergenId]/
+│               │       └── route.ts     # GET, PUT, DELETE allergen
+│               ├── categories/
+│               │   ├── route.ts         # GET, POST categories (admin)
+│               │   └── [categoryId]/
+│               │       └── route.ts     # GET, PUT, DELETE category
+│               ├── products/
+│               │   ├── route.ts         # GET, POST products (admin)
+│               │   └── [productId]/
+│               │       └── route.ts     # GET, PUT, DELETE product
+│               └── variants/
+│                   ├── route.ts         # GET, POST variants (admin)
+│                   └── [variantId]/
+│                       └── route.ts     # GET, PUT, DELETE variant
+├── menu/                      # 🌐 Public menu endpoints (sin autenticación)
+│   └── [establishmentId]/
+│       ├── route.ts           # Menu overview
+│       ├── allergens/
+│       │   └── route.ts       # GET allergens (public)
+│       ├── categories/
+│       │   └── route.ts       # GET categories (public)
+│       ├── products/
+│       │   └── route.ts       # GET products (public)
+│       └── variants/
+│           └── route.ts       # GET variants (public)
+├── orders/                    # 📦 Order management
+│   ├── route.ts               # POST create order (client)
+│   └── [orderId]/
+│       └── route.ts           # GET order details/status
+└── super-admin/               # 👑 Super admin endpoints
+    ├── allergens/
+    │   └── route.ts
+    ├── establishments/
+    │   ├── route.ts
+    │   └── [id]/
+    │       └── route.ts
+    └── users/
+        ├── route.ts
+        └── [id]/
+            └── route.ts
 
-src/
-├── utils/
-│   └── api-responses.ts           # API response utilities
-├── middleware/
-│   └── auth-middleware.ts         # Authentication middleware
-└── app/
-    └── api/
-        ├── menu/
-        │   └── categories/
-        │       └── route.ts       # Categories API endpoints
-        └── orders/
-            └── employee/
-                └── [orderId]/
-                    └── route.ts   # Employee order endpoints
+; =============================================================================
+; 7. FRONTEND API SERVICES - Cliente API
+; =============================================================================
 
+src/services/api/              # API client functions
+├── allergen.api.ts           # getAllAllergens, getAllergensForAdmin
+├── category.api.ts           # getAllCategoriesByEstablishment, createCategory
+├── establishment.api.ts      # getEstablishmentById, updateEstablishment
+├── order.api.ts             # createClientOrder, getOrdersByEstablishment
+├── product.api.ts           # getProductsByCategory, createProduct
+└── user.api.ts              # createUser, getUserById
 
-6 Frontend Services
-import type { CreateOrderDTO } from '@/types/dtos'
+; Ejemplo:
+; export async function createClientOrder(orderData: CreateOrderDTO) {
+;   const response = await fetch('/api/orders', {
+;     method: 'POST',
+;     body: JSON.stringify(orderData)  // ← datos en camelCase
+;   })
+;   return response.json()
+; }
 
-export async function submitOrder(orderData: CreateOrderDTO) {
-  const response = await fetch('/api/menu', {
-    method: 'POST',
-    body: JSON.stringify(orderData)
-  })
-  return response.json()
-}
+; =============================================================================
+; 8. FRONTEND PAGES - Rutas internacionalizadas
+; =============================================================================
 
-7 Componentes React
-'use client'
-import { submitOrder } from '@/services/api'
-import type { CreateOrderDTO } from '@/types/dtos'
+src/app/[lang]/               # Routing internacionalizado
+├── layout.tsx               # Layout principal con providers
+├── page.tsx                 # Home page
+├── admin/                   # 🔒 Panel de administración
+│   └── [establishmentId]/
+│       ├── page.tsx         # Dashboard de admin
+│       ├── employees/
+│       │   └── page.tsx     # Gestión de empleados
+│       └── menu/
+│           └── page.tsx     # 🎯 Gestión de menú (MenuManagement)
+├── cart/
+│   └── page.tsx             # Carrito de compra
+├── login/
+│   ├── page.tsx
+│   └── LoginPageClient.tsx  # Componente cliente de login
+├── menu/                    # 🌐 Vista pública del menú
+│   └── [establishmentId]/
+│       └── page.tsx         # Menu del cliente (QR scan)
+├── order/
+│   └── [orderId]/
+│       ├── page.tsx         # Detalles del pedido
+│       └── track/
+│           └── page.tsx     # Seguimiento del pedido
+└── register/
+    ├── page.tsx
+    └── RegisterPageClient.tsx
 
-export function OrderForm() {
-  async function handleSubmit(data: CreateOrderDTO) {
-    await submitOrder(data)
-  }
-  // ...
-}
+; =============================================================================
+; 9. REACT COMPONENTS - Organizados por funcionalidad
+; =============================================================================
 
+src/components/
+├── admin/                    # Componentes específicos de admin
+│   └── AdminNavbar.tsx
+├── auth/                     # Componentes de autenticación
+│   └── AuthGuard.tsx        # Protección de rutas
+├── management/               # 🎯 Componentes de gestión (NUEVOS)
+│   ├── MenuManagement.tsx   # Gestión principal del menú
+│   ├── CategoryManagement.tsx # Gestión de categorías
+│   ├── ProductManagement.tsx  # Gestión de productos
+│   └── VariantManagement.tsx  # Gestión de variantes
+├── order/                    # Componentes de pedidos
+│   ├── OrderForm.tsx        # Formulario de pedido (cliente)
+│   ├── OrderList.tsx        # Lista de pedidos (empleados)
+│   ├── OrderCard.tsx        # Tarjeta individual de pedido
+│   └── OrderFilters.tsx     # Filtros para empleados
+└── ...
 
+; =============================================================================
+; 10. TRANSLATIONS - Sistema de internacionalización
+; =============================================================================
 
+src/translations/
+├── modules/
+│   └── admin/
+│       ├── index.ts         # Exportaciones principales
+│       ├── en.ts           # Traducciones inglés admin
+│       ├── es.ts           # Traducciones español admin
+│       └── fr.ts           # Traducciones francés admin
+└── types/
+    └── admin.ts            # Tipos de traducciones admin
 
+; Estructura de traducciones:
+; {
+;   establishmentAdmin: {
+;     menuManagement: {
+;       title: "...",
+;       categories: { title: "..." },
+;       products: { title: "..." }
+;     },
+;     messages: {
+;       error: { title: "Error", loadingFailed: "..." },
+;       success: { categoryCreated: "..." }
+;     }
+;   }
+; }
 
-Estructura de Tipos y Modelos:
+; =============================================================================
+; 11. FLUJOS DE DATOS PRINCIPALES
+; =============================================================================
 
-src/types/
-├── menu.ts            # Definiciones de tipos para todo el menú y entidades
+; FLUJO 1: Gestión de Menú (Admin) - ✅ CORREGIDO
+; Administrador (establishment_admin/general_admin) accede a: /es/admin/1/menu
+; ↓
+; Middleware verifica: session.user.role in ['waiter', 'cook', 'establishment_admin', 'general_admin']
+; ↓
+; MenuManagement.tsx se carga (clases: .menu-management, .admin-card)
+; ↓
+; Fetch categories: /api/admin/establishments/1/menu/categories
+; Fetch allergens: /api/admin/establishments/1/menu/allergens
+; ↓
+; Backend transforma snake_case → camelCase antes de responder
+; ↓
+; category.service.ts maneja la lógica de BD
+; ↓
+; Datos mostrados en CategoryManagement/ProductManagement (.category-grid, .product-card)
 
-API Routes (Backend)
-src/app/api/
-├── auth/
-│   └── [...nextauth]/     # Configuración de autenticación
-├── products/
-│   └── route.ts           # API endpoints para productos
-├── categories/
-│   └── route.ts           # API endpoints para categorías
-└── orders/
-    └── route.ts           # API endpoints para pedidos
+; FLUJO 2: Vista de Menú (Cliente QR)
+; Cliente (role: 'client') escanea QR: /es/menu/1
+; ↓
+; Página pública de menú (sin autenticación requerida) (.menu-grid, .category-filter)
+; ↓
+; Fetch menu: /api/menu/1/categories, /api/menu/1/products
+; ↓
+; Servicios públicos (sin autenticación)
+; ↓
+; Backend transforma datos a camelCase
+; ↓
+; Datos mostrados al cliente (.product-card, .allergen-item)
 
-Componentes de la UI (Frontend)
-src/app/restaurant/[id]/menu/components/
-├── CategoryList.tsx       # Lista de categorías
-├── ProductList.tsx        # Lista de productos
-├── ProductModal.tsx       # Modal de detalles del producto
-├── LanguageSelector.tsx   # Selector de idioma
-├── OrderSummary.tsx       # Resumen del pedido
-└── OrderHistory.tsx       # Historial de pedidos
+; FLUJO 3: Crear Pedido (Cliente)
+; Cliente selecciona productos en /es/menu/1
+; ↓
+; OrderForm.tsx recopila datos del carrito (camelCase) (.cart-item, .cart-summary)
+; ↓
+; POST /api/orders con CreateOrderDTO (camelCase)
+; ↓
+; Backend recibe camelCase, puede transformar a snake_case si necesario
+; ↓
+; order.service.ts crea pedido en BD
+; ↓
+; Confirmación al cliente (datos en camelCase) (.order-confirmation)
 
+; FLUJO 4: Gestión de Pedidos (Empleados)
+; Empleado (waiter/cook) accede a dashboard de pedidos
+; ↓
+; Middleware verifica: session.user.role in ['waiter', 'cook', 'establishment_admin']
+; ↓
+; GET /api/admin/establishments/1/orders (con filtros)
+; ↓
+; order.service.ts obtiene pedidos del establecimiento
+; ↓
+; Backend transforma datos a camelCase
+; ↓
+; OrderList.tsx muestra pedidos (.order-list, .order-card)
+; ↓
+; Empleado puede cambiar estado via PATCH /api/orders/[orderId]
 
-Servicios y Utilidades
-src/services/
-└── menu-services.ts       # Servicios para interactuar con la API
+; FLUJO 5: Roles y Permisos
+; Base de datos: user.role = 'establishment_admin' (snake_case)
+; ↓
+; Session: session.user.role = 'establishment_admin' (mantiene snake_case)
+; ↓
+; Frontend: if (session.user.role === 'establishment_admin') { ... }
+; ↓
+; Middleware: allowedRoles.includes(session.user.role as UserRole)
 
-src/utils/
-├── serializers.ts         # Funciones para serializar datos
-└── translations.ts        # Utilidades para traducciones
+; =============================================================================
+; 12. ARCHIVOS CLAVE PARA DESARROLLO DIARIO
+; =============================================================================
+
+; Más utilizados día a día:
+; 1. src/types/management.ts - Tipos de componentes de gestión
+; 2. src/components/management/ - Componentes de administración
+; 3. src/services/*.service.ts - Lógica de negocio
+; 4. src/translations/modules/admin/ - Traducciones de admin
+; 5. schema.prisma - Estructura de BD
+; 6. src/styles/admin.css - Estilos de administración
+; 7. src/styles/components/ - Estilos por componente
+
+; Para nuevas características:
+; 8. src/schemas/ - Validación de datos
+; 9. src/app/api/ - Endpoints API
+; 10. src/services/api/ - Cliente API
+; 11. src/styles/pages/ - Estilos específicos de página
+
+; =============================================================================
+; 13. CONFIGURACIÓN Y UTILIDADES
+; =============================================================================
 
 src/lib/
-└── prisma.ts             # Configuración del cliente Prisma
+├── prisma.ts             # Cliente Prisma (singleton)
+├── api-client.ts         # Configuración cliente API
+└── logger.ts            # Sistema de logging
 
+src/utils/
+├── apiUtils.ts          # Utilidades para APIs
+├── serializers.ts       # Funciones de serialización
+├── translations.ts      # Utilidades de traducciones
+└── camelcaseKeys.ts     # Transformación snake_case ↔ camelCase
 
-Configuración y Base de Datos
-prisma/
-├── schema.prisma         # Esquema de la base de datos
-└── seed.ts              # Datos iniciales
+src/middleware/
+└── auth-middleware.ts   # Middleware de autenticación
 
+; Configuración raíz:
 .env                     # Variables de entorno
-
-
-Estilos
-src/styles/
-├── components.css       # Estilos de componentes
-└── fonts.css           # Configuración de fuentes
-
-src/app/
-└── globals.css         # Estilos globales
-
-Archivos de Configuración
+next.config.js          # Configuración Next.js
+tailwind.config.js      # Configuración Tailwind CSS
+tsconfig.json           # Configuración TypeScript
 package.json            # Dependencias y scripts
-tailwind.config.js      # Configuración de Tailwind CSS
-next.config.js         # Configuración de Next.js
-tsconfig.json          # Configuración de TypeScript
 
+; =============================================================================
+; 14. CONFIGURACIÓN TAILWIND Y SISTEMA DE DISEÑO
+; =============================================================================
 
-Los archivos más importantes para el desarrollo diario son:
+; tailwind.config.js - Configuración extendida:
+; module.exports = {
+;   content: ['./src/**/*.{js,ts,jsx,tsx}'],
+;   theme: {
+;     extend: {
+;       colors: {
+;         primary: '#000',
+;         secondary: '#fff',
+;         muted: '#666',
+;         border: '#e5e7eb'
+;       },
+;       spacing: {
+;         '18': '4.5rem',
+;         '88': '22rem'
+;       }
+;     }
+;   }
+; }
 
-menu.ts para los tipos
-Los componentes en components
-menu-services.ts para la lógica de negocio
-schema.prisma para la estructura de la base de datos
+; Estrategia de estilos:
+; 1. Variables CSS para valores que cambian (colores, espaciados)
+; 2. Tailwind para utilities rápidas (flex, grid, responsive)
+; 3. CSS personalizado para componentes complejos
+; 4. Prefijos por funcionalidad para evitar conflictos
 
+; Ejemplo de uso combinado:
+; <div className="admin-card p-6 bg-white border border-gray-200 rounded-lg">
+;   <h2 className="admin-card-title text-xl font-semibold mb-4">...</h2>
+;   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+;     <div className="product-card">...</div>
+;   </div>
+; </div>
 
-Recapitulando los archivos y su propósito:
-src/lib/prisma.ts: (Ya existente y recomendado) Tu cliente de Prisma, configurado como un singleton para una gestión eficiente de la base de datos.
-src/types/dtos.ts: (Nuevo) Donde defines la estructura de los datos que tu API espera recibir en las peticiones (CreateOrderDTO para crear pedidos, UpdateOrderStatusDTO para cambiar estados, etc.).
-src/app/api/employees/orders/route.ts: (Modificado) Este GET es para que los empleados vean todos los pedidos de su establecimiento, con filtros opcionales por estado o tipo.
-src/app/api/employees/orders/[orderId]/route.ts: (Nuevo) Este GET es para que los empleados vean los detalles de un pedido específico de su establecimiento.
-src/app/api/client/orders/route.ts: (Nuevo) Este POST es para que los clientes puedan crear un nuevo pedido.
+; =============================================================================
+; 15. CARACTERÍSTICAS ARQUITECTÓNICAS PRINCIPALES
+; =============================================================================
 
-src/app/: Esta es la carpeta principal para las páginas de tu aplicación Next.js.
+; ✅ Separación Admin/Public APIs - Endpoints diferenciados por roles
+; ✅ Internacionalización completa - Rutas con [lang] y traducciones
+; ✅ Gestión de componentes - Separación clara por funcionalidad
+; ✅ Servicios tipados - Classes con métodos específicos
+; ✅ Middleware de auth - Protección automática de rutas
+; ✅ Validación con Zod - Esquemas de validación en tiempo de ejecución
+; ✅ Sistema de traducciones - Soporte multiidioma completo
+; ✅ Convenciones de código consistentes - snake_case (DB) ↔ camelCase (código)
+; ✅ Control de acceso granular - Roles específicos por funcionalidad
+; ✅ Sistema de diseño híbrido - CSS personalizado + Tailwind utilities
+; ✅ Estilos organizados - Por componente y funcionalidad
+; ✅ Diseño minimalista - Variables CSS consistentes
+; ✅ Arquitectura escalable - Fácil agregar nuevas funcionalidades
 
+; =============================================================================
+; 16. ROLES Y PERMISOS POR FUNCIONALIDAD
+; =============================================================================
 
-restaurant/[id]/order/page.tsx: Esto es perfecto para el cliente que escanea el QR. La ruta sería algo como /restaurant/123/order, donde 123 es el id del establecimiento. En esta página, el cliente podría ver el menú de ese restaurante específico y realizar su pedido. Es la experiencia principal para el cliente que viene del QR.
-dashboard/orders/page.tsx: Esto es ideal para los empleados (camareros, cocineros, administradores de establecimiento). Sería su panel principal para ver y gestionar los pedidos. Aquí es donde usarían la API de employees/orders que hemos creado.
-src/components/: Un lugar centralizado para tus componentes reutilizables.
+; 🔐 ROLES DISPONIBLES:
+; - 'client': Solo acceso público (menú, pedidos propios)
+; - 'waiter': Gestión de pedidos, vista de menú admin
+; - 'cook': Gestión de pedidos (cocina), vista de menú admin
+; - 'establishment_admin': Gestión completa del establecimiento
+; - 'general_admin': Acceso completo al sistema
 
+; 📋 PERMISOS POR ENDPOINT:
+; /api/menu/* - Público (todos los roles)
+; /api/orders (POST) - 'client' para crear, resto para gestionar
+; /api/admin/establishments/*/menu/* - ['waiter', 'cook', 'establishment_admin', 'general_admin']
+; /api/admin/establishments/*/employees/* - ['establishment_admin', 'general_admin']
+; /api/super-admin/* - Solo 'general_admin'
 
-order/: Agrupar los componentes relacionados con los pedidos aquí es muy lógico.
-OrderForm.tsx: Podría ser el formulario que los clientes usan para seleccionar productos y enviar su pedido.
-OrderList.tsx: Un componente para mostrar una lista de pedidos, utilizado tanto en el dashboard/orders (para empleados) como posiblemente en la página de un cliente para ver el estado de su pedido.
-OrderFilters.tsx: Para que los empleados puedan filtrar pedidos por estado, tipo, etc.
-src/services/: Una capa dedicada a interactuar con tus APIs de backend.
-
-
-orderServices.ts: Esto es crucial. Aquí pondrías funciones que se encarguen de hacer las llamadas a tus endpoints de la API. Por ejemplo:
-WorkspaceClientMenu(establishmentId: number, lang: string): Para obtener la carta de un restaurante.
-createClientOrder(orderData: CreateOrderDTO): Para enviar un nuevo pedido desde el cliente.
-WorkspaceEmployeeOrders(establishmentId: number, filters?: OrderFilters): Para que los empleados obtengan la lista de pedidos.
-WorkspaceEmployeeOrderDetails(orderId: number): Para que los empleados vean un pedido específico.
-updateOrderStatus(orderId: number, newStatus: UpdateOrderStatusDTO): Para que los empleados cambien el estado de un pedido. Mantener esta lógica en services hace que tus componentes de página (page.tsx) sean más limpios y se centren solo en la UI.
-src/types/: Donde defines tus tipos TypeScript.
-
-
-dtos.ts: Ya hemos hablado de este. Es donde viven tus DTOs para las peticiones y respuestas de la API.
-
-
-¡Claro que sí! Con gusto te hago un resumen completo de los archivos clave que hemos creado y modificado, explicando su propósito y cómo encajan en tu aplicación.
-
-Resumen de Archivos Clave
-Aquí tienes un desglose de los archivos importantes y su función en tu proyecto:
-1. src/types/dtos.ts (Modificado)
-Función: Este archivo ahora contiene la definición de los esquemas de validación de datos usando la librería Zod. En lugar de solo tipos de TypeScript, tenemos objetos z.object() que describen la estructura y las reglas de tus datos para solicitudes de API.
-Funcionamiento:
-CreateOrderItemSchema: Define cómo debe lucir un ítem individual dentro de un pedido al crearlo.
-CreateOrderSchema: Define la estructura completa de un nuevo pedido que un cliente enviaría a tu API.
-UpdateOrderStatusSchema: Define la estructura de los datos para actualizar el estado de un pedido, usado por los empleados.
-Zod y Tipado: De estos esquemas de Zod, se infieren automáticamente los tipos de TypeScript (ej. CreateOrderDTO), lo que te asegura que tus datos son válidos tanto en tiempo de ejecución (con Zod) como en tiempo de compilación (con TypeScript).
-2. src/lib/prisma.ts (Existente - Mencionado)
-Función: Este archivo es donde configuras e inicializas tu cliente Prisma. Es la conexión principal entre tu aplicación y la base de datos.
-Funcionamiento: Exporta una instancia de PrismaClient que se utiliza en todas tus rutas de API para interactuar con la base de datos (realizar consultas, mutaciones, etc.).
-3. src/app/api/auth/[...nextauth]/route.ts (Existente - Mencionado)
-Función: Contiene la configuración de NextAuth.js para la autenticación en tu aplicación. Define proveedores de autenticación, callbacks de sesión, etc.
-Funcionamiento: Esencial para proteger tus rutas de API de empleados y asegurar que solo los usuarios autorizados (con roles específicos como 'waiter', 'cook', 'establishment_admin') puedan acceder a ciertos recursos.
-4. src/store/orderStore.ts (Nuevo - Si usas Zustand/similar)
-Función: Si optaste por una solución de gestión de estado global como Zustand para el carrito de compra (como se sugirió), este archivo define tu store central.
-Funcionamiento: Provee el estado del carrito (cartItems) y las acciones para manipularlo (addToCart, removeFromCart, clearCart, etc.) a cualquier componente que use el hook useOrderStore(), sin necesidad de Prop Drilling o un Context Provider manual.
-5. Rutas de API en src/app/api/ (Modificadas)
-src/app/api/client/orders/route.ts (Modificado POST)
-
-
-Función: Es el endpoint al que los clientes envían sus nuevos pedidos.
-Funcionamiento: Recibe una solicitud POST, valida su cuerpo utilizando el CreateOrderSchema de Zod. Si la validación es exitosa, crea el pedido y sus ítems asociados en la base de datos a través de Prisma y devuelve el pedido creado.
-src/app/api/employees/orders/route.ts (Modificado GET)
-
-
-Función: Es el endpoint para que los empleados consulten la lista de pedidos de su establecimiento.
-Funcionamiento: Requiere autenticación de empleado. Permite filtrar pedidos por status y orderType mediante parámetros de URL. Realiza una consulta a la base de datos incluyendo detalles de ítems, productos, variantes, alérgenos y traducciones para el idioma especificado. Los datos Decimal de Prisma se serializan a number para la respuesta JSON.
-src/app/api/employees/orders/[orderId]/route.ts (Modificado PATCH)
-
-
-Función: Permite a los empleados actualizar el estado de un pedido específico.
-Funcionamiento: Requiere autenticación de empleado y valida que el orderId sea válido y que el pedido pertenezca al establecimiento del empleado. El cuerpo de la solicitud se valida con UpdateOrderStatusSchema de Zod. Actualiza el estado del pedido en la base de datos y añade un registro al historial de estados, devolviendo el pedido actualizado.
-6. Componentes React en src/components/order/ (Nuevos/Modificados)
-src/components/order/OrderForm.tsx (Modificado)
-
-
-Función: Es el formulario que usa el cliente para enviar su pedido.
-Funcionamiento: Recopila el número de mesa, notas y el método de pago. Utiliza el useOrderStore (Zustand) para acceder a los ítems del carrito. Al enviar, llama a createClientOrder (tu servicio) y maneja los estados de carga, éxito y error.
-src/components/order/OrderList.tsx (Nuevo)
-
-
-Función: Muestra una lista de pedidos. Diseñado para el dashboard de empleados.
-Funcionamiento: Recibe una array de orders como prop y renderiza un OrderCard para cada uno. También recibe una función onOrderUpdate que se usa para refrescar la lista después de que un pedido sea modificado.
-src/components/order/OrderCard.tsx (Nuevo - Auxiliar)
-
-
-Función: Muestra los detalles de un solo pedido en el dashboard de empleados y permite cambiar su estado.
-Funcionamiento: Recibe un objeto order y onUpdate. Muestra información detallada del pedido, ítems, traducciones y un selector para que el empleado cambie el estado del pedido, llamando a updateOrderStatus de tus servicios.
-src/components/order/OrderFilters.tsx (Nuevo)
-
-
-Función: Provee controles de interfaz de usuario para filtrar los pedidos en el dashboard de empleados.
-Funcionamiento: Permite filtrar por estado y tipo de pedido. Cuando los filtros cambian, llama a una función onFiltersChange (proporcionada por useOrders en la página del dashboard) para actualizar la lista de pedidos.
-7. src/hooks/useOrders.ts (Nuevo)
-Función: Un hook personalizado para la página del dashboard de empleados (OrdersPage.tsx) para gestionar la lógica de carga de pedidos.
-Funcionamiento: Encapsula la lógica de WorkspaceEmployeeOrders (llamada a la API), maneja los estados de loading, error y orders. También gestiona los filtros que se aplican a la API y expone una función updateFilters para que OrderFilters pueda cambiar el estado de los filtros y recargar los pedidos.
-8. src/services/orderServices.ts (Existente - Mencionado)
-Función: Este archivo contendría las funciones del lado del cliente para interactuar con tus APIs de pedidos.
-Funcionamiento: Aquí definirías funciones como createClientOrder(orderData) (que llamaría a POST /api/client/orders) y updateOrderStatus(orderId, statusData) (que llamaría a PATCH /api/employees/orders/[orderId]), y WorkspaceEmployeeOrders(establishmentId, filters) (que llamaría a GET /api/employees/orders).
-¿Qué necesitaría para poder acceder al menú de un restaurante en concreto?
-Para que un cliente (o cualquier usuario) pueda acceder al menú de un restaurante en concreto, necesitas:
-Una ruta de página en el frontend:
-
-
-Lo más común es tener una ruta dinámica como: src/app/restaurant/[id]/page.tsx o src/app/restaurant/[id]/menu/page.tsx.
-El [id] en la ruta de Next.js te permitirá capturar el ID del restaurante de la URL (ej., /restaurant/123).
-Un componente para mostrar el menú:
-
-
-Necesitarías un componente que reciba el establishmentId (el ID del restaurante) y sea responsable de cargar y mostrar sus productos y categorías. Por ejemplo: src/components/product/ProductList.tsx.
-Un servicio de API para obtener el menú:
-
-
-Tendrías un endpoint de API (por ejemplo: src/app/api/client/menu/[establishmentId]/route.ts) que reciba el ID del restaurante y devuelva sus productos, variantes, alérgenos y traducciones. Este endpoint no necesitaría autenticación, ya que es para clientes públicos.
-El servicio de frontend (src/services/productServices.ts) llamaría a este endpoint.
-Lógica en la página para cargar el menú:
-
-
-Dentro de src/app/restaurant/[id]/menu/page.tsx (o donde decidas mostrar el menú), usarías un hook de React (useEffect o un hook personalizado) para llamar a tu servicio de API y obtener los datos del menú basándote en el establishmentId de la URL.
-En resumen, el flujo sería:
-El usuario navega a /restaurant/123/menu.
-La página src/app/restaurant/[id]/menu/page.tsx se renderiza.
-Esta página extrae el id (123) de la URL.
-Un hook en la página o en un componente hijo llama a WorkspaceMenu(123) (función en src/services/productServices.ts).
-WorkspaceMenu hace una solicitud GET a /api/client/menu/123.
-La API consulta la base de datos a través de Prisma y devuelve los datos del menú.
-Los datos se muestran en el componente ProductList.
-
+; =============================================================================
+; FIN DE ARQUITECTURA
+; =============================================================================

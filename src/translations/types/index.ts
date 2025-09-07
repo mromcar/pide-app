@@ -10,7 +10,7 @@ import type { NavbarTranslations, MainMenuTranslations, RedirectTranslations } f
 import type { CartTranslations, CheckoutTranslations, OrderSummaryTranslations, OrderConfirmationTranslations, OrderStatusTranslations } from './orders'
 import type { RestaurantMenuTranslations } from './restaurant-menu'
 import type { LoginTranslations } from './auth'
-import type { EstablishmentAdminTranslations } from './admin'
+import type { EstablishmentAdminPanelTranslations } from './admin'
 import type { RegisterTranslations } from './register'
 
 export interface UITranslation {
@@ -41,7 +41,7 @@ export interface UITranslation {
   orderStatus: OrderStatusTranslations
   login: LoginTranslations
   register: RegisterTranslations
-  establishmentAdmin: EstablishmentAdminTranslations
+  establishmentAdmin: EstablishmentAdminPanelTranslations
   mainMenu: MainMenuTranslations
   redirect: RedirectTranslations
 }

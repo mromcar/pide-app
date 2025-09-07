@@ -36,6 +36,6 @@ export function buildTranslations(lang: string): UITranslation {
     orderConfirmation: orders.orderConfirmation,
     orderStatus: orders.orderStatus,
 
-    establishmentAdmin: admin
+    establishmentAdmin: admin.establishmentAdmin
   }
 }

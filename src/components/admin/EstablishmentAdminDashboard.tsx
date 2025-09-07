@@ -3,6 +3,7 @@
 import { useTranslation } from '@/hooks/useTranslation'
 import { LanguageCode } from '@/constants/languages'
 import { EstablishmentResponseDTO } from '@/types/dtos/establishment'
+import Link from 'next/link'
 
 interface EstablishmentAdminDashboardProps {
   establishment: EstablishmentResponseDTO | null
@@ -50,27 +51,27 @@ export function EstablishmentAdminDashboard({
         <div className="dashboard-quick-actions">
           <h3 className="dashboard-section-title">{t.establishmentAdmin.dashboard.quickActions}</h3>
           <div className="quick-actions-grid">
-            <a
+            <Link
               href={`/${languageCode}/admin/${establishmentId}/orders`}
               className="quick-action-card"
             >
               <h4>{t.establishmentAdmin.dashboard.viewOrders}</h4>
               <p>{t.establishmentAdmin.dashboard.viewOrdersDesc}</p>
-            </a>
-            <a
+            </Link>
+            <Link
               href={`/${languageCode}/admin/${establishmentId}/menu`}
               className="quick-action-card"
             >
               <h4>{t.establishmentAdmin.dashboard.manageMenu}</h4>
               <p>{t.establishmentAdmin.dashboard.manageMenuDesc}</p>
-            </a>
-            <a
+            </Link>
+            <Link
               href={`/${languageCode}/admin/${establishmentId}/employees`}
               className="quick-action-card"
             >
               <h4>{t.establishmentAdmin.dashboard.manageTeam}</h4>
               <p>{t.establishmentAdmin.dashboard.manageTeamDesc}</p>
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -173,14 +174,14 @@ export function EstablishmentAdminDashboard({
               >
                 {t.establishmentAdmin.dashboard.copyUrl}
               </button>
-              <a
+              <Link
                 href={`/${languageCode}/menu/${establishmentId}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary"
               >
                 {t.establishmentAdmin.dashboard.previewMenu}
-              </a>
+              </Link>
             </div>
           </div>
         </div>

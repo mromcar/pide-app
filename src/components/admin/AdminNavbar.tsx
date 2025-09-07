@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import { signOut, useSession } from 'next-auth/react'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { LanguageCode } from '@/constants/languages'
-import type { EstablishmentResponseDTO } from '@/types/dtos/establishment' // ✅ CAMBIAR a DTO
+import type { EstablishmentResponseDTO } from '@/types/dtos/establishment'
 import { UserRole } from '@/constants/enums'
 
 // ✅ Interface tipada para mejor type safety
@@ -18,7 +19,7 @@ interface MenuItem {
 interface AdminNavbarProps {
   languageCode: LanguageCode
   establishmentId: string
-  establishment?: EstablishmentResponseDTO | null // ✅ CAMBIAR a DTO
+  establishment?: EstablishmentResponseDTO | null
 }
 
 export default function AdminNavbar({
@@ -27,7 +28,6 @@ export default function AdminNavbar({
   establishment,
 }: AdminNavbarProps) {
   const { data: session } = useSession()
-  const router = useRouter()
   const pathname = usePathname()
   const { t } = useTranslation(languageCode)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
@@ -36,7 +36,6 @@ export default function AdminNavbar({
   const userName = session?.user?.name || 'Usuario'
   const establishmentName = establishment?.name || 'Establecimiento'
 
-  // ✅ ACTUALIZADAS: URLs más cortas sin "establishment"
   const menuItems: MenuItem[] = [
     {
       href: `/${languageCode}/admin/${establishmentId}/menu`,
@@ -55,12 +54,12 @@ export default function AdminNavbar({
     },
   ]
 
-  // ✅ TypeScript ahora sabe que item.roles es UserRole[]
   const filteredMenuItems = menuItems.filter((item) => item.roles.includes(userRole))
 
-  const handleTitleClick = () => {
-    // ✅ ACTUALIZADA: URL más corta sin "establishment"
-    router.push(`/${languageCode}/admin/${establishmentId}`)
+  // Activo si coincide exacto o es subruta
+  const isActivePath = (path: string | null, href: string) => {
+    if (!path || !href) return false
+    return path === href || path.startsWith(href + '/')
   }
 
   return (
@@ -68,23 +67,28 @@ export default function AdminNavbar({
       <div className="admin-navbar-container">
         {/* Logo/Brand */}
         <div className="admin-navbar-brand">
-          <h2 onClick={handleTitleClick} className="establishment-title">
+          <Link
+            href={`/${languageCode}/admin/${establishmentId}`}
+            className="establishment-title"
+            aria-label={establishmentName}
+          >
             {establishmentName}
-          </h2>
+          </Link>
         </div>
 
         {/* Navigation Links */}
         <div className="admin-navbar-menu">
           {filteredMenuItems.map((item) => {
-            const isActive = pathname.includes(item.href.split('/').pop() || '')
+            const active = isActivePath(pathname, item.href)
             return (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
-                className={`admin-navbar-link ${isActive ? 'active' : ''}`}
+                className={`admin-navbar-link ${active ? 'active' : ''}`}
+                aria-current={active ? 'page' : undefined}
               >
                 {item.label}
-              </a>
+              </Link>
             )
           })}
         </div>
@@ -113,14 +117,14 @@ export default function AdminNavbar({
 
           {showProfileMenu && (
             <div className="admin-navbar-profile-menu">
-              <a href={`/${languageCode}/admin/profile`} className="admin-navbar-profile-item">
-                {t.establishmentAdmin.establishment.actions.accountData}
-              </a>
+              <Link href={`/${languageCode}/admin/profile`} className="admin-navbar-profile-item">
+                {t.establishmentAdmin.actions.accountData}
+              </Link>
               <button
                 onClick={() => signOut({ callbackUrl: `/${languageCode}/login` })}
                 className="admin-navbar-profile-item admin-navbar-signout"
               >
-                {t.establishmentAdmin.establishment.actions.signOut}
+                {t.establishmentAdmin.actions.signOut}
               </button>
             </div>
           )}

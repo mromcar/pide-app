@@ -4493,3 +4493,701 @@
 2025-09-06 10:59:04:594 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
 2025-09-06 10:59:04:594 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
 2025-09-06 10:59:05:595 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 12:27:25:2725 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:27:25:2725 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:27:25:2725 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:27:26:2726 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:27:26:2726 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:27:26:2726 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:27:26:2726 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:27:26:2726 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:27:26:2726 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:27:42:2742 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:27:42:2742 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:27:42:2742 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:27:42:2742 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:27:42:2742 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:27:42:2742 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:27:42:2742 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:27:42:2742 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:27:43:2743 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:28:34:2834 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:28:34:2834 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:28:34:2834 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:28:34:2834 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:28:34:2834 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:28:34:2834 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:28:34:2834 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:28:35:2835 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:28:35:2835 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:32:21:3221 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:32:21:3221 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:32:21:3221 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:32:21:3221 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:32:22:3222 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:32:22:3222 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:32:22:3222 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:32:22:3222 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:32:22:3222 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:37:21:3721 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:37:21:3721 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:37:21:3721 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:37:22:3722 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:37:22:3722 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:37:22:3722 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:37:22:3722 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:37:22:3722 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:37:22:3722 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:42:21:4221 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:42:21:4221 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:42:21:4221 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:42:21:4221 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:42:21:4221 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:42:21:4221 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:42:22:4222 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:42:22:4222 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:42:23:4223 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:43:28:4328 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:43:28:4328 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:43:28:4328 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:43:28:4328 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:43:28:4328 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:43:28:4328 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:43:28:4328 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:43:28:4328 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:43:28:4328 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:43:49:4349 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:43:49:4349 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:43:49:4349 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:43:51:4351 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:43:51:4351 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:43:51:4351 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:43:51:4351 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:43:51:4351 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:43:51:4351 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:47:21:4721 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:47:21:4721 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:47:21:4721 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:47:21:4721 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:47:21:4721 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:47:21:4721 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:47:22:4722 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:47:22:4722 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:47:22:4722 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:51:29:5129 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:51:29:5129 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:51:29:5129 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:51:30:5130 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:51:30:5130 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:51:30:5130 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:51:30:5130 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:51:30:5130 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:51:31:5131 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:52:21:5221 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:52:21:5221 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:52:21:5221 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:52:21:5221 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:52:21:5221 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:52:21:5221 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:52:21:5221 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:52:21:5221 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:52:21:5221 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:52:53:5253 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:52:53:5253 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:52:53:5253 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:52:53:5253 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:52:53:5253 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:52:53:5253 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:52:53:5253 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:52:53:5253 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:52:54:5254 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:54:45:5445 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:54:45:5445 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:54:45:5445 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:54:46:5446 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:54:46:5446 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:54:46:5446 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:54:46:5446 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:54:46:5446 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:54:46:5446 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:55:28:5528 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:55:28:5528 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:55:28:5528 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:55:28:5528 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:55:28:5528 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:55:28:5528 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:55:29:5529 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:55:29:5529 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:55:29:5529 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:55:53:5553 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:55:53:5553 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:55:53:5553 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:55:53:5553 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:55:53:5553 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:55:53:5553 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:55:53:5553 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:55:53:5553 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:55:53:5553 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:56:14:5614 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:56:14:5614 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:56:14:5614 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:56:15:5615 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:56:16:5616 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:56:16:5616 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:56:16:5616 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:56:16:5616 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:56:16:5616 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:57:21:5721 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:57:21:5721 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:57:21:5721 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:57:21:5721 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:57:21:5721 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:57:21:5721 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:57:21:5721 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:57:22:5722 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:57:22:5722 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:57:23:5723 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:57:23:5723 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:57:23:5723 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:57:24:5724 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:57:24:5724 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:57:24:5724 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:57:25:5725 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:57:25:5725 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:57:25:5725 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:57:26:5726 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:57:26:5726 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:57:26:5726 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:57:26:5726 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:57:26:5726 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:57:26:5726 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:58:44:5844 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:58:44:5844 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:58:44:5844 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:58:44:5844 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:58:44:5844 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:58:44:5844 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 12:58:44:5844 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 12:58:44:5844 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 12:58:45:5845 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:01:39:139 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:01:39:139 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:01:39:139 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:01:39:139 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:01:39:139 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:01:40:140 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:01:40:140 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:01:40:140 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:01:40:140 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:01:40:140 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:01:40:140 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:01:40:140 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:01:41:141 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:01:41:141 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:01:41:141 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:01:41:141 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:01:41:141 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:01:41:141 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:01:51:151 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:01:51:151 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:01:51:151 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:01:51:151 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:01:51:151 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:01:51:151 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:01:51:151 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:01:51:151 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:01:51:151 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:03:17:317 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:03:17:317 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:03:17:317 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:03:17:317 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:03:17:317 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:03:17:317 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:03:18:318 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:03:18:318 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:03:18:318 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:04:48:448 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:04:48:448 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:04:48:448 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:04:48:448 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:04:48:448 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:04:49:449 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:04:49:449 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:04:49:449 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:04:49:449 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:05:37:537 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:05:37:537 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:05:37:537 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:05:37:537 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:05:37:537 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:05:37:537 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:05:37:537 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:05:37:537 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:05:37:537 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:05:50:550 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:05:50:550 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:05:50:550 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:05:51:551 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:05:51:551 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:05:51:551 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:05:51:551 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:05:51:551 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:05:51:551 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:06:22:622 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:06:22:622 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:06:22:622 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:06:23:623 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:06:23:623 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:06:23:623 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:06:23:623 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:06:23:623 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:06:23:623 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:06:26:626 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:06:26:626 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:06:26:626 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:06:26:626 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:06:26:626 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:06:26:626 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:06:26:626 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:06:26:626 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:06:26:626 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:08:14:814 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:08:15:815 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:08:15:815 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:08:15:815 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:08:15:815 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:08:15:815 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:08:15:815 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:08:15:815 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:08:15:815 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:15:915 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:15:915 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:17:917 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:18:918 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:18:918 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:18:918 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:18:918 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:18:918 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:18:918 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:19:919 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:19:919 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:20:920 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:21:921 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:21:921 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:21:921 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:21:921 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:21:921 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:21:921 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:21:921 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:21:921 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:22:922 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:22:922 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:23:923 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:23:923 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:24:924 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:24:924 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:25:925 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:25:925 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:25:925 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:25:925 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:26:926 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:26:926 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:27:927 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:27:927 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:28:928 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:28:928 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:29:929 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:29:929 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:30:930 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:30:930 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:31:931 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:31:931 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:32:932 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:32:932 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:32:932 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:32:932 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:33:933 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:33:933 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:33:933 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:34:934 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:34:934 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:35:935 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:35:935 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:36:936 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:36:936 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:37:937 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:37:937 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:38:938 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:38:938 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:39:939 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:39:939 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:40:940 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:40:940 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:40:940 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:40:940 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:40:940 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:40:940 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:41:941 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:41:941 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:41:941 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:41:941 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:41:941 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:41:941 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:41:941 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:43:943 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:43:943 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:44:944 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:44:944 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:45:945 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:45:945 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:46:946 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:46:946 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:46:946 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:46:946 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:46:946 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:46:946 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:46:946 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:46:946 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:09:46:946 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:46:946 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:47:947 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:09:47:947 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:47:947 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:48:948 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:48:948 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:49:949 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:49:949 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:50:950 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:50:950 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:51:951 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:51:951 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:52:952 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:52:952 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:53:953 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:53:953 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:54:954 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:54:954 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:54:954 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:55:955 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:56:956 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:56:956 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:57:957 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:09:57:957 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:09:57:957 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:13:16:1316 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:13:16:1316 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:16:1316 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:13:16:1316 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:13:16:1316 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:16:1316 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:13:17:1317 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:13:17:1317 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:17:1317 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:17:1317 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:13:17:1317 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:13:18:1318 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:21:1321 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:13:21:1321 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:22:1322 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:13:22:1322 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:23:1323 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:13:23:1323 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:24:1324 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:13:24:1324 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:25:1325 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:13:25:1325 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:26:1326 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:13:26:1326 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:13:28:1328 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:42:1442 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:42:1442 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:14:42:1442 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:14:42:1442 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:14:42:1442 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:42:1442 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:43:1443 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:14:43:1443 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:14:43:1443 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:43:1443 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:14:45:1445 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:45:1445 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:46:1446 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:47:1447 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:48:1448 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:48:1448 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:49:1449 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:49:1449 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:14:49:1449 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:14:49:1449 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:14:49:1449 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:49:1449 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:14:49:1449 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:49:1449 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:49:1449 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:14:49:1449 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:50:1450 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:14:50:1450 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:50:1450 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:51:1451 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:51:1451 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:52:1452 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:52:1452 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:53:1453 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:53:1453 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:54:1454 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:54:1454 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:55:1455 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:55:1455 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:56:1456 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:56:1456 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:57:1457 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:57:1457 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:58:1458 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:58:1458 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:14:59:1459 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:14:59:1459 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:00:150 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:00:150 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:01:151 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:02:152 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:02:152 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:03:153 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:03:153 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:03:153 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:03:153 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:03:153 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:03:153 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:03:153 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:03:153 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:03:153 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:03:153 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:04:154 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:04:154 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:04:154 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:05:155 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:05:155 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:06:156 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:06:156 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:07:157 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:07:157 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:08:158 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:08:158 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:09:159 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:09:159 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:10:1510 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:10:1510 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:11:1511 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:13:1513 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:14:1514 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:14:1514 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:14:1514 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:14:1514 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:14:1514 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:14:1514 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:15:1515 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:15:1515 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:15:1515 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:15:1515 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:15:1515 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:15:1515 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:15:1515 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:15:1515 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:17:1517 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:17:1517 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:18:1518 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:18:1518 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:19:1519 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:19:1519 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:20:1520 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:20:1520 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:21:1521 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:21:1521 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:22:1522 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:22:1522 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:23:1523 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:23:1523 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:24:1524 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:24:1524 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:25:1525 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:26:1526 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:27:1527 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:27:1527 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:27:1527 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:27:1527 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:27:1527 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:27:1527 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:27:1527 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:27:1527 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:28:1528 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:29:1529 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:29:1529 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:29:1529 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:29:1529 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:29:1529 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:29:1529 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:29:1529 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:30:1530 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:30:1530 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:30:1530 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:30:1530 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:30:1530 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:31:1531 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:31:1531 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:32:1532 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:32:1532 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:33:1533 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:33:1533 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:34:1534 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:34:1534 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:35:1535 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:35:1535 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:36:1536 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:36:1536 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:37:1537 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:15:59:1559 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:59:1559 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:59:1559 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:59:1559 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:59:1559 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:59:1559 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:59:1559 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:15:59:1559 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:15:59:1559 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:15:59:1559 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:16:01:161 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:01:161 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:02:162 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:02:162 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:03:163 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:03:163 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:04:164 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:04:164 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:05:165 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:05:165 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:06:166 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:06:166 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:07:167 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:07:167 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:08:168 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:33:1633 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:16:33:1633 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:33:1633 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:16:34:1634 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:16:34:1634 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:34:1634 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:34:1634 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:16:34:1634 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:16:34:1634 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:34:1634 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:16:35:1635 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:35:1635 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:36:1636 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:36:1636 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:37:1637 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:37:1637 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:37:1637 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:37:1637 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:38:1638 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:38:1638 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:39:1639 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:39:1639 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:40:1640 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:40:1640 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:41:1641 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:43:1643 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:43:1643 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:16:43:1643 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:16:44:1644 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:16:44:1644 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:44:1644 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:44:1644 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:16:44:1644 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:16:44:1644 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:44:1644 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:16:45:1645 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:45:1645 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:46:1646 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:46:1646 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:47:1647 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:47:1647 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:48:1648 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:48:1648 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:49:1649 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:49:1649 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:50:1650 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:50:1650 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:51:1651 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:16:51:1651 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:16:52:1652 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:16:1716 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:16:1716 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:17:16:1716 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:17:16:1716 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:17:16:1716 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:16:1716 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:16:1716 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:17:17:1717 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:17:17:1717 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:17:1717 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:17:17:1717 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:18:1718 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:18:1718 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:18:1718 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:19:1719 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:19:1719 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:20:1720 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:20:1720 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:20:1720 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:20:1720 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:17:20:1720 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:17:21:1721 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:17:21:1721 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:21:1721 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:17:21:1721 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:17:21:1721 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:21:1721 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:17:21:1721 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:21:1721 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:22:1722 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:24:1724 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:25:1725 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:25:1725 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:26:1726 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:26:1726 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:27:1727 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:27:1727 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:27:1727 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:27:1727 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:28:1728 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:29:1729 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:30:1730 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:30:1730 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:31:1731 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:31:1731 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:32:1732 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:32:1732 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:33:1733 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:17:33:1733 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:17:34:1734 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:19:23:1923 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:19:23:1923 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:19:23:1923 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:19:24:1924 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:19:25:1925 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:19:25:1925 [32minfo[39m: [32m[ADMIN API] Fetching categories for establishmentId: 1 by user: 1[39m
+2025-09-06 13:19:25:1925 [32minfo[39m: [32m[ADMIN API] Authentication/Authorization failed:[39m
+2025-09-06 13:19:25:1925 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:19:25:1925 [32minfo[39m: [32m[ADMIN API] Found 3 categories for establishmentId: 1[39m
+2025-09-06 13:19:26:1926 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:19:26:1926 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:19:27:1927 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:19:27:1927 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:19:28:1928 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:19:28:1928 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:19:29:1929 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:19:29:1929 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:19:30:1930 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:19:30:1930 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:19:31:1931 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-06 13:19:31:1931 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
+2025-09-06 13:19:32:1932 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m

@@ -1,13 +1,6 @@
-import { adminEn } from './en'
-import { adminEs } from './es'
-import { adminFr } from './fr'
-import type { EstablishmentAdminTranslations } from '../../types/admin'
+import { admin as en } from './en'
+import { admin as es } from './es'
+import { admin as fr } from './fr'
+import type { AdminModuleTranslations } from '../../types/admin'
 
-export const adminTranslations: Record<string, EstablishmentAdminTranslations> = {
-  en: adminEn,
-  es: adminEs,
-  fr: adminFr
-}
-
-export { adminEn, adminEs, adminFr }
-export type { EstablishmentAdminTranslations }
+export const adminTranslations: Record<string, AdminModuleTranslations> = { en, es, fr }

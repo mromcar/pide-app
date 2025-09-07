@@ -1,6 +1,6 @@
-import type { EstablishmentAdminTranslations } from '../../types/admin'
+import type { AdminModuleTranslations } from '../../types/admin'
 
-export const adminEs: EstablishmentAdminTranslations = {
+export const admin = {
   dashboard: {
     title: 'Panel del Establecimiento',
     subtitle: 'Gestiona las operaciones de tu restaurante',
@@ -31,7 +31,8 @@ export const adminEs: EstablishmentAdminTranslations = {
     no: 'No',
     notAvailable: 'No disponible',
     qrCode: 'Código QR del Menú',
-    qrCodeDesc: 'Comparte este enlace o código QR con tus clientes para que accedan al menú',
+    qrCodeDesc:
+      'Comparte este enlace o código QR con tus clientes para que accedan al menú',
     menuUrl: 'URL del menú',
     copyUrl: 'Copiar URL',
     previewMenu: 'Vista previa del menú',
@@ -42,7 +43,7 @@ export const adminEs: EstablishmentAdminTranslations = {
     employeeManagement: 'Gestión de Empleados',
     orderSupervision: 'Supervisión de Pedidos',
     settings: 'Configuración',
-    logout: 'Cerrar sesión'
+    logout: 'Cerrar sesión',
   },
   menuManagement: {
     title: 'Gestión del Menú',
@@ -63,7 +64,7 @@ export const adminEs: EstablishmentAdminTranslations = {
       confirm: 'Confirmar',
       update: 'Actualizar Categoría',
       create: 'Crear Categoría',
-      order: 'Orden'
+      order: 'Orden',
     },
     products: {
       title: 'Productos',
@@ -83,7 +84,7 @@ export const adminEs: EstablishmentAdminTranslations = {
       deleteMessage: '¿Estás seguro de que quieres eliminar este producto?',
       allergensLabel: 'Alérgenos:',
       noAllergens: 'Ninguno',
-      variantNumber: 'Variante'
+      variantNumber: 'Variante',
     },
     variants: {
       title: 'Variantes',
@@ -98,8 +99,8 @@ export const adminEs: EstablishmentAdminTranslations = {
       description: 'Descripción',
       price: 'Precio (€)',
       sku: 'SKU',
-      saving: 'Guardando...'
-    }
+      saving: 'Guardando...',
+    },
   },
   employeeManagement: {
     title: 'Gestión de Empleados',
@@ -115,7 +116,7 @@ export const adminEs: EstablishmentAdminTranslations = {
     roles: {
       waiter: 'Camarero',
       cook: 'Cocinero',
-      establishment_admin: 'Administrador'
+      establishment_admin: 'Administrador',
     },
     confirmDelete: 'Confirmar eliminación',
     deleteMessage: '¿Estás seguro de que quieres eliminar este empleado?',
@@ -123,28 +124,29 @@ export const adminEs: EstablishmentAdminTranslations = {
     sendInvitation: 'Enviar Invitación',
     loading: 'Cargando empleados...',
     noEmployees: 'No hay empleados',
-    noEmployeesDescription: 'Agrega empleados para gestionar los permisos y roles de tu establecimiento.',
-    addFirstEmployee: 'Agregar Primer Empleado'
+    noEmployeesDescription:
+      'Agrega empleados para gestionar los permisos y roles de tu establecimiento.',
+    addFirstEmployee: 'Agregar Primer Empleado',
   },
   orderSupervision: {
-    title: 'Supervisión de pedidos',
-    subtitle: 'Supervisa y gestiona los pedidos',
+    title: 'Supervisión de Pedidos',
+    subtitle: 'Monitoriza y gestiona todos los pedidos',
     filters: {
-      all: 'Todos los Pedidos',
-      pending: 'Pendientes',
+      all: 'Todos',
+      pending: 'Pendiente',
       preparing: 'Preparando',
-      ready: 'Listos',
-      delivered: 'Entregados',
-      cancelled: 'Cancelados',
+      ready: 'Listo',
+      delivered: 'Entregado',
+      cancelled: 'Cancelado',
       date: 'Fecha',
       status: 'Estado',
-      allStatuses: 'Todos los estados'
+      allStatuses: 'Todos los estados',
     },
     refresh: 'Actualizar',
     stats: {
       totalOrders: 'Pedidos totales',
       activeOrders: 'Pedidos activos',
-      completedOrders: 'Pedidos completados'
+      completedOrders: 'Pedidos completados',
     },
     noOrdersInStatus: 'No hay pedidos en este estado',
     markAs: 'Marcar como',
@@ -157,13 +159,13 @@ export const adminEs: EstablishmentAdminTranslations = {
       total: 'Total',
       items: 'Artículos',
       notes: 'Notas',
-      timestamp: 'Hora'
+      timestamp: 'Hora',
     },
     actions: {
-      updateStatus: 'Actualizar Estado',
-      viewDetails: 'Ver Detalles',
-      printOrder: 'Imprimir Pedido'
-    }
+      updateStatus: 'Actualizar estado',
+      viewDetails: 'Ver detalles',
+      printOrder: 'Imprimir pedido',
+    },
   },
   forms: {
     save: 'Guardar',
@@ -178,43 +180,37 @@ export const adminEs: EstablishmentAdminTranslations = {
     edit: 'Editar',
     delete: 'Eliminar',
     update: 'Actualizar',
-    create: 'Crear'
+    create: 'Crear',
   },
-  placeholders: { // 👈 Nueva sección
-    categories: {
-      name: 'Ej: Entrantes, Platos principales, Postres...'
-    },
+  placeholders: {
+    categories: { name: 'Ej: Entrantes, Platos principales, Postres...' },
     products: {
       name: 'Ej: Paella Valenciana, Gazpacho Andaluz...',
-      description: 'Describe tu producto aquí...'
+      description: 'Describe aquí tu producto...',
     },
     variants: {
       description: 'Ej: Ración normal, Media ración, Pequeña...',
-      price: '0.00'
-    }
-  },
-  helpTexts: { // 👈 Nueva sección
-    variants: {
-      inactiveNotVisible: 'Las variantes inactivas no aparecerán en el menú público'
-    }
+      price: '0.00',
+    },
   },
   messages: {
     success: {
-      categoryCreated: 'Categoría creada exitosamente',
-      categoryUpdated: 'Categoría actualizada exitosamente',
-      categoryDeleted: 'Categoría eliminada exitosamente',
-      productCreated: 'Producto creado exitosamente',
-      productUpdated: 'Producto actualizado exitosamente',
-      productDeleted: 'Producto eliminado exitosamente',
-      variantCreated: 'Variante creada exitosamente',
-      variantUpdated: 'Variante actualizada exitosamente',
-      variantDeleted: 'Variante eliminada exitosamente',
-      employeeCreated: 'Empleado creado exitosamente',
-      employeeUpdated: 'Empleado actualizado exitosamente',
-      employeeDeleted: 'Empleado eliminado exitosamente',
-      orderUpdated: 'Pedido actualizado exitosamente'
+      categoryCreated: 'Categoría creada correctamente',
+      categoryUpdated: 'Categoría actualizada correctamente',
+      categoryDeleted: 'Categoría eliminada correctamente',
+      productCreated: 'Producto creado correctamente',
+      productUpdated: 'Producto actualizado correctamente',
+      productDeleted: 'Producto eliminado correctamente',
+      variantCreated: 'Variante creada correctamente',
+      variantUpdated: 'Variante actualizada correctamente',
+      variantDeleted: 'Variante eliminada correctamente',
+      employeeCreated: 'Empleado creado correctamente',
+      employeeUpdated: 'Empleado actualizado correctamente',
+      employeeDeleted: 'Empleado eliminado correctamente',
+      orderUpdated: 'Pedido actualizado correctamente',
     },
     error: {
+      title: 'Error',
       categoryCreateFailed: 'Error al crear la categoría',
       categoryUpdateFailed: 'Error al actualizar la categoría',
       categoryDeleteFailed: 'Error al eliminar la categoría',
@@ -228,41 +224,261 @@ export const adminEs: EstablishmentAdminTranslations = {
       employeeUpdateFailed: 'Error al actualizar el empleado',
       employeeDeleteFailed: 'Error al eliminar el empleado',
       orderUpdateFailed: 'Error al actualizar el pedido',
-      loadingFailed: 'Error al cargar los datos'
+      loadingFailed: 'Error al cargar los datos',
+      verifyingPermissions: 'Verificando permisos...',
     },
     emptyStates: {
       noCategories: 'No hay categorías disponibles',
-      noCategoriesDesc: 'Para gestionar productos, primero necesitas crear al menos una categoría.',
+      noCategoriesDesc:
+        'Para gestionar productos, primero crea al menos una categoría.',
       createFirstCategory: 'Crear primera categoría',
       noProducts: 'No hay productos en esta categoría',
-      noProductsDesc: 'Añade tu primer producto para comenzar a construir tu menú.',
+      noProductsDesc:
+        'Añade tu primer producto para empezar a construir tu menú.',
       addFirstProduct: 'Añadir primer producto',
-      noVariants: 'No hay variantes',
-      noVariantsDesc: 'Añade variantes para ofrecer diferentes opciones de este producto.',
+      noVariants: 'Sin variantes',
+      noVariantsDesc:
+        'Añade variantes para ofrecer diferentes opciones de este producto.',
       addFirstVariant: 'Añadir primera variante',
       selectCategory: 'Selecciona una categoría',
-      selectCategoryDesc: 'Elige una categoría de la barra lateral para ver y gestionar sus productos.',
+      selectCategoryDesc:
+        'Elige una categoría de la barra lateral para ver y gestionar sus productos.',
       selectProduct: 'Selecciona un producto',
       selectProductDesc: 'Elige un producto para gestionar sus variantes.',
-      helperText: '💡 Ve a la pestaña "Categorías" para crear tu primera categoría'
-    }
+      helperText: 'Ve a “Categorías” para crear tu primera categoría',
+    },
   },
-  establishment: {
+
+  establishmentAdmin: {
     title: 'Administración del Establecimiento',
     loading: 'Cargando datos del establecimiento...',
     error: {
       title: 'Error',
-      failedToFetch: 'Error al cargar los datos del establecimiento',
+      notFound: 'Establecimiento no encontrado',
+      failedToFetch: 'No se pudo cargar el establecimiento',
       unknownError: 'Ha ocurrido un error desconocido',
-      goBack: 'Volver'
+      goBack: 'Volver',
     },
     actions: {
       signOut: 'Cerrar Sesión',
-      accountData: 'Datos de cuenta'
+      accountData: 'Datos de cuenta',
     },
     accessDenied: {
       title: 'Acceso Denegado',
-      message: 'No tienes permisos para acceder a esta página'
-    }
-  }
-}
+      message: 'No tienes permisos para acceder a esta página',
+    },
+    forms: {
+      loading: 'Cargando...',
+      retry: 'Reintentar',
+      save: 'Guardar',
+      cancel: 'Cancelar',
+      edit: 'Editar',
+      delete: 'Eliminar',
+      update: 'Actualizar',
+      create: 'Crear',
+      active: 'Activo',
+      inactive: 'Inactivo',
+    },
+    messages: {
+      error: {
+        title: 'Error',
+        loadingFailed: 'Error al cargar los datos',
+        verifyingPermissions: 'Verificando permisos...',
+      },
+      emptyStates: {
+        noCategories: 'No hay categorías disponibles',
+        noCategoriesDesc:
+          'Para gestionar productos, primero crea al menos una categoría.',
+        createFirstCategory: 'Crear primera categoría',
+        noProducts: 'No hay productos en esta categoría',
+        noProductsDesc:
+          'Añade tu primer producto para empezar a construir tu menú.',
+        addFirstProduct: 'Añadir primer producto',
+        noVariants: 'Sin variantes',
+        noVariantsDesc:
+          'Añade variantes para ofrecer diferentes opciones de este producto.',
+        addFirstVariant: 'Añadir primera variante',
+        selectCategory: 'Selecciona una categoría',
+        selectCategoryDesc:
+          'Elige una categoría de la barra lateral para ver y gestionar sus productos.',
+        selectProduct: 'Selecciona un producto',
+        selectProductDesc: 'Elige un producto para gestionar sus variantes.',
+        helperText: 'Ve a "Categorías" para crear tu primera categoría',
+      },
+    },
+    navigation: {
+      menuManagement: 'Gestión de Menú',
+      employeeManagement: 'Gestión de Empleados',
+      orderSupervision: 'Supervisión de Pedidos',
+    },
+    dashboard: {
+      title: 'Panel del Establecimiento',
+      subtitle: 'Gestiona las operaciones del restaurante',
+      overview: 'Resumen',
+      quickActions: 'Acciones rápidas',
+      todaysOrders: 'Pedidos de hoy',
+      activeOrders: 'Pedidos activos',
+      dailyRevenue: 'Ingresos del día',
+      activeEmployees: 'Empleados activos',
+      viewOrders: 'Ver pedidos',
+      viewOrdersDesc: 'Gestiona pedidos pendientes y completados',
+      manageMenu: 'Gestionar menú',
+      manageMenuDesc: 'Edita categorías, productos y precios',
+      manageTeam: 'Gestionar equipo',
+      manageTeamDesc: 'Administra empleados y permisos',
+      establishmentInfo: 'Información del establecimiento',
+      name: 'Nombre',
+      address: 'Dirección',
+      city: 'Ciudad',
+      phone: 'Teléfono',
+      website: 'Sitio web',
+      status: 'Estado',
+      acceptsOrders: 'Acepta pedidos',
+      createdAt: 'Creado',
+      active: 'Activo',
+      inactive: 'Inactivo',
+      yes: 'Sí',
+      no: 'No',
+      notAvailable: 'No disponible',
+      qrCode: 'Código QR del menú',
+      qrCodeDesc:
+        'Comparte este enlace o QR con tus clientes para acceder al menú',
+      menuUrl: 'URL del menú',
+      copyUrl: 'Copiar URL',
+      previewMenu: 'Previsualizar menú',
+    },
+    menuManagement: {
+      title: 'Gestión de Menú',
+      subtitle: 'Gestiona categorías, productos y variantes',
+      loading: 'Cargando menú...',
+      categories: {
+        title: 'Categorías',
+        addNew: 'Nueva Categoría',
+        edit: 'Editar Categoría',
+        delete: 'Eliminar Categoría',
+        name: 'Nombre',
+        description: 'Descripción',
+        active: 'Activo',
+        actions: 'Acciones',
+        confirmDelete: 'Confirmar eliminación',
+        deleteMessage: '¿Seguro que quieres eliminar esta categoría?',
+        cancel: 'Cancelar',
+        confirm: 'Confirmar',
+        update: 'Actualizar Categoría',
+        create: 'Crear Categoría',
+        order: 'Orden',
+      },
+      products: {
+        title: 'Productos',
+        addNew: 'Nuevo Producto',
+        edit: 'Editar Producto',
+        delete: 'Eliminar Producto',
+        name: 'Nombre',
+        description: 'Descripción',
+        price: 'Precio',
+        category: 'Categoría',
+        active: 'Activo',
+        image: 'Imagen',
+        actions: 'Acciones',
+        variants: 'Variantes',
+        allergens: 'Alérgenos',
+        confirmDelete: 'Confirmar eliminación',
+        deleteMessage: '¿Seguro que quieres eliminar este producto?',
+        allergensLabel: 'Alérgenos:',
+        noAllergens: 'Ninguno',
+        variantNumber: 'Variante',
+      },
+      variants: {
+        title: 'Variantes',
+        addNew: 'Nueva Variante',
+        edit: 'Editar Variante',
+        delete: 'Eliminar Variante',
+        name: 'Nombre',
+        priceModifier: 'Modificador de precio',
+        active: 'Activo',
+        allProducts: 'Todos los productos',
+        product: 'Producto',
+        description: 'Descripción',
+        price: 'Precio (€)',
+        sku: 'SKU',
+        saving: 'Guardando...',
+      },
+    },
+    employeeManagement: {
+      title: 'Gestión de Empleados',
+      subtitle: 'Gestiona el personal del restaurante',
+      addEmployee: 'Agregar Empleado',
+      editEmployee: 'Editar Empleado',
+      deleteEmployee: 'Eliminar Empleado',
+      name: 'Nombre',
+      email: 'Email',
+      role: 'Rol',
+      active: 'Activo',
+      actions: 'Acciones',
+      roles: {
+        waiter: 'Camarero',
+        cook: 'Cocinero',
+        establishment_admin: 'Administrador',
+      },
+      confirmDelete: 'Confirmar eliminación',
+      deleteMessage: '¿Seguro que quieres eliminar este empleado?',
+      inviteEmployee: 'Invitar Empleado',
+      sendInvitation: 'Enviar invitación',
+      loading: 'Cargando empleados...',
+      noEmployees: 'No hay empleados',
+      noEmployeesDescription:
+        'Agrega empleados para gestionar permisos y roles de tu establecimiento.',
+      addFirstEmployee: 'Agregar primer empleado',
+    },
+    orderSupervision: {
+      title: 'Supervisión de Pedidos',
+      subtitle: 'Monitoriza y gestiona todos los pedidos',
+      filters: {
+        all: 'Todos',
+        pending: 'Pendiente',
+        preparing: 'Preparando',
+        ready: 'Listo',
+        delivered: 'Entregado',
+        cancelled: 'Cancelado',
+        date: 'Fecha',
+        status: 'Estado',
+        allStatuses: 'Todos los estados',
+      },
+      refresh: 'Actualizar',
+      stats: {
+        totalOrders: 'Pedidos totales',
+        activeOrders: 'Pedidos activos',
+        completedOrders: 'Pedidos completados',
+      },
+      noOrdersInStatus: 'No hay pedidos en este estado',
+      markAs: 'Marcar como',
+      hideDetails: 'Ocultar detalles',
+      orderDetails: {
+        orderNumber: 'Pedido #',
+        customer: 'Cliente',
+        table: 'Mesa',
+        status: 'Estado',
+        total: 'Total',
+        items: 'Artículos',
+        notes: 'Notas',
+        timestamp: 'Hora',
+      },
+      actions: {
+        updateStatus: 'Actualizar estado',
+        viewDetails: 'Ver detalles',
+        printOrder: 'Imprimir pedido',
+      },
+    },
+    placeholders: {
+      categories: { name: 'Ej: Entrantes, Platos, Postres...' },
+      products: {
+        name: 'Ej: Paella Valenciana, Gazpacho Andaluz...',
+        description: 'Describe aquí tu producto...',
+      },
+      variants: {
+        description: 'Ej: Normal, Media ración, Pequeña...',
+        price: '0.00',
+      },
+    },
+  },
+} satisfies AdminModuleTranslations

@@ -526,6 +526,33 @@
   color: #9ca3af;
 }
 
+/* Menu studio 3-column layout */
+.menu-studio-grid {
+  /* 1 col en móvil, 3 paneles a partir de lg */
+  display: grid;
+  gap: 1rem; /* 16px */
+}
+
+@media (min-width: 1024px) {
+  .menu-studio-grid {
+    grid-template-columns: 280px minmax(420px, 1fr) minmax(360px, 480px);
+  }
+}
+
+.menu-pane {
+  /* Híbrido: utilidades Tailwind a través de @apply si usas Tailwind en CSS */
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: .5rem;
+  padding: 1rem;
+}
+
+.menu-pane-title {
+  font-weight: 600;
+  margin-bottom: .75rem;
+  font-size: 1rem;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .management-layout {

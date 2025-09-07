@@ -1,6 +1,6 @@
-import type { EstablishmentAdminTranslations } from '../../types/admin'
+import type { AdminModuleTranslations } from '../../types/admin'
 
-export const adminEn: EstablishmentAdminTranslations = {
+export const admin = {
   dashboard: {
     title: 'Establishment Dashboard',
     subtitle: 'Manage your restaurant operations',
@@ -181,22 +181,12 @@ export const adminEn: EstablishmentAdminTranslations = {
     create: 'Create'
   },
   placeholders: {
-    categories: {
-      name: 'Ex: Starters, Main courses, Desserts...'
-    },
+    categories: { name: 'Ex: Starters, Main courses, Desserts...' },
     products: {
       name: 'Ex: Paella Valenciana, Andalusian Gazpacho...',
       description: 'Describe your product here...'
     },
-    variants: {
-      description: 'Ex: Normal portion, Half portion, Small...',
-      price: '0.00'
-    }
-  },
-  helpTexts: {
-    variants: {
-      inactiveNotVisible: 'Inactive variants will not appear in the public menu'
-    }
+    variants: { description: 'Ex: Normal portion, Half portion, Small...', price: '0.00' }
   },
   messages: {
     success: {
@@ -215,6 +205,7 @@ export const adminEn: EstablishmentAdminTranslations = {
       orderUpdated: 'Order updated successfully'
     },
     error: {
+      title: 'Error',
       categoryCreateFailed: 'Failed to create category',
       categoryUpdateFailed: 'Failed to update category',
       categoryDeleteFailed: 'Failed to delete category',
@@ -228,7 +219,8 @@ export const adminEn: EstablishmentAdminTranslations = {
       employeeUpdateFailed: 'Failed to update employee',
       employeeDeleteFailed: 'Failed to delete employee',
       orderUpdateFailed: 'Failed to update order',
-      loadingFailed: 'Failed to load data'
+      loadingFailed: 'Failed to load data',
+      verifyingPermissions: 'Checking permissions...'
     },
     emptyStates: {
       noCategories: 'No categories available',
@@ -247,12 +239,13 @@ export const adminEn: EstablishmentAdminTranslations = {
       helperText: '💡 Go to the "Categories" tab to create your first category'
     }
   },
-  establishment: {
+  establishmentAdmin: {
     title: 'Establishment Administration',
     loading: 'Loading establishment data...',
     error: {
       title: 'Error',
-      failedToFetch: 'Failed to fetch establishment data',
+      notFound: 'Establishment not found',
+      failedToFetch: 'Failed to load establishment',
       unknownError: 'An unknown error occurred',
       goBack: 'Go Back'
     },
@@ -263,6 +256,211 @@ export const adminEn: EstablishmentAdminTranslations = {
     accessDenied: {
       title: 'Access Denied',
       message: 'You do not have permission to access this page'
-    }
-  }
-}
+    },
+    forms: {
+      loading: 'Loading...',
+      retry: 'Retry',
+      save: 'Save',
+      cancel: 'Cancel',
+      edit: 'Edit',
+      delete: 'Delete',
+      update: 'Update',
+      create: 'Create',
+      active: 'Active',
+      inactive: 'Inactive',
+    },
+    messages: {
+      error: {
+        title: 'Error',
+        loadingFailed: 'Failed to load data',
+        verifyingPermissions: 'Checking permissions...',
+      },
+      emptyStates: {
+        noCategories: 'No categories available',
+        noCategoriesDesc: 'To manage products, you first need to create at least one category.',
+        createFirstCategory: 'Create first category',
+        noProducts: 'No products in this category',
+        noProductsDesc: 'Add your first product to start building your menu.',
+        addFirstProduct: 'Add first product',
+        noVariants: 'No variants',
+        noVariantsDesc: 'Add variants to offer different options for this product.',
+        addFirstVariant: 'Add first variant',
+        selectCategory: 'Select a category',
+        selectCategoryDesc: 'Choose a category from the sidebar to view and manage its products.',
+        selectProduct: 'Select a product',
+        selectProductDesc: 'Choose a product to manage its variants.',
+        helperText: 'Go to "Categories" to create your first category',
+      },
+    },
+    navigation: {
+      menuManagement: 'Menu Management',
+      employeeManagement: 'Employee Management',
+      orderSupervision: 'Order Supervision',
+    },
+    dashboard: {
+      title: 'Establishment Dashboard',
+      subtitle: 'Manage your restaurant operations',
+      overview: 'Overview',
+      quickActions: 'Quick Actions',
+      todaysOrders: "Today's Orders",
+      activeOrders: 'Active Orders',
+      dailyRevenue: 'Daily Revenue',
+      activeEmployees: 'Active Employees',
+      viewOrders: 'View Orders',
+      viewOrdersDesc: 'Manage pending and completed orders',
+      manageMenu: 'Manage Menu',
+      manageMenuDesc: 'Edit categories, products and prices',
+      manageTeam: 'Manage Team',
+      manageTeamDesc: 'Administer employees and permissions',
+      establishmentInfo: 'Establishment Information',
+      name: 'Name',
+      address: 'Address',
+      city: 'City',
+      phone: 'Phone',
+      website: 'Website',
+      status: 'Status',
+      acceptsOrders: 'Accepts Orders',
+      createdAt: 'Created',
+      active: 'Active',
+      inactive: 'Inactive',
+      yes: 'Yes',
+      no: 'No',
+      notAvailable: 'Not available',
+      qrCode: 'Menu QR Code',
+      qrCodeDesc: 'Share this link or QR code with your customers to access the menu',
+      menuUrl: 'Menu URL',
+      copyUrl: 'Copy URL',
+      previewMenu: 'Preview Menu',
+    },
+    menuManagement: {
+      title: 'Menu Management',
+      subtitle: 'Manage categories, products and variants',
+      loading: 'Loading menu...',
+      categories: {
+        title: 'Categories',
+        addNew: 'Add New Category',
+        edit: 'Edit Category',
+        delete: 'Delete Category',
+        name: 'Name',
+        description: 'Description',
+        active: 'Active',
+        actions: 'Actions',
+        confirmDelete: 'Confirm Deletion',
+        deleteMessage: 'Are you sure you want to delete this category?',
+        cancel: 'Cancel',
+        confirm: 'Confirm',
+        update: 'Update Category',
+        create: 'Create Category',
+        order: 'Order',
+      },
+      products: {
+        title: 'Products',
+        addNew: 'Add New Product',
+        edit: 'Edit Product',
+        delete: 'Delete Product',
+        name: 'Name',
+        description: 'Description',
+        price: 'Price',
+        category: 'Category',
+        active: 'Active',
+        image: 'Image',
+        actions: 'Actions',
+        variants: 'Variants',
+        allergens: 'Allergens',
+        confirmDelete: 'Confirm Deletion',
+        deleteMessage: 'Are you sure you want to delete this product?',
+        allergensLabel: 'Allergens:',
+        noAllergens: 'None',
+        variantNumber: 'Variant',
+      },
+      variants: {
+        title: 'Variants',
+        addNew: 'Add New Variant',
+        edit: 'Edit Variant',
+        delete: 'Delete Variant',
+        name: 'Name',
+        priceModifier: 'Price Modifier',
+        active: 'Active',
+        allProducts: 'All Products',
+        product: 'Product',
+        description: 'Description',
+        price: 'Price (€)',
+        sku: 'SKU',
+        saving: 'Saving...',
+      },
+    },
+    employeeManagement: {
+      title: 'Employee Management',
+      subtitle: 'Manage your restaurant staff',
+      addEmployee: 'Add Employee',
+      editEmployee: 'Edit Employee',
+      deleteEmployee: 'Delete Employee',
+      name: 'Name',
+      email: 'Email',
+      role: 'Role',
+      active: 'Active',
+      actions: 'Actions',
+      roles: {
+        waiter: 'Waiter',
+        cook: 'Cook',
+        establishment_admin: 'Administrator',
+      },
+      confirmDelete: 'Confirm Deletion',
+      deleteMessage: 'Are you sure you want to delete this employee?',
+      inviteEmployee: 'Invite Employee',
+      sendInvitation: 'Send Invitation',
+      loading: 'Loading employees...',
+      noEmployees: 'No employees',
+      noEmployeesDescription:
+        'Add employees to manage permissions and roles for your establishment.',
+      addFirstEmployee: 'Add First Employee',
+    },
+    orderSupervision: {
+      title: 'Order Supervision',
+      subtitle: 'Monitor and manage all orders',
+      filters: {
+        all: 'All Orders',
+        pending: 'Pending',
+        preparing: 'Preparing',
+        ready: 'Ready',
+        delivered: 'Delivered',
+        cancelled: 'Cancelled',
+        date: 'Date',
+        status: 'Status',
+        allStatuses: 'All Statuses',
+      },
+      refresh: 'Refresh',
+      stats: {
+        totalOrders: 'Total Orders',
+        activeOrders: 'Active Orders',
+        completedOrders: 'Completed Orders',
+      },
+      noOrdersInStatus: 'No orders in this status',
+      markAs: 'Mark as',
+      hideDetails: 'Hide details',
+      orderDetails: {
+        orderNumber: 'Order #',
+        customer: 'Customer',
+        table: 'Table',
+        status: 'Status',
+        total: 'Total',
+        items: 'Items',
+        notes: 'Notes',
+        timestamp: 'Time',
+      },
+      actions: {
+        updateStatus: 'Update Status',
+        viewDetails: 'View Details',
+        printOrder: 'Print Order',
+      },
+    },
+    placeholders: {
+      categories: { name: 'Ex: Starters, Main courses, Desserts...' },
+      products: {
+        name: 'Ex: Paella Valenciana, Andalusian Gazpacho...',
+        description: 'Describe your product here...'
+      },
+      variants: { description: 'Ex: Normal portion, Half portion, Small...', price: '0.00' }
+    },
+  },
+} satisfies AdminModuleTranslations

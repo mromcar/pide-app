@@ -12,38 +12,31 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '3000',
-        pathname: '/images/**',
-      },
+      { protocol: 'http', hostname: 'localhost', port: '3000', pathname: '/images/**' },
     ],
   },
-  // Optimizaciones de compilación
+  // Mantén optimizePackageImports en experimental
   experimental: {
     optimizePackageImports: ['@heroicons/react', 'zod'],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+  // Mueve experimental.turbo -> turbopack
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
-  // Optimización de webpack
+  // Optimización de webpack (para build con webpack)
   webpack: (config: Configuration, { dev, isServer }: WebpackConfigOptions) => {
     if (!dev && !isServer) {
-      // Ensure optimization object exists
-      if (!config.optimization) {
-        config.optimization = {}
-      }
+      if (!config.optimization) config.optimization = {}
       config.optimization.splitChunks = {
         chunks: 'all',
         cacheGroups: {
           vendor: {
-            test: /[\\\\/]node_modules[\\\\/]/,
+            test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
             chunks: 'all',
           },
@@ -51,7 +44,7 @@ const nextConfig: NextConfig = {
       }
     }
     return config
-  }
+  },
 }
 
 export default nextConfig

@@ -66,16 +66,14 @@ export default function EstablishmentAdminPage({ params }: EstablishmentAdminPag
         const data = await getEstablishmentById(numericEstablishmentId)
 
         if (!data) {
-          throw new Error(t.establishmentAdmin.establishment.error.failedToFetch)
+          throw new Error(t.establishmentAdmin.error.failedToFetch)
         }
 
         setEstablishment(data)
         console.log('✅ EstablishmentAdminPage: Establishment loaded:', data.name)
       } catch (err) {
         console.error('❌ EstablishmentAdminPage: Error fetching establishment:', err)
-        setError(
-          err instanceof Error ? err.message : t.establishmentAdmin.establishment.error.unknownError
-        )
+        setError(err instanceof Error ? err.message : t.establishmentAdmin.error.unknownError)
       } finally {
         setLoading(false)
       }
@@ -139,9 +137,7 @@ export default function EstablishmentAdminPage({ params }: EstablishmentAdminPag
     return (
       <div className="establishment-admin-loading">
         <div className="establishment-admin-loading-content">
-          <p className="establishment-admin-loading-text">
-            {t.establishmentAdmin.establishment.loading}
-          </p>
+          <p className="establishment-admin-loading-text">{t.establishmentAdmin.loading}</p>
         </div>
       </div>
     )
@@ -160,9 +156,7 @@ export default function EstablishmentAdminPage({ params }: EstablishmentAdminPag
         <div className="establishment-admin-loading">
           <div className="establishment-admin-loading-content">
             <div className="establishment-admin-spinner"></div>
-            <p className="establishment-admin-loading-text">
-              {t.establishmentAdmin.establishment.loading}
-            </p>
+            <p className="establishment-admin-loading-text">{t.establishmentAdmin.loading}</p>
           </div>
         </div>
       </div>
@@ -179,9 +173,7 @@ export default function EstablishmentAdminPage({ params }: EstablishmentAdminPag
         />
         <div className="establishment-admin-error">
           <div className="establishment-admin-error-content">
-            <h1 className="establishment-admin-error-title">
-              {t.establishmentAdmin.establishment.error.title}
-            </h1>
+            <h1 className="establishment-admin-error-title">{t.establishmentAdmin.error.title}</h1>
             <p className="establishment-admin-error-message">{error}</p>
             <button
               onClick={() => fetchEstablishment(establishmentId)}

@@ -7,7 +7,6 @@ import AdminNavbar from '@/components/admin/AdminNavbar'
 import { MenuManagement } from '@/components/management/MenuManagement'
 import { useTranslation } from '@/hooks/useTranslation'
 import { getEstablishmentById } from '@/services/api/establishment.api'
-import { UserRole } from '@/constants/enums'
 import type { LanguageCode } from '@/constants/languages'
 import type { EstablishmentResponseDTO } from '@/types/dtos/establishment'
 
@@ -29,7 +28,6 @@ export default function EstablishmentMenuPage({ params }: EstablishmentMenuPageP
   const [establishment, setEstablishment] = useState<EstablishmentResponseDTO | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState('categories')
 
   // ✅ Resolver params
   useEffect(() => {
@@ -41,6 +39,16 @@ export default function EstablishmentMenuPage({ params }: EstablishmentMenuPageP
   }, [params])
 
   const { t } = useTranslation(resolvedParams?.lang || 'es')
+
+  // ✅ Mostrar loading mientras se resuelven params
+  if (!resolvedParams) {
+    return (
+      <div className="admin-loading">
+        <div className="loading-spinner"></div>
+        <p>{t.establishmentAdmin.forms.loading}</p>
+      </div>
+    )
+  }
 
   // ✅ Cargar establishment una vez que tenemos params y sesión
   useEffect(() => {
@@ -55,50 +63,30 @@ export default function EstablishmentMenuPage({ params }: EstablishmentMenuPageP
         const data = await getEstablishmentById(establishmentId)
 
         if (!data) {
-          throw new Error('Establishment not found')
+          throw new Error(t.establishmentAdmin.error.notFound)
         }
 
         setEstablishment(data)
-        console.log('✅ Establishment loaded:', data.name)
+        console.debug('establishment loaded', data.name)
       } catch (err) {
-        console.error('❌ Error loading establishment:', err)
-        setError(err instanceof Error ? err.message : 'Failed to load establishment')
+        console.debug('establishment load error', err)
+        setError(err instanceof Error ? err.message : t.establishmentAdmin.error.failedToFetch)
       } finally {
         setLoading(false)
       }
     }
 
     fetchEstablishment()
-  }, [resolvedParams, session])
-
-  // ✅ Mostrar loading mientras se resuelven params
-  if (!resolvedParams) {
-    return (
-      <div className="admin-loading">
-        <div className="loading-spinner"></div>
-        <p>Cargando página...</p>
-      </div>
-    )
-  }
+  }, [resolvedParams, session, t])
 
   const { lang: languageCode, establishmentId } = resolvedParams
-  const numericEstablishmentId = parseInt(establishmentId, 10)
 
   return (
     <AuthGuard
-      allowedRoles={[
-        UserRole.establishment_admin,
-        UserRole.waiter,
-        UserRole.cook,
-        UserRole.general_admin,
-      ]}
-      establishmentId={numericEstablishmentId}
-      languageCode={languageCode}
-      requireEstablishmentMatch={true}
       fallback={
         <div className="admin-loading">
           <div className="loading-spinner"></div>
-          <p>Verificando permisos...</p>
+          <p>{t.establishmentAdmin.messages.error.verifyingPermissions}</p>
         </div>
       }
     >
@@ -115,7 +103,7 @@ export default function EstablishmentMenuPage({ params }: EstablishmentMenuPageP
               <div className="admin-card-body">
                 <div className="loading-content">
                   <div className="loading-spinner"></div>
-                  <p>{t.establishmentAdmin.menuManagement.loading}</p>
+                  <p>{t.establishmentAdmin.forms.loading}</p>
                 </div>
               </div>
             </div>
@@ -123,39 +111,26 @@ export default function EstablishmentMenuPage({ params }: EstablishmentMenuPageP
             <div className="admin-card">
               <div className="admin-card-body">
                 <div className="error-content">
-                  <h3>Error</h3>
+                  <h3>{t.establishmentAdmin.messages.error.title}</h3>
                   <p>{error}</p>
                   <button
                     onClick={() => window.location.reload()}
                     className="admin-btn admin-btn-primary"
                   >
-                    Reintentar
+                    {t.establishmentAdmin.forms.retry}
                   </button>
                 </div>
               </div>
             </div>
           ) : establishment ? (
             <>
-              {/* Header del menú */}
-              <div className="admin-card mb-6">
-                <div className="admin-card-header">
-                  <h2 className="admin-card-title">{t.establishmentAdmin.menuManagement.title}</h2>
-                  <p className="admin-card-subtitle">{establishment.name}</p>
-                </div>
-              </div>
-
-              {/* Componente de gestión de menú */}
-              <MenuManagement
-                establishmentId={establishmentId}
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                languageCode={languageCode}
-              />
+              {/* Gestión de menú */}
+              <MenuManagement establishmentId={establishmentId} languageCode={languageCode} />
             </>
           ) : (
             <div className="admin-card">
               <div className="admin-card-body">
-                <p>No se pudo cargar la información del establecimiento.</p>
+                <p>{t.establishmentAdmin.error.failedToFetch}</p>
               </div>
             </div>
           )}

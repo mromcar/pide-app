@@ -148,6 +148,9 @@ export function CategoryManagement({
 
   console.log('🎨 CategoryManagement: Rendering with categories:', categories?.length || 0)
 
+  // Ahora emptyStates es obligatorio en tipos → sin aserción
+  const emptyStates = t.establishmentAdmin.messages.emptyStates
+
   return (
     <div className="category-management">
       {/* Header */}
@@ -192,10 +195,10 @@ export function CategoryManagement({
           {console.log('🎨 CategoryManagement: Rendering empty state')}
           <div className="empty-state">
             <div className="empty-icon">📂</div>
-            <h3>{t.establishmentAdmin.messages.emptyStates.noCategories}</h3>
-            <p>{t.establishmentAdmin.messages.emptyStates.noCategoriesDesc}</p>
+            <h3>{emptyStates.noCategories}</h3>
+            <p>{emptyStates.noCategoriesDesc}</p>
             <button onClick={handleAddCategory} className="btn btn-secondary">
-              {t.establishmentAdmin.messages.emptyStates.createFirstCategory}
+              {emptyStates.createFirstCategory}
             </button>
           </div>
         </>
