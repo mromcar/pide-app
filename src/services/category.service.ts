@@ -241,3 +241,5 @@ export class CategoryService {
     return addOrUpdateCategoryTranslation(categoryId, translationData);
   }
 }
+
+export const categoryService = new CategoryService()

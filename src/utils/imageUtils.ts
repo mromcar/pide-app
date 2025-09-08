@@ -48,9 +48,10 @@ export async function getProductImageUrlIfExists(productId: number): Promise<str
   return exists ? url : null;
 }
 
-// Función para verificar si existe la imagen (opcional)
-export function getImageUrlWithFallback(basePath: string, id: number, fallback?: string): string {
+/**
+ * Construye la URL de imagen (no verifica existencia).
+ */
+export function getImageUrlWithFallback(basePath: string, id: number): string {
   const imageUrl = `${basePath}/${id}.jpg`
-  // En producción podrías verificar si existe la imagen
   return imageUrl
 }

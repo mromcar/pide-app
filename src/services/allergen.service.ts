@@ -148,3 +148,5 @@ export class AllergenService {
     });
   }
 }
+
+export const allergenService = new AllergenService()

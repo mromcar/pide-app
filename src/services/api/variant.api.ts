@@ -2,22 +2,16 @@ import {
   ProductVariantCreateDTO,
   ProductVariantUpdateDTO,
   ProductVariantResponseDTO,
-} from '@/types/dtos/productVariant';
-import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils';
-import { VariantApiError } from '@/types/errors/variant.api.error';
-import { getClientApiUrl, debugApiClient } from '@/lib/api-client';
+} from '@/types/dtos/productVariant'
+import { handleApiResponse, handleCaughtError, ApiError } from '@/utils/apiUtils'
+import { VariantApiError } from '@/types/errors/variant.api.error'
+import { getClientApiUrl, debugApiClient } from '@/lib/api-client'
 
-const API_MENU_PATH = '/api/menu';
-const API_ADMIN_PATH = '/api/admin/establishments';
+const API_MENU_PATH = '/api/menu'
+const API_ADMIN_PATH = '/api/admin/establishments'
 
-/**
- * Fetches all variants of a specific product (public menu).
- * Your API requires productId as query parameter.
- */
-async function getAllVariantsByProduct(
-  establishmentId: number,
-  productId: number
-): Promise<ProductVariantResponseDTO[]> {
+// Public
+export async function getAllVariantsByProduct(establishmentId: number, productId: number): Promise<ProductVariantResponseDTO[]> {
   try {
     console.log('🔍 VariantAPI: Fetching variants for product:', { establishmentId, productId })
 
@@ -42,15 +36,7 @@ async function getAllVariantsByProduct(
   }
 }
 
-/**
- * Fetches a specific variant by its ID.
- * Since your public API requires productId, we need it as parameter.
- */
-async function getVariantById(
-  establishmentId: number,
-  productId: number,
-  variantId: number
-): Promise<ProductVariantResponseDTO | null> {
+export async function getVariantById(establishmentId: number, productId: number, variantId: number): Promise<ProductVariantResponseDTO | null> {
   try {
     console.log('🔍 VariantAPI: Fetching variant by ID:', { establishmentId, productId, variantId })
 
@@ -73,13 +59,8 @@ async function getVariantById(
   }
 }
 
-/**
- * Creates a new variant for a product (admin).
- */
-async function createVariant(
-  establishmentId: number,
-  variantData: ProductVariantCreateDTO
-): Promise<ProductVariantResponseDTO> {
+// Admin CRUD (simple)
+export async function createVariant(establishmentId: number, variantData: ProductVariantCreateDTO): Promise<ProductVariantResponseDTO> {
   try {
     console.log('🔍 VariantAPI: Creating variant for establishment:', {
       establishmentId,
@@ -110,14 +91,7 @@ async function createVariant(
   }
 }
 
-/**
- * Updates an existing variant (admin).
- */
-async function updateVariant(
-  establishmentId: number,
-  variantId: number,
-  variantData: ProductVariantUpdateDTO
-): Promise<ProductVariantResponseDTO> {
+export async function updateVariant(establishmentId: number, variantId: number, variantData: ProductVariantUpdateDTO): Promise<ProductVariantResponseDTO> {
   try {
     console.log('🔍 VariantAPI: Updating variant:', {
       establishmentId,
@@ -148,13 +122,7 @@ async function updateVariant(
   }
 }
 
-/**
- * Deletes an existing variant (admin).
- */
-async function deleteVariant(
-  establishmentId: number,
-  variantId: number
-): Promise<void> {
+export async function deleteVariant(establishmentId: number, variantId: number): Promise<void> {
   try {
     console.log('🔍 VariantAPI: Deleting variant:', { establishmentId, variantId })
 
@@ -175,18 +143,37 @@ async function deleteVariant(
   }
 }
 
-export const variantApiService = {
-  getAllVariantsByProduct,
-  getVariantById,
-  createVariant,
-  updateVariant,
-  deleteVariant,
-};
+// Admin (list/create/update/delete used by AdminMenuManager)
+type VariantsResponse = { variants: ProductVariantResponseDTO[] }
+type VariantOneResponse = { variant: ProductVariantResponseDTO }
 
-export {
-  getAllVariantsByProduct,
-  getVariantById,
-  createVariant,
-  updateVariant,
-  deleteVariant,
-};
+export async function getAdminVariants(establishmentId: number, productId: number): Promise<ProductVariantResponseDTO[]> {
+  const q = new URLSearchParams({ productId: String(productId) })
+  const res = await fetch(getClientApiUrl(`${API_ADMIN_PATH}/${establishmentId}/menu/variants?${q}`), { cache: 'no-store' })
+  if (!res.ok) throw new Error('Failed to fetch variants')
+  const json: VariantsResponse = await res.json()
+  return json.variants
+}
+
+export async function createAdminVariant(establishmentId: number, body: unknown): Promise<ProductVariantResponseDTO> {
+  const res = await fetch(getClientApiUrl(`${API_ADMIN_PATH}/${establishmentId}/menu/variants`), {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error('Failed to create variant')
+  const json: VariantOneResponse = await res.json()
+  return json.variant
+}
+
+export async function updateAdminVariant(establishmentId: number, id: number, body: unknown): Promise<ProductVariantResponseDTO> {
+  const res = await fetch(getClientApiUrl(`${API_ADMIN_PATH}/${establishmentId}/menu/variants/${id}`), {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  })
+  if (!res.ok) throw new Error('Failed to update variant')
+  const json: VariantOneResponse = await res.json()
+  return json.variant
+}
+
+export async function deleteAdminVariant(establishmentId: number, id: number): Promise<void> {
+  const res = await fetch(getClientApiUrl(`${API_ADMIN_PATH}/${establishmentId}/menu/variants/${id}`), { method: 'DELETE' })
+  if (!res.ok) throw new Error('Failed to delete variant')
+}

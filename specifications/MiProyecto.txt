@@ -1,6 +1,32 @@
 🧾 Nombre del Proyecto
 Pide
 
+Opción A (recomendada): API first-class multilenguaje. Los endpoints de create/update aceptan la entidad + translations[] y persisten todo en una transacción. Beneficios: atomicidad, menos round trips, validación única con Zod, consistencia y escalabilidad.
+Plan práctico
+
+Mantener en UI un modelo unificado con translations: Record<LanguageCode, ...>.
+Añadir mappers UI ↔ DTO en una capa fina (adaptadores). Ahora pueden mapear “solo ES” si el backend aún no acepta translations; cuando el backend esté listo, solo cambias los mappers.
+Siguiente paso: crear mappers y alinear onCreate de tablas
+
+
+Contratos estables: los DTOs aceptan translations desde hoy, aunque temporalmente envíes solo ES. No cambias la firma luego.
+Atomicidad: una transacción por operación (crear/actualizar) mantiene coherencia.
+Adaptadores finos: el frontend mapea su modelo UI a DTOs en un solo lugar src/services/mappers/menuMappers.ts. Cambios futuros no tocan componentes.
+Reutilización: los servicios existentes siguen siendo la única fuente de verdad: category.api.ts, product.api.ts, variant.api.ts, allergen.api.ts
+
+
+ran enfoque profesional: “Master–Detail” con 3 zonas y edición en cajón (drawer)
+
+Columna izquierda: categorías (lista con orden, crear/renombrar/activar/eliminar, estados vacíos).
+Panel central: tabla de productos de la categoría seleccionada (CRUD, activar/desactivar, precio, alérgenos con checks).
+Panel derecho o Drawer: variantes del producto seleccionado y formularios de edición/creación.
+Edición en Drawer con pestañas por idioma para capturar traducciones (categoría/producto/variante). Las imágenes no se muestran; solo botón “Actualizar imagen” (stub para implementar luego).
+Estados vacíos guiados: si no hay categorías > CTA crear; si no hay productos > CTA crear; si no hay variantes > CTA crear.
+Persistencia: cada operación guarda entidad base + sus traducciones. Los alérgenos se gestionan por checkboxes con el catálogo completo.
+Te dejo el scaffolding inicial (componentes y estructura). Es código listo para ir conectando tus servicios reales sin romper la app.
+
+Página: usar el nuevo manager
+
 💡 ¿Qué es Pide?
 Pide es una plataforma web responsive (móvil, tablet, PC) diseñada para digitalizar la experiencia de pedir en bares, restaurantes y otros establecimientos hosteleros.
  A través de un código QR, los clientes pueden acceder a la carta de un establecimiento concreto, hacer pedidos desde su dispositivo móvil sin esperar al camarero, y opcionalmente pagar.

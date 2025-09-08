@@ -7,6 +7,15 @@ import { getClientApiUrl, debugApiClient } from '@/lib/api-client';
 
 const API_SUPER_ADMIN_PATH = '/api/super-admin/users';
 
+// Tipos auxiliares para paginación/estadísticas/filtros
+type UsersPagination = { page: number; pageSize: number; total: number; totalPages: number }
+type UsersStats = { totalUsersInSystem: number }
+type UsersFilters = {
+  role: UserRole | null
+  search: string | null
+  establishmentId: number | null
+}
+
 /**
  * Fetches a user by their ID (super admin only).
  */
@@ -31,7 +40,7 @@ async function getUserById(userId: number): Promise<UserResponseDTO | null> {
       return null;
     }
 
-    const data = await handleApiResponse<{ user: UserResponseDTO; additionalInfo?: any; message?: string }>(response);
+    const data = await handleApiResponse<{ user: UserResponseDTO; additionalInfo?: Record<string, unknown>; message?: string }>(response);
 
     console.log('✅ UserAPI: User loaded:', {
       userId: data.user.userId,
@@ -60,9 +69,9 @@ async function getAllUsers(
   establishmentId?: number
 ): Promise<{
   users: UserResponseDTO[];
-  pagination: { page: number; pageSize: number; total: number; totalPages: number };
-  stats: { totalUsersInSystem: number };
-  filters: { role: UserRole | null; search: string | null; establishmentId: number | null };
+  pagination: UsersPagination;
+  stats: UsersStats;
+  filters: UsersFilters;
 }> {
   try {
     console.log('🔍 UserAPI: Fetching all users with filters:', {
@@ -90,9 +99,9 @@ async function getAllUsers(
 
     const data = await handleApiResponse<{
       users: UserResponseDTO[];
-      pagination: { page: number; pageSize: number; total: number; totalPages: number };
-      stats: { totalUsersInSystem: number };
-      filters: { role: UserRole | null; search: string | null; establishmentId: number | null };
+      pagination: UsersPagination;
+      stats: UsersStats;
+      filters: UsersFilters;
       message: string;
     }>(response);
 
@@ -228,9 +237,9 @@ async function searchUsers(searchTerm: string, limit: number = 10): Promise<User
 
     const data = await handleApiResponse<{
       users: UserResponseDTO[];
-      pagination: any;
-      stats: any;
-      filters: any;
+      pagination: UsersPagination;
+      stats: UsersStats;
+      filters: UsersFilters;
       message: string;
     }>(response);
 
@@ -266,9 +275,9 @@ async function getUsersByRole(role: UserRole): Promise<UserResponseDTO[]> {
 
     const data = await handleApiResponse<{
       users: UserResponseDTO[];
-      pagination: any;
-      stats: any;
-      filters: any;
+      pagination: UsersPagination;
+      stats: UsersStats;
+      filters: UsersFilters;
       message: string;
     }>(response);
 
@@ -304,9 +313,9 @@ async function getUsersByEstablishment(establishmentId: number): Promise<UserRes
 
     const data = await handleApiResponse<{
       users: UserResponseDTO[];
-      pagination: any;
-      stats: any;
-      filters: any;
+      pagination: UsersPagination;
+      stats: UsersStats;
+      filters: UsersFilters;
       message: string;
     }>(response);
 

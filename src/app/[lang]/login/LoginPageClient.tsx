@@ -3,15 +3,19 @@
 import { useState, useEffect } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { UITranslation } from '@/translations'
+import type { UITranslation } from '@/translations'
 import { UserRole } from '@/constants/enums'
+import type { LanguageCode } from '@/constants/languages'
 
-interface LoginPageClientProps {
+// Extiende el tipo de props
+export interface LoginPageClientProps {
   translations: UITranslation
-  lang: string
+  lang: LanguageCode
+  callbackUrl?: string
 }
 
-export default function LoginPageClient({ translations, lang }: LoginPageClientProps) {
+export default function LoginPageClient(props: LoginPageClientProps) {
+  const { translations, lang, callbackUrl } = props
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -21,44 +25,23 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
   const { data: session } = useSession()
   const t = translations.login
 
-  // ✅ REDIRIGIR AUTOMÁTICAMENTE DESPUÉS DEL LOGIN EXITOSO
   useEffect(() => {
     if (session?.user) {
-      console.log('✅ LoginPageClient: User authenticated, redirecting...', {
-        userId: session.user.id,
-        role: session.user.role,
-        establishmentId: session.user.establishmentId,
-      })
-
-      // ✅ USAR LOS VALORES CORRECTOS DEL ENUM
-      switch (session.user.role) {
+      switch (session.user.role as UserRole) {
         case UserRole.establishment_admin:
         case UserRole.waiter:
         case UserRole.cook:
-          // ✅ Redirigir al admin del establishment del usuario
           if (session.user.establishmentId) {
-            console.log(`🏢 Redirecting to establishment admin: ${session.user.establishmentId}`)
             router.push(`/${lang}/admin/${session.user.establishmentId}`)
           } else {
-            console.log('⚠️ User has no establishmentId, redirecting to home')
             router.push(`/${lang}`)
           }
           break
-
         case UserRole.general_admin:
-          // ✅ General admin puede ir a cualquier establishment o dashboard general
-          console.log('👑 General admin authenticated, redirecting to general dashboard')
-          router.push(`/${lang}/super-admin`) // O donde tengas el dashboard de super admin
+          router.push(`/${lang}/super-admin`)
           break
-
-        case UserRole.client: // ✅ CORREGIDO: client en lugar de customer
-          // ✅ Cliente normal va a la página principal
-          console.log('👤 Client authenticated, redirecting to home')
-          router.push(`/${lang}`)
-          break
-
+        case UserRole.client:
         default:
-          console.log('❓ Unknown role, redirecting to home')
           router.push(`/${lang}`)
       }
     }
@@ -68,19 +51,29 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
     e.preventDefault()
     setIsLoading(true)
     setError('')
-
     try {
+      // Usamos redirect: false para obtener SignInResponse tipada
       const result = await signIn('credentials', {
         email,
         password,
-        redirect: false, // ✅ No auto-redirect, lo manejamos manualmente
+        redirect: false,
+        callbackUrl: callbackUrl ?? `/${lang}`,
       })
 
       if (result?.error) {
         setError(t.error.invalidCredentials)
-        setIsLoading(false) // ✅ Solo resetear loading si hay error
+        setIsLoading(false)
+        return
       }
-      // ✅ Si no hay error, el useEffect se encargará de la redirección
+
+      if (result?.ok && result.url) {
+        // Navegamos manualmente a la URL proporcionada
+        router.push(result.url)
+        return
+      }
+
+      // Fallback
+      setIsLoading(false)
     } catch (err) {
       const message =
         err instanceof Error ? `${t.error.networkError}: ${err.message}` : t.error.networkError
@@ -92,12 +85,8 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
   const handleGoogleLogin = async () => {
     setIsLoading(true)
     setError('')
-
     try {
-      await signIn('google', {
-        redirect: false, // ✅ También manejar Google login manualmente
-      })
-      // ✅ useEffect se encargará de la redirección
+      await signIn('google', { callbackUrl: callbackUrl ?? `/${lang}` })
     } catch (err) {
       const message =
         err instanceof Error ? `${t.error.oauthError}: ${err.message}` : t.error.oauthError
@@ -106,7 +95,6 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
     }
   }
 
-  // ✅ Si ya está autenticado, mostrar loading mientras redirige
   if (session?.user) {
     return (
       <div className="login-container">
@@ -129,13 +117,11 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
     <div className="login-container">
       <div className="login-card">
         <div className="login-bg-card">
-          {/* Header */}
           <div className="login-header">
             <h2 className="login-title">{t.title}</h2>
             <p className="login-subtitle">{t.subtitle}</p>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="login-error">
               <p className="login-error-text">{error}</p>
@@ -217,7 +203,6 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
             </button>
           </form>
 
-          {/* Divider */}
           <div className="login-divider">
             <div className="login-divider-line" />
             <div className="login-divider-text">
@@ -225,7 +210,6 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
             </div>
           </div>
 
-          {/* Google Login */}
           <div className="login-google-section">
             <button onClick={handleGoogleLogin} disabled={isLoading} className="login-google-btn">
               <svg className="login-google-icon" viewBox="0 0 24 24">
@@ -250,7 +234,6 @@ export default function LoginPageClient({ translations, lang }: LoginPageClientP
             </button>
           </div>
 
-          {/* Register Link */}
           <div className="login-register-link">
             <a href={`/${lang}/register`} className="login-register-anchor">
               {t.signUp}

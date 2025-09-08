@@ -2,17 +2,16 @@
   "extends": [
     "next/core-web-vitals",
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "plugin:@typescript-eslint/recommended"
   ],
-  "plugins": ["@typescript-eslint"],
   "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
   "rules": {
     "no-console": "warn",
     "react/react-in-jsx-scope": "off",
     "@typescript-eslint/no-unused-vars": [
-      "warn",
-      { "argsIgnorePattern": "^_" }
+      "error",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
     ],
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-unsafe-assignment": "warn",

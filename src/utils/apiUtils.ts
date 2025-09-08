@@ -110,21 +110,24 @@ export function isValidUUID(uuid: string): boolean {
  * @param defaultMessage Default message if error doesn't provide a clear one.
  * @returns Never returns, always throws an error.
  */
-export function handleCaughtError<SpecificError extends ApiError>(
+export function handleCaughtError<SpecificError extends ApiError, Details = unknown>(
   error: unknown,
-  SpecificApiErrorConstructor: new (message: string, status: number, details?: any) => SpecificError,
+  SpecificApiErrorConstructor: new (message: string, status: number, details?: Details) => SpecificError,
   defaultMessage: string = 'An unexpected error occurred.'
 ): never {
   if (error instanceof SpecificApiErrorConstructor) {
     throw error;
   }
   if (error instanceof ApiError) {
-    throw new SpecificApiErrorConstructor(error.message, error.status, error.details);
+    const normalizedDetails = (error.details ?? undefined) as unknown as Details | undefined;
+    throw new SpecificApiErrorConstructor(error.message, error.status, normalizedDetails);
   }
   if (error instanceof Error) {
     console.error('Unexpected API error:', error);
-    throw new SpecificApiErrorConstructor(error.message || defaultMessage, 500, { originalError: error.name });
+    const details = { originalError: error.name } as unknown as Details;
+    throw new SpecificApiErrorConstructor(error.message || defaultMessage, 500, details);
   }
   console.error('Unknown API error:', error);
-  throw new SpecificApiErrorConstructor(defaultMessage, 500, { originalError: String(error) });
+  const details = { originalError: String(error) } as unknown as Details;
+  throw new SpecificApiErrorConstructor(defaultMessage, 500, details);
 }

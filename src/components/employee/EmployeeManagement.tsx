@@ -15,8 +15,7 @@ export default function EmployeeManagement({
 }: EmployeeManagementProps) {
   const { t } = useTranslation(languageCode)
   const [loading, setLoading] = useState(true)
-  const [employees, setEmployees] = useState([])
-
+  const [employees] = useState<unknown[]>([])
   useEffect(() => {
     // TODO: Implementar fetch de empleados
     console.log('🚧 EmployeeManagement: Loading employees for establishment:', establishmentId)

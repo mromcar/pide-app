@@ -11,6 +11,8 @@ import type { ProductResponseDTO } from '@/types/dtos/product'
 import type { ProductVariantResponseDTO } from '@/types/dtos/productVariant'
 import type { ProductVariantTranslationResponseDTO } from '@/types/dtos/productVariantTranslation'
 import type { EstablishmentResponseDTO } from '@/types/dtos/establishment'
+import type { AllergenResponseDTO } from '@/types/dtos/allergen' // ← añadir
+
 import QuantitySelector from './QuantitySelector'
 import AllergenDisplay from './AllergenDisplay'
 
@@ -22,8 +24,8 @@ interface MenuCategoryWithProducts extends CategoryDTO {
 interface MenuDisplayProps {
   menu: MenuCategoryWithProducts[]
   lang: LanguageCode
-  establishment: EstablishmentResponseDTO // ✅ AÑADIDO
-  allergens: any[] // ✅ AÑADIDO
+  establishment: EstablishmentResponseDTO
+  allergens: AllergenResponseDTO[] // ← antes: any[]
 }
 
 // ✅ CAMBIO: Recibir props adicionales
