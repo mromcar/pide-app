@@ -25,8 +25,24 @@ const getLocale = (request: NextRequest): LanguageCode => {
   }
 }
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl
+
+  // Ignorar assets y rutas públicas
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/favicon.ico') ||
+    pathname.startsWith('/robots.txt') ||
+    pathname.startsWith('/sitemap.xml') ||
+    pathname.startsWith('/fonts') ||
+    pathname.startsWith('/images') ||
+    pathname.startsWith('/assets') ||
+    /\.[\w]+$/.test(pathname)            // archivos con extensión
+  ) {
+    return NextResponse.next()
+  }
+
   console.log('🔒 Middleware processing:', pathname)
 
   // ✅ 1. DETECCIÓN DE IDIOMA (mantener funcionalidad existente)
@@ -35,10 +51,10 @@ export async function middleware(request: NextRequest) {
   )
 
   if (!pathnameHasLocale) {
-    const locale = getLocale(request)
+    const locale = getLocale(req)
     const redirectPath = `/${locale}${pathname}`
     console.log('🌍 Redirecting for locale:', redirectPath)
-    return NextResponse.redirect(new URL(redirectPath, request.url))
+    return NextResponse.redirect(new URL(redirectPath, req.url))
   }
 
   // ✅ 2. PROTECCIÓN DE RUTAS ADMIN - CORREGIDO
@@ -49,7 +65,7 @@ export async function middleware(request: NextRequest) {
     try {
       // ✅ CORREGIR: Configuración correcta para obtener token
       const token = await getToken({
-        req: request,
+        req,
         secret: process.env.NEXTAUTH_SECRET,
         // ✅ AGREGAR: Nombre correcto de cookie según entorno
         cookieName:
@@ -69,7 +85,7 @@ export async function middleware(request: NextRequest) {
       // ✅ FORZAR REDIRECCIÓN A LOGIN SI NO HAY TOKEN
       if (!token || !token.id || !token.role) {
         const locale = pathname.split('/')[1] || DEFAULT_LANGUAGE
-        const loginUrl = new URL(`/${locale}/login`, request.url)
+        const loginUrl = new URL(`/${locale}/login`, req.url)
 
         console.log('❌ NO VALID TOKEN - FORCING LOGIN REDIRECT:', loginUrl.href)
 
@@ -110,7 +126,7 @@ export async function middleware(request: NextRequest) {
       const userRole = token.role as UserRole
       if (!allowedAdminRoles.includes(userRole)) {
         const locale = pathname.split('/')[1] || DEFAULT_LANGUAGE
-        const accessDeniedUrl = new URL(`/${locale}/access-denied`, request.url)
+        const accessDeniedUrl = new URL(`/${locale}/access-denied`, req.url)
         console.log('❌ INSUFFICIENT ROLE:', userRole, '→ ACCESS DENIED')
         return NextResponse.redirect(accessDeniedUrl)
       }
@@ -132,7 +148,7 @@ export async function middleware(request: NextRequest) {
           if (!userEstablishmentId) {
             console.log('❌ USER HAS NO ESTABLISHMENT ASSIGNED')
             const locale = pathname.split('/')[1] || DEFAULT_LANGUAGE
-            const accessDeniedUrl = new URL(`/${locale}/access-denied`, request.url)
+            const accessDeniedUrl = new URL(`/${locale}/access-denied`, req.url)
             return NextResponse.redirect(accessDeniedUrl)
           }
 
@@ -143,7 +159,7 @@ export async function middleware(request: NextRequest) {
               pathname.split(`/admin/${requestedEstablishmentId}`)[1] || ''
             const correctUrl = new URL(
               `/${locale}/admin/${userEstablishmentId}${pathAfterEstablishment}`,
-              request.url
+              req.url
             )
             return NextResponse.redirect(correctUrl)
           }
@@ -154,7 +170,7 @@ export async function middleware(request: NextRequest) {
     } catch (error) {
       console.error('❌ Middleware ERROR:', error)
       const locale = pathname.split('/')[1] || DEFAULT_LANGUAGE
-      const loginUrl = new URL(`/${locale}/login`, request.url)
+      const loginUrl = new URL(`/${locale}/login`, req.url)
       console.log('❌ ERROR FALLBACK - REDIRECTING TO LOGIN')
       return NextResponse.redirect(loginUrl)
     }
@@ -169,12 +185,12 @@ export async function middleware(request: NextRequest) {
 
   if (requiresAuth) {
     const token = await getToken({
-      req: request,
+      req,
       secret: process.env.NEXTAUTH_SECRET,
     })
     if (!token) {
       const locale = pathname.split('/')[1] || DEFAULT_LANGUAGE
-      const loginUrl = new URL(`/${locale}/login`, request.url)
+      const loginUrl = new URL(`/${locale}/login`, req.url)
       console.log(
         '🔒 Protected route requires auth:',
         pathname,
@@ -190,7 +206,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|images|icons).*)',
-  ],
+  matcher: ['/((?!_next|api|favicon\\.ico|robots\\.txt|sitemap\\.xml|fonts/|images/|assets/).*)'],
 }

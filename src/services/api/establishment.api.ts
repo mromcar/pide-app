@@ -307,29 +307,55 @@ async function getPublicMenuData(establishmentId: number): Promise<PublicMenuDat
 
     const data = await handleApiResponse<ApiMenuResponse>(response)
 
-    // ✅ Usar solo campos que existen en EstablishmentResponseDTO
+    // Normalizar establishment para soportar establishment_id | establishmentId
+    const rawEst = data.establishment as unknown as Record<string, any> | undefined
+    const normalizedEst: EstablishmentResponseDTO | null = rawEst
+      ? {
+          establishmentId:
+            rawEst.establishmentId ?? rawEst.establishment_id ?? data.establishmentId ?? establishmentId,
+          name: rawEst.name ?? data.establishmentName ?? '',
+          description: rawEst.description ?? data.establishmentDescription ?? null,
+          address: rawEst.address ?? null,
+          city: rawEst.city ?? null,
+          phone1: rawEst.phone1 ?? null,
+          phone2: rawEst.phone2 ?? null,
+          website: rawEst.website ?? null,
+          acceptsOrders: rawEst.acceptsOrders ?? true,
+          isActive: rawEst.isActive ?? true,
+          createdAt: rawEst.createdAt ?? null,
+          updatedAt: rawEst.updatedAt ?? null,
+          taxId: rawEst.taxId ?? null,
+          postalCode: rawEst.postalCode ?? null,
+          billingBankDetails: null,
+          paymentBankDetails: null,
+          contactPerson: null,
+          categories: undefined,
+          administrators: undefined,
+        }
+      : {
+          establishmentId: data.establishmentId ?? establishmentId,
+          name: data.establishmentName ?? '',
+          description: data.establishmentDescription ?? null,
+          address: data.address ?? null,
+          city: data.city ?? null,
+          phone1: data.phone1 ?? null,
+          phone2: data.phone2 ?? null,
+          website: data.website ?? null,
+          acceptsOrders: true,
+          isActive: true,
+          createdAt: null,
+          updatedAt: null,
+          taxId: null,
+          postalCode: null,
+          billingBankDetails: null,
+          paymentBankDetails: null,
+          contactPerson: null,
+          categories: undefined,
+          administrators: undefined,
+        }
+
     const menuData: PublicMenuDataResponse = {
-      establishment: data.establishment || {
-        establishmentId: data.establishmentId || establishmentId,
-        name: data.establishmentName || '',
-        description: data.establishmentDescription || null,
-        address: data.address || null,
-        city: data.city || null,
-        phone1: data.phone1 || null,
-        phone2: data.phone2 || null,
-        website: data.website || null,
-        acceptsOrders: true,
-        isActive: true,
-        createdAt: null,
-        updatedAt: null,
-        taxId: null,
-        postalCode: null,
-        billingBankDetails: null,
-        paymentBankDetails: null,
-        contactPerson: null,
-        categories: undefined,
-        administrators: undefined,
-      },
+      establishment: normalizedEst,
       categories: data.categories || [],
       allergens: data.allergens || [],
     }

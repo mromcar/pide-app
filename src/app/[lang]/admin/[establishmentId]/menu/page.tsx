@@ -25,7 +25,7 @@ export default function EstablishmentMenuPage({ params }: EstablishmentMenuPageP
     >
       <div className="admin-page">
         <AdminNavbar languageCode={lang} establishmentId={establishmentId} establishment={null} />
-        <AdminMenuManager establishmentId={establishmentId} lang={lang} />
+        <AdminMenuManager lang={lang} establishmentId={establishmentId} />
       </div>
     </AuthGuard>
   )

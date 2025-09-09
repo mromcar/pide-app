@@ -10,6 +10,13 @@ import CategoryForm from './forms/CategoryForm'
 import ProductForm from './forms/ProductForm'
 import VariantForm from './forms/VariantForm'
 
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  getAdminMenu,
+  type AdminMenuCategory,
+  type AdminMenuProduct,
+  type AdminMenuVariant,
+} from '@/services/api/menu.api'
 import { useAllergens, useCategories, useProducts, useVariants } from '@/hooks/queries/menu'
 import type { LanguageCode } from '@/constants/languages'
 import type {
@@ -29,66 +36,75 @@ interface Props {
 export default function AdminMenuManager({ establishmentId, lang }: Props) {
   const { t } = useTranslation(lang)
   const estId = Number(establishmentId)
+  const qc = useQueryClient()
 
-  // Selección
+  // Estado local
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
-
-  // Drawer
   const [drawer, setDrawer] = useState<DrawerEntity | null>(null)
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const openDrawer = (entity: DrawerEntity) => {
-    setDrawer(entity)
-    setDrawerOpen(true)
-  }
-  const closeDrawer = () => {
-    setDrawerOpen(false)
-    setDrawer(null)
-  }
+  const drawerOpen = !!drawer
+  const openDrawer = (entity: DrawerEntity) => setDrawer(entity)
+  const closeDrawer = () => setDrawer(null)
 
-  // Queries + Mutations (TanStack Query)
+  // Menú agregado (categorías -> productos -> variantes)
+  const adminMenuQ = useQuery({
+    queryKey: ['adminMenu', estId],
+    queryFn: () => getAdminMenu(estId),
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  })
+
+  // Hooks de mutaciones existentes
   const {
-    categoriesQ,
+    categoriesQ: _ignoredCategoriesQ,
     createM: createCategoryM,
     updateM: updateCategoryM,
     deleteM: deleteCategoryM,
   } = useCategories(estId)
+
   const allergensQ = useAllergens(estId)
+
   const {
-    productsQ,
+    productsQ: _ignoredProductsQ,
     createM: createProductM,
     updateM: updateProductM,
     deleteM: deleteProductM,
   } = useProducts(estId, selectedCategoryId)
+
   const {
-    variantsQ,
+    variantsQ: _ignoredVariantsQ,
     createM: createVariantM,
     updateM: updateVariantM,
     deleteM: deleteVariantM,
   } = useVariants(estId, selectedProductId)
 
-  // Auto-selección por defecto al cargar datos
+  // Datos auxiliares
+  const allergens = allergensQ?.data ?? []
+
+  // Derivados del menú agregado
+  const categories: AdminMenuCategory[] = adminMenuQ.data?.categories ?? []
+  const products: AdminMenuProduct[] =
+    (selectedCategoryId != null
+      ? categories.find((c) => c.id === selectedCategoryId)?.products
+      : categories[0]?.products) ?? []
+  const variants: AdminMenuVariant[] =
+    (selectedProductId != null
+      ? products.find((p) => p.id === selectedProductId)?.variants
+      : products[0]?.variants) ?? []
+
+  // Auto-selección inicial
   useEffect(() => {
-    if (categoriesQ.data?.length && selectedCategoryId == null) {
-      setSelectedCategoryId(categoriesQ.data[0].id)
+    if (categories.length && selectedCategoryId == null) {
+      setSelectedCategoryId(categories[0].id)
     }
-  }, [categoriesQ.data, selectedCategoryId])
+  }, [categories, selectedCategoryId])
 
   useEffect(() => {
-    if (!productsQ.data?.length) {
-      setSelectedProductId(null)
-    } else if (selectedProductId == null) {
-      setSelectedProductId(productsQ.data[0].id)
-    }
-  }, [productsQ.data, selectedProductId])
+    if (!products?.length) setSelectedProductId(null)
+    else if (selectedProductId == null) setSelectedProductId(products[0].id)
+  }, [products, selectedProductId])
 
-  const categories = categoriesQ.data ?? []
-  const products = productsQ.data ?? []
-  const variants = variantsQ.data ?? []
-  const allergens = allergensQ.data ?? []
-
-  const loading =
-    categoriesQ.isLoading || allergensQ.isLoading || productsQ.isLoading || variantsQ.isLoading
+  const loading = adminMenuQ.isLoading || allergensQ.isLoading
 
   if (loading) {
     return (
@@ -103,21 +119,30 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
     )
   }
 
+  async function invalidateMenu() {
+    await qc.invalidateQueries({ queryKey: ['adminMenu', estId] })
+  }
+
   return (
-    <div className="grid grid-cols-12 gap-4 p-4">
-      <aside className="col-span-3">
+    <div className="admin-menu__grid">
+      <aside className="admin-menu__sidebar">
         <CategoryList
           lang={lang}
-          categories={categories}
+          categories={categories as any}
           onSelect={(id) => {
             setSelectedCategoryId(id)
             setSelectedProductId(null)
           }}
           onCreate={async (draft) => {
-            openDrawer({ type: 'category', mode: 'create', context: { orderHint: draft.order } })
+            openDrawer({
+              type: 'category',
+              mode: 'create',
+              context: { orderHint: (draft as any).order },
+            })
           }}
           onDelete={async (id) => {
             await deleteCategoryM.mutateAsync(id)
+            await invalidateMenu()
             if (selectedCategoryId === id) {
               setSelectedCategoryId(null)
               setSelectedProductId(null)
@@ -125,16 +150,30 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
           }}
           onEdit={(id) => {
             const cat = categories.find((c) => c.id === id)
-            if (cat) openDrawer({ type: 'category', mode: 'edit', data: cat })
+            if (cat) openDrawer({ type: 'category', mode: 'edit', data: cat as any })
+          }}
+          onUpdate={async (id, patch) => {
+            const current = categories.find((c) => c.id === id)
+            if (!current) return
+            await updateCategoryM.mutateAsync({ ...(current as any), ...patch })
+            await invalidateMenu()
+          }}
+          onReorder={async (nextOrders) => {
+            for (const { id, order } of nextOrders) {
+              const current = categories.find((c) => c.id === id)
+              if (!current || current.order === order) continue
+              await updateCategoryM.mutateAsync({ ...(current as any), order })
+            }
+            await invalidateMenu()
           }}
         />
       </aside>
 
-      <main className="col-span-9">
+      <main className="admin-menu__panel">
         <ProductTable
           lang={lang}
           allergens={allergens}
-          products={products}
+          products={products as any}
           onRowClick={(id) => setSelectedProductId(id)}
           onCreate={async () => {
             if (!selectedCategoryId) return
@@ -147,15 +186,17 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
           onUpdate={async (id, patch) => {
             const current = products.find((p) => p.id === id)
             if (!current) return
-            await updateProductM.mutateAsync({ ...current, ...patch })
+            await updateProductM.mutateAsync({ ...(current as any), ...patch })
+            await invalidateMenu()
           }}
           onDelete={async (id) => {
             await deleteProductM.mutateAsync(id)
+            await invalidateMenu()
             if (selectedProductId === id) setSelectedProductId(null)
           }}
           onEdit={(id) => {
             const prod = products.find((p) => p.id === id)
-            if (prod) openDrawer({ type: 'product', mode: 'edit', data: prod })
+            if (prod) openDrawer({ type: 'product', mode: 'edit', data: prod as any })
           }}
         />
 
@@ -163,7 +204,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
           <div className="mt-6">
             <VariantTable
               lang={lang}
-              variants={variants}
+              variants={variants as any}
               onCreate={async () => {
                 openDrawer({
                   type: 'variant',
@@ -174,14 +215,16 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
               onUpdate={async (id, patch) => {
                 const current = variants.find((v) => v.id === id)
                 if (!current) return
-                await updateVariantM.mutateAsync({ ...current, ...patch })
+                await updateVariantM.mutateAsync({ ...(current as any), ...patch })
+                await invalidateMenu()
               }}
               onDelete={async (id) => {
                 await deleteVariantM.mutateAsync(id)
+                await invalidateMenu()
               }}
               onEdit={(id) => {
                 const v = variants.find((vv) => vv.id === id)
-                if (v) openDrawer({ type: 'variant', mode: 'edit', data: v })
+                if (v) openDrawer({ type: 'variant', mode: 'edit', data: v as any })
               }}
             />
           </div>
@@ -194,10 +237,10 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
           drawer?.type === 'category'
             ? t.establishmentAdmin.menuManagement.categories.title
             : drawer?.type === 'product'
-              ? t.establishmentAdmin.menuManagement.products.title
-              : drawer?.type === 'variant'
-                ? t.establishmentAdmin.menuManagement.variants.title
-                : ''
+            ? t.establishmentAdmin.menuManagement.products.title
+            : drawer?.type === 'variant'
+            ? t.establishmentAdmin.menuManagement.variants.title
+            : ''
         }
         onClose={closeDrawer}
       >
@@ -217,6 +260,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             onSubmit={async (values) => {
               if (drawer.mode === 'create') await createCategoryM.mutateAsync(values)
               else await updateCategoryM.mutateAsync(values)
+              await invalidateMenu()
               closeDrawer()
             }}
           />
@@ -245,6 +289,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             onSubmit={async (values) => {
               if (drawer.mode === 'create') await createProductM.mutateAsync(values)
               else await updateProductM.mutateAsync(values)
+              await invalidateMenu()
               closeDrawer()
             }}
           />
@@ -267,6 +312,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             onSubmit={async (values) => {
               if (drawer.mode === 'create') await createVariantM.mutateAsync(values)
               else await updateVariantM.mutateAsync(values)
+              await invalidateMenu()
               closeDrawer()
             }}
           />

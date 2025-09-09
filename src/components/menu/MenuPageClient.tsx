@@ -48,7 +48,9 @@ export default function MenuPageClient({
       setEstablishmentId(establishment.establishmentId)
 
       if (typeof window !== 'undefined') {
-        document.cookie = `currentEstablishmentId=${establishment.establishmentId}; path=/; max-age=${60 * 60 * 24 * 30}`
+        document.cookie = `currentEstablishmentId=${
+          establishment.establishmentId
+        }; path=/; max-age=${60 * 60 * 24 * 30}`
         console.log(
           '🍪 MenuPageClient: Establishment ID stored in cookie:',
           establishment.establishmentId
@@ -311,15 +313,20 @@ export default function MenuPageClient({
                     {product.allergens && product.allergens.length > 0 && (
                       <div className="menu-product-allergens">
                         <span className="allergen-label">{menuT.allergens}:</span>
-                        {product.allergens.map((allergen) => (
-                          <span
-                            key={allergen.allergen?.allergenId}
-                            className="menu-allergen-badge"
-                            title={allergen.allergen?.name}
-                          >
-                            {allergen.allergen?.code}
-                          </span>
-                        ))}
+                        {product.allergens.map((alg, idx) => {
+                          const id = alg.allergen?.allergenId ?? (alg as any).allergenId ?? idx
+                          const code = alg.allergen?.code ?? (alg as any).code ?? 'ALG'
+                          const name = alg.allergen?.name ?? (alg as any).name ?? 'Allergen'
+                          return (
+                            <span
+                              key={`${product.productId}-alg-${id}`}
+                              className="menu-allergen-badge"
+                              title={name}
+                            >
+                              {code}
+                            </span>
+                          )
+                        })}
                       </div>
                     )}
 

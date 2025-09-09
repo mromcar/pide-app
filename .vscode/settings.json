@@ -17,5 +17,11 @@
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "prettier.singleQuote": true,
-  "prettier.semi": false
+  "prettier.semi": false,
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+  "less.lint.unknownAtRules": "ignore",
+  "editor.quickSuggestions": { "strings": true },
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.experimental.configFile": "tailwind.config.ts"
 }

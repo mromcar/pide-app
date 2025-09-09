@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { LanguageCode } from '@/constants/languages'
 import type { ProductVariant } from '@/types/management/menu'
@@ -20,6 +21,27 @@ export default function VariantTable({
   onEdit,
 }: Props) {
   const { t } = useTranslation(lang)
+  const [editId, setEditId] = useState<number | null>(null)
+  const [draftName, setDraftName] = useState<string>('')
+  const [draftPrice, setDraftPrice] = useState<string>('')
+
+  function startEdit(v: ProductVariant) {
+    setEditId(v.id)
+    setDraftName(v.translations[lang]?.name ?? '')
+    setDraftPrice(String(v.priceModifier ?? 0))
+  }
+  async function save(v: ProductVariant) {
+    const priceNum = Number(draftPrice)
+    const patch: Partial<ProductVariant> = {
+      priceModifier: Number.isFinite(priceNum) ? priceNum : v.priceModifier,
+      translations: {
+        ...v.translations,
+        [lang]: { ...(v.translations[lang] || { name: '' }), name: draftName },
+      } as any,
+    }
+    await onUpdate(v.id, patch)
+    setEditId(null)
+  }
 
   return (
     <div className="admin-card">
@@ -38,7 +60,7 @@ export default function VariantTable({
             {t.establishmentAdmin.messages.emptyStates.noVariantsDesc}
           </p>
         ) : (
-          <table className="admin-table">
+          <table className="admin-menu__table">
             <thead>
               <tr>
                 <th>{t.establishmentAdmin.menuManagement.variants.name}</th>
@@ -48,35 +70,82 @@ export default function VariantTable({
               </tr>
             </thead>
             <tbody>
-              {variants.map((v) => (
-                <tr key={v.id}>
-                  <td>{v.translations[lang]?.name ?? '(no name)'}</td>
-                  <td>{v.priceModifier.toFixed(2)}</td>
-                  <td>
-                    <button
-                      className="admin-tag"
-                      onClick={() => onUpdate(v.id, { active: !v.active })}
+              {variants.map((v) => {
+                const isEdit = editId === v.id
+                return (
+                  <tr key={v.id}>
+                    <td
+                      className="admin-menu__cell--editable"
+                      onClick={() => !isEdit && startEdit(v)}
                     >
-                      {v.active
-                        ? t.establishmentAdmin.dashboard.active
-                        : t.establishmentAdmin.dashboard.inactive}
-                    </button>
-                  </td>
-                  <td>
-                    <div className="flex gap-2">
+                      {isEdit ? (
+                        <input
+                          className="admin-input"
+                          value={draftName}
+                          onChange={(e) => setDraftName(e.target.value)}
+                        />
+                      ) : (
+                        v.translations[lang]?.name ?? '(no name)'
+                      )}
+                    </td>
+                    <td
+                      className="admin-menu__cell--editable"
+                      onClick={() => !isEdit && startEdit(v)}
+                    >
+                      {isEdit ? (
+                        <input
+                          className="admin-input"
+                          value={draftPrice}
+                          inputMode="decimal"
+                          onChange={(e) => setDraftPrice(e.target.value)}
+                        />
+                      ) : (
+                        v.priceModifier.toFixed(2)
+                      )}
+                    </td>
+                    <td>
                       <button
-                        className="admin-btn admin-btn-secondary"
-                        onClick={() => onEdit(v.id)}
+                        className="admin-tag"
+                        onClick={() => onUpdate(v.id, { active: !v.active })}
                       >
-                        {t.establishmentAdmin.forms.edit}
+                        {v.active
+                          ? t.establishmentAdmin.dashboard.active
+                          : t.establishmentAdmin.dashboard.inactive}
                       </button>
-                      <button className="admin-btn admin-btn-danger" onClick={() => onDelete(v.id)}>
-                        {t.establishmentAdmin.forms.delete}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td>
+                      {isEdit ? (
+                        <div className="admin-menu__row-actions">
+                          <button className="admin-menu__save-btn" onClick={() => save(v)}>
+                            {t.establishmentAdmin.forms.update}
+                          </button>
+                          <button
+                            className="admin-menu__cancel-btn"
+                            onClick={() => setEditId(null)}
+                          >
+                            {t.establishmentAdmin.forms.cancel}
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="admin-menu__row-actions">
+                          <button
+                            className="admin-btn admin-btn-secondary"
+                            onClick={() => onEdit(v.id)}
+                          >
+                            {t.establishmentAdmin.forms.edit}
+                          </button>
+                          <button
+                            className="admin-btn admin-btn-danger"
+                            onClick={() => onDelete(v.id)}
+                          >
+                            {t.establishmentAdmin.forms.delete}
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         )}

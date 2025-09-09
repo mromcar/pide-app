@@ -1,7 +1,14 @@
-import { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { EstablishmentMenuPageProps } from '@/types/pages'
 import { getPublicMenuData } from '@/services/api/establishment.api'
 import MenuPageClient from '@/components/menu/MenuPageClient'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
 
 export async function generateMetadata({ params }: EstablishmentMenuPageProps): Promise<Metadata> {
   const resolvedParams = await params
@@ -17,7 +24,6 @@ export async function generateMetadata({ params }: EstablishmentMenuPageProps): 
 
   return {
     title: establishmentName ? `${establishmentName} - Menu` : 'Restaurant Menu',
-    viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   }
 }
 
