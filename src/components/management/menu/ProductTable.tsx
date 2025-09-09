@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { LanguageCode } from '@/constants/languages'
 import type { UIAllergen, MenuProduct } from '@/types/management/menu'
+import { allergenIcons } from '@/components/icons/AllergenIcons' // +
 
 interface Props {
   lang: LanguageCode
@@ -83,11 +84,8 @@ export default function ProductTable({
               <tr>
                 <th>{t.establishmentAdmin.menuManagement.products.name}</th>
                 <th>{t.establishmentAdmin.menuManagement.products.price}</th>
-                {allergens.map((a) => (
-                  <th key={`alg-h-${a.id}`} className="text-center" title={a.name}>
-                    {short(a.name)}
-                  </th>
-                ))}
+                <th>{t.establishmentAdmin.menuManagement.products.variants}</th>
+                <th>{t.establishmentAdmin.menuManagement.products.allergens}</th>
                 <th>{t.establishmentAdmin.forms.active}</th>
                 <th className="w-1">{t.establishmentAdmin.menuManagement.products.actions}</th>
               </tr>
@@ -97,42 +95,35 @@ export default function ProductTable({
                 const isEdit = editId === p.id
                 const nameVal = isEdit ? draftName : p.translations[lang]?.name ?? '(no name)'
                 const priceVal = isEdit ? draftPrice : p.price.toFixed(2)
-                const selected = new Set<number>(p.allergens || [])
 
                 return (
-                  <tr key={p.id} onClick={() => onRowClick(p.id)} className="cursor-pointer">
+                  <tr key={p.id} className="cursor-default">
+                    {/* Nombre */}
                     <td
                       className="admin-menu__cell--editable"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        if (!isEdit) startEdit(p)
-                      }}
+                      onClick={() => !isEdit && startEdit(p)}
                     >
                       {isEdit ? (
                         <input
                           className="admin-input"
                           value={draftName}
                           onChange={(e) => setDraftName(e.target.value)}
-                          onClick={(e) => e.stopPropagation()}
                         />
                       ) : (
                         nameVal
                       )}
                     </td>
 
+                    {/* Precio */}
                     <td
                       className="admin-menu__cell--editable"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        if (!isEdit) startEdit(p)
-                      }}
+                      onClick={() => !isEdit && startEdit(p)}
                     >
                       {isEdit ? (
                         <input
                           className="admin-input"
                           value={draftPrice}
                           onChange={(e) => setDraftPrice(e.target.value)}
-                          onClick={(e) => e.stopPropagation()}
                           inputMode="decimal"
                         />
                       ) : (
@@ -140,23 +131,37 @@ export default function ProductTable({
                       )}
                     </td>
 
-                    {allergens.map((a) => {
-                      const checked = selected.has(a.id)
-                      return (
-                        <td key={`alg-c-${p.id}-${a.id}`} className="admin-menu__cell--checkbox">
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) => toggleAllergen(p, a.id, e.currentTarget.checked)}
-                            aria-label={`${nameVal} - ${a.name}`}
-                            title={a.name}
-                          />
-                        </td>
-                      )
-                    })}
+                    {/* Nº variantes */}
+                    <td className="text-center">{p.variants?.length ?? 0}</td>
 
-                    <td onClick={(e) => e.stopPropagation()}>
+                    {/* Iconos de alérgenos */}
+                    <td>
+                      <div className="flex flex-wrap gap-1">
+                        {(p.allergens || []).map((id) => {
+                          const a = allergens.find((x) => x.id === id)
+                          if (!a) return null
+                          const Icon = a.code ? (allergenIcons as any)[a.code] : null
+                          return Icon ? (
+                            <Icon
+                              key={`alg-${p.id}-${a.id}`}
+                              size={16}
+                              className="text-neutral-500"
+                            />
+                          ) : (
+                            <span
+                              key={`alg-${p.id}-${a.id}`}
+                              className="menu-allergen-badge"
+                              title={a.name}
+                            >
+                              {a.code ?? '·'}
+                            </span>
+                          )
+                        })}
+                      </div>
+                    </td>
+
+                    {/* Estado */}
+                    <td>
                       <button
                         className="admin-tag"
                         onClick={() => onUpdate(p.id, { active: !p.active })}
@@ -167,7 +172,8 @@ export default function ProductTable({
                       </button>
                     </td>
 
-                    <td onClick={(e) => e.stopPropagation()}>
+                    {/* Acciones = Editar/Eliminar */}
+                    <td>
                       {isEdit ? (
                         <div className="admin-menu__row-actions">
                           <button className="admin-menu__save-btn" onClick={() => saveEdit(p)}>
@@ -182,6 +188,7 @@ export default function ProductTable({
                           <button
                             className="admin-btn admin-btn-secondary"
                             onClick={() => onEdit(p.id)}
+                            title={t.establishmentAdmin.menuManagement.products.edit}
                           >
                             {t.establishmentAdmin.forms.edit}
                           </button>
