@@ -57,8 +57,7 @@ export class UserService {
 
     const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
-    // ✅ CORRECCIÓN: Usar eslint-disable para la variable descartada
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // ✅ Descarta el password
     const { password: _, ...dataWithoutPassword } = data;
 
     const newUser = await prisma.user.create({

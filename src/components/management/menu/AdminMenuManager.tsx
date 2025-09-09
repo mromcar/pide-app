@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+'use client'
+
+import { useEffect, useState } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import CategoryList from './CategoryList'
 import ProductTable from './ProductTable'
@@ -8,39 +10,13 @@ import CategoryForm from './forms/CategoryForm'
 import ProductForm from './forms/ProductForm'
 import VariantForm from './forms/VariantForm'
 
-import {
-  getAdminCategories,
-  createAdminCategory,
-  updateAdminCategory,
-} from '@/services/api/category.api'
-import { getAdminAllergens } from '@/services/api/allergen.api'
-import {
-  getAdminProducts,
-  createAdminProduct,
-  updateAdminProduct,
-} from '@/services/api/product.api'
-import {
-  getAdminVariants,
-  createAdminVariant,
-  updateAdminVariant,
-} from '@/services/api/variant.api'
-
-import {
-  mapCategoryUIToDTO,
-  mapProductUIToDTO,
-  mapVariantUIToDTO,
-  mapCategoryDTOToUI,
-  mapProductDTOToUI,
-  mapVariantDTOToUI,
-} from '@/services/mappers/menuMappers'
-
+import { useAllergens, useCategories, useProducts, useVariants } from '@/hooks/queries/menu'
 import type { LanguageCode } from '@/constants/languages'
 import type {
+  DrawerEntity,
   MenuCategory,
   MenuProduct,
   ProductVariant,
-  DrawerEntity,
-  UIAllergen,
 } from '@/types/management/menu'
 
 const LANGS: LanguageCode[] = ['es', 'en', 'fr']
@@ -52,13 +28,7 @@ interface Props {
 
 export default function AdminMenuManager({ establishmentId, lang }: Props) {
   const { t } = useTranslation(lang)
-
-  // Data
-  const [loading, setLoading] = useState(true)
-  const [categories, setCategories] = useState<MenuCategory[]>([])
-  const [products, setProducts] = useState<MenuProduct[]>([])
-  const [variants, setVariants] = useState<ProductVariant[]>([])
-  const [allergens, setAllergens] = useState<UIAllergen[]>([])
+  const estId = Number(establishmentId)
 
   // Selección
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
@@ -67,103 +37,58 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
   // Drawer
   const [drawer, setDrawer] = useState<DrawerEntity | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
-
-  // Load categories + allergens on mount
-  useEffect(() => {
-    let cancelled = false
-    async function loadInitial() {
-      setLoading(true)
-      try {
-        const [catDTOs, allgs] = await Promise.all([
-          getAdminCategories(Number(establishmentId)),
-          getAdminAllergens(Number(establishmentId)),
-        ])
-        if (cancelled) return
-        const cats = catDTOs.map(mapCategoryDTOToUI)
-        setCategories(cats)
-        setAllergens(
-          allgs.map(
-            (a: { allergenId?: number; id?: number; name?: string; allergenName?: string }) => ({
-              id: a.allergenId ?? a.id ?? 0,
-              name: a.name ?? a.allergenName ?? '',
-            })
-          )
-        )
-        setSelectedCategoryId(cats[0]?.id ?? null)
-        setSelectedProductId(null)
-        setProducts([])
-        setVariants([])
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    loadInitial()
-    return () => {
-      cancelled = true
-    }
-  }, [establishmentId])
-
-  // Load products when category changes
-  useEffect(() => {
-    let cancelled = false
-    async function loadProducts() {
-      if (!selectedCategoryId) {
-        setProducts([])
-        setSelectedProductId(null)
-        return
-      }
-      const dto = await getAdminProducts(Number(establishmentId), {
-        categoryId: selectedCategoryId,
-      })
-      if (cancelled) return
-      const ui = dto.map(mapProductDTOToUI)
-      setProducts(ui)
-      setSelectedProductId(ui[0]?.id ?? null)
-      setVariants([])
-    }
-    loadProducts().catch((e) => console.error('Failed to load products', e))
-    return () => {
-      cancelled = true
-    }
-  }, [establishmentId, selectedCategoryId])
-
-  // Load variants when product changes
-  useEffect(() => {
-    let cancelled = false
-    async function loadVariants() {
-      if (!selectedProductId) {
-        setVariants([])
-        return
-      }
-      const dto = await getAdminVariants(Number(establishmentId), selectedProductId)
-      if (cancelled) return
-      setVariants(dto.map(mapVariantDTOToUI))
-    }
-    loadVariants().catch((e) => console.error('Failed to load variants', e))
-    return () => {
-      cancelled = true
-    }
-  }, [establishmentId, selectedProductId])
-
-  const productsInCategory = useMemo(
-    () => (selectedCategoryId ? products.filter((p) => p.categoryId === selectedCategoryId) : []),
-    [products, selectedCategoryId]
-  )
-
-  const variantsOfProduct = useMemo(
-    () => (selectedProductId ? variants.filter((v) => v.productId === selectedProductId) : []),
-    [variants, selectedProductId]
-  )
-
   const openDrawer = (entity: DrawerEntity) => {
     setDrawer(entity)
     setDrawerOpen(true)
   }
-
   const closeDrawer = () => {
     setDrawerOpen(false)
     setDrawer(null)
   }
+
+  // Queries + Mutations (TanStack Query)
+  const {
+    categoriesQ,
+    createM: createCategoryM,
+    updateM: updateCategoryM,
+    deleteM: deleteCategoryM,
+  } = useCategories(estId)
+  const allergensQ = useAllergens(estId)
+  const {
+    productsQ,
+    createM: createProductM,
+    updateM: updateProductM,
+    deleteM: deleteProductM,
+  } = useProducts(estId, selectedCategoryId)
+  const {
+    variantsQ,
+    createM: createVariantM,
+    updateM: updateVariantM,
+    deleteM: deleteVariantM,
+  } = useVariants(estId, selectedProductId)
+
+  // Auto-selección por defecto al cargar datos
+  useEffect(() => {
+    if (categoriesQ.data?.length && selectedCategoryId == null) {
+      setSelectedCategoryId(categoriesQ.data[0].id)
+    }
+  }, [categoriesQ.data, selectedCategoryId])
+
+  useEffect(() => {
+    if (!productsQ.data?.length) {
+      setSelectedProductId(null)
+    } else if (selectedProductId == null) {
+      setSelectedProductId(productsQ.data[0].id)
+    }
+  }, [productsQ.data, selectedProductId])
+
+  const categories = categoriesQ.data ?? []
+  const products = productsQ.data ?? []
+  const variants = variantsQ.data ?? []
+  const allergens = allergensQ.data ?? []
+
+  const loading =
+    categoriesQ.isLoading || allergensQ.isLoading || productsQ.isLoading || variantsQ.isLoading
 
   if (loading) {
     return (
@@ -192,12 +117,10 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             openDrawer({ type: 'category', mode: 'create', context: { orderHint: draft.order } })
           }}
           onDelete={async (id) => {
-            setCategories((prev) => prev.filter((c) => c.id !== id))
+            await deleteCategoryM.mutateAsync(id)
             if (selectedCategoryId === id) {
               setSelectedCategoryId(null)
               setSelectedProductId(null)
-              setProducts([])
-              setVariants([])
             }
           }}
           onEdit={(id) => {
@@ -211,7 +134,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
         <ProductTable
           lang={lang}
           allergens={allergens}
-          products={productsInCategory}
+          products={products}
           onRowClick={(id) => setSelectedProductId(id)}
           onCreate={async () => {
             if (!selectedCategoryId) return
@@ -222,14 +145,13 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             })
           }}
           onUpdate={async (id, patch) => {
-            setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)))
+            const current = products.find((p) => p.id === id)
+            if (!current) return
+            await updateProductM.mutateAsync({ ...current, ...patch })
           }}
           onDelete={async (id) => {
-            setProducts((prev) => prev.filter((p) => p.id !== id))
-            if (selectedProductId === id) {
-              setSelectedProductId(null)
-              setVariants([])
-            }
+            await deleteProductM.mutateAsync(id)
+            if (selectedProductId === id) setSelectedProductId(null)
           }}
           onEdit={(id) => {
             const prod = products.find((p) => p.id === id)
@@ -241,7 +163,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
           <div className="mt-6">
             <VariantTable
               lang={lang}
-              variants={variantsOfProduct}
+              variants={variants}
               onCreate={async () => {
                 openDrawer({
                   type: 'variant',
@@ -250,10 +172,12 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                 })
               }}
               onUpdate={async (id, patch) => {
-                setVariants((prev) => prev.map((v) => (v.id === id ? { ...v, ...patch } : v)))
+                const current = variants.find((v) => v.id === id)
+                if (!current) return
+                await updateVariantM.mutateAsync({ ...current, ...patch })
               }}
               onDelete={async (id) => {
-                setVariants((prev) => prev.filter((v) => v.id !== id))
+                await deleteVariantM.mutateAsync(id)
               }}
               onEdit={(id) => {
                 const v = variants.find((vv) => vv.id === id)
@@ -282,7 +206,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             langs={LANGS}
             initialValues={
               drawer.mode === 'edit'
-                ? drawer.data!
+                ? (drawer.data as MenuCategory)
                 : {
                     id: 0,
                     order: (categories.at(-1)?.order ?? 0) + 1,
@@ -291,28 +215,9 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                   }
             }
             onSubmit={async (values) => {
-              try {
-                if (drawer.mode === 'create') {
-                  const created = await createAdminCategory(
-                    Number(establishmentId),
-                    mapCategoryUIToDTO(values)
-                  )
-                  const ui = mapCategoryDTOToUI(created)
-                  setCategories((prev) => [...prev, ui].sort((a, b) => a.order - b.order))
-                  setSelectedCategoryId((prev) => prev ?? ui.id)
-                } else {
-                  const updated = await updateAdminCategory(
-                    Number(establishmentId),
-                    values.id,
-                    mapCategoryUIToDTO(values)
-                  )
-                  const ui = mapCategoryDTOToUI(updated)
-                  setCategories((prev) => prev.map((c) => (c.id === ui.id ? ui : c)))
-                }
-                closeDrawer()
-              } catch (e) {
-                console.error('Category save failed', e)
-              }
+              if (drawer.mode === 'create') await createCategoryM.mutateAsync(values)
+              else await updateCategoryM.mutateAsync(values)
+              closeDrawer()
             }}
           />
         )}
@@ -323,7 +228,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             allergens={allergens}
             initialValues={
               drawer.mode === 'edit'
-                ? drawer.data!
+                ? (drawer.data as MenuProduct)
                 : {
                     id: 0,
                     categoryId: drawer.context!.categoryId,
@@ -338,28 +243,9 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                   }
             }
             onSubmit={async (values) => {
-              try {
-                if (drawer.mode === 'create') {
-                  const created = await createAdminProduct(
-                    Number(establishmentId),
-                    mapProductUIToDTO(values)
-                  )
-                  const ui = mapProductDTOToUI(created)
-                  setProducts((prev) => [...prev, ui])
-                  setSelectedProductId(ui.id)
-                } else {
-                  const updated = await updateAdminProduct(
-                    Number(establishmentId),
-                    values.id,
-                    mapProductUIToDTO(values)
-                  )
-                  const ui = mapProductDTOToUI(updated)
-                  setProducts((prev) => prev.map((p) => (p.id === ui.id ? ui : p)))
-                }
-                closeDrawer()
-              } catch (e) {
-                console.error('Product save failed', e)
-              }
+              if (drawer.mode === 'create') await createProductM.mutateAsync(values)
+              else await updateProductM.mutateAsync(values)
+              closeDrawer()
             }}
           />
         )}
@@ -369,7 +255,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             langs={LANGS}
             initialValues={
               drawer.mode === 'edit'
-                ? drawer.data!
+                ? (drawer.data as ProductVariant)
                 : {
                     id: 0,
                     productId: drawer.context!.productId,
@@ -379,27 +265,9 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                   }
             }
             onSubmit={async (values) => {
-              try {
-                if (drawer.mode === 'create') {
-                  const created = await createAdminVariant(
-                    Number(establishmentId),
-                    mapVariantUIToDTO(values)
-                  )
-                  const ui = mapVariantDTOToUI(created)
-                  setVariants((prev) => [...prev, ui])
-                } else {
-                  const updated = await updateAdminVariant(
-                    Number(establishmentId),
-                    values.id,
-                    mapVariantUIToDTO(values)
-                  )
-                  const ui = mapVariantDTOToUI(updated)
-                  setVariants((prev) => prev.map((v) => (v.id === ui.id ? ui : v)))
-                }
-                closeDrawer()
-              } catch (e) {
-                console.error('Variant save failed', e)
-              }
+              if (drawer.mode === 'create') await createVariantM.mutateAsync(values)
+              else await updateVariantM.mutateAsync(values)
+              closeDrawer()
             }}
           />
         )}

@@ -5266,3 +5266,5 @@
 2025-09-07 21:38:28:3828 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
 2025-09-07 21:38:28:3828 [32minfo[39m: [32m[ADMIN API] Fetching products for establishmentId: 1 by user: 1[39m
 2025-09-07 21:38:30:3830 [32minfo[39m: [32m[ADMIN API] Found 3 products for establishmentId: 1[39m
+2025-09-09 13:05:52:552 [32minfo[39m: [32m[PUBLIC API] Fetching public menu for establishment:[39m
+2025-09-09 13:05:55:555 [32minfo[39m: [32m[PUBLIC API] Menu público obtenido exitosamente:[39m

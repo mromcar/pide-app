@@ -388,9 +388,24 @@ npm run build
 
 ---
 
+## 🧠 Estado de servidor con TanStack Query
+
+- Usar TanStack Query para todo data fetching (no useEffect con fetch).
+- Claves centralizadas en src/services/queryKeys.ts (qk.categories/products/variants/allergens).
+- Hooks reutilizables en src/hooks/queries/ (useCategories, useProducts, useVariants, useAllergens).
+- Mutaciones con actualizaciones optimistas (onMutate), rollback en onError e invalidación en onSettled.
+- Mapear DTO ⇄ UI solo en services/mappers (los componentes consumen tipos UI).
+- Admin UI: staleTime≥30s y refetchOnWindowFocus=false.
+
+## ESLint
+
+- Usar ESLint CLI con Next.js (extends: next/core-web-vitals).
+- Ignorar .next/, dist/, coverage/ y next-env.d.ts.
+- Archivos Node (next.config.js, tailwind, postcss): env node, permitir require y desactivar no-undef.
+
 > **⚠️ IMPORTANTE: Estos estándares son OBLIGATORIOS. Cualquier código que no siga estas convenciones debe ser rechazado y corregido.**
 
 ---
 
-**Última actualización:** Enero 2025
+**Última actualización:** Septiembre 2025
 **Versión:** 1.0.0

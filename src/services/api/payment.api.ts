@@ -143,7 +143,6 @@ async function getOrderPayments(orderId: number): Promise<PaymentResponseDTO[]> 
 async function updatePaymentStatus(
   paymentId: string,
   status: PaymentStatus,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _metadata?: Record<string, unknown>
 ): Promise<PaymentResponseDTO> {
   try {

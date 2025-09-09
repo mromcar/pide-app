@@ -363,3 +363,15 @@ npm run format                 # Prettier formatting
 - Test data integrity
 
 **Remember**: This is a production restaurant management system. Prioritize security, user experience, and maintainability in all code generation and suggestions.
+
+## Server State with TanStack Query (React Query)
+
+- Use TanStack Query for all server state (no manual useEffect fetches).
+- Centralize query keys in src/services/queryKeys.ts (qk.categories, qk.products, qk.variants, qk.allergens).
+- Create reusable hooks under src/hooks/queries/ (useCategories, useProducts, useVariants, useAllergens).
+- Mutations must:
+  - Perform optimistic updates via onMutate for common toggles/patches.
+  - Roll back on error and invalidate relevant keys on settle.
+- Map DTO ⇄ UI only in services/mappers (components consume UI types).
+- Prefer staleTime and refetchOnWindowFocus=false for admin UI.
+- SSR/Prefetch plan: use @tanstack/react-query hydration (dehydrate/rehydrate) when needed at scale (future).

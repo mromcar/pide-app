@@ -1,5 +1,5 @@
 ﻿/* Importaciones de fuentes y archivos CSS PRIMERO */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap');
 @import './fonts.css';
 @import './base.css';
 @import './components/buttons.css';
@@ -13,7 +13,6 @@
 @import './pages/menu.css';
 @import './pages/login.css';
 @import './pages/admin.css';
-
 
 /* Directivas Tailwind DESPUÉS de todos los imports */
 @tailwind base;
