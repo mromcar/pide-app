@@ -9,7 +9,6 @@ import EditDrawer from './drawers/EditDrawer'
 import CategoryForm from './forms/CategoryForm'
 import ProductForm from './forms/ProductForm'
 import VariantForm from './forms/VariantForm'
-import VariantTable from './VariantTable' // +
 import { notify } from '@/utils/notify'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -19,15 +18,13 @@ import {
   type AdminMenuProduct,
 } from '@/services/api/menu.api'
 import { useAllergens, useCategories, useProducts, useVariants } from '@/hooks/queries/menu'
-import type { LanguageCode } from '@/constants/languages'
+import { VISIBLE_LANGS, type LanguageCode } from '@/constants/languages'
 import type {
   DrawerEntity,
   MenuCategory,
   MenuProduct,
   ProductVariant,
 } from '@/types/management/menu'
-
-const LANGS: LanguageCode[] = ['es', 'en', 'fr']
 
 interface Props {
   establishmentId: string
@@ -46,13 +43,6 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
   const drawerOpen = !!drawer
   const openDrawer = (entity: DrawerEntity) => setDrawer(entity)
   const closeDrawer = () => setDrawer(null)
-
-  // Tab activa en drawer de producto
-  const [productTab, setProductTab] = useState<'general' | 'variants'>('general') // +
-  useEffect(() => {
-    // Resetear al cambiar de entidad de drawer
-    setProductTab('general')
-  }, [drawer?.type, drawer?.mode])
 
   // Menú agregado
   const adminMenuQ = useQuery({
@@ -77,11 +67,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
     deleteM: deleteProductM,
   } = useProducts(estId, selectedCategoryId)
 
-  const {
-    createM: createVariantM,
-    updateM: updateVariantM,
-    deleteM: deleteVariantM,
-  } = useVariants(estId, selectedProductId)
+  const { createM: createVariantM, updateM: updateVariantM } = useVariants(estId, selectedProductId)
 
   const allergens = allergensQ.data ?? []
   const categories: AdminMenuCategory[] = adminMenuQ.data?.categories ?? []
@@ -114,7 +100,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
         <div className="admin-card-body">
           <div className="loading-content">
             <div className="loading-spinner" />
-            <p>{t.establishmentAdmin.forms.loading}</p>
+            <p className="sr-only">{t.establishmentAdmin.forms.loading}</p>
           </div>
         </div>
       </div>
@@ -146,9 +132,9 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                 setSelectedCategoryId(null)
                 setSelectedProductId(null)
               }
-              notify.success((t as any).messages?.success?.categoryDeleted ?? '✔')
+              notify.success(t.establishmentAdmin.notifications?.categoryDeleted ?? '✔')
             } catch {
-              notify.error((t as any).messages?.error?.categoryDeleteFailed ?? '✖')
+              notify.error(t.establishmentAdmin.notifications?.categoryDeleteError ?? '✖')
             }
           }}
           onUpdate={async (id, patch) => {
@@ -157,9 +143,9 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             try {
               await updateCategoryM.mutateAsync({ ...(current as any), ...patch })
               await invalidateMenu()
-              notify.success((t as any).messages?.success?.categoryUpdated ?? '✔')
+              notify.success(t.establishmentAdmin.notifications?.categoryUpdated ?? '✔')
             } catch {
-              notify.error((t as any).messages?.error?.categoryUpdateFailed ?? '✖')
+              notify.error(t.establishmentAdmin.notifications?.categoryUpdateError ?? '✖')
             }
           }}
           onReorder={async (nextOrders) => {
@@ -170,13 +156,12 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                 await updateCategoryM.mutateAsync({ ...(current as any), order })
               }
               await invalidateMenu()
-              notify.success((t as any).messages?.success?.categoryUpdated ?? '✔')
+              notify.success(t.establishmentAdmin.notifications?.categoryReordered ?? '✔')
             } catch {
-              notify.error((t as any).messages?.error?.categoryUpdateFailed ?? '✖')
+              notify.error(t.establishmentAdmin.notifications?.categoryReorderError ?? '✖')
             }
           }}
           onEdit={(id) => {
-            // NUEVO
             const cat = categories.find((c) => c.id === id)
             if (cat) openDrawer({ type: 'category', mode: 'edit', data: cat as any })
           }}
@@ -203,17 +188,9 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             try {
               await updateProductM.mutateAsync({ ...(current as any), ...patch })
               await invalidateMenu()
-              notify.success(
-                t.establishmentAdmin.notifications?.productUpdated ??
-                  (t as any).messages?.success?.productUpdated ??
-                  '✔'
-              )
+              notify.success(t.establishmentAdmin.notifications?.productUpdated ?? '✔')
             } catch {
-              notify.error(
-                t.establishmentAdmin.notifications?.productUpdateError ??
-                  (t as any).messages?.error?.productUpdateFailed ??
-                  '✖'
-              )
+              notify.error(t.establishmentAdmin.notifications?.productUpdateError ?? '✖')
             }
           }}
           onDelete={async (id) => {
@@ -221,9 +198,9 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
               await deleteProductM.mutateAsync(id)
               await invalidateMenu()
               if (selectedProductId === id) setSelectedProductId(null)
-              notify.success((t as any).messages?.success?.productDeleted ?? '✔')
+              notify.success(t.establishmentAdmin.notifications?.productDeleted ?? '✔')
             } catch {
-              notify.error((t as any).messages?.error?.productDeleteFailed ?? '✖')
+              notify.error(t.establishmentAdmin.notifications?.productDeleteError ?? '✖')
             }
           }}
           onEdit={(id) => {
@@ -242,10 +219,9 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                 })
               )
               await invalidateMenu()
-              // Reutilizamos "actualizado"
-              notify.success((t as any).messages?.success?.productUpdated ?? '✔')
+              notify.success(t.establishmentAdmin.notifications?.productReordered ?? '✔')
             } catch {
-              notify.error((t as any).messages?.error?.productUpdateFailed ?? '✖')
+              notify.error(t.establishmentAdmin.notifications?.productReorderError ?? '✖')
             }
           }}
         />
@@ -263,195 +239,133 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
             : ''
         }
         onClose={closeDrawer}
+        lang={lang}
       >
         {drawer?.type === 'category' && (
           <CategoryForm
-            langs={LANGS}
+            uiLang={lang}
+            langs={VISIBLE_LANGS}
             initialValues={
               drawer.mode === 'edit'
                 ? (drawer.data as MenuCategory)
                 : {
                     id: 0,
                     order:
-                      categories.length > 0
+                      drawer?.context?.orderHint ??
+                      (categories.length > 0
                         ? Math.max(...categories.map((c: any) => c.order ?? 0)) + 1
-                        : 1,
+                        : 1),
                     active: true,
-                    translations: { es: { name: '' }, en: { name: '' }, fr: { name: '' } },
+                    translations: {
+                      es: { name: '' },
+                      en: { name: '' },
+                      fr: { name: '' },
+                    },
                   }
             }
             onSubmit={async (values) => {
+              console.log('[AdminMenuManager] CategoryForm onSubmit called with values:', values)
               try {
                 if (drawer.mode === 'create') {
-                  await createCategoryM.mutateAsync(values)
-                  notify.success((t as any).messages?.success?.categoryCreated ?? '✔')
+                  console.log('[AdminMenuManager] Creating category with establishmentId:', estId)
+                  const payload = { establishmentId: estId, ...values }
+                  console.log('[AdminMenuManager] Create payload:', payload)
+                  await createCategoryM.mutateAsync(payload as any)
+                  console.log('[AdminMenuManager] Category created successfully')
+                  notify.success(t.establishmentAdmin.notifications?.categoryCreated ?? '✔')
                 } else {
-                  await updateCategoryM.mutateAsync({ ...(drawer.data as any), ...values })
-                  notify.success((t as any).messages?.success?.categoryUpdated ?? '✔')
+                  console.log('[AdminMenuManager] Updating category')
+                  await updateCategoryM.mutateAsync({ ...(drawer.data as any), ...values } as any)
+                  console.log('[AdminMenuManager] Category updated successfully')
+                  notify.success(t.establishmentAdmin.notifications?.categoryUpdated ?? '✔')
                 }
                 await invalidateMenu()
-                closeDrawer()
-              } catch {
-                notify.error(
-                  (t as any).messages?.error?.[
-                    drawer.mode === 'create' ? 'categoryCreateFailed' : 'categoryUpdateFailed'
-                  ] ?? '✖'
-                )
+                setTimeout(() => closeDrawer(), 1200)
+              } catch (err) {
+                console.error('[AdminMenuManager] Create/Update category error:', err)
+                console.error('[AdminMenuManager] Error details:', {
+                  message: err instanceof Error ? err.message : String(err),
+                  error: err,
+                })
+                notify.error(t.establishmentAdmin.notifications?.categorySaveError ?? '✖')
               }
             }}
           />
         )}
 
         {drawer?.type === 'product' && (
-          <>
-            {/* Tabs header (usar claves existentes) */}
-            <div className="mb-4 border-b">
-              <nav className="flex gap-2">
-                <button
-                  type="button"
-                  className={`px-3 py-2 text-sm ${
-                    productTab === 'general'
-                      ? 'border-b-2 border-black font-medium'
-                      : 'text-neutral-500'
-                  }`}
-                  onClick={() => setProductTab('general')}
-                >
-                  {t.establishmentAdmin.tabs?.general ??
-                    t.establishmentAdmin.menuManagement.products.title}
-                </button>
-                <button
-                  type="button"
-                  className={`px-3 py-2 text-sm ${
-                    productTab === 'variants'
-                      ? 'border-b-2 border-black font-medium'
-                      : 'text-neutral-500'
-                  } ${drawer.mode === 'create' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  onClick={() => drawer.mode === 'edit' && setProductTab('variants')}
-                  disabled={drawer.mode === 'create'}
-                >
-                  {t.establishmentAdmin.tabs?.variants ??
-                    t.establishmentAdmin.menuManagement.variants.title}
-                </button>
-              </nav>
-            </div>
-
-            {productTab === 'general' && (
-              <ProductForm
-                langs={LANGS}
-                allergens={allergens}
-                initialValues={
-                  drawer.mode === 'edit'
-                    ? (drawer.data as MenuProduct)
-                    : {
-                        id: 0,
-                        categoryId: drawer.context!.categoryId,
-                        price: 0,
-                        active: true,
-                        allergens: [],
-                        translations: { es: { name: '' }, en: { name: '' }, fr: { name: '' } },
-                      }
+          <ProductForm
+            uiLang={lang}
+            langs={VISIBLE_LANGS}
+            allergens={allergens}
+            initialValues={
+              drawer.mode === 'edit'
+                ? (drawer.data as MenuProduct)
+                : {
+                    id: 0,
+                    categoryId: drawer?.context?.categoryId!,
+                    price: 0,
+                    active: true,
+                    allergens: [],
+                    translations: {
+                      es: { name: '', description: '' },
+                      en: { name: '', description: '' },
+                      fr: { name: '', description: '' },
+                    },
+                  }
+            }
+            onSubmit={async (values) => {
+              try {
+                if (drawer.mode === 'create') {
+                  await createProductM.mutateAsync(values)
+                  notify.success(t.establishmentAdmin.notifications?.productCreated ?? '✔')
+                } else {
+                  await updateProductM.mutateAsync(values)
+                  notify.success(t.establishmentAdmin.notifications?.productUpdated ?? '✔')
                 }
-                onSubmit={async (values) => {
-                  try {
-                    if (drawer.mode === 'create') {
-                      await createProductM.mutateAsync(values)
-                      notify.success((t as any).messages?.success?.productCreated ?? '✔')
-                    } else {
-                      await updateProductM.mutateAsync(values)
-                      notify.success((t as any).messages?.success?.productUpdated ?? '✔')
-                    }
-                    await invalidateMenu()
-                    closeDrawer()
-                  } catch {
-                    notify.error(
-                      (t as any).messages?.error?.[
-                        drawer.mode === 'create' ? 'productCreateFailed' : 'productUpdateFailed'
-                      ] ?? '✖'
-                    )
-                  }
-                }}
-              />
-            )}
-
-            {drawer.mode === 'edit' && productTab === 'variants' && (
-              <div className="mt-2">
-                <VariantTable
-                  lang={lang}
-                  variants={
-                    (products.find((p) => p.id === (drawer.data as MenuProduct).id)?.variants ??
-                      []) as any
-                  }
-                  onCreate={async () => {
-                    openDrawer({
-                      type: 'variant',
-                      mode: 'create',
-                      context: { productId: (drawer.data as MenuProduct).id },
-                    })
-                  }}
-                  onUpdate={async (id, patch) => {
-                    const prod = products.find((p) => p.id === (drawer.data as MenuProduct).id)
-                    const current = prod?.variants?.find((v: any) => v.id === id)
-                    if (!current) return
-                    try {
-                      await updateVariantM.mutateAsync({ ...(current as any), ...patch })
-                      await invalidateMenu()
-                      notify.success((t as any).messages?.success?.variantUpdated ?? '✔')
-                    } catch {
-                      notify.error((t as any).messages?.error?.variantUpdateFailed ?? '✖')
-                    }
-                  }}
-                  onDelete={async (id) => {
-                    try {
-                      await deleteVariantM.mutateAsync(id)
-                      await invalidateMenu()
-                      notify.success((t as any).messages?.success?.variantDeleted ?? '✔')
-                    } catch {
-                      notify.error((t as any).messages?.error?.variantDeleteFailed ?? '✖')
-                    }
-                  }}
-                  onEdit={(id) => {
-                    // NUEVO
-                    const prod = products.find((p) => p.id === (drawer.data as MenuProduct).id)
-                    const v = prod?.variants?.find((vv: any) => vv.id === id)
-                    if (v) openDrawer({ type: 'variant', mode: 'edit', data: v as any })
-                  }}
-                />
-              </div>
-            )}
-          </>
+                await invalidateMenu()
+                setTimeout(() => closeDrawer(), 1200)
+              } catch (err) {
+                console.error('Create/Update product error:', err)
+                notify.error(t.establishmentAdmin.notifications?.productSaveError ?? '✖')
+              }
+            }}
+          />
         )}
 
         {drawer?.type === 'variant' && (
           <VariantForm
-            langs={LANGS}
+            uiLang={lang}
+            langs={VISIBLE_LANGS}
             initialValues={
               drawer.mode === 'edit'
                 ? (drawer.data as ProductVariant)
                 : {
                     id: 0,
-                    productId: drawer.context!.productId,
+                    productId: drawer?.context?.productId ?? selectedProductId!,
                     priceModifier: 0,
                     active: true,
-                    translations: { es: { name: '' }, en: { name: '' }, fr: { name: '' } },
+                    translations: {
+                      es: { name: '', description: '' },
+                      en: { name: '', description: '' },
+                      fr: { name: '', description: '' },
+                    },
                   }
             }
             onSubmit={async (values) => {
               try {
                 if (drawer.mode === 'create') {
                   await createVariantM.mutateAsync(values as any)
-                  notify.success((t as any).messages?.success?.variantCreated ?? '✔')
+                  notify.success(t.establishmentAdmin.notifications?.variantCreated ?? '✔')
                 } else {
                   await updateVariantM.mutateAsync(values as any)
-                  notify.success((t as any).messages?.success?.variantUpdated ?? '✔')
+                  notify.success(t.establishmentAdmin.notifications?.variantUpdated ?? '✔')
                 }
                 await invalidateMenu()
-                closeDrawer()
-              } catch {
-                notify.error(
-                  (t as any).messages?.error?.[
-                    drawer.mode === 'create' ? 'variantCreateFailed' : 'variantUpdateFailed'
-                  ] ?? '✖'
-                )
+                setTimeout(() => closeDrawer(), 1200)
+              } catch (err) {
+                console.error('Create/Update variant error:', err)
+                notify.error(t.establishmentAdmin.notifications?.variantSaveError ?? '✖')
               }
             }}
           />

@@ -181,6 +181,9 @@ export const admin = {
     delete: 'Eliminar',
     update: 'Actualizar',
     create: 'Crear',
+    translations: 'Traducciones',
+    notTranslated: 'Sin traducir',
+    translationHint: '💡 Cambia de idioma para auto-traducir',
   },
   placeholders: {
     categories: { name: 'Ej: Entrantes, Platos, Postres...' },
@@ -278,6 +281,12 @@ export const admin = {
       create: 'Crear',
       active: 'Activo',
       inactive: 'Inactivo',
+      required: 'Requerido',
+      optional: 'Opcional',
+      translations: 'Traducciones',
+      notTranslated: 'Sin traducir',
+      translationHint: '💡 Cambia de idioma para auto-traducir',
+      saving: 'Guardando...',
     },
     messages: {
       error: {

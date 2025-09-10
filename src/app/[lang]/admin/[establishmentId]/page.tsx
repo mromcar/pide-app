@@ -127,7 +127,7 @@ export default function EstablishmentAdminPage({ params }: EstablishmentAdminPag
       <div className="establishment-admin-loading">
         <div className="establishment-admin-loading-content">
           <div className="establishment-admin-spinner"></div>
-          <p className="establishment-admin-loading-text">{t.establishmentAdmin.forms.loading}</p>
+          <p className="sr-only">{t.establishmentAdmin.forms.loading}</p>
         </div>
       </div>
     )
@@ -137,7 +137,7 @@ export default function EstablishmentAdminPage({ params }: EstablishmentAdminPag
     return (
       <div className="establishment-admin-loading">
         <div className="establishment-admin-loading-content">
-          <p className="establishment-admin-loading-text">{t.establishmentAdmin.loading}</p>
+          <p className="sr-only">{t.establishmentAdmin.loading}</p>
         </div>
       </div>
     )
@@ -156,7 +156,7 @@ export default function EstablishmentAdminPage({ params }: EstablishmentAdminPag
         <div className="establishment-admin-loading">
           <div className="establishment-admin-loading-content">
             <div className="establishment-admin-spinner"></div>
-            <p className="establishment-admin-loading-text">{t.establishmentAdmin.loading}</p>
+            <p className="sr-only">{t.establishmentAdmin.loading}</p>
           </div>
         </div>
       </div>

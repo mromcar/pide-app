@@ -1,6 +1,6 @@
+import { useEffect, useMemo } from 'react'
 import type { LanguageCode } from '@/constants/languages'
 import { VISIBLE_LANGS } from '@/constants/languages'
-import { useEffect, useMemo } from 'react'
 
 interface LanguageTabsProps {
   langs: LanguageCode[]
@@ -9,29 +9,32 @@ interface LanguageTabsProps {
 }
 
 export default function LanguageTabs({ langs, active, onChange }: LanguageTabsProps) {
-  // Solo mostrar ES/EN, aunque el caller pase FR
-  const visible = useMemo<LanguageCode[]>(
-    () => (langs?.length ? langs : VISIBLE_LANGS).filter((l) => VISIBLE_LANGS.includes(l)),
+  const tabs = useMemo(
+    () =>
+      (langs?.length ? langs : (['es', 'en'] as LanguageCode[])).filter((l) =>
+        VISIBLE_LANGS.includes(l)
+      ),
     [langs]
   )
 
-  // Si el activo es FR (u otro no visible), forzar al primero visible
   useEffect(() => {
-    if (visible.length && !visible.includes(active)) onChange(visible[0])
-  }, [active, visible, onChange])
+    if (tabs.length && !tabs.includes(active)) {
+      onChange(tabs[0])
+    }
+  }, [active, tabs, onChange])
 
   return (
-    <div className="mb-3 flex gap-2 border-b">
-      {visible.map((l) => (
+    <div className="admin-form__language-tabs">
+      {tabs.map((lang) => (
         <button
-          key={l}
+          key={lang}
           type="button"
-          className={`px-2 py-1 text-sm ${
-            active === l ? 'border-b-2 border-black font-medium' : 'text-gray-500'
+          className={`admin-form__language-tab ${
+            active === lang ? 'admin-form__language-tab--active' : ''
           }`}
-          onClick={() => onChange(l)}
+          onClick={() => onChange(lang)}
         >
-          {l.toUpperCase()}
+          {lang.toUpperCase()}
         </button>
       ))}
     </div>

@@ -16,6 +16,8 @@ export const loginFr: LoginTranslations = {
   signUp: "S'inscrire",
   googleButton: 'Continuer avec Google',
   orDivider: 'ou',
+  hidePassword: 'Masquer le mot de passe',
+  showPassword: 'Afficher le mot de passe',
   error: {
     invalidCredentials: 'Email ou mot de passe incorrect',
     networkError: 'Erreur réseau. Vérifiez votre connexion',

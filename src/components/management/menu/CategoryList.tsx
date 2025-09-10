@@ -153,7 +153,7 @@ export default function CategoryList({
                 const isEdit = editId === c.id
                 const isDragging = dragId === c.id
                 const isOver = dragOverId === c.id
-                const nameVal = isEdit ? draftName : getCategoryName(c, lang) || '(no name)'
+                const nameVal = isEdit ? draftName : getCategoryName(c, lang) || ''
 
                 return (
                   <tr
@@ -171,7 +171,7 @@ export default function CategoryList({
                       className="admin-menu__drag-handle"
                       draggable
                       onDragStart={(e) => onDragStart(e, c.id)}
-                      title="Drag to reorder"
+                      aria-label={t.establishmentAdmin.menuManagement.categories.order}
                     >
                       ☰
                     </td>

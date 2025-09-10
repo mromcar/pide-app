@@ -1,13 +1,18 @@
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
+import { useTranslation } from '@/hooks/useTranslation'
+import type { LanguageCode } from '@/constants/languages'
 
 interface EditDrawerProps {
   open: boolean
   title: string
   onClose: () => void
   children: React.ReactNode
+  lang: LanguageCode
 }
 
-export default function EditDrawer({ open, title, onClose, children }: EditDrawerProps) {
+export default function EditDrawer({ open, title, onClose, children, lang }: EditDrawerProps) {
+  const { t } = useTranslation(lang)
+
   useEffect(() => {
     const onEsc = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     document.addEventListener('keydown', onEsc)
@@ -20,7 +25,9 @@ export default function EditDrawer({ open, title, onClose, children }: EditDrawe
       aria-hidden={!open}
     >
       <div
-        className={`absolute inset-0 bg-black/40 transition-opacity ${open ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 bg-black/40 transition-opacity ${
+          open ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={onClose}
       />
       <aside
@@ -30,13 +37,19 @@ export default function EditDrawer({ open, title, onClose, children }: EditDrawe
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex items-center justify-between border-b p-4">
-          <h3 className="text-lg font-semibold">{title}</h3>
-          <button onClick={onClose} aria-label="Close" className="text-sm underline">
-            Close
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-5 py-4">
+          <h3 className="text-lg font-semibold truncate">{title}</h3>
+          <button
+            onClick={onClose}
+            aria-label={t.establishmentAdmin.forms.cancel}
+            title={t.establishmentAdmin.forms.cancel}
+            className="h-8 w-8 grid place-items-center rounded hover:bg-neutral-100 text-neutral-700"
+          >
+            ✖
           </button>
         </div>
-        <div className="overflow-y-auto p-4">{children}</div>
+
+        <div className="h-full overflow-y-auto px-5 py-4">{children}</div>
       </aside>
     </div>
   )

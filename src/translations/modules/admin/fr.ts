@@ -168,7 +168,6 @@ export const admin = {
   forms: {
     save: 'Enregistrer',
     cancel: 'Annuler',
-    saving: 'Enregistrement...',
     loading: 'Chargement...',
     retry: 'Réessayer',
     required: 'Requis',
@@ -179,6 +178,10 @@ export const admin = {
     delete: 'Supprimer',
     update: 'Mettre à jour',
     create: 'Créer',
+    translations: 'Traductions',
+    notTranslated: 'Non traduit',
+    translationHint: '💡 Changez de langue pour auto-traduire',
+    saving: 'Enregistrement...',
   },
   messages: {
     success: {
@@ -271,6 +274,12 @@ export const admin = {
       create: 'Créer',
       active: 'Actif',
       inactive: 'Inactif',
+      required: 'Requis',
+      optional: 'Optionnel',
+      translations: 'Traductions',
+      notTranslated: 'Non traduit',
+      translationHint: '💡 Changez de langue pour auto-traduire',
+      saving: 'Enregistrement...',
     },
     messages: {
       error: {

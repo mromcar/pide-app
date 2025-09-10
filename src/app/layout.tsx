@@ -3,9 +3,6 @@ import React from 'react'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 
-// Elimina este import si existe:
-// import '@/styles/fonts.css'
-
 // Resto de estilos globales
 import '@/styles/base.css'
 import '@/styles/components/buttons.css'
@@ -15,6 +12,7 @@ import '@/styles/components/navigation.css'
 import '@/styles/components/cart.css'
 import '@/styles/components/allergens.css'
 import '@/styles/components/admin-menu.css'
+import '@/styles/components/admin-forms.css'
 import '@/styles/utilities.css'
 import '@/styles/pages/checkout.css'
 import '@/styles/pages/menu.css'

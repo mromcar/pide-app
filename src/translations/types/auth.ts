@@ -15,6 +15,8 @@ export interface LoginTranslations {
   signUp: string;
   googleButton: string;
   orDivider: string;
+  hidePassword: string;
+  showPassword: string;
   error: {
     invalidCredentials: string;
     networkError: string;

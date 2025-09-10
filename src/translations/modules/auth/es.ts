@@ -16,6 +16,8 @@ export const loginEs: LoginTranslations = {
   signUp: 'Regístrate',
   googleButton: 'Continuar con Google',
   orDivider: 'o',
+  hidePassword: 'Ocultar contraseña',
+  showPassword: 'Mostrar contraseña',
   error: {
     invalidCredentials: 'Correo o contraseña incorrectos',
     networkError: 'Error de conexión. Verifica tu conexión a internet',

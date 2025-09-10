@@ -168,7 +168,6 @@ export const admin = {
   forms: {
     save: 'Save',
     cancel: 'Cancel',
-    saving: 'Saving...',
     loading: 'Loading...',
     retry: 'Retry',
     required: 'Required',
@@ -178,7 +177,11 @@ export const admin = {
     edit: 'Edit',
     delete: 'Delete',
     update: 'Update',
-    create: 'Create'
+    create: 'Create',
+    translations: 'Translations',
+    notTranslated: 'Not translated',
+    translationHint: '💡 Switch language to auto-translate',
+    saving: 'Saving...',
   },
   placeholders: {
     categories: { name: 'Ex: Starters, Main courses, Desserts...' },
@@ -268,6 +271,12 @@ export const admin = {
       create: 'Create',
       active: 'Active',
       inactive: 'Inactive',
+      required: 'Required',
+      optional: 'Optional',
+      translations: 'Translations',
+      notTranslated: 'Not translated',
+      translationHint: '💡 Switch language to auto-translate',
+      saving: 'Saving...',
     },
     messages: {
       error: {

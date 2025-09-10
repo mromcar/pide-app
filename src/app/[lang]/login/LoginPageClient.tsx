@@ -1,64 +1,40 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { signIn, useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 import type { UITranslation } from '@/translations'
-import { UserRole } from '@/constants/enums'
 import type { LanguageCode } from '@/constants/languages'
 
-// Extiende el tipo de props
 export interface LoginPageClientProps {
   translations: UITranslation
   lang: LanguageCode
   callbackUrl?: string
 }
 
-export default function LoginPageClient(props: LoginPageClientProps) {
-  const { translations, lang, callbackUrl } = props
+export default function LoginPageClient({ translations, lang, callbackUrl }: LoginPageClientProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const router = useRouter()
-  const { data: session } = useSession()
   const t = translations.login
-
-  useEffect(() => {
-    if (session?.user) {
-      switch (session.user.role as UserRole) {
-        case UserRole.establishment_admin:
-        case UserRole.waiter:
-        case UserRole.cook:
-          if (session.user.establishmentId) {
-            router.push(`/${lang}/admin/${session.user.establishmentId}`)
-          } else {
-            router.push(`/${lang}`)
-          }
-          break
-        case UserRole.general_admin:
-          router.push(`/${lang}/super-admin`)
-          break
-        case UserRole.client:
-        default:
-          router.push(`/${lang}`)
-      }
-    }
-  }, [session, router, lang])
 
   const handleCredentialsLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError('')
+
+    console.log('[Login] Attempting credentials login')
+
     try {
-      // Usamos redirect: false para obtener SignInResponse tipada
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
-        callbackUrl: callbackUrl ?? `/${lang}`,
+        // No callbackUrl - manejamos la redirección manualmente
       })
+
+      console.log('[Login] Result:', { ok: result?.ok, error: result?.error, url: result?.url })
 
       if (result?.error) {
         setError(t.error.invalidCredentials)
@@ -66,18 +42,19 @@ export default function LoginPageClient(props: LoginPageClientProps) {
         return
       }
 
-      if (result?.ok && result.url) {
-        // Navegamos manualmente a la URL proporcionada
-        router.push(result.url)
+      if (result?.ok) {
+        console.log('[Login] Success, redirecting based on user role')
+        // Redirigir directamente al admin sin pasar por `/es`
+        window.location.href = `/${lang}/admin-redirect`
         return
       }
 
-      // Fallback
       setIsLoading(false)
     } catch (err) {
-      const message =
+      console.error('[Login] Exception:', err)
+      const msg =
         err instanceof Error ? `${t.error.networkError}: ${err.message}` : t.error.networkError
-      setError(message)
+      setError(msg)
       setIsLoading(false)
     }
   }
@@ -85,36 +62,19 @@ export default function LoginPageClient(props: LoginPageClientProps) {
   const handleGoogleLogin = async () => {
     setIsLoading(true)
     setError('')
+
     try {
       await signIn('google', { callbackUrl: callbackUrl ?? `/${lang}` })
     } catch (err) {
-      const message =
+      const msg =
         err instanceof Error ? `${t.error.oauthError}: ${err.message}` : t.error.oauthError
-      setError(message)
+      setError(msg)
       setIsLoading(false)
     }
   }
 
-  if (session?.user) {
-    return (
-      <div className="login-container">
-        <div className="login-card">
-          <div className="login-bg-card">
-            <div className="login-header">
-              <h2 className="login-title">{t.title}</h2>
-              <div className="establishment-admin-loading-content">
-                <div className="establishment-admin-spinner"></div>
-                <p className="establishment-admin-loading-text">Redirigiendo...</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="login-container">
+    <div className="login-container" suppressHydrationWarning>
       <div className="login-card">
         <div className="login-bg-card">
           <div className="login-header">
@@ -166,39 +126,19 @@ export default function LoginPageClient(props: LoginPageClientProps) {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="password-toggle-btn"
+                  aria-label={showPassword ? t.hidePassword : t.showPassword}
                 >
-                  {showPassword ? (
-                    // Icono ojo cerrado
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                      <line x1="1" y1="1" x2="23" y2="23" />
-                    </svg>
-                  ) : (
-                    // Icono ojo abierto
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
+                  {showPassword ? '🙈' : '👁️'}
                 </button>
               </div>
             </div>
 
-            <button type="submit" disabled={isLoading} className="login-submit-btn">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="login-submit-btn"
+              aria-describedby={error ? 'login-error' : undefined}
+            >
               {isLoading ? t.signingIn : t.signInButton}
             </button>
           </form>
@@ -211,8 +151,13 @@ export default function LoginPageClient(props: LoginPageClientProps) {
           </div>
 
           <div className="login-google-section">
-            <button onClick={handleGoogleLogin} disabled={isLoading} className="login-google-btn">
-              <svg className="login-google-icon" viewBox="0 0 24 24">
+            <button
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
+              className="login-google-btn"
+              type="button"
+            >
+              <svg className="login-google-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

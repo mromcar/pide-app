@@ -14,6 +14,11 @@ export interface EstablishmentAdminPanelTranslations {
     loading: string; retry: string; save: string; cancel: string
     edit: string; delete: string; update: string; create: string
     active: string; inactive: string
+    required: string; optional: string
+    translations: string
+    notTranslated: string
+    translationHint: string
+    saving: string
   }
   messages: {
     error: { title: string; loadingFailed: string; verifyingPermissions: string }
@@ -119,6 +124,9 @@ export interface AdminModuleTranslations {
     save: string; cancel: string; saving: string; loading: string; retry: string
     required: string; optional: string; active: string; inactive: string
     edit: string; delete: string; update: string; create: string
+    translations: string
+    notTranslated: string
+    translationHint: string
   }
   placeholders: EstablishmentAdminPanelTranslations['placeholders']
   messages: {

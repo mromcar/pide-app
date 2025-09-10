@@ -1,0 +1,304 @@
+/* Admin Forms - Estilos específicos para formularios de administración */
+
+/* Contenedor principal del formulario */
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+/* Header del formulario con controles principales */
+.admin-form__header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-form__control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-form__control-group--end {
+  justify-self: end;
+}
+
+/* Labels */
+.admin-form__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin: 0;
+}
+
+.admin-form__label--required::after {
+  content: '*';
+  color: #dc2626;
+  margin-left: 0.25rem;
+}
+
+/* Inputs base */
+.admin-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  background-color: #ffffff;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.admin-input--small {
+  width: 5rem;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.admin-input--medium {
+  width: 8rem;
+}
+
+/* Textarea */
+.admin-textarea {
+  width: 100%;
+  min-height: 4rem;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  background-color: #ffffff;
+  color: #374151;
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.admin-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Checkbox */
+.admin-checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+/* Campo principal del formulario */
+.admin-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-form__field-input {
+  position: relative;
+}
+
+/* Errores de validación */
+.admin-form__error {
+  font-size: 0.875rem;
+  color: #dc2626;
+  margin-top: 0.25rem;
+}
+
+/* Preview de traducciones */
+.admin-form__translations-preview {
+  background-color: #f9fafb;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-form__translations-title {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.admin-form__translation-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.admin-form__translation-item:last-child {
+  margin-bottom: 0;
+}
+
+.admin-form__translation-lang {
+  width: 2rem;
+  color: #6b7280;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.75rem;
+}
+
+.admin-form__translation-text {
+  color: #374151;
+}
+
+.admin-form__translation-text--empty {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Footer del formulario */
+.admin-form__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.admin-form__hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.admin-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-form__success {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #059669;
+}
+
+/* Botón principal del formulario */
+.admin-form__submit-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  background-color: #3b82f6;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-form__submit-btn:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.admin-form__submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-form__spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Language Tabs - Mejorado */
+.admin-form__language-tabs {
+  display: flex;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  border-radius: 0.5rem 0.5rem 0 0;
+  overflow: hidden;
+}
+
+.admin-form__language-tab {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  background-color: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  min-width: 4rem;
+}
+
+.admin-form__language-tab:hover:not(.admin-form__language-tab--active) {
+  color: #374151;
+  background-color: #f3f4f6;
+}
+
+.admin-form__language-tab--active {
+  color: #3b82f6;
+  background-color: #ffffff;
+  border-bottom-color: #3b82f6;
+  font-weight: 600;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.admin-form__language-tab:first-child {
+  border-top-left-radius: 0.5rem;
+}
+
+.admin-form__language-tab:last-child {
+  border-top-right-radius: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-form__header {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .admin-form__control-group--end {
+    justify-self: start;
+  }
+
+  .admin-form__footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .admin-form__actions {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-form__language-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    min-width: 3rem;
+  }
+}

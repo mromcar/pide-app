@@ -1,16 +1,9 @@
-'use server'
-
-import LoginPageClient from './LoginPageClient'
-import { LanguageCode } from '@/constants/languages'
-import { getTranslation } from '@/translations'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
-
-type SessionUser = {
-  id?: string
-  role?: string
-  establishmentId?: string | null
-}
+import LoginPageClient from './LoginPageClient'
+import { getTranslation } from '@/translations'
+import type { LanguageCode } from '@/constants/languages'
 
 interface LoginPageProps {
   params: { lang: LanguageCode }
@@ -21,30 +14,17 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
   const { lang } = params
   const translations = await getTranslation(lang)
 
-  const session = await getServerSession()
-  const user = (session?.user as SessionUser | undefined) ?? undefined
-  const role = user?.role
-  const establishmentId = user?.establishmentId ?? undefined
+  const session = await getServerSession(authOptions)
 
-  if (role === 'restaurant_admin' && establishmentId) {
-    redirect(`/${lang}/admin/${establishmentId}`)
-  }
-  if (role === 'general_admin') {
-    redirect(`/${lang}/super-admin`)
+  console.log('[LoginPage SSR] Session exists:', !!session?.user)
+
+  if (session?.user) {
+    const u = session.user as any
+    if (u?.role === 'general_admin') redirect(`/${lang}/super-admin`)
+    if (u?.establishmentId) redirect(`/${lang}/admin/${u.establishmentId}`)
+    redirect(`/${lang}`)
   }
 
-  return (
-    <LoginPageClient
-      translations={translations}
-      lang={lang}
-      callbackUrl={
-        searchParams?.callbackUrl ??
-        (role === 'restaurant_admin' && establishmentId
-          ? `/${lang}/admin/${establishmentId}`
-          : role === 'general_admin'
-            ? `/${lang}/super-admin`
-            : `/${lang}`)
-      }
-    />
-  )
+  const callbackUrl = searchParams?.callbackUrl ?? `/${lang}`
+  return <LoginPageClient translations={translations} lang={lang} callbackUrl={callbackUrl} />
 }

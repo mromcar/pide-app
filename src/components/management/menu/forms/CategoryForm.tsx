@@ -1,29 +1,26 @@
-import { useMemo, useState } from 'react'
-import * as RHF from 'react-hook-form'
-type UseFormGeneric = <TFieldValues extends RHF.FieldValues = RHF.FieldValues, TContext = unknown>(
-  props?: RHF.UseFormProps<TFieldValues, TContext>
-) => RHF.UseFormReturn<TFieldValues, TContext>
-const rhfAny = RHF as unknown as { useForm?: unknown; default?: { useForm?: unknown } }
-const useForm = (rhfAny.useForm ?? rhfAny.default?.useForm) as unknown as UseFormGeneric
+import { useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import LanguageTabs from './LanguageTabs'
 import type { LanguageCode } from '@/constants/languages'
 import type { MenuCategory } from '@/types/management/menu'
+import { useTranslation } from '@/hooks/useTranslation'
 
-const translationSchema = z.object({
-  name: z.string().min(1, 'Required'),
-  description: z.string().optional().nullable(),
-})
-const buildSchema = (langs: LanguageCode[]) =>
+const buildTranslationSchema = (requiredMsg: string) =>
+  z.object({
+    name: z.string().min(1, requiredMsg),
+  })
+
+const buildSchema = (langs: LanguageCode[], requiredMsg: string) =>
   z.object({
     id: z.number(),
     order: z.number().min(0),
     active: z.boolean(),
     translations: z.object(
-      Object.fromEntries(langs.map((l) => [l, translationSchema])) as Record<
+      Object.fromEntries(langs.map((l) => [l, buildTranslationSchema(requiredMsg)])) as Record<
         LanguageCode,
-        typeof translationSchema
+        ReturnType<typeof buildTranslationSchema>
       >
     ),
   })
@@ -32,70 +29,149 @@ interface CategoryFormProps {
   langs: LanguageCode[]
   initialValues: MenuCategory
   onSubmit: (values: MenuCategory) => Promise<void>
+  uiLang: LanguageCode
 }
 
-export default function CategoryForm({ langs, initialValues, onSubmit }: CategoryFormProps) {
+export default function CategoryForm({
+  langs,
+  initialValues,
+  onSubmit,
+  uiLang,
+}: CategoryFormProps) {
+  const { t } = useTranslation(uiLang)
+  const requiredMsg = t.establishmentAdmin.forms.required
+
   const [activeLang, setActiveLang] = useState<LanguageCode>(langs[0])
-  const schema = useMemo(() => buildSchema(langs), [langs])
+  const schema = useMemo(() => buildSchema(langs, requiredMsg), [langs, requiredMsg])
+
   const { register, handleSubmit, formState, watch, setValue } = useForm<MenuCategory>({
     resolver: zodResolver(schema),
     defaultValues: initialValues,
   })
 
+  const isCreateRef = useRef(!initialValues?.id || initialValues.id === 0)
+  const [saved, setSaved] = useState(false)
   const submitting = formState.isSubmitting
   const values = watch()
 
   return (
     <form
-      className="space-y-4"
-      onSubmit={handleSubmit(async (v: MenuCategory) => {
-        await onSubmit(v)
+      className="admin-form"
+      onSubmit={handleSubmit(async (v) => {
+        console.log('[CategoryForm] Submitting values:', v)
+        try {
+          await onSubmit(v)
+          setSaved(true)
+          setTimeout(() => setSaved(false), 2000)
+        } catch (error) {
+          console.error('[CategoryForm] Submit error:', error)
+        }
       })}
     >
-      <div className="flex items-center gap-3">
-        <label className="text-sm">Order</label>
-        <input
-          type="number"
-          className="admin-input w-24"
-          {...register('order', { valueAsNumber: true })}
-        />
-        <label className="text-sm">Active</label>
-        <input type="checkbox" {...register('active')} />
+      {/* Header con orden y estado activo */}
+      <div className="admin-form__header">
+        <div className="admin-form__control-group">
+          <label className="admin-form__label">
+            {t.establishmentAdmin.menuManagement.categories.order}
+          </label>
+          <input
+            type="number"
+            min="0"
+            className="admin-input admin-input--small"
+            {...register('order', { valueAsNumber: true })}
+          />
+        </div>
+        <div className="admin-form__control-group admin-form__control-group--end">
+          <label className="admin-form__label">{t.establishmentAdmin.forms.active}</label>
+          <input type="checkbox" className="admin-checkbox" {...register('active')} />
+        </div>
       </div>
 
+      {/* Tabs de idiomas */}
       <LanguageTabs langs={langs} active={activeLang} onChange={setActiveLang} />
 
-      <div className="space-y-2">
-        <label className="text-sm">Name</label>
-        <input
-          className="admin-input"
-          value={values.translations[activeLang]?.name ?? ''}
-          onChange={(e) =>
-            setValue(
-              `translations.${activeLang}.name` as RHF.FieldPath<MenuCategory>,
-              e.target.value,
-              { shouldValidate: true }
-            )
-          }
-        />
-        <label className="text-sm">Description</label>
-        <textarea
-          className="admin-textarea"
-          value={values.translations[activeLang]?.description ?? ''}
-          onChange={(e) =>
-            setValue(
-              `translations.${activeLang}.description` as RHF.FieldPath<MenuCategory>,
-              e.target.value,
-              { shouldValidate: false }
-            )
-          }
-        />
+      {/* Campo de nombre */}
+      <div className="admin-form__field">
+        <label className="admin-form__label admin-form__label--required">
+          {t.establishmentAdmin.menuManagement.categories.name}
+        </label>
+
+        <div className="admin-form__field-input">
+          <input
+            className="admin-input"
+            placeholder={`${
+              t.establishmentAdmin.menuManagement.categories.name
+            } (${activeLang.toUpperCase()})`}
+            value={values.translations?.[activeLang]?.name ?? ''}
+            onChange={(e) =>
+              setValue(`translations.${activeLang}.name` as any, e.target.value, {
+                shouldValidate: true,
+              })
+            }
+          />
+        </div>
+
+        {/* Errores de validación */}
+        {formState.errors.translations?.[activeLang]?.name && (
+          <div className="admin-form__error">
+            {formState.errors.translations[activeLang].name?.message}
+          </div>
+        )}
       </div>
 
-      <div className="flex justify-end gap-2">
-        <button type="submit" className="admin-btn admin-btn-primary" disabled={submitting}>
-          Save
-        </button>
+      {/* Preview de otras traducciones */}
+      {langs.length > 1 && (
+        <div className="admin-form__translations-preview">
+          <div className="admin-form__translations-title">
+            {t.establishmentAdmin.forms.translations}:
+          </div>
+          <div>
+            {langs
+              .filter((lang) => lang !== activeLang)
+              .map((lang) => (
+                <div key={lang} className="admin-form__translation-item">
+                  <span className="admin-form__translation-lang">{lang.toUpperCase()}:</span>
+                  <span
+                    className={
+                      values.translations?.[lang]?.name
+                        ? 'admin-form__translation-text'
+                        : 'admin-form__translation-text admin-form__translation-text--empty'
+                    }
+                  >
+                    {values.translations?.[lang]?.name || t.establishmentAdmin.forms.notTranslated}
+                  </span>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* Footer con acciones */}
+      <div className="admin-form__footer">
+        <div className="admin-form__hint">{t.establishmentAdmin.forms.translationHint}</div>
+
+        <div className="admin-form__actions">
+          {saved && (
+            <div className="admin-form__success">
+              <span>✅</span>
+              <span>
+                {isCreateRef.current
+                  ? t.establishmentAdmin.notifications?.categoryCreated
+                  : t.establishmentAdmin.notifications?.categoryUpdated}
+              </span>
+            </div>
+          )}
+          <button type="submit" className="admin-form__submit-btn" disabled={submitting}>
+            {submitting ? (
+              <>
+                <div className="admin-form__spinner"></div>
+                <span>{t.establishmentAdmin.forms.saving}</span>
+              </>
+            ) : (
+              <span>{t.establishmentAdmin.forms.save}</span>
+            )}
+          </button>
+        </div>
       </div>
     </form>
   )
