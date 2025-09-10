@@ -1,0 +1,76 @@
+iguiente Gran Paso: Diseñar la Pantalla de Edición de Producto
+Cuando el usuario haga clic en "Editar" en la fila de un producto, en lugar de editarlo en la misma tabla, deberías mostrar una nueva interfaz. Tienes dos opciones excelentes para esto:
+
+Un Panel Lateral (Opción recomendada): Un panel que se desliza desde la derecha de la pantalla. Es moderno, no tapa toda la vista principal y permite al usuario cerrar y volver a la lista rápidamente.
+
+Una Ventana Modal: Una ventana que aparece en el centro de la pantalla. También es una buena opción, muy clara y directa.
+
+Dentro de este panel o modal, organizarás toda la información del producto.
+
+Estructura de la Pantalla de Edición:
+Usa pestañas o secciones bien definidas para no abrumar al usuario. Por ejemplo: Información General, Variantes y Alérgenos.
+
+1. Sección "Información General"
+Esta sección contendrá los campos básicos del producto.
+
+Nombre del Producto: [ Croquetas Caseras        ]
+
+Descripción: Un campo de texto más grande donde el restaurador pueda escribir detalles atractivos para sus clientes.
+
+Imagen del Producto: Un botón o un área para [ Subir imagen 🖼️ ]. Este es un añadido muy profesional.
+
+Precio Base: [ 4.50 ] € (Este sería el precio del producto sin variantes o de la variante por defecto).
+
+Categoría: Un menú desplegable para [ Entrantes ⌄ ].
+
+Estado: Un interruptor moderno (toggle switch) para cambiar entre Activo y Oculto.
+
+Estado: Oculto ⚪-----⚫ Activo
+
+2. Sección "Variantes"
+Aquí es donde el usuario podrá gestionar las variantes de forma cómoda.
+
+Una tabla simple solo para las variantes de este producto.
+
+Columnas: Nombre, Precio (o Modificador de Precio), Acciones.
+
+Un botón bien visible: [ + Añadir Variante ].
+
+Ejemplo dentro de la pantalla de edición de "Croquetas Caseras":
+
+Nombre	Precio Final	Acciones
+Ración (6 unidades)	8.50 €	✏️ 🗑️
+Media ración (3 unidades)	4.50 €	✏️ 🗑️
+
+Exportar a Hojas de cálculo
+3. Sección "Alérgenos"
+Aquí mejoraremos la experiencia de selección. Los badges con letras están genial para mostrar, pero para editar necesitamos algo más intuitivo.
+
+Rejilla de Selección (Grid): Muestra todos los alérgenos disponibles con su icono y nombre completo. El usuario simplemente hace clic para activar o desactivar cada uno. Es mucho más claro que tener que recordar qué significa cada letra.
+
+Ejemplo de la interfaz de selección:
+
+Selecciona los alérgenos presentes:
+
+[✅ Gluten 🌾] [  ] Crustáceos 🦐 [✅ Huevos 🥚] [  ] Pescado 🐟
+[  ] Cacahuetes 🥜 [✅ Soja 🌱] [✅ Lácteos 🥛] [  ] Apio 🌿
+
+Pequeños Refinamientos para la Pantalla Actual (Master View)
+Mientras construyes la pantalla de edición, puedes aplicar estos pequeños retoques a la vista de lista que ya has mejorado:
+
+Iconos para Acciones: Reemplaza el texto "Editar" y "Eliminar" por iconos universales de lápiz (✏️) y papelera (🗑️). Ocupan menos espacio, se ven más limpios y se entienden globalmente.
+
+Estilo para los Badges de Alérgenos: ¡Dales color! Asigna un color a cada alérgeno o a grupos de alérgenos. Esto ayuda a la identificación visual rápida. Por ejemplo, el gluten siempre podría ser un badge naranja, y los lácteos uno azul.
+
+Funcionalidad Drag-and-Drop: Activa la funcionalidad de arrastrar y soltar en las categorías y productos usando el icono (☰). Permitir al restaurador reordenar su menú de forma visual es una característica muy potente y profesional.
+
+Resumen de tus Próximos Pasos:
+Decide si usarás un panel lateral o un modal para la edición.
+
+Crea la vista de edición para un producto al hacer clic en "Editar".
+
+Organiza esa vista en las tres secciones: Información General, Variantes y Alérgenos.
+
+Implementa las interfaces de edición sugeridas para cada sección, especialmente la rejilla visual para los alérgenos y la gestión de variantes.
+
+(Opcional) Refina la lista principal con iconos y colores para una apariencia aún más pulida.

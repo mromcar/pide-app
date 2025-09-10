@@ -28,30 +28,25 @@ export default function CategoryList({
 }: Props) {
   const { t } = useTranslation(lang)
 
-  // Lista local para drag & drop (orden visual)
+  function getCategoryName(c: MenuCategory, l: LanguageCode) {
+    const anyC = c as any
+    const tr = anyC.translations as Record<string, { name?: string; title?: string }> | undefined
+    return (
+      tr?.[l]?.name ??
+      tr?.[l]?.title ??
+      tr?.es?.name ??
+      tr?.es?.title ??
+      tr?.en?.name ??
+      tr?.fr?.name ??
+      anyC.name ??
+      anyC.title ??
+      ''
+    )
+  }
+
   const sorted = useMemo(() => [...categories].sort((a, b) => a.order - b.order), [categories])
   const [items, setItems] = useState<RowCat[]>(sorted)
   useEffect(() => setItems(sorted), [sorted])
-
-  // Crear nueva
-  const [creating, setCreating] = useState(false)
-  const [name, setName] = useState('')
-
-  const create = async () => {
-    if (!name.trim()) return
-    setCreating(true)
-    try {
-      const draft: Omit<MenuCategory, 'id'> = {
-        order: (items.at(-1)?.order ?? 0) + 1,
-        active: true,
-        translations: { [lang]: { name } } as MenuCategory['translations'],
-      }
-      await onCreate(draft)
-      setName('')
-    } finally {
-      setCreating(false)
-    }
-  }
 
   // Edición inline
   const [editId, setEditId] = useState<number | null>(null)
@@ -59,17 +54,15 @@ export default function CategoryList({
 
   function startEdit(c: MenuCategory) {
     setEditId(c.id)
-    setDraftName(c.translations[lang]?.name ?? '')
+    setDraftName(getCategoryName(c, lang))
   }
   async function saveEdit(c: MenuCategory) {
-    // Solo mutamos traducción en el idioma actual
     const patch: Partial<MenuCategory> = {
       translations: {
         ...c.translations,
-        [lang]: { ...(c.translations[lang] || { name: '' }), name: draftName },
+        [lang]: { ...(c.translations as any)[lang], name: draftName },
       } as any,
     }
-
     await onUpdate(c.id, patch)
     setEditId(null)
   }
@@ -77,17 +70,15 @@ export default function CategoryList({
     setEditId(null)
   }
 
-  // Drag & Drop HTML5
+  // Drag & Drop
   const [dragId, setDragId] = useState<number | null>(null)
   const [dragOverId, setDragOverId] = useState<number | null>(null)
 
   function onDragStart(e: React.DragEvent, id: number) {
     setDragId(id)
     e.dataTransfer.effectAllowed = 'move'
-    // Necesario para Firefox
     e.dataTransfer.setData('text/plain', String(id))
   }
-
   function onDragOver(e: React.DragEvent, overId: number) {
     e.preventDefault()
     if (!dragId || dragId === overId) return
@@ -102,48 +93,59 @@ export default function CategoryList({
     curr.splice(toIdx, 0, moved)
     setItems(curr)
   }
-
   async function onDragEnd() {
     if (!dragId) return
     setDragOverId(null)
     setDragId(null)
-    // Persistir nuevo orden 1..n
     const nextOrders = items.map((c, idx) => ({ id: c.id, order: idx + 1 }))
     await onReorder(nextOrders)
   }
 
+  const handleCreateClick = () => {
+    const nextOrder = (items.at(-1)?.order ?? 0) + 1
+    const draft: Omit<MenuCategory, 'id'> = {
+      order: nextOrder,
+      active: true,
+      // FR oculto en UI pero mantenemos estructura
+      translations: { es: { name: '' }, en: { name: '' }, fr: { name: '' } } as any,
+    }
+    onCreate(draft)
+  }
+
   return (
     <div className="admin-card">
-      <div className="admin-card-header">
+      <div className="admin-card-header flex items-center justify-between">
         <h3>{t.establishmentAdmin.menuManagement.categories.title}</h3>
+        <button
+          type="button"
+          className="h-8 w-8 grid place-items-center rounded bg-black text-white hover:bg-neutral-800"
+          onClick={handleCreateClick}
+          aria-label={t.establishmentAdmin.menuManagement.categories.addNew}
+          title={t.establishmentAdmin.menuManagement.categories.addNew}
+        >
+          +
+        </button>
       </div>
 
-      <div className="admin-card-body space-y-2">
-        <div className="flex gap-2">
-          <input
-            className="admin-input flex-1"
-            placeholder={t.establishmentAdmin.placeholders.categories.name}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <button className="admin-btn admin-btn-primary" onClick={create} disabled={creating}>
-            {t.establishmentAdmin.menuManagement.categories.addNew}
-          </button>
-        </div>
-
+      <div className="admin-card-body">
         {items.length === 0 ? (
           <p className="text-sm text-muted">
             {t.establishmentAdmin.messages.emptyStates.noCategoriesDesc}
           </p>
         ) : (
-          <table className="admin-menu__table">
+          <table className="admin-menu__table admin-menu__table--categories">
             <thead>
               <tr>
                 <th style={{ width: 28 }} />
                 <th>{t.establishmentAdmin.menuManagement.categories.name}</th>
                 <th style={{ width: 68 }}>#</th>
                 <th>{t.establishmentAdmin.forms.active}</th>
-                <th className="w-1">{t.establishmentAdmin.menuManagement.products.actions}</th>
+                <th className="w-1 text-right">
+                  <span aria-hidden>⋯</span>
+                  <span className="sr-only">
+                    {t.establishmentAdmin.menuManagement.products.actions}
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -151,7 +153,7 @@ export default function CategoryList({
                 const isEdit = editId === c.id
                 const isDragging = dragId === c.id
                 const isOver = dragOverId === c.id
-                const nameVal = isEdit ? draftName : c.translations[lang]?.name ?? '(no name)'
+                const nameVal = isEdit ? draftName : getCategoryName(c, lang) || '(no name)'
 
                 return (
                   <tr
@@ -169,6 +171,7 @@ export default function CategoryList({
                       className="admin-menu__drag-handle"
                       draggable
                       onDragStart={(e) => onDragStart(e, c.id)}
+                      title="Drag to reorder"
                     >
                       ☰
                     </td>
@@ -192,6 +195,10 @@ export default function CategoryList({
                       )}
                     </td>
 
+                    <td className="text-center text-muted" onClick={(e) => e.stopPropagation()}>
+                      {c.order}
+                    </td>
+
                     <td onClick={(e) => e.stopPropagation()}>
                       <button
                         className="admin-tag"
@@ -203,7 +210,7 @@ export default function CategoryList({
                       </button>
                     </td>
 
-                    <td onClick={(e) => e.stopPropagation()}>
+                    <td className="text-right" onClick={(e) => e.stopPropagation()}>
                       {isEdit ? (
                         <div className="admin-menu__row-actions">
                           <button className="admin-menu__save-btn" onClick={() => saveEdit(c)}>
@@ -214,18 +221,24 @@ export default function CategoryList({
                           </button>
                         </div>
                       ) : (
-                        <div className="admin-menu__row-actions">
+                        <div className="flex items-center justify-end gap-2">
                           <button
-                            className="admin-btn admin-btn-secondary"
+                            type="button"
+                            className="h-8 w-8 grid place-items-center rounded hover:bg-neutral-100 text-neutral-700"
                             onClick={() => onEdit(c.id)}
+                            aria-label={t.establishmentAdmin.forms.edit}
+                            title={t.establishmentAdmin.forms.edit}
                           >
-                            {t.establishmentAdmin.forms.edit}
+                            ✏️
                           </button>
                           <button
-                            className="admin-btn admin-btn-danger"
+                            type="button"
+                            className="h-8 w-8 grid place-items-center rounded hover:bg-red-50 text-red-600"
                             onClick={() => onDelete(c.id)}
+                            aria-label={t.establishmentAdmin.forms.delete}
+                            title={t.establishmentAdmin.forms.delete}
                           >
-                            {t.establishmentAdmin.forms.delete}
+                            🗑️
                           </button>
                         </div>
                       )}

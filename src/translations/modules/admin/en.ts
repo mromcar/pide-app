@@ -462,5 +462,32 @@ export const admin = {
       },
       variants: { description: 'Ex: Normal portion, Half portion, Small...', price: '0.00' }
     },
+    tabs: { general: 'General', variants: 'Variants' },
+    notifications: {
+      categoryCreated: 'Category created',
+      categoryUpdated: 'Category updated',
+      categoryDeleted: 'Category deleted',
+      categorySaveError: 'Error saving category',
+      categoryUpdateError: 'Error updating category',
+      categoryDeleteError: 'Error deleting category',
+      categoryReordered: 'Category order updated',
+      categoryReorderError: 'Error reordering categories',
+
+      productCreated: 'Product created',
+      productUpdated: 'Product updated',
+      productDeleted: 'Product deleted',
+      productSaveError: 'Error saving product',
+      productUpdateError: 'Error updating product',
+      productDeleteError: 'Error deleting product',
+      productReordered: 'Product order updated',
+      productReorderError: 'Error reordering products',
+
+      variantCreated: 'Variant created',
+      variantUpdated: 'Variant updated',
+      variantDeleted: 'Variant deleted',
+      variantSaveError: 'Error saving variant',
+      variantUpdateError: 'Error updating variant',
+      variantDeleteError: 'Error deleting variant',
+    },
   },
 } satisfies AdminModuleTranslations

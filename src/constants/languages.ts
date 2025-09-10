@@ -1,15 +1,10 @@
 export type LanguageCode = 'es' | 'en' | 'fr'
 
-export interface Language {
-  code: LanguageCode
-  name: string
-  flag: string
-}
-
-export const SUPPORTED_LANGUAGES: Language[] = [
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' }
-]
-
+// Idioma por defecto
 export const DEFAULT_LANGUAGE: LanguageCode = 'es'
+
+// Idiomas soportados por i18n (mantener FR para compatibilidad interna)
+export const SUPPORTED_LANGS: LanguageCode[] = ['es', 'en', 'fr']
+
+// Idiomas visibles en UI (FR oculto temporalmente)
+export const VISIBLE_LANGS: LanguageCode[] = ['es', 'en']

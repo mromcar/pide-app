@@ -467,5 +467,35 @@ export const admin = {
         price: '0.00'
       },
     },
+    tabs: {
+      general: 'Général',
+      variants: 'Variantes',
+    },
+    notifications: {
+      categoryCreated: 'Catégorie créée',
+      categoryUpdated: 'Catégorie mise à jour',
+      categoryDeleted: 'Catégorie supprimée',
+      categorySaveError: 'Erreur lors de l’enregistrement de la catégorie',
+      categoryUpdateError: 'Erreur lors de la mise à jour de la catégorie',
+      categoryDeleteError: 'Erreur lors de la suppression de la catégorie',
+      categoryReordered: 'Ordre des catégories mis à jour',
+      categoryReorderError: 'Erreur lors du réordonnancement des catégories',
+
+      productCreated: 'Produit créé',
+      productUpdated: 'Produit mis à jour',
+      productDeleted: 'Produit supprimé',
+      productSaveError: 'Erreur lors de l’enregistrement du produit',
+      productUpdateError: 'Erreur lors de la mise à jour du produit',
+      productDeleteError: 'Erreur lors de la suppression du produit',
+      productReordered: 'Ordre des produits mis à jour',
+      productReorderError: 'Erreur lors du réordonnancement des produits',
+
+      variantCreated: 'Variante créée',
+      variantUpdated: 'Variante mise à jour',
+      variantDeleted: 'Variante supprimée',
+      variantSaveError: 'Erreur lors de l’enregistrement de la variante',
+      variantUpdateError: 'Erreur lors de la mise à jour de la variante',
+      variantDeleteError: 'Erreur lors de la suppression de la variante',
+    },
   },
 } satisfies AdminModuleTranslations

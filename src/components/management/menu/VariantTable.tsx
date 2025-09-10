@@ -66,7 +66,12 @@ export default function VariantTable({
                 <th>{t.establishmentAdmin.menuManagement.variants.name}</th>
                 <th>{t.establishmentAdmin.menuManagement.variants.priceModifier}</th>
                 <th>{t.establishmentAdmin.forms.active}</th>
-                <th className="w-1">{t.establishmentAdmin.menuManagement.products.actions}</th>
+                <th className="w-1 text-right">
+                  <span aria-hidden>⋯</span>
+                  <span className="sr-only">
+                    {t.establishmentAdmin.menuManagement.products.actions}
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -113,7 +118,7 @@ export default function VariantTable({
                           : t.establishmentAdmin.dashboard.inactive}
                       </button>
                     </td>
-                    <td>
+                    <td className="text-right">
                       {isEdit ? (
                         <div className="admin-menu__row-actions">
                           <button className="admin-menu__save-btn" onClick={() => save(v)}>
@@ -127,18 +132,24 @@ export default function VariantTable({
                           </button>
                         </div>
                       ) : (
-                        <div className="admin-menu__row-actions">
+                        <div className="flex items-center justify-end gap-2">
                           <button
-                            className="admin-btn admin-btn-secondary"
+                            type="button"
+                            className="h-8 w-8 grid place-items-center rounded hover:bg-neutral-100 text-neutral-700"
                             onClick={() => onEdit(v.id)}
+                            aria-label={t.establishmentAdmin.forms.edit}
+                            title={t.establishmentAdmin.forms.edit}
                           >
-                            {t.establishmentAdmin.forms.edit}
+                            ✏️
                           </button>
                           <button
-                            className="admin-btn admin-btn-danger"
+                            type="button"
+                            className="h-8 w-8 grid place-items-center rounded hover:bg-red-50 text-red-600"
                             onClick={() => onDelete(v.id)}
+                            aria-label={t.establishmentAdmin.forms.delete}
+                            title={t.establishmentAdmin.forms.delete}
                           >
-                            {t.establishmentAdmin.forms.delete}
+                            🗑️
                           </button>
                         </div>
                       )}

@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 import { match } from '@formatjs/intl-localematcher'
 import Negotiator from 'negotiator'
-import {
-  SUPPORTED_LANGUAGES,
-  DEFAULT_LANGUAGE,
-  LanguageCode,
-} from '@/constants/languages'
+import { SUPPORTED_LANGS, DEFAULT_LANGUAGE, LanguageCode } from '@/constants/languages'
 import { UserRole } from '@/constants/enums'
 
 const getLocale = (request: NextRequest): LanguageCode => {
@@ -14,7 +10,7 @@ const getLocale = (request: NextRequest): LanguageCode => {
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value))
 
   const languages = new Negotiator({ headers: negotiatorHeaders }).languages()
-  const locales: string[] = SUPPORTED_LANGUAGES.map(lang => lang.code)
+  const locales: string[] = SUPPORTED_LANGS
 
   try {
     const locale = match(languages, locales, DEFAULT_LANGUAGE)
@@ -45,15 +41,14 @@ export async function middleware(req: NextRequest) {
 
   console.log('🔒 Middleware processing:', pathname)
 
-  // ✅ 1. DETECCIÓN DE IDIOMA (mantener funcionalidad existente)
-  const pathnameHasLocale = SUPPORTED_LANGUAGES.some(lang =>
-    pathname.startsWith(`/${lang.code}/`) || pathname === `/${lang.code}`
+  // ✅ 1. DETECCIÓN DE IDIOMA
+  const pathnameHasLocale = SUPPORTED_LANGS.some((code: LanguageCode) =>
+    pathname.startsWith(`/${code}/`) || pathname === `/${code}`
   )
 
   if (!pathnameHasLocale) {
     const locale = getLocale(req)
     const redirectPath = `/${locale}${pathname}`
-    console.log('🌍 Redirecting for locale:', redirectPath)
     return NextResponse.redirect(new URL(redirectPath, req.url))
   }
 

@@ -1,4 +1,5 @@
 import type { UIAllergen } from '@/types/management/menu'
+import { allergenIcons } from '@/components/icons/AllergenIcons'
 
 interface Props {
   allergens: UIAllergen[]
@@ -11,10 +12,20 @@ export default function AllergenSelector({ allergens, selectedIds, onChange }: P
     <div className="flex flex-wrap gap-2">
       {allergens.map((a) => {
         const checked = selectedIds.has(a.id)
+        const anyA = a as any
+        const code: string | undefined = anyA.code ?? anyA.slug ?? undefined
+        const Icon = code ? (allergenIcons as any)[code] : undefined
         return (
-          <label key={a.id} className="inline-flex items-center gap-1 text-xs">
+          <label
+            key={a.id}
+            className={`inline-flex items-center gap-1 rounded border px-2 py-1 text-xs ${
+              checked ? 'border-black bg-neutral-50' : 'border-neutral-200'
+            }`}
+            title={(a as any).name}
+          >
             <input
               type="checkbox"
+              className="mr-1"
               checked={checked}
               onChange={(e) => {
                 const next = new Set(selectedIds)
@@ -23,7 +34,8 @@ export default function AllergenSelector({ allergens, selectedIds, onChange }: P
                 onChange(Array.from(next))
               }}
             />
-            <span>{a.name}</span>
+            {Icon ? <Icon size={14} className="text-neutral-600" /> : null}
+            <span>{(a as any).name}</span>
           </label>
         )
       })}

@@ -87,6 +87,19 @@ export interface EstablishmentAdminPanelTranslations {
     products: { name: string; description: string }
     variants: { description: string; price: string }
   }
+  // NUEVO: pestañas dentro del drawer
+  tabs?: { general: string; variants: string }
+  // NUEVO: mensajes rápidos para toasts del panel
+  notifications?: {
+    categoryCreated: string; categoryUpdated: string; categoryDeleted: string
+    categorySaveError: string; categoryUpdateError: string; categoryDeleteError: string
+    categoryReordered: string; categoryReorderError: string
+    productCreated: string; productUpdated: string; productDeleted: string
+    productSaveError: string; productUpdateError: string; productDeleteError: string
+    productReordered: string; productReorderError: string
+    variantCreated: string; variantUpdated: string; variantDeleted: string
+    variantSaveError: string; variantUpdateError: string; variantDeleteError: string
+  }
 }
 
 export interface AdminModuleTranslations {
