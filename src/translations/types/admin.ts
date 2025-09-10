@@ -17,7 +17,8 @@ export interface EstablishmentAdminPanelTranslations {
     required: string; optional: string
     translations: string
     notTranslated: string
-    translationHint: string
+    requiredLanguage: string
+    requiredLanguages: string
     saving: string
   }
   messages: {
@@ -126,7 +127,8 @@ export interface AdminModuleTranslations {
     edit: string; delete: string; update: string; create: string
     translations: string
     notTranslated: string
-    translationHint: string
+    requiredLanguage: string
+    requiredLanguages: string
   }
   placeholders: EstablishmentAdminPanelTranslations['placeholders']
   messages: {

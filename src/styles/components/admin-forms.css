@@ -22,6 +22,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-height: 2.5rem; /* Consistencia de altura */
 }
 
 .admin-form__control-group--end {
@@ -92,8 +93,8 @@
 
 /* Checkbox */
 .admin-checkbox {
-  width: 1rem;
-  height: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
   accent-color: #3b82f6;
   cursor: pointer;
 }
@@ -154,9 +155,34 @@
   color: #374151;
 }
 
-.admin-form__translation-text--empty {
-  color: #9ca3af;
+.admin-form__translation-text--required-missing {
+  color: #dc2626;
   font-style: italic;
+}
+
+.admin-form__translation-text--empty {
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Error banner for missing required languages */
+.admin-form__error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.admin-form__error-banner svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
 }
 
 /* Footer del formulario */
@@ -187,12 +213,12 @@
   color: #059669;
 }
 
-/* Botón principal del formulario */
+/* Botón principal del formulario - Mejorado */
 .admin-form__submit-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   background-color: #3b82f6;
   color: #ffffff;
   border: none;
@@ -201,17 +227,30 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 2.5rem; /* Mismo height que otros controles */
+  justify-content: center;
 }
 
 .admin-form__submit-btn:hover:not(:disabled) {
   background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 }
 
 .admin-form__submit-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
+.admin-form__submit-btn svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Spinner mejorado */
 .admin-form__spinner {
   width: 1rem;
   height: 1rem;
@@ -219,11 +258,7 @@
   border-top: 2px solid #ffffff;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  flex-shrink: 0;
 }
 
 /* Language Tabs - Mejorado */
@@ -271,6 +306,28 @@
 
 .admin-form__language-tab:last-child {
   border-top-right-radius: 0.5rem;
+}
+
+/* Botón con icono para formularios */
+.admin-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.admin-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-icon-btn svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 /* Responsive */

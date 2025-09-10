@@ -10,6 +10,7 @@ import CategoryForm from './forms/CategoryForm'
 import ProductForm from './forms/ProductForm'
 import VariantForm from './forms/VariantForm'
 import { notify } from '@/utils/notify'
+import { mapCategoryUIToCreateDTO, mapCategoryUIToUpdateDTO } from '@/utils/categoryHelpers'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
@@ -44,7 +45,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
   const openDrawer = (entity: DrawerEntity) => setDrawer(entity)
   const closeDrawer = () => setDrawer(null)
 
-  // Menú agregado
+  // Menú agregado - Following TanStack Query patterns
   const adminMenuQ = useQuery({
     queryKey: ['adminMenu', estId],
     queryFn: () => getAdminMenu(estId),
@@ -52,7 +53,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
     refetchOnWindowFocus: false,
   })
 
-  // Mutaciones
+  // Mutaciones - Following TanStack Query hook patterns
   const {
     createM: createCategoryM,
     updateM: updateCategoryM,
@@ -243,12 +244,11 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
       >
         {drawer?.type === 'category' && (
           <CategoryForm
-            uiLang={lang}
             langs={VISIBLE_LANGS}
             initialValues={
               drawer.mode === 'edit'
                 ? (drawer.data as MenuCategory)
-                : {
+                : ({
                     id: 0,
                     order:
                       drawer?.context?.orderHint ??
@@ -261,21 +261,24 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                       en: { name: '' },
                       fr: { name: '' },
                     },
-                  }
+                  } as MenuCategory)
             }
+            uiLang={lang}
             onSubmit={async (values) => {
               console.log('[AdminMenuManager] CategoryForm onSubmit called with values:', values)
               try {
                 if (drawer.mode === 'create') {
                   console.log('[AdminMenuManager] Creating category with establishmentId:', estId)
-                  const payload = { establishmentId: estId, ...values }
-                  console.log('[AdminMenuManager] Create payload:', payload)
-                  await createCategoryM.mutateAsync(payload as any)
+                  const createDTO = mapCategoryUIToCreateDTO(values)
+                  console.log('[AdminMenuManager] Create DTO with all translations:', createDTO)
+                  await createCategoryM.mutateAsync(createDTO)
                   console.log('[AdminMenuManager] Category created successfully')
                   notify.success(t.establishmentAdmin.notifications?.categoryCreated ?? '✔')
                 } else {
                   console.log('[AdminMenuManager] Updating category')
-                  await updateCategoryM.mutateAsync({ ...(drawer.data as any), ...values } as any)
+                  const updateDTO = mapCategoryUIToUpdateDTO(values)
+                  console.log('[AdminMenuManager] Update DTO with all translations:', updateDTO)
+                  await updateCategoryM.mutateAsync({ id: drawer.data!.id, ...updateDTO })
                   console.log('[AdminMenuManager] Category updated successfully')
                   notify.success(t.establishmentAdmin.notifications?.categoryUpdated ?? '✔')
                 }
@@ -295,15 +298,14 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
 
         {drawer?.type === 'product' && (
           <ProductForm
-            uiLang={lang}
             langs={VISIBLE_LANGS}
             allergens={allergens}
             initialValues={
               drawer.mode === 'edit'
                 ? (drawer.data as MenuProduct)
-                : {
+                : ({
                     id: 0,
-                    categoryId: drawer?.context?.categoryId!,
+                    categoryId: drawer.context?.categoryId ?? selectedCategoryId ?? 0,
                     price: 0,
                     active: true,
                     allergens: [],
@@ -312,7 +314,7 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                       en: { name: '', description: '' },
                       fr: { name: '', description: '' },
                     },
-                  }
+                  } as MenuProduct)
             }
             onSubmit={async (values) => {
               try {
@@ -325,24 +327,23 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                 }
                 await invalidateMenu()
                 setTimeout(() => closeDrawer(), 1200)
-              } catch (err) {
-                console.error('Create/Update product error:', err)
+              } catch {
                 notify.error(t.establishmentAdmin.notifications?.productSaveError ?? '✖')
               }
             }}
+            uiLang={lang}
           />
         )}
 
         {drawer?.type === 'variant' && (
           <VariantForm
-            uiLang={lang}
             langs={VISIBLE_LANGS}
             initialValues={
               drawer.mode === 'edit'
                 ? (drawer.data as ProductVariant)
-                : {
+                : ({
                     id: 0,
-                    productId: drawer?.context?.productId ?? selectedProductId!,
+                    productId: selectedProductId ?? 0,
                     priceModifier: 0,
                     active: true,
                     translations: {
@@ -350,24 +351,24 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
                       en: { name: '', description: '' },
                       fr: { name: '', description: '' },
                     },
-                  }
+                  } as ProductVariant)
             }
             onSubmit={async (values) => {
               try {
                 if (drawer.mode === 'create') {
-                  await createVariantM.mutateAsync(values as any)
+                  await createVariantM.mutateAsync(values)
                   notify.success(t.establishmentAdmin.notifications?.variantCreated ?? '✔')
                 } else {
-                  await updateVariantM.mutateAsync(values as any)
+                  await updateVariantM.mutateAsync(values)
                   notify.success(t.establishmentAdmin.notifications?.variantUpdated ?? '✔')
                 }
                 await invalidateMenu()
                 setTimeout(() => closeDrawer(), 1200)
-              } catch (err) {
-                console.error('Create/Update variant error:', err)
+              } catch {
                 notify.error(t.establishmentAdmin.notifications?.variantSaveError ?? '✖')
               }
             }}
+            uiLang={lang}
           />
         )}
       </EditDrawer>

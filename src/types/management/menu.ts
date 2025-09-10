@@ -1,10 +1,12 @@
 import type { LanguageCode } from '@/constants/languages'
 
-export type MenuCategory = {
+export interface MenuCategory {
   id: number
   order: number
   active: boolean
-  translations: Record<LanguageCode, { name: string; description?: string | null }>
+  translations: Record<LanguageCode, {
+    name: string
+  }>
 }
 
 export type MenuProduct = {

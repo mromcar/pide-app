@@ -43,9 +43,19 @@ export default function EditDrawer({ open, title, onClose, children, lang }: Edi
             onClick={onClose}
             aria-label={t.establishmentAdmin.forms.cancel}
             title={t.establishmentAdmin.forms.cancel}
-            className="h-8 w-8 grid place-items-center rounded hover:bg-neutral-100 text-neutral-700"
+            className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-neutral-100 text-neutral-700 transition-colors"
           >
-            ✖
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         </div>
 

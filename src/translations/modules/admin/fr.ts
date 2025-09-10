@@ -180,7 +180,8 @@ export const admin = {
     create: 'Créer',
     translations: 'Traductions',
     notTranslated: 'Non traduit',
-    translationHint: '💡 Changez de langue pour auto-traduire',
+    requiredLanguage: 'Langue requise',
+    requiredLanguages: 'Langues requises',
     saving: 'Enregistrement...',
   },
   messages: {
@@ -278,7 +279,8 @@ export const admin = {
       optional: 'Optionnel',
       translations: 'Traductions',
       notTranslated: 'Non traduit',
-      translationHint: '💡 Changez de langue pour auto-traduire',
+      requiredLanguage: 'Langue requise',
+      requiredLanguages: 'Langues requises',
       saving: 'Enregistrement...',
     },
     messages: {

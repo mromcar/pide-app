@@ -14,9 +14,10 @@ import {
 import { getAdminAllergens } from '@/services/api/allergen.api'
 import {
   mapCategoryDTOToUI, mapProductDTOToUI, mapVariantDTOToUI,
-  mapCategoryUIToDTO, mapProductUIToDTO, mapVariantUIToDTO,
+  mapProductUIToDTO, mapVariantUIToDTO,
 } from '@/services/mappers/menuMappers'
 import type { MenuCategory, MenuProduct, ProductVariant, UIAllergen } from '@/types/management/menu'
+import type { CategoryCreateDTO, CategoryUpdateDTO } from '@/types/dtos/category'
 
 export function useAllergens(establishmentId: number) {
   return useQuery({
@@ -36,26 +37,69 @@ export function useAllergens(establishmentId: number) {
 
 export function useCategories(establishmentId: number) {
   const qc = useQueryClient()
+
   const categoriesQ = useQuery({
     queryKey: qk.categories(establishmentId),
     queryFn: async () => (await getAdminCategories(establishmentId)).map(mapCategoryDTOToUI),
+    staleTime: 5 * 60_000,
+    refetchOnWindowFocus: false,
   })
+
+  // CREATE: Acepta CategoryCreateDTO directamente
   const createM = useMutation({
-    mutationFn: (v: MenuCategory) => createAdminCategory(establishmentId, mapCategoryUIToDTO(v)),
+    mutationFn: (data: CategoryCreateDTO) => {
+      console.log('[useCategories] createM mutationFn called with:', data)
+      console.log('[useCategories] CREATE - sortOrder:', data.sortOrder, 'type:', typeof data.sortOrder)
+      console.log('[useCategories] CREATE - isActive:', data.isActive, 'type:', typeof data.isActive)
+
+      // Asegurar que establishmentId esté en el DTO
+      const completeData = { ...data, establishmentId }
+      console.log('[useCategories] CREATE - completeData being sent to API:', completeData)
+      console.log('[useCategories] CREATE - API payload sortOrder:', completeData.sortOrder, 'type:', typeof completeData.sortOrder)
+      console.log('[useCategories] CREATE - API payload isActive:', completeData.isActive, 'type:', typeof completeData.isActive)
+
+      return createAdminCategory(establishmentId, completeData)
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.categories(establishmentId) }),
   })
+
+  // UPDATE: Acepta CategoryUpdateDTO directamente
   const updateM = useMutation({
-    mutationFn: (v: MenuCategory) => updateAdminCategory(establishmentId, v.id, mapCategoryUIToDTO(v)),
+    mutationFn: (data: CategoryUpdateDTO & { id: number }) => {
+      console.log('[useCategories] updateM mutationFn called with:', data)
+      console.log('[useCategories] UPDATE - sortOrder:', data.sortOrder, 'type:', typeof data.sortOrder)
+      console.log('[useCategories] UPDATE - isActive:', data.isActive, 'type:', typeof data.isActive)
+
+      const { id, ...updateData } = data
+      console.log('[useCategories] UPDATE - updateData being sent to API:', updateData)
+      console.log('[useCategories] UPDATE - API payload sortOrder:', updateData.sortOrder, 'type:', typeof updateData.sortOrder)
+      console.log('[useCategories] UPDATE - API payload isActive:', updateData.isActive, 'type:', typeof updateData.isActive)
+
+      return updateAdminCategory(establishmentId, id, updateData)
+    },
     onMutate: async (v) => {
       const key = qk.categories(establishmentId)
       await qc.cancelQueries({ queryKey: key })
       const prev = qc.getQueryData<MenuCategory[]>(key)
-      if (prev) qc.setQueryData<MenuCategory[]>(key, prev.map((c) => (c.id === v.id ? { ...c, ...v } : c)))
+      if (prev && 'id' in v) {
+        // Optimistic update with proper null/undefined handling
+        const updatedCategories = prev.map((c) =>
+          c.id === v.id
+            ? {
+                ...c,
+                active: v.isActive !== undefined && v.isActive !== null ? v.isActive : c.active,
+                order: v.sortOrder !== undefined && v.sortOrder !== null ? v.sortOrder : c.order
+              }
+            : c
+        )
+        qc.setQueryData<MenuCategory[]>(key, updatedCategories)
+      }
       return { prev, key }
     },
     onError: (_e, _v, ctx) => { if (ctx?.prev) qc.setQueryData(ctx.key, ctx.prev) },
     onSettled: () => qc.invalidateQueries({ queryKey: qk.categories(establishmentId) }),
   })
+
   const deleteM = useMutation({
     mutationFn: (id: number) => deleteAdminCategory(establishmentId, id),
     onMutate: async (id) => {
@@ -68,6 +112,7 @@ export function useCategories(establishmentId: number) {
     onError: (_e, _id, ctx) => { if (ctx?.prev) qc.setQueryData(ctx.key, ctx.prev) },
     onSettled: () => qc.invalidateQueries({ queryKey: qk.categories(establishmentId) }),
   })
+
   return { categoriesQ, createM, updateM, deleteM }
 }
 

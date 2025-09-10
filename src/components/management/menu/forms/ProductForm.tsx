@@ -137,7 +137,6 @@ export default function ProductForm({
       </div>
 
       <div className="admin-form__footer">
-        <div className="admin-form__hint">{t.establishmentAdmin.forms.translationHint}</div>
         <div className="admin-form__actions">
           <button type="submit" className="admin-form__submit-btn" disabled={submitting}>
             {submitting ? (

@@ -1,5 +1,6 @@
 import type { LanguageCode } from '@/constants/languages'
 import type { MenuCategory, MenuProduct, ProductVariant } from '@/types/management/menu'
+import type { CategoryDTO, CategoryUpdateDTO } from '@/types/dtos/category'
 
 // Soporte de idiomas (ajusta si tienes más)
 const SUPPORTED_LANGS = new Set<LanguageCode>(['es', 'en', 'fr'] as const)
@@ -21,6 +22,23 @@ function toLangDict<T extends { languageCode: string }>(
   return out as Record<LanguageCode, { name: string; description?: string | null }>
 }
 
+// Utilidad específica para categorías (solo name, sin description)
+function toCategoryLangDict<T extends { languageCode: string }>(
+  rows: T[] = [],
+  pick: (row: T) => { name: string }
+): Record<LanguageCode, { name: string }> {
+  const out: Partial<Record<LanguageCode, { name: string }>> = {}
+  for (const r of rows) {
+    const code = r.languageCode as LanguageCode
+    if (SUPPORTED_LANGS.has(code)) out[code] = pick(r)
+  }
+  // fallbacks mínimos
+  for (const lc of SUPPORTED_LANGS) {
+    if (!out[lc]) out[lc] = { name: '' }
+  }
+  return out as Record<LanguageCode, { name: string }>
+}
+
 // Tipos DTO agregados usados por el panel admin
 export type AdminMenuVariantDTO = ProductVariant
 export type AdminMenuProductDTO = MenuProduct & { variants: AdminMenuVariantDTO[] }
@@ -35,7 +53,10 @@ export function mapPrismaMenuToAdminDTO(categories: any[]): AdminMenuCategoryDTO
         productId: Number(v.productId ?? p.productId ?? p.id),
         priceModifier: Number(v.priceModifier ?? v.priceDelta ?? v.price ?? 0),
         active: Boolean(v.isActive ?? v.active ?? true),
-        translations: toLangDict(v.translations ?? [], (t: any) => ({ name: t.variantDescription ?? t.name ?? '' })),
+        translations: toLangDict(v.translations ?? [], (t: any) => ({
+          name: t.variantDescription ?? t.name ?? '',
+          description: t.description ?? null
+        })),
       }))
 
       // precio como mínimo de variantes
@@ -54,7 +75,7 @@ export function mapPrismaMenuToAdminDTO(categories: any[]): AdminMenuCategoryDTO
           .filter((x: number) => Number.isFinite(x)),
         translations: toLangDict(p.translations ?? [], (t: any) => ({
           name: t.name ?? '',
-          description: t.description ?? '',
+          description: t.description ?? null,
         })),
         variants,
       } satisfies AdminMenuProductDTO
@@ -64,22 +85,30 @@ export function mapPrismaMenuToAdminDTO(categories: any[]): AdminMenuCategoryDTO
       id: Number(c.categoryId ?? c.id),
       order: Number(c.sortOrder ?? c.order ?? 0),
       active: Boolean(c.isActive ?? c.active ?? true),
-      translations: toLangDict(c.translations ?? [], (t: any) => ({ name: t.name ?? '' })),
+      // Categories only have name, no description
+      translations: toCategoryLangDict(c.translations ?? [], (t: any) => ({ name: t.name ?? '' })),
       products,
     } satisfies AdminMenuCategoryDTO
   })
 }
 
 // Mappers DTO <-> UI usados por hooks/queries (categorías, productos, variantes)
-export function mapCategoryDTOToUI(dto: any): MenuCategory {
+export function mapCategoryDTOToUI(dto: CategoryDTO): MenuCategory {
   return {
-    id: Number(dto.categoryId ?? dto.id),
-    order: Number(dto.sortOrder ?? dto.order ?? 0),
-    active: Boolean(dto.isActive ?? dto.active ?? true),
-    translations:
-      dto.translations && !Array.isArray(dto.translations)
-        ? dto.translations
-        : toLangDict(dto.translations ?? [], (t: any) => ({ name: t.name ?? '' })),
+    id: dto.categoryId,
+    order: dto.sortOrder ?? 0,
+    active: dto.isActive ?? true,
+    translations: dto.translations?.reduce((acc: Record<LanguageCode, { name: string }>, t: any) => {
+      acc[t.languageCode as LanguageCode] = {
+        name: t.name,
+        // No description for categories
+      }
+      return acc
+    }, {} as Record<LanguageCode, { name: string }>) ?? {
+      es: { name: dto.name },
+      en: { name: '' },
+      fr: { name: '' },
+    },
   }
 }
 
@@ -97,7 +126,7 @@ export function mapProductDTOToUI(dto: any): MenuProduct {
         ? dto.translations
         : toLangDict(dto.translations ?? [], (t: any) => ({
             name: t.name ?? '',
-            description: t.description ?? '',
+            description: t.description ?? null,
           })),
   }
 }
@@ -111,16 +140,23 @@ export function mapVariantDTOToUI(dto: any): ProductVariant {
     translations:
       dto.translations && !Array.isArray(dto.translations)
         ? dto.translations
-        : toLangDict(dto.translations ?? [], (t: any) => ({ name: t.variantDescription ?? t.name ?? '' })),
+        : toLangDict(dto.translations ?? [], (t: any) => ({
+          name: t.variantDescription ?? t.name ?? '',
+          description: t.description ?? null
+        })),
   }
 }
 
-export function mapCategoryUIToDTO(ui: MenuCategory): any {
+export function mapCategoryUIToDTO(ui: MenuCategory): CategoryUpdateDTO {
   return {
-    id: ui.id,
-    order: ui.order,
-    active: ui.active,
-    translations: ui.translations,
+    name: ui.translations.es?.name || ui.translations.en?.name || '',
+    sortOrder: ui.order,
+    isActive: ui.active,
+    translations: Object.entries(ui.translations).map(([lang, trans]) => ({
+      languageCode: lang,
+      name: trans.name,
+      // No description for categories
+    })),
   }
 }
 

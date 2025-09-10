@@ -183,7 +183,8 @@ export const admin = {
     create: 'Crear',
     translations: 'Traducciones',
     notTranslated: 'Sin traducir',
-    translationHint: '💡 Cambia de idioma para auto-traducir',
+    requiredLanguage: 'Idioma requerido',
+    requiredLanguages: 'Idiomas requeridos',
   },
   placeholders: {
     categories: { name: 'Ej: Entrantes, Platos, Postres...' },
@@ -285,7 +286,8 @@ export const admin = {
       optional: 'Opcional',
       translations: 'Traducciones',
       notTranslated: 'Sin traducir',
-      translationHint: '💡 Cambia de idioma para auto-traducir',
+      requiredLanguage: 'Idioma requerido',
+      requiredLanguages: 'Idiomas requeridos',
       saving: 'Guardando...',
     },
     messages: {

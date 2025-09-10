@@ -9,9 +9,14 @@ export const translationUpsertSchema = z.object({
 })
 
 export const categoryUpsertSchema = z.object({
-  order: z.number().int().nonnegative(),
-  active: z.boolean(),
-  translations: z.array(translationUpsertSchema).min(1),
+  order: z.number().min(0).optional(),
+  active: z.boolean().optional(),
+  translations: z.array(
+    z.object({
+      languageCode: z.enum(['es', 'en', 'fr']),
+      name: z.string().min(1),
+    })
+  ),
 })
 
 export const productUpsertSchema = z.object({

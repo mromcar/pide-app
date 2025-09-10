@@ -5,14 +5,14 @@ export interface CategoryCreateDTO {
   name: string;
   sortOrder?: number | null;
   isActive?: boolean | null;
-  translations?: CategoryTranslationCreateDTO[];
+  translations?: CategoryTranslationCreateDTO[]; // ✅ Usa el DTO correcto sin description
 }
 
 export interface CategoryUpdateDTO {
   name?: string;
   sortOrder?: number | null;
   isActive?: boolean | null;
-  translations?: (CategoryTranslationCreateDTO | CategoryTranslationUpdateDTO)[];
+  translations?: (CategoryTranslationCreateDTO | CategoryTranslationUpdateDTO)[]; // ✅ Usa DTOs correctos
 }
 
 export interface CategoryDTO {
@@ -24,17 +24,17 @@ export interface CategoryDTO {
   createdAt?: string | null;
   updatedAt?: string | null;
   deletedAt?: string | null;
-  translations?: CategoryTranslationDTO[];
+  translations?: CategoryTranslationDTO[]; // ✅ Usa el DTO correcto
 }
 
 export interface CategoryResponseDTO {
   categoryId: number;
   establishmentId: number;
   name: string;
-  description?: string | null;
   sortOrder?: number | null;
   isActive: boolean;
   createdAt?: string | null;
   updatedAt?: string | null;
   deletedAt?: string | null;
+  // ✅ SIN description - correcto según Prisma schema
 }

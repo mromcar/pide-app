@@ -8,15 +8,15 @@ export const categoryIdSchema = z.object({
 export const categoryCreateSchema = z.object({
   establishmentId: z.number().int().positive(),
   name: z.string().min(1).max(255),
-  sortOrder: z.number().int().optional().nullable(),
-  isActive: z.boolean().optional().nullable(),
+  sortOrder: z.number().int().min(0).nullable().optional().default(0), // ✅ Default to 0, ensure min validation
+  isActive: z.boolean().nullable().optional().default(true), // ✅ Default to true
   translations: z.array(categoryTranslationCreateSchema).optional(),
 });
 
 export const categoryUpdateSchema = z.object({
   name: z.string().min(1).max(255).optional(),
-  sortOrder: z.number().int().optional().nullable(),
-  isActive: z.boolean().optional().nullable(),
+  sortOrder: z.number().int().min(0).nullable().optional(), // ✅ Min validation
+  isActive: z.boolean().nullable().optional(),
   translations: z.array(categoryTranslationCreateSchema).optional(),
 });
 

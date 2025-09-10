@@ -180,7 +180,8 @@ export const admin = {
     create: 'Create',
     translations: 'Translations',
     notTranslated: 'Not translated',
-    translationHint: '💡 Switch language to auto-translate',
+    requiredLanguage: 'Required language',
+    requiredLanguages: 'Required languages',
     saving: 'Saving...',
   },
   placeholders: {
@@ -275,7 +276,8 @@ export const admin = {
       optional: 'Optional',
       translations: 'Translations',
       notTranslated: 'Not translated',
-      translationHint: '💡 Switch language to auto-translate',
+      requiredLanguage: 'Required language',
+      requiredLanguages: 'Required languages',
       saving: 'Saving...',
     },
     messages: {
