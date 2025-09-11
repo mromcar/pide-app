@@ -42,7 +42,6 @@ export default function CategoryList({
       tr?.es?.name ??
       tr?.es?.title ??
       tr?.en?.name ??
-      tr?.fr?.name ??
       anyC.name ??
       anyC.title ??
       ''
@@ -137,8 +136,15 @@ export default function CategoryList({
     setIsUpdating(c.id)
 
     try {
-      // ✅ Usar mapper para conversión consistente
-      const patch = { active: !c.active }
+      // Obtener el nombre actual en español o inglés
+      const currentName =
+        c.translations?.es?.name ||
+        c.translations?.en?.name ||
+        Object.values(c.translations ?? {})[0]?.name ||
+        ''
+
+      // Usar mapper para conversión consistente, asegurando que name esté presente
+      const patch = { active: !c.active, translations: c.translations, name: currentName }
       const updateDTO = mapCategoryPartialToUpdateDTO(patch)
 
       await onUpdate(c.id, updateDTO)
@@ -266,7 +272,7 @@ export default function CategoryList({
     const draft: Omit<MenuCategory, 'id'> = {
       order: nextOrder,
       active: true,
-      translations: { es: { name: '' }, en: { name: '' }, fr: { name: '' } } as any,
+      translations: { es: { name: '' }, en: { name: '' } } as any, // Solo español e inglés
     }
     onCreate(draft)
   }
@@ -345,18 +351,15 @@ export default function CategoryList({
                     onDragOver={(e) => onDragOver(e, c.id)}
                     onDrop={onDragEnd}
                   >
-                    {/* ✅ Drag handle */}
                     <td
                       className="admin-menu__drag-handle"
                       draggable={!isEdit && !isConfirming && !isLoading}
                       onDragStart={(e) => onDragStart(e, c.id)}
-                      aria-label="Arrastrar para reordenar"
+                      aria-label={t.establishmentAdmin.menuManagement.categories.order}
                       style={{ textAlign: 'center' }}
                     >
                       {isLoading ? '⏳' : '☰'}
                     </td>
-
-                    {/* ✅ Nombre - SOLO editable con click, SIN botón lápiz */}
                     <td
                       className="admin-menu__cell--editable"
                       onClick={(e) => {
@@ -383,7 +386,7 @@ export default function CategoryList({
                             }}
                             onBlur={() => saveEdit(c)}
                             autoFocus
-                            placeholder="Nombre de categoría"
+                            placeholder={t.establishmentAdmin.menuManagement.categories.name}
                             disabled={isLoading}
                           />
                           {isLoading && <span className="admin-menu__loading-indicator">⏳</span>}
@@ -391,15 +394,13 @@ export default function CategoryList({
                       ) : (
                         <span
                           className="admin-menu__cell-text"
-                          title={`${nameVal} - Click para editar`}
+                          title={`${nameVal} - ${t.establishmentAdmin.menuManagement.categories.edit}`}
                         >
                           {nameVal}
                           <span className="admin-menu__edit-hint">✏️</span>
                         </span>
                       )}
                     </td>
-
-                    {/* ✅ MEJORADO: Orden editable */}
                     <td
                       onClick={(e) => e.stopPropagation()}
                       style={{ textAlign: 'center', color: '#6b7280', fontSize: '0.875rem' }}
@@ -417,11 +418,9 @@ export default function CategoryList({
                         }}
                         className="admin-order-input"
                         disabled={isLoading}
-                        title="Click para cambiar orden"
+                        title={t.establishmentAdmin.menuManagement.categories.order}
                       />
                     </td>
-
-                    {/* ✅ CORREGIDO: Estado activo funcional */}
                     <td onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center' }}>
                       <button
                         className={`admin-status-toggle ${
@@ -429,41 +428,47 @@ export default function CategoryList({
                         }`}
                         onClick={(e) => !isConfirming && !isLoading && toggleActive(c, e)}
                         disabled={isConfirming || isLoading}
-                        title={c.active ? 'Desactivar categoría' : 'Activar categoría'}
-                        aria-label={c.active ? 'Categoría activa' : 'Categoría inactiva'}
+                        title={
+                          c.active
+                            ? t.establishmentAdmin.forms.active
+                            : t.establishmentAdmin.forms.inactive
+                        }
+                        aria-label={
+                          c.active
+                            ? t.establishmentAdmin.forms.active
+                            : t.establishmentAdmin.forms.inactive
+                        }
                       >
                         {isLoading ? '⏳' : c.active ? '🟢' : '🔴'}
                       </button>
                     </td>
-
-                    {/* ✅ MEJORADO: Solo botón eliminar, iconos coherentes */}
                     <td onClick={(e) => e.stopPropagation()} style={{ textAlign: 'right' }}>
-                      {isConfirming ? (
-                        // ✅ Confirmación con click fuera
-                        <div className="admin-menu__confirm-overlay" ref={confirmRef}>
-                          <div className="admin-menu__confirm-content">
-                            <button
-                              className="admin-menu__confirm-btn admin-menu__confirm-btn--delete"
-                              onClick={() => confirmDelete(c.id)}
-                              disabled={isDeleting}
-                              title="Confirmar eliminación"
-                            >
-                              {isDeleting ? '⏳' : '✓'}
-                            </button>
-                            <button
-                              className="admin-menu__confirm-btn admin-menu__confirm-btn--cancel"
-                              onClick={cancelDelete}
-                              disabled={isDeleting}
-                              title="Cancelar"
-                            >
-                              ✕
-                            </button>
+                      <div className="admin-menu__row-actions">
+                        {isConfirming ? (
+                          <div className="admin-menu__confirm-overlay" ref={confirmRef}>
+                            <div className="admin-menu__confirm-content">
+                              <button
+                                className="admin-menu__confirm-btn admin-menu__confirm-btn--delete"
+                                onClick={() => confirmDelete(c.id)}
+                                disabled={isDeleting}
+                                title={t.establishmentAdmin.menuManagement.categories.confirmDelete}
+                              >
+                                {isDeleting ? '⏳' : '✓'}
+                              </button>
+                              <button
+                                className="admin-menu__confirm-btn admin-menu__confirm-btn--cancel"
+                                onClick={cancelDelete}
+                                disabled={isDeleting}
+                                title={t.establishmentAdmin.forms.cancel}
+                              >
+                                ✕
+                              </button>
+                            </div>
+                            <div className="admin-menu__confirm-hint">
+                              {/* Puedes añadir una clave en tus traducciones si quieres un texto aquí */}
+                            </div>
                           </div>
-                          <div className="admin-menu__confirm-hint">Click fuera para cancelar</div>
-                        </div>
-                      ) : (
-                        // ✅ SOLO botón eliminar - lápiz eliminado
-                        <div className="admin-menu__row-actions">
+                        ) : (
                           <button
                             type="button"
                             className="admin-icon-btn admin-icon-btn--delete"
@@ -471,14 +476,14 @@ export default function CategoryList({
                               e.stopPropagation()
                               startDeleteConfirmation(c.id, e)
                             }}
-                            aria-label="Eliminar categoría"
-                            title="Eliminar categoría"
+                            aria-label={t.establishmentAdmin.menuManagement.categories.delete}
+                            title={t.establishmentAdmin.menuManagement.categories.delete}
                             disabled={isEdit || isLoading}
                           >
                             🗑️
                           </button>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </td>
                   </tr>
                 )
