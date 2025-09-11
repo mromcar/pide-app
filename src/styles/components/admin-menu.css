@@ -1,150 +1,761 @@
-/* Layout principal */
+/* ==========================================================================
+   ADMIN MENU MANAGEMENT STYLES - VERSIÓN DEFINITIVA
+   Layout sin superposición de paneles
+   ========================================================================== */
+
+/* ✅ LAYOUT PRINCIPAL - SIN SUPERPOSICIÓN */
 .admin-menu__grid {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: 420px 1fr; /* ✅ 420px + gap = espacio garantizado */
+  gap: 2rem; /* ✅ Gap más grande para separación clara */
   align-items: start;
-}
-@media (max-width: 1024px) {
-  .admin-menu__grid {
-    grid-template-columns: 1fr;
-  }
+  min-height: 600px;
+  isolation: isolate; /* ✅ Crea nuevo contexto de apilamiento */
 }
 
-/* Tarjetas */
-.admin-card {
+.admin-menu__sidebar {
+  display: flex;
+  flex-direction: column;
   position: relative;
-  background: #fff;
+  z-index: 10; /* ✅ Z-index mayor para estar encima */
+  background: transparent;
+}
+
+.admin-menu__panel {
+  position: relative;
+  z-index: 5; /* ✅ Z-index menor que sidebar */
+  min-width: 0;
+  overflow-x: auto;
+  background: transparent;
+}
+
+/* ✅ ASEGURAR QUE CARDS NO SE SUPERPONGAN */
+.admin-card {
+  background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
+  overflow: visible; /* ✅ Cambio crítico: permitir overflow para botones */
+  position: relative;
+  z-index: inherit;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); /* ✅ Sombra para separación visual */
 }
+
 .admin-card-header {
   padding: 1rem 1.25rem;
   border-bottom: 1px solid #f1f5f9;
-}
-.admin-card-body {
-  padding: 1rem 1.25rem;
+  background: #fafbfc;
+  position: relative;
+  z-index: inherit;
 }
 
-/* Tabla base */
+.admin-card-body {
+  padding: 1rem 1.25rem;
+  position: relative;
+  z-index: inherit;
+  overflow: visible; /* ✅ Crítico para botones */
+}
+
+.admin-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-card-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* ==========================================================================
+   BOTONES ADMIN - VISIBILIDAD GARANTIZADA
+   ========================================================================== */
+
+.admin-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  line-height: 1;
+  position: relative;
+  z-index: 20; /* ✅ Z-index alto para botones */
+}
+
+.admin-icon-btn--primary {
+  background-color: #1f2937;
+  color: #ffffff;
+}
+
+.admin-icon-btn--primary:hover {
+  background-color: #374151;
+  transform: scale(1.05);
+}
+
+.admin-icon-btn--edit {
+  background-color: transparent;
+  color: #6b7280;
+}
+
+.admin-icon-btn--edit:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+  transform: scale(1.1);
+}
+
+.admin-icon-btn--delete {
+  background-color: transparent;
+  color: #dc2626;
+}
+
+.admin-icon-btn--delete:hover {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  transform: scale(1.1);
+}
+
+.admin-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ✅ CRÍTICO: Acciones con z-index alto */
+.admin-menu__row-actions {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 60px;
+  position: relative;
+  z-index: 20; /* ✅ Z-index alto para estar siempre visible */
+}
+
+/* Botones de confirmación */
+.admin-menu__confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 60px;
+  position: relative;
+  z-index: 20;
+}
+
+.admin-menu__confirm-btn {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.admin-menu__confirm-btn--delete {
+  background: #10b981;
+  color: white;
+}
+
+.admin-menu__confirm-btn--delete:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+.admin-menu__confirm-btn--cancel {
+  background: #ef4444;
+  color: white;
+}
+
+.admin-menu__confirm-btn--cancel:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+/* Botones de edición */
+.admin-menu__save-btn {
+  background: #10b981;
+  color: #ffffff;
+  padding: 0.25rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 20;
+}
+
+.admin-menu__save-btn:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+.admin-menu__cancel-btn {
+  background: #6b7280;
+  color: #ffffff;
+  padding: 0.25rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 20;
+}
+
+.admin-menu__cancel-btn:hover {
+  background: #4b5563;
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+   TABLAS - ANCHOS FIJOS Y Z-INDEX CONTROLADO
+   ========================================================================== */
+
 .admin-menu__table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
+  position: relative;
+  z-index: inherit;
 }
+
 .admin-menu__table th,
 .admin-menu__table td {
-  padding: 0.75rem 0.75rem;
+  padding: 0.5rem;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible; /* ✅ Crítico para botones en última columna */
+  position: relative;
+}
+
+.admin-menu__table th {
+  background: #f8fafc;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+/* ✅ TABLA DE CATEGORÍAS - ANCHOS ESPECÍFICOS */
+.admin-menu__table--categories {
+  width: 400px; /* ✅ Ancho fijo para coincidir con sidebar */
+  min-width: 400px;
 }
 
 /* Drag handle */
-.admin-menu__drag-handle {
-  width: 28px;
+.admin-menu__table--categories th:nth-child(1),
+.admin-menu__table--categories td:nth-child(1) {
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
   text-align: center;
-  cursor: grab;
-  color: #6b7280;
 }
 
-/* Estados de DnD */
+/* Nombre - con ellipsis */
+.admin-menu__table--categories th:nth-child(2),
+.admin-menu__table--categories td:nth-child(2) {
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Orden */
+.admin-menu__table--categories th:nth-child(3),
+.admin-menu__table--categories td:nth-child(3) {
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
+  text-align: center;
+}
+
+/* Estado */
+.admin-menu__table--categories th:nth-child(4),
+.admin-menu__table--categories td:nth-child(4) {
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
+}
+
+/* ✅ CRÍTICO: Acciones - SIEMPRE VISIBLE CON OVERFLOW */
+.admin-menu__table--categories th:nth-child(5),
+.admin-menu__table--categories td:nth-child(5) {
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+  text-align: right;
+  overflow: visible !important; /* ✅ Crítico para botones */
+  position: relative;
+  z-index: 15;
+}
+
+/* ✅ TABLA DE PRODUCTOS SIMPLIFICADA */
+.admin-menu__table--products-simple {
+  min-width: 560px;
+  position: relative;
+  z-index: 5; /* ✅ Z-index menor que categorías */
+}
+
+.admin-menu__table--products-simple th:nth-child(1),
+.admin-menu__table--products-simple td:nth-child(1) {
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
+  text-align: center;
+}
+
+.admin-menu__table--products-simple th:nth-child(2),
+.admin-menu__table--products-simple td:nth-child(2) {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-menu__table--products-simple th:nth-child(3),
+.admin-menu__table--products-simple td:nth-child(3) {
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
+}
+
+.admin-menu__table--products-simple th:nth-child(4),
+.admin-menu__table--products-simple td:nth-child(4) {
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
+  text-align: center;
+}
+
+.admin-menu__table--products-simple th:nth-child(5),
+.admin-menu__table--products-simple td:nth-child(5) {
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
+}
+
+.admin-menu__table--products-simple th:nth-child(6),
+.admin-menu__table--products-simple td:nth-child(6) {
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+  text-align: right;
+  overflow: visible;
+}
+
+/* ==========================================================================
+   ELEMENTOS DE INTERACCIÓN
+   ========================================================================== */
+
+/* Drag handle */
+.admin-menu__drag-handle {
+  cursor: grab;
+  color: #9ca3af;
+  user-select: none;
+}
+
+.admin-menu__drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Celdas editables */
+.admin-menu__cell--editable {
+  cursor: pointer;
+  position: relative;
+}
+
+.admin-menu__cell--editable:hover {
+  background-color: #f9fafb;
+}
+
+.admin-menu__cell-text {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #374151;
+}
+
+/* Input de edición */
+.admin-input {
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  background: #ffffff;
+  color: #374151;
+  box-sizing: border-box;
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* ==========================================================================
+   ESTADOS DE FILA
+   ========================================================================== */
+
+.admin-menu__row {
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.admin-menu__row--selectable {
+  cursor: pointer;
+}
+
+.admin-menu__row--selectable:hover {
+  background-color: #f8fafc;
+}
+
+.admin-menu__row--confirming {
+  background-color: #fef3c7;
+  border-left: 3px solid #f59e0b;
+}
+
 .admin-menu__row--dragging {
   opacity: 0.6;
+  transform: scale(1.02);
 }
+
 .admin-menu__row--dragover {
-  outline: 2px dashed #d1d5db;
+  outline: 2px dashed #3b82f6;
+  outline-offset: -2px;
 }
 
-/* Celda editable */
-.admin-menu__cell--editable {
-  cursor: text;
+/* ✅ NUEVO: Estados de fila profesionales */
+.admin-menu__row--selected {
+  background-color: #eff6ff !important;
+  border-left: 3px solid #3b82f6;
+  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.1);
 }
 
-/* Acciones compactas */
-.admin-menu__row-actions {
+.admin-menu__row--selected:hover {
+  background-color: #dbeafe !important;
+}
+
+/* ✅ NUEVO: Edición inline mejorada */
+.admin-menu__inline-edit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-menu__inline-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.admin-menu__inline-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.admin-menu__inline-btn--save {
+  background: #10b981;
+  color: white;
+}
+
+.admin-menu__inline-btn--save:hover {
+  background: #059669;
+  transform: scale(1.1);
+}
+
+.admin-menu__inline-btn--cancel {
+  background: #ef4444;
+  color: white;
+}
+
+.admin-menu__inline-btn--cancel:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+/* ✅ NUEVO: Hint de edición */
+.admin-menu__edit-hint {
+  opacity: 0;
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  transition: opacity 0.2s;
+  color: #9ca3af;
+}
+
+.admin-menu__cell--editable:hover .admin-menu__edit-hint {
+  opacity: 0.7;
+}
+
+/* ✅ NUEVO: Toggle de estado con iconos */
+.admin-status-toggle {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  position: relative;
+}
+
+.admin-status-toggle:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+}
+
+.admin-status-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.admin-status-toggle--active:hover:not(:disabled) {
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+.admin-status-toggle--inactive:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* ✅ NUEVO: Input de orden */
+.admin-order-input {
+  width: 32px;
+  padding: 0.125rem 0.25rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  text-align: center;
+  font-size: 0.875rem;
+  background: transparent;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.admin-order-input:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.admin-order-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.admin-order-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ✅ MEJORADO: Overlay de confirmación con hint */
+.admin-menu__confirm-overlay {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 30;
+  min-width: 120px;
+}
+
+.admin-menu__confirm-content {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
 }
 
-/* Botones “tag” */
+.admin-menu__confirm-hint {
+  font-size: 0.625rem;
+  color: #92400e;
+  text-align: center;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* ✅ MEJORADO: Botones de confirmación consistentes */
+.admin-menu__confirm-btn {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.admin-menu__confirm-btn--delete {
+  background: #10b981;
+  color: white;
+}
+
+.admin-menu__confirm-btn--delete:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+.admin-menu__confirm-btn--cancel {
+  background: #ef4444;
+  color: white;
+}
+
+.admin-menu__confirm-btn--cancel:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+/* ✅ NUEVO: Estado de carga */
+.admin-menu__row--loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.admin-menu__loading-indicator {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+}
+
+/* Animaciones mejoradas */
+@keyframes pulse-loading {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.admin-menu__row--loading {
+  animation: pulse-loading 1.5s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   COMPONENTES AUXILIARES
+   ========================================================================== */
+
+/* Tags de estado */
 .admin-tag {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 28px;
-  padding: 0 10px;
-  border-radius: 9999px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
   background: #f3f4f6;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-/* Específico: tabla de Categorías */
-.admin-menu__table--categories th:nth-child(1),
-.admin-menu__table--categories td:nth-child(1) { /* drag */
-  width: 28px;
+.admin-tag:hover {
+  background: #e5e7eb;
 }
-.admin-menu__table--categories th:nth-child(3),
-.admin-menu__table--categories td:nth-child(3) { /* # */
-  width: 64px;
+
+/* Contador de variantes */
+.admin-menu__variants-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: #f3f4f6;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* Estado vacío */
+.no-categories-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
   text-align: center;
-}
-.admin-menu__table--categories th:nth-child(4),
-.admin-menu__table--categories td:nth-child(4) { /* activo */
-  width: 96px;
-}
-.admin-menu__table--categories th:last-child,
-.admin-menu__table--categories td:last-child { /* acciones */
-  width: 96px;
+  color: #6b7280;
 }
 
-/* La tabla de categorías no usa layout fijo para que el nombre fluya */
-.admin-menu__table--categories {
-  table-layout: auto;
+.no-categories-state .empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
 }
 
-/* Permitir salto de línea en la columna “Nombre” y no recortar */
-.admin-menu__table--categories th:nth-child(2),
-.admin-menu__table--categories td:nth-child(2) {
-  white-space: normal;
-  overflow: visible;
+.no-categories-state h3 {
+  color: #374151;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
-/* Mantener anchos de columnas auxiliares */
-.admin-menu__table--categories th:nth-child(1),
-.admin-menu__table--categories td:nth-child(1) { width: 28px; }
-.admin-menu__table--categories th:nth-child(3),
-.admin-menu__table--categories td:nth-child(3) { width: 64px; text-align: center; }
-.admin-menu__table--categories th:nth-child(4),
-.admin-menu__table--categories td:nth-child(4) { width: 96px; }
-.admin-menu__table--categories th:last-child,
-.admin-menu__table--categories td:last-child { width: 96px; }
-
-/* Específico: tabla de Productos */
-.admin-menu__table--products th:nth-child(1) { width: 28px; }         /* drag */
-.admin-menu__table--products th:nth-child(3) { width: 120px; }        /* precio */
-.admin-menu__table--products th:nth-child(4) { width: 110px; }        /* variantes */
-.admin-menu__table--products th:nth-child(6) { width: 96px; }         /* activo */
-.admin-menu__table--products th:last-child { width: 96px; }           /* acciones */
-
-/* Acciones: alinear a la derecha y asegurar ancho */
-.admin-menu__table th:last-child,
-.admin-menu__table td:last-child {
-  text-align: right;
+.no-categories-state p {
+  margin: 0;
+  max-width: 20rem;
+  line-height: 1.5;
+  font-size: 0.875rem;
 }
 
-/* Categorías: columna de acciones más compacta */
-.admin-menu__table--categories th:last-child,
-.admin-menu__table--categories td:last-child {
-  width: 88px;      /* antes 96px; ajusta si necesitas más */
-  min-width: 80px;
-}
+/* ==========================================================================
+   UTILIDADES
+   ========================================================================== */
 
-/* Utilidad de accesibilidad: texto sólo para lectores de pantalla */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -157,36 +768,92 @@
   border: 0;
 }
 
-/* Agregado: estilos para la tabla de categorías en modo edición */
-.admin-menu__table--categories .admin-menu__cell--editable {
-  background: #f9fafb;
-  border-color: #d1d5db;
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 1400px) {
+  .admin-menu__grid {
+    grid-template-columns: 380px 1fr;
+    gap: 1.5rem;
+  }
+
+  .admin-menu__table--categories {
+    width: 360px;
+    min-width: 360px;
+  }
+
+  .admin-menu__table--categories th:nth-child(2),
+  .admin-menu__table--categories td:nth-child(2) {
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+  }
 }
 
-/* Agregado: botón de guardar en la fila de edición */
-.admin-menu__save-btn {
-  background: #4caf50;
-  color: #fff;
-  padding: 0.375rem 0.75rem;
-  border: none;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  font-size: 0.875rem;
-}
-.admin-menu__save-btn:hover {
-  background: #45a049;
+@media (max-width: 1200px) {
+  .admin-menu__grid {
+    grid-template-columns: 360px 1fr;
+    gap: 1rem;
+  }
+
+  .admin-menu__table--categories {
+    width: 340px;
+    min-width: 340px;
+  }
 }
 
-/* Agregado: botón de cancelar en la fila de edición */
-.admin-menu__cancel-btn {
-  background: #f44336;
-  color: #fff;
-  padding: 0.375rem 0.75rem;
-  border: none;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  font-size: 0.875rem;
+@media (max-width: 1024px) {
+  .admin-menu__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-menu__sidebar {
+    margin-bottom: 2rem;
+    z-index: auto;
+  }
+
+  .admin-menu__panel {
+    z-index: auto;
+  }
+
+  .admin-menu__table--categories,
+  .admin-menu__table--products-simple {
+    table-layout: auto;
+    width: 100%;
+    min-width: auto;
+  }
+
+  .admin-menu__table--categories th,
+  .admin-menu__table--categories td,
+  .admin-menu__table--products-simple th,
+  .admin-menu__table--products-simple td {
+    width: auto !important;
+    min-width: auto !important;
+    max-width: none !important;
+  }
 }
-.admin-menu__cancel-btn:hover {
-  background: #e53935;
+
+@media (max-width: 768px) {
+  .admin-menu__table th,
+  .admin-menu__table td {
+    padding: 0.375rem 0.25rem;
+    font-size: 0.875rem;
+  }
+
+  .admin-icon-btn {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+  }
+
+  .admin-menu__row-actions {
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .admin-menu__confirm-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
 }

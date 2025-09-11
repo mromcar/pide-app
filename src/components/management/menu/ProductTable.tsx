@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { LanguageCode } from '@/constants/languages'
 import type { UIAllergen, MenuProduct } from '@/types/management/menu'
-import { allergenIcons } from '@/components/icons/AllergenIcons'
 
 interface Props {
   lang: LanguageCode
@@ -30,7 +29,7 @@ export default function ProductTable({
   lang,
   allergens,
   products,
-  onRowClick: _onRowClick, // renombrado para cumplir /^_/u
+  onRowClick,
   onCreate,
   onUpdate,
   onDelete,
@@ -39,22 +38,26 @@ export default function ProductTable({
 }: Props) {
   const { t } = useTranslation(lang)
 
-  // Orden local optimista para DnD
+  // Estados locales para DnD y edición inline
   const [localOrder, setLocalOrder] = useState<MenuProduct[] | null>(null)
   const rows = useMemo(() => localOrder ?? products, [localOrder, products])
 
   const [editId, setEditId] = useState<number | null>(null)
   const [draftName, setDraftName] = useState<string>('')
   const [draftPrice, setDraftPrice] = useState<string>('')
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const [draggingId, setDraggingId] = useState<number | null>(null)
   const [overId, setOverId] = useState<number | null>(null)
 
+  // Edición inline
   function startEdit(p: MenuProduct) {
     const pp = p as AnyProduct
     setEditId(p.id)
     setDraftName(pp.translations?.[lang]?.name ?? '')
     setDraftPrice(String(pp.price ?? 0))
+    setConfirmDeleteId(null)
   }
 
   async function saveEdit(p: MenuProduct) {
@@ -76,19 +79,26 @@ export default function ProductTable({
     setEditId(null)
   }
 
-  // Resolver icono de alérgeno de forma tolerante al tipo
-  function renderAllergen(a: UIAllergen, key: string) {
-    const anyA = a as any
-    const code: string | undefined = anyA.code ?? anyA.slug ?? undefined
-    const Icon = code ? (allergenIcons as any)[code] : undefined
-    if (Icon) {
-      return <Icon key={key} size={16} className="text-neutral-500" title={String(anyA.name)} />
+  // Confirmación inline
+  function startDeleteConfirmation(id: number) {
+    setConfirmDeleteId(id)
+    setEditId(null)
+  }
+
+  function cancelDelete() {
+    setConfirmDeleteId(null)
+  }
+
+  async function confirmDelete(id: number) {
+    setIsDeleting(true)
+    try {
+      await onDelete(id)
+      setConfirmDeleteId(null)
+    } catch (error) {
+      console.error('Error deleting product:', error)
+    } finally {
+      setIsDeleting(false)
     }
-    return (
-      <span key={key} className="menu-allergen-badge" title={String(anyA.name)}>
-        {code ?? String(anyA.name ?? '·').slice(0, 1)}
-      </span>
-    )
   }
 
   // DnD helpers
@@ -112,7 +122,6 @@ export default function ProductTable({
     const newOrder = reorderArray(rows, fromIdx, toIdx)
     setLocalOrder(newOrder)
 
-    // Generar órdenes 1..n
     const next = newOrder.map((p, idx) => ({ id: p.id, order: idx + 1 }))
     try {
       await onReorder(next)
@@ -125,31 +134,40 @@ export default function ProductTable({
 
   return (
     <div className="admin-card">
-      <div className="admin-card-header flex items-center justify-between">
-        <h3>{t.establishmentAdmin.menuManagement.products.title}</h3>
-        <div className="admin-menu__row-actions">
-          <button className="admin-btn admin-btn-primary" onClick={onCreate}>
-            {t.establishmentAdmin.menuManagement.products.addNew}
+      <div className="admin-card-header">
+        <div className="admin-card-title-row">
+          <h3 className="admin-card-title">{t.establishmentAdmin.menuManagement.products.title}</h3>
+          <button className="admin-icon-btn admin-icon-btn--primary" onClick={onCreate}>
+            +
           </button>
         </div>
       </div>
 
-      <div className="admin-card-body overflow-x-auto">
+      <div className="admin-card-body">
         {rows.length === 0 ? (
-          <p className="text-sm text-muted">
-            {t.establishmentAdmin.messages.emptyStates.noProductsDesc}
-          </p>
+          <div className="no-categories-state">
+            <div className="empty-icon">📦</div>
+            <h3>{t.establishmentAdmin.messages.emptyStates.noProducts}</h3>
+            <p>{t.establishmentAdmin.messages.emptyStates.noProductsDesc}</p>
+          </div>
         ) : (
-          <table className="admin-menu__table admin-menu__table--products">
+          <table className="admin-menu__table admin-menu__table--products-simple">
             <thead>
               <tr>
-                <th style={{ width: 28 }}></th>
-                <th>{t.establishmentAdmin.menuManagement.products.name}</th>
-                <th>{t.establishmentAdmin.menuManagement.products.price}</th>
-                <th>{t.establishmentAdmin.menuManagement.products.variants}</th>
-                <th>{t.establishmentAdmin.menuManagement.products.allergens}</th>
-                <th>{t.establishmentAdmin.forms.active}</th>
-                <th className="w-1 text-right">
+                <th className="admin-menu__drag-column">
+                  <span className="sr-only">Reordenar</span>
+                </th>
+                <th className="admin-menu__name-column">
+                  {t.establishmentAdmin.menuManagement.products.name}
+                </th>
+                <th className="admin-menu__price-column">
+                  {t.establishmentAdmin.menuManagement.products.price}
+                </th>
+                <th className="admin-menu__variants-column">
+                  {t.establishmentAdmin.menuManagement.products.variants}
+                </th>
+                <th className="admin-menu__status-column">{t.establishmentAdmin.forms.active}</th>
+                <th className="admin-menu__actions-column">
                   <span aria-hidden>⋯</span>
                   <span className="sr-only">
                     {t.establishmentAdmin.menuManagement.products.actions}
@@ -161,19 +179,28 @@ export default function ProductTable({
               {rows.map((p) => {
                 const pp = p as AnyProduct
                 const isEdit = editId === p.id
-                const nameVal = isEdit ? draftName : pp.translations?.[lang]?.name ?? '(no name)'
+                const isConfirming = confirmDeleteId === p.id
+                const isDragging = draggingId === p.id
+                const isOver = overId === p.id
+
+                const nameVal = isEdit ? draftName : pp.translations?.[lang]?.name ?? '(sin nombre)'
                 const priceVal = isEdit ? draftPrice : Number(pp.price ?? 0).toFixed(2)
                 const variantCount = pp.variants?.length ?? pp.variantsCount ?? 0
 
                 return (
                   <tr
                     key={p.id}
-                    className={
-                      'cursor-default ' +
-                      (draggingId === p.id ? 'admin-menu__row--dragging ' : '') +
-                      (overId === p.id ? 'admin-menu__row--dragover ' : '')
-                    }
-                    draggable
+                    className={[
+                      'admin-menu__row',
+                      isDragging ? 'admin-menu__row--dragging' : '',
+                      isOver ? 'admin-menu__row--dragover' : '',
+                      isConfirming ? 'admin-menu__row--confirming' : '',
+                      !isEdit && !isConfirming ? 'admin-menu__row--selectable' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    onClick={() => !isEdit && !isConfirming && onRowClick(p.id)}
+                    draggable={!isEdit && !isConfirming}
                     onDragStart={() => setDraggingId(p.id)}
                     onDragOver={(e) => {
                       e.preventDefault()
@@ -186,97 +213,120 @@ export default function ProductTable({
                     }}
                   >
                     {/* Drag handle */}
-                    <td className="admin-menu__drag-handle" title="Arrastrar para reordenar">
+                    <td className="admin-menu__drag-handle" aria-label="Arrastrar para reordenar">
                       ☰
                     </td>
 
-                    {/* Nombre */}
+                    {/* Nombre - Editable inline */}
                     <td
                       className="admin-menu__cell--editable"
-                      onClick={() => !isEdit && startEdit(p)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (!isEdit && !isConfirming) startEdit(p)
+                      }}
                     >
                       {isEdit ? (
                         <input
                           className="admin-input"
                           value={draftName}
                           onChange={(e) => setDraftName(e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          autoFocus
+                          placeholder="Nombre del producto"
                         />
                       ) : (
-                        nameVal
+                        <span className="admin-menu__cell-text">{nameVal}</span>
                       )}
                     </td>
 
-                    {/* Precio */}
+                    {/* Precio - Editable inline */}
                     <td
                       className="admin-menu__cell--editable"
-                      onClick={() => !isEdit && startEdit(p)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (!isEdit && !isConfirming) startEdit(p)
+                      }}
                     >
                       {isEdit ? (
                         <input
                           className="admin-input"
                           value={draftPrice}
                           onChange={(e) => setDraftPrice(e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
                           inputMode="decimal"
+                          placeholder="0.00"
                         />
                       ) : (
-                        priceVal
+                        <span className="admin-menu__cell-text">€{priceVal}</span>
                       )}
                     </td>
 
-                    {/* Nº variantes */}
-                    <td className="text-center">{variantCount}</td>
-
-                    {/* Iconos de alérgenos */}
-                    <td>
-                      <div className="flex flex-wrap gap-1">
-                        {(pp.allergens || []).map((id) => {
-                          const a = allergens.find((x) => x.id === id)
-                          if (!a) return null
-                          return renderAllergen(a, `alg-${p.id}-${a.id}`)
-                        })}
-                      </div>
+                    {/* Nº Variantes - Solo lectura */}
+                    <td className="admin-menu__cell-center" onClick={(e) => e.stopPropagation()}>
+                      <span className="admin-menu__variants-count">{variantCount}</span>
                     </td>
 
-                    {/* Estado */}
-                    <td>
+                    {/* ✅ NUEVO: Estado - Con iconos claros */}
+                    <td className="admin-menu__cell-status" onClick={(e) => e.stopPropagation()}>
                       <button
-                        className="admin-tag"
-                        onClick={() => onUpdate(p.id, { active: !pp.active } as any)}
+                        className={`admin-status-toggle ${
+                          pp.active
+                            ? 'admin-status-toggle--active'
+                            : 'admin-status-toggle--inactive'
+                        }`}
+                        onClick={() =>
+                          !isConfirming && onUpdate(p.id, { active: !pp.active } as any)
+                        }
+                        disabled={isConfirming}
+                        title={pp.active ? 'Desactivar producto' : 'Activar producto'}
+                        aria-label={pp.active ? 'Producto activo' : 'Producto inactivo'}
                       >
-                        {pp.active
-                          ? t.establishmentAdmin.dashboard.active
-                          : t.establishmentAdmin.dashboard.inactive}
+                        {pp.active ? '🟢' : '🔴'}
                       </button>
                     </td>
 
-                    {/* Acciones */}
-                    <td className="text-right">
-                      {isEdit ? (
-                        <div className="admin-menu__row-actions">
-                          <button className="admin-menu__save-btn" onClick={() => saveEdit(p)}>
-                            {t.establishmentAdmin.forms.update}
-                          </button>
-                          <button className="admin-menu__cancel-btn" onClick={cancelEdit}>
-                            {t.establishmentAdmin.forms.cancel}
-                          </button>
+                    {/* ✅ MEJORADO: Acciones consistentes */}
+                    <td className="admin-menu__cell-actions" onClick={(e) => e.stopPropagation()}>
+                      {isConfirming ? (
+                        // Confirmación con overlay
+                        <div className="admin-menu__confirm-overlay">
+                          <div className="admin-menu__confirm-content">
+                            <button
+                              className="admin-menu__confirm-btn admin-menu__confirm-btn--delete"
+                              onClick={() => confirmDelete(p.id)}
+                              disabled={isDeleting}
+                              title="Confirmar eliminación"
+                            >
+                              {isDeleting ? '⏳' : '💀'}
+                            </button>
+                            <button
+                              className="admin-menu__confirm-btn admin-menu__confirm-btn--cancel"
+                              onClick={cancelDelete}
+                              disabled={isDeleting}
+                              title="Cancelar"
+                            >
+                              ❌
+                            </button>
+                          </div>
                         </div>
                       ) : (
-                        <div className="flex items-center justify-end gap-2">
+                        // ✅ ICONOS CONSISTENTES - NUNCA CAMBIAN
+                        <div className="admin-menu__row-actions">
                           <button
                             type="button"
-                            className="h-8 w-8 grid place-items-center rounded hover:bg-neutral-100 text-neutral-700"
+                            className="admin-icon-btn admin-icon-btn--edit"
                             onClick={() => onEdit(p.id)}
-                            aria-label={t.establishmentAdmin.forms.edit}
-                            title={t.establishmentAdmin.forms.edit}
+                            aria-label="Editar producto completo"
+                            title="Editar producto (alérgenos, descripción, variantes...)"
                           >
                             ✏️
                           </button>
                           <button
                             type="button"
-                            className="h-8 w-8 grid place-items-center rounded hover:bg-red-50 text-red-600"
-                            onClick={() => onDelete(p.id)}
-                            aria-label={t.establishmentAdmin.forms.delete}
-                            title={t.establishmentAdmin.forms.delete}
+                            className="admin-icon-btn admin-icon-btn--delete"
+                            onClick={() => startDeleteConfirmation(p.id)}
+                            aria-label="Eliminar producto"
+                            title="Eliminar producto"
                           >
                             🗑️
                           </button>

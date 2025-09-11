@@ -10,7 +10,11 @@ import CategoryForm from './forms/CategoryForm'
 import ProductForm from './forms/ProductForm'
 import VariantForm from './forms/VariantForm'
 import { notify } from '@/utils/notify'
-import { mapCategoryUIToCreateDTO, mapCategoryUIToUpdateDTO } from '@/utils/categoryHelpers'
+import {
+  mapCategoryUIToCreateDTO,
+  mapCategoryUIToUpdateDTO,
+  mapCategoryPartialToUpdateDTO,
+} from '@/services/mappers/menuMappers'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
@@ -26,6 +30,7 @@ import type {
   MenuProduct,
   ProductVariant,
 } from '@/types/management/menu'
+import type { CategoryUpdateDTO } from '@/types/dtos/category'
 
 interface Props {
   establishmentId: string
@@ -138,11 +143,10 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
               notify.error(t.establishmentAdmin.notifications?.categoryDeleteError ?? '✖')
             }
           }}
-          onUpdate={async (id, patch) => {
-            const current = categories.find((c) => c.id === id)
-            if (!current) return
+          onUpdate={async (id, updateDTO: CategoryUpdateDTO) => {
+            // ✅ updateDTO ya viene mapeado desde CategoryList
             try {
-              await updateCategoryM.mutateAsync({ ...(current as any), ...patch })
+              await updateCategoryM.mutateAsync({ id, ...updateDTO })
               await invalidateMenu()
               notify.success(t.establishmentAdmin.notifications?.categoryUpdated ?? '✔')
             } catch {
@@ -151,10 +155,13 @@ export default function AdminMenuManager({ establishmentId, lang }: Props) {
           }}
           onReorder={async (nextOrders) => {
             try {
+              // ✅ Procesar reordenamientos con mappers
               for (const { id, order } of nextOrders) {
                 const current = categories.find((c) => c.id === id)
                 if (!current || current.order === order) continue
-                await updateCategoryM.mutateAsync({ ...(current as any), order })
+
+                const updateDTO = mapCategoryPartialToUpdateDTO({ order })
+                await updateCategoryM.mutateAsync({ id, ...updateDTO })
               }
               await invalidateMenu()
               notify.success(t.establishmentAdmin.notifications?.categoryReordered ?? '✔')

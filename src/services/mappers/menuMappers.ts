@@ -1,6 +1,129 @@
 import type { LanguageCode } from '@/constants/languages'
 import type { MenuCategory, MenuProduct, ProductVariant } from '@/types/management/menu'
-import type { CategoryDTO, CategoryUpdateDTO } from '@/types/dtos/category'
+import type { CategoryDTO, CategoryCreateDTO, CategoryUpdateDTO } from '@/types/dtos/category'
+
+// ✅ HELPER: Conversión de UI translations a DTO translations (UI → API)
+function mapUITranslationsToDTO(
+  uiTranslations: Record<LanguageCode, { name: string; description?: string }> | undefined
+): Array<{ languageCode: string; name: string; description?: string }> {
+  if (!uiTranslations) return []
+
+  return Object.entries(uiTranslations)
+    .filter(([_, trans]) => trans?.name?.trim())
+    .map(([languageCode, trans]) => ({
+      languageCode,
+      name: trans.name.trim(),
+      ...(trans.description && { description: trans.description.trim() })
+    }))
+}
+
+// ✅ HELPER: Conversión de DTO translations a UI translations (API → UI)
+function mapDTOTranslationsToUI(
+  dtoTranslations: Array<{ languageCode: string; name: string; description?: string }> | undefined
+): Record<LanguageCode, { name: string; description?: string }> {
+  if (!dtoTranslations) return {} as any
+
+  const result: Record<string, { name: string; description?: string }> = {}
+
+  dtoTranslations.forEach(trans => {
+    result[trans.languageCode] = {
+      name: trans.name || '',
+      ...(trans.description && { description: trans.description })
+    }
+  })
+
+  return result as Record<LanguageCode, { name: string; description?: string }>
+}
+
+// ✅ HELPER: Conversión específica para categorías (solo name)
+function mapUICategoryTranslationsToDTO(
+  uiTranslations: Record<LanguageCode, { name: string }> | undefined
+): Array<{ languageCode: string; name: string }> {
+  if (!uiTranslations) return []
+
+  return Object.entries(uiTranslations)
+    .filter(([_, trans]) => trans?.name?.trim())
+    .map(([languageCode, trans]) => ({
+      languageCode,
+      name: trans.name.trim()
+    }))
+}
+
+// ✅ HELPER: Conversión específica para categorías (solo name)
+export function mapDTOCategoryTranslationsToUI(
+  dtoTranslations: Array<{ languageCode: string; name: string }> | undefined
+): Record<LanguageCode, { name: string }> {
+  if (!dtoTranslations) return {} as any
+
+  const result: Record<string, { name: string }> = {}
+
+  dtoTranslations.forEach(trans => {
+    result[trans.languageCode] = {
+      name: trans.name || ''
+    }
+  })
+
+  return result as Record<LanguageCode, { name: string }>
+}
+
+// ✅ CategoryDTO → MenuCategory (UI)
+export function mapCategoryDTOToUI(dto: CategoryDTO): MenuCategory {
+  return {
+    id: dto.categoryId,
+    order: dto.sortOrder ?? 0,
+    active: dto.isActive ?? true,
+    translations: mapDTOCategoryTranslationsToUI(dto.translations),
+  }
+}
+
+// ✅ MenuCategory (UI) → CategoryCreateDTO
+export function mapCategoryUIToCreateDTO(ui: MenuCategory): CategoryCreateDTO {
+  return {
+    establishmentId: 0, // Will be set in the hook
+    name: ui.translations.es?.name || ui.translations.en?.name || '',
+    sortOrder: ui.order,
+    isActive: ui.active,
+    translations: mapUICategoryTranslationsToDTO(ui.translations),
+  }
+}
+
+// ✅ MenuCategory (UI) → CategoryUpdateDTO
+export function mapCategoryUIToUpdateDTO(ui: MenuCategory): CategoryUpdateDTO {
+  return {
+    name: ui.translations.es?.name || ui.translations.en?.name || '',
+    sortOrder: ui.order,
+    isActive: ui.active,
+    translations: mapUICategoryTranslationsToDTO(ui.translations),
+  }
+}
+
+// ✅ Partial updates - para toggle active/order changes
+export function mapCategoryPartialToUpdateDTO(
+  partial: Partial<Pick<MenuCategory, 'active' | 'order' | 'translations'>>
+): CategoryUpdateDTO {
+  const result: CategoryUpdateDTO = {}
+
+  if (partial.active !== undefined) result.isActive = partial.active
+  if (partial.order !== undefined) result.sortOrder = partial.order
+  if (partial.translations !== undefined) {
+    result.translations = mapUICategoryTranslationsToDTO(partial.translations)
+  }
+
+  return result
+}
+
+// ✅ Helper para preservar translations existentes en updates parciales
+export function preserveExistingTranslations(
+  current: MenuCategory,
+  patch: Partial<MenuCategory>
+): MenuCategory {
+  return {
+    ...current,
+    ...patch,
+    // Si patch no incluye translations, preservar las actuales
+    translations: patch.translations || current.translations
+  }
+}
 
 // Soporte de idiomas (ajusta si tienes más)
 const SUPPORTED_LANGS = new Set<LanguageCode>(['es', 'en', 'fr'] as const)
@@ -92,26 +215,6 @@ export function mapPrismaMenuToAdminDTO(categories: any[]): AdminMenuCategoryDTO
   })
 }
 
-// Mappers DTO <-> UI usados por hooks/queries (categorías, productos, variantes)
-export function mapCategoryDTOToUI(dto: CategoryDTO): MenuCategory {
-  return {
-    id: dto.categoryId,
-    order: dto.sortOrder ?? 0,
-    active: dto.isActive ?? true,
-    translations: dto.translations?.reduce((acc: Record<LanguageCode, { name: string }>, t: any) => {
-      acc[t.languageCode as LanguageCode] = {
-        name: t.name,
-        // No description for categories
-      }
-      return acc
-    }, {} as Record<LanguageCode, { name: string }>) ?? {
-      es: { name: dto.name },
-      en: { name: '' },
-      fr: { name: '' },
-    },
-  }
-}
-
 export function mapProductDTOToUI(dto: any): MenuProduct {
   return {
     id: Number(dto.productId ?? dto.id),
@@ -144,19 +247,6 @@ export function mapVariantDTOToUI(dto: any): ProductVariant {
           name: t.variantDescription ?? t.name ?? '',
           description: t.description ?? null
         })),
-  }
-}
-
-export function mapCategoryUIToDTO(ui: MenuCategory): CategoryUpdateDTO {
-  return {
-    name: ui.translations.es?.name || ui.translations.en?.name || '',
-    sortOrder: ui.order,
-    isActive: ui.active,
-    translations: Object.entries(ui.translations).map(([lang, trans]) => ({
-      languageCode: lang,
-      name: trans.name,
-      // No description for categories
-    })),
   }
 }
 

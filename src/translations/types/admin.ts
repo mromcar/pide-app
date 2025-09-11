@@ -66,6 +66,7 @@ export interface EstablishmentAdminPanelTranslations {
       active: string; image: string; actions: string; variants: string; allergens: string
       confirmDelete: string; deleteMessage: string; allergensLabel: string
       noAllergens: string; variantNumber: string
+      confirm: string; cancel: string
     }
     variants: {
       title: string; addNew: string; edit: string; delete: string

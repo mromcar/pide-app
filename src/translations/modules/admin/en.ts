@@ -83,7 +83,9 @@ export const admin = {
       deleteMessage: 'Are you sure you want to delete this product?',
       allergensLabel: 'Allergens:',
       noAllergens: 'None',
-      variantNumber: 'Variant'
+      variantNumber: 'Variant',
+      confirm: 'Confirm',
+      cancel: 'Cancel',
     },
     variants: {
       title: 'Variants',
@@ -392,6 +394,8 @@ export const admin = {
         allergensLabel: 'Allergens:',
         noAllergens: 'None',
         variantNumber: 'Variant',
+        confirm: 'Confirm',
+        cancel: 'Cancel',
       },
       variants: {
         title: 'Variants',

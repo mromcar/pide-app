@@ -85,6 +85,8 @@ export const admin = {
       allergensLabel: 'Alérgenos:',
       noAllergens: 'Ninguno',
       variantNumber: 'Variante',
+      confirm: 'Confirmar',
+      cancel: 'Cancelar',
     },
     variants: {
       title: 'Variantes',
@@ -407,6 +409,8 @@ export const admin = {
         allergensLabel: 'Alérgenos:',
         noAllergens: 'Ninguno',
         variantNumber: 'Variante',
+        confirm: 'Confirmar',
+        cancel: 'Cancelar',
       },
       variants: {
         title: 'Variantes',

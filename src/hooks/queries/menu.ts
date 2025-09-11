@@ -14,7 +14,7 @@ import {
 import { getAdminAllergens } from '@/services/api/allergen.api'
 import {
   mapCategoryDTOToUI, mapProductDTOToUI, mapVariantDTOToUI,
-  mapProductUIToDTO, mapVariantUIToDTO,
+  mapProductUIToDTO, mapVariantUIToDTO, mapDTOCategoryTranslationsToUI
 } from '@/services/mappers/menuMappers'
 import type { MenuCategory, MenuProduct, ProductVariant, UIAllergen } from '@/types/management/menu'
 import type { CategoryCreateDTO, CategoryUpdateDTO } from '@/types/dtos/category'
@@ -48,32 +48,23 @@ export function useCategories(establishmentId: number) {
   // CREATE: Acepta CategoryCreateDTO directamente
   const createM = useMutation({
     mutationFn: (data: CategoryCreateDTO) => {
-      console.log('[useCategories] createM mutationFn called with:', data)
-      console.log('[useCategories] CREATE - sortOrder:', data.sortOrder, 'type:', typeof data.sortOrder)
-      console.log('[useCategories] CREATE - isActive:', data.isActive, 'type:', typeof data.isActive)
-
-      // Asegurar que establishmentId esté en el DTO
-      const completeData = { ...data, establishmentId }
-      console.log('[useCategories] CREATE - completeData being sent to API:', completeData)
-      console.log('[useCategories] CREATE - API payload sortOrder:', completeData.sortOrder, 'type:', typeof completeData.sortOrder)
-      console.log('[useCategories] CREATE - API payload isActive:', completeData.isActive, 'type:', typeof completeData.isActive)
-
-      return createAdminCategory(establishmentId, completeData)
+      console.log('[useCategories] createM - Using consistent DTO format:', data)
+      console.log('[useCategories] createM - translations:', data.translations, 'isArray:', Array.isArray(data.translations))
+      return createAdminCategory(establishmentId, data)
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.categories(establishmentId) }),
   })
 
-  // UPDATE: Acepta CategoryUpdateDTO directamente
+  // ✅ CORREGIDO: UPDATE acepta CategoryUpdateDTO directamente
   const updateM = useMutation({
     mutationFn: (data: CategoryUpdateDTO & { id: number }) => {
-      console.log('[useCategories] updateM mutationFn called with:', data)
-      console.log('[useCategories] UPDATE - sortOrder:', data.sortOrder, 'type:', typeof data.sortOrder)
-      console.log('[useCategories] UPDATE - isActive:', data.isActive, 'type:', typeof data.isActive)
+      console.log('[useCategories] updateM - CategoryUpdateDTO:', data)
 
       const { id, ...updateData } = data
-      console.log('[useCategories] UPDATE - updateData being sent to API:', updateData)
-      console.log('[useCategories] UPDATE - API payload sortOrder:', updateData.sortOrder, 'type:', typeof updateData.sortOrder)
-      console.log('[useCategories] UPDATE - API payload isActive:', updateData.isActive, 'type:', typeof updateData.isActive)
+
+      // ✅ NO hacer conversión manual - updateData ya está en formato DTO correcto
+      console.log('[useCategories] updateM - Sending to API:', updateData)
+      console.log('[useCategories] updateM - translations type:', typeof updateData.translations, 'isArray:', Array.isArray(updateData.translations))
 
       return updateAdminCategory(establishmentId, id, updateData)
     },
@@ -81,17 +72,37 @@ export function useCategories(establishmentId: number) {
       const key = qk.categories(establishmentId)
       await qc.cancelQueries({ queryKey: key })
       const prev = qc.getQueryData<MenuCategory[]>(key)
+
       if (prev && 'id' in v) {
-        // Optimistic update with proper null/undefined handling
-        const updatedCategories = prev.map((c) =>
-          c.id === v.id
-            ? {
-                ...c,
-                active: v.isActive !== undefined && v.isActive !== null ? v.isActive : c.active,
-                order: v.sortOrder !== undefined && v.sortOrder !== null ? v.sortOrder : c.order
-              }
-            : c
-        )
+        // ✅ CORREGIDO: Optimistic update con type safety garantizada
+        const updatedCategories = prev.map((c): MenuCategory => {
+          if (c.id !== v.id) return c
+
+          // ✅ Garantizar tipos no-null con fallbacks seguros
+          const newOrder: number = v.sortOrder !== undefined && v.sortOrder !== null ? v.sortOrder : c.order
+          const newActive: boolean = v.isActive !== undefined && v.isActive !== null ? v.isActive : c.active
+
+          // ✅ Translations conversion con type safety
+          let newTranslations = c.translations
+          if (v.translations && Array.isArray(v.translations)) {
+            // ✅ Filtrar translations válidas antes de mapear
+            const validTranslations = v.translations.filter(
+              (t): t is { languageCode: string; name: string } =>
+                typeof t.languageCode === 'string' && typeof t.name === 'string'
+            )
+            if (validTranslations.length > 0) {
+              newTranslations = mapDTOCategoryTranslationsToUI(validTranslations)
+            }
+          }
+
+          return {
+            ...c,
+            active: newActive,    // ✅ Guaranteed boolean
+            order: newOrder,      // ✅ Guaranteed number
+            translations: newTranslations
+          }
+        })
+
         qc.setQueryData<MenuCategory[]>(key, updatedCategories)
       }
       return { prev, key }
