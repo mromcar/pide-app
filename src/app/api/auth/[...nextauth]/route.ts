@@ -55,11 +55,11 @@ export const authOptions: AuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 24 horas en lugar de 30 días para testing
-    updateAge: 2 * 60 * 60, // Actualizar cada 2 horas
+    maxAge: 8 * 60 * 60, // ✅ 8 horas (turno de trabajo)
+    updateAge: 1 * 60 * 60, // ✅ Renovar cada hora si activo
   },
   jwt: {
-    maxAge: 24 * 60 * 60, // 24 horas para testing
+    maxAge: 8 * 60 * 60, // ✅ 8 horas (turno de trabajo)
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
@@ -112,6 +112,7 @@ export const authOptions: AuthOptions = {
           token.establishmentId = dbUser.establishmentId;
           token.name = dbUser.name;
           token.image = null;
+          token.lastActivity = Date.now(); // ✅ Tracking de actividad
 
           console.log('✅ JWT Token created:', {
             id: token.id,
@@ -120,6 +121,8 @@ export const authOptions: AuthOptions = {
           })
         }
       }
+      // ✅ Actualizar última actividad en cada request
+      token.lastActivity = Date.now();
       // En requests posteriores, el token ya tiene toda la info
       return token;
     },
@@ -138,6 +141,20 @@ export const authOptions: AuthOptions = {
         })
       }
       return session;
+    }
+  },
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === 'production'
+        ? '__Secure-next-auth.session-token'
+        : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 8 * 60 * 60, // ✅ 8 horas, consistente con session
+      }
     }
   },
   pages: {

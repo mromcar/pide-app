@@ -283,6 +283,15 @@ export const admin = {
       requiredLanguages: 'Langues requises',
       saving: 'Enregistrement...',
     },
+    security: {
+      sessionWarning: 'Votre session expirera dans 5 minutes. Voulez-vous continuer ?',
+      sessionExpired: 'Session expirée en raison d\'inactivité',
+      sessionExtended: 'Session renouvelée automatiquement',
+      logoutSuccess: 'Session fermée avec succès',
+      timeRemaining: 'Temps restant',
+      minutes: 'minutes',
+      extend: 'Étendre la session',
+    },
     messages: {
       error: {
         title: 'Erreur',
@@ -508,5 +517,14 @@ export const admin = {
       variantUpdateError: 'Erreur lors de la mise à jour de la variante',
       variantDeleteError: 'Erreur lors de la suppression de la variante',
     },
+  },
+  security: {
+    sessionWarning: 'Votre session expirera dans 5 minutes. Voulez-vous continuer ?',
+    sessionExpired: 'Session expirée en raison d\'inactivité',
+    sessionExtended: 'Session renouvelée automatiquement',
+    logoutSuccess: 'Session fermée avec succès',
+    timeRemaining: 'Temps restant',
+    minutes: 'minutes',
+    extend: 'Étendre la session',
   },
 } satisfies AdminModuleTranslations

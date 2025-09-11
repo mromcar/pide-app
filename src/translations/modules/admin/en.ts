@@ -280,6 +280,15 @@ export const admin = {
       requiredLanguages: 'Required languages',
       saving: 'Saving...',
     },
+    security: {
+      sessionWarning: 'Your session will expire in 5 minutes. Do you want to continue?',
+      sessionExpired: 'Session expired due to inactivity',
+      sessionExtended: 'Session renewed automatically',
+      logoutSuccess: 'Session closed successfully',
+      timeRemaining: 'Time remaining',
+      minutes: 'minutes',
+      extend: 'Extend session',
+    },
     messages: {
       error: {
         title: 'Error',
@@ -500,5 +509,14 @@ export const admin = {
       variantUpdateError: 'Error updating variant',
       variantDeleteError: 'Error deleting variant',
     },
+  },
+  security: {
+    sessionWarning: 'Your session will expire in 5 minutes. Do you want to continue?',
+    sessionExpired: 'Session expired due to inactivity',
+    sessionExtended: 'Session renewed automatically',
+    logoutSuccess: 'Session closed successfully',
+    timeRemaining: 'Time remaining',
+    minutes: 'minutes',
+    extend: 'Extend session',
   },
 } satisfies AdminModuleTranslations

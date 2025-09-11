@@ -21,6 +21,15 @@ export interface EstablishmentAdminPanelTranslations {
     requiredLanguages: string
     saving: string
   }
+  security: {
+    sessionWarning: string
+    sessionExpired: string
+    sessionExtended: string
+    logoutSuccess: string
+    timeRemaining: string
+    minutes: string
+    extend: string
+  }
   messages: {
     error: { title: string; loadingFailed: string; verifyingPermissions: string }
     emptyStates: {
@@ -93,9 +102,7 @@ export interface EstablishmentAdminPanelTranslations {
     products: { name: string; description: string }
     variants: { description: string; price: string }
   }
-  // NUEVO: pestañas dentro del drawer
   tabs?: { general: string; variants: string }
-  // NUEVO: mensajes rápidos para toasts del panel
   notifications?: {
     categoryCreated: string; categoryUpdated: string; categoryDeleted: string
     categorySaveError: string; categoryUpdateError: string; categoryDeleteError: string
@@ -154,4 +161,13 @@ export interface AdminModuleTranslations {
     emptyStates: EstablishmentAdminPanelTranslations['messages']['emptyStates']
   }
   establishmentAdmin: EstablishmentAdminPanelTranslations
+  security: {
+    sessionWarning: string
+    sessionExpired: string
+    sessionExtended: string
+    logoutSuccess: string
+    timeRemaining: string
+    minutes: string
+    extend: string
+  }
 }

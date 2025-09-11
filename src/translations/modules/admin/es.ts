@@ -249,7 +249,7 @@ export const admin = {
         'Elige una categoría de la barra lateral para ver y gestionar sus productos.',
       selectProduct: 'Selecciona un producto',
       selectProductDesc: 'Elige un producto para gestionar sus variantes.',
-      helperText: 'Ve a “Categorías” para crear tu primera categoría',
+      helperText: 'Ve a "Categorías" para crear tu primera categoría',
     },
   },
 
@@ -289,6 +289,15 @@ export const admin = {
       requiredLanguage: 'Idioma requerido',
       requiredLanguages: 'Idiomas requeridos',
       saving: 'Guardando...',
+    },
+    security: {
+      sessionWarning: 'Tu sesión expirará en 5 minutos. ¿Deseas continuar?',
+      sessionExpired: 'Sesión expirada por inactividad',
+      sessionExtended: 'Sesión renovada automáticamente',
+      logoutSuccess: 'Sesión cerrada correctamente',
+      timeRemaining: 'Tiempo restante',
+      minutes: 'minutos',
+      extend: 'Extender sesión',
     },
     messages: {
       error: {
@@ -518,5 +527,14 @@ export const admin = {
       variantUpdateError: 'Error al actualizar la variante',
       variantDeleteError: 'Error al eliminar la variante',
     },
+  },
+  security: {
+    sessionWarning: 'Tu sesión expirará en 5 minutos. ¿Deseas continuar?',
+    sessionExpired: 'Sesión expirada por inactividad',
+    sessionExtended: 'Sesión renovada automáticamente',
+    logoutSuccess: 'Sesión cerrada correctamente',
+    timeRemaining: 'Tiempo restante',
+    minutes: 'minutos',
+    extend: 'Extender sesión',
   },
 } satisfies AdminModuleTranslations

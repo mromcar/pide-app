@@ -52,17 +52,17 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(redirectPath, req.url))
   }
 
-  // ✅ 2. PROTECCIÓN DE RUTAS ADMIN - CORREGIDO
+  // ✅ 2. PROTECCIÓN DE RUTAS ADMIN
   const adminRoutePattern = /^\/[a-z]{2}\/admin/
   if (adminRoutePattern.test(pathname)) {
     console.log('🛡️ Admin route detected:', pathname)
 
     try {
-      // ✅ CORREGIR: Configuración correcta para obtener token
+      // ✅ Configuración correcta para obtener token
       const token = await getToken({
         req,
         secret: process.env.NEXTAUTH_SECRET,
-        // ✅ AGREGAR: Nombre correcto de cookie según entorno
+        // ✅ Nombre correcto de cookie según entorno
         cookieName:
           process.env.NODE_ENV === 'production'
             ? '__Secure-next-auth.session-token'
@@ -75,7 +75,21 @@ export async function middleware(req: NextRequest) {
         hasRole: !!token?.role,
         role: token?.role,
         establishmentId: token?.establishmentId,
+        age: token?.iat && typeof token.iat === 'number' ? Date.now() - (token.iat * 1000) : 'unknown',
       })
+
+      // ✅ Verificar edad del token
+      if (token?.iat && typeof token.iat === 'number') {
+        const tokenAge = Date.now() - (token.iat * 1000)
+        const maxTokenAge = 8 * 60 * 60 * 1000 // 8 horas en ms
+
+        if (tokenAge > maxTokenAge) {
+          console.log('❌ TOKEN TOO OLD - FORCING LOGIN')
+          const locale = pathname.split('/')[1] || DEFAULT_LANGUAGE
+          const loginUrl = new URL(`/${locale}/login?reason=expired`, req.url)
+          return NextResponse.redirect(loginUrl)
+        }
+      }
 
       // ✅ FORZAR REDIRECCIÓN A LOGIN SI NO HAY TOKEN
       if (!token || !token.id || !token.role) {
