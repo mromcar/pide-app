@@ -307,19 +307,22 @@ export default function CategoryList({
           <table className="admin-menu__table admin-menu__table--categories">
             <thead>
               <tr>
-                <th style={{ width: '30px' }}>
-                  <span className="sr-only">Reordenar</span>
+                <th style={{ width: 32, textAlign: 'center' }}>
+                  <span className="sr-only">
+                    {t.establishmentAdmin.menuManagement.categories.order}
+                  </span>
                 </th>
-                <th style={{ width: '180px' }}>
+                <th style={{ width: 140, textAlign: 'left' }}>
                   {t.establishmentAdmin.menuManagement.categories.name}
                 </th>
-                <th style={{ width: '40px', textAlign: 'center' }}>#</th>
-                <th style={{ width: '70px', textAlign: 'center' }}>
-                  {t.establishmentAdmin.forms.active}
+                <th style={{ width: 40, textAlign: 'center' }}>#</th>
+                <th style={{ width: 110, textAlign: 'center' }}>
+                  {t.establishmentAdmin.menuManagement.categories.active}
                 </th>
-                <th style={{ width: '80px', textAlign: 'right' }}>
-                  <span aria-hidden>⋯</span>
-                  <span className="sr-only">Acciones</span>
+                <th style={{ width: 60, textAlign: 'right' }}>
+                  <span className="sr-only">
+                    {t.establishmentAdmin.menuManagement.categories.actions}
+                  </span>
                 </th>
               </tr>
             </thead>
@@ -331,7 +334,9 @@ export default function CategoryList({
                 const isOver = dragOverId === c.id
                 const isSelected = selectedCategoryId === c.id
                 const isLoading = isUpdating === c.id
-                const nameVal = isEdit ? draftName : getCategoryName(c, lang) || '(sin nombre)'
+                const nameVal = isEdit
+                  ? draftName
+                  : getCategoryName(c, lang) || t.establishmentAdmin.menuManagement.categories.name
 
                 return (
                   <tr
@@ -351,15 +356,25 @@ export default function CategoryList({
                     onDragOver={(e) => onDragOver(e, c.id)}
                     onDrop={onDragEnd}
                   >
+                    {/* Drag handle */}
                     <td
                       className="admin-menu__drag-handle"
                       draggable={!isEdit && !isConfirming && !isLoading}
                       onDragStart={(e) => onDragStart(e, c.id)}
                       aria-label={t.establishmentAdmin.menuManagement.categories.order}
-                      style={{ textAlign: 'center' }}
+                      style={{
+                        textAlign: 'center',
+                        paddingRight: 0,
+                        paddingLeft: 0,
+                        width: 32,
+                        minWidth: 32,
+                        maxWidth: 32,
+                      }}
                     >
-                      {isLoading ? '⏳' : '☰'}
+                      {/* Solo muestra ⏳ si la fila está cargando Y es la fila de estado, nunca en el drag handle */}
+                      {'☰'}
                     </td>
+                    {/* Nombre */}
                     <td
                       className="admin-menu__cell--editable"
                       onClick={(e) => {
@@ -368,7 +383,16 @@ export default function CategoryList({
                           startEdit(c, e)
                         }
                       }}
-                      style={{ maxWidth: '180px', position: 'relative' }}
+                      style={{
+                        maxWidth: 140,
+                        minWidth: 100,
+                        paddingLeft: 8,
+                        paddingRight: 8,
+                        position: 'relative',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
                     >
                       {isEdit ? (
                         <div className="admin-menu__inline-edit">
@@ -401,9 +425,19 @@ export default function CategoryList({
                         </span>
                       )}
                     </td>
+                    {/* Orden */}
                     <td
                       onClick={(e) => e.stopPropagation()}
-                      style={{ textAlign: 'center', color: '#6b7280', fontSize: '0.875rem' }}
+                      style={{
+                        textAlign: 'center',
+                        color: '#6b7280',
+                        fontSize: '0.875rem',
+                        width: 40,
+                        minWidth: 40,
+                        maxWidth: 40,
+                        paddingLeft: 0,
+                        paddingRight: 0,
+                      }}
                     >
                       <input
                         type="number"
@@ -421,70 +455,101 @@ export default function CategoryList({
                         title={t.establishmentAdmin.menuManagement.categories.order}
                       />
                     </td>
-                    <td onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center' }}>
-                      <button
-                        className={`admin-status-toggle ${
-                          c.active ? 'admin-status-toggle--active' : 'admin-status-toggle--inactive'
-                        }`}
-                        onClick={(e) => !isConfirming && !isLoading && toggleActive(c, e)}
-                        disabled={isConfirming || isLoading}
-                        title={
-                          c.active
-                            ? t.establishmentAdmin.forms.active
-                            : t.establishmentAdmin.forms.inactive
-                        }
-                        aria-label={
-                          c.active
-                            ? t.establishmentAdmin.forms.active
-                            : t.establishmentAdmin.forms.inactive
-                        }
+                    {/* Estado + Eliminar */}
+                    <td
+                      style={{
+                        textAlign: 'center',
+                        paddingLeft: 0,
+                        paddingRight: 0,
+                        width: 110,
+                        minWidth: 80,
+                        maxWidth: 120,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.25rem',
+                        }}
                       >
-                        {isLoading ? '⏳' : c.active ? '🟢' : '🔴'}
-                      </button>
-                    </td>
-                    <td onClick={(e) => e.stopPropagation()} style={{ textAlign: 'right' }}>
-                      <div className="admin-menu__row-actions">
-                        {isConfirming ? (
-                          <div className="admin-menu__confirm-overlay" ref={confirmRef}>
-                            <div className="admin-menu__confirm-content">
-                              <button
-                                className="admin-menu__confirm-btn admin-menu__confirm-btn--delete"
-                                onClick={() => confirmDelete(c.id)}
-                                disabled={isDeleting}
-                                title={t.establishmentAdmin.menuManagement.categories.confirmDelete}
-                              >
-                                {isDeleting ? '⏳' : '✓'}
-                              </button>
-                              <button
-                                className="admin-menu__confirm-btn admin-menu__confirm-btn--cancel"
-                                onClick={cancelDelete}
-                                disabled={isDeleting}
-                                title={t.establishmentAdmin.forms.cancel}
-                              >
-                                ✕
-                              </button>
+                        <button
+                          className={`admin-status-toggle ${
+                            c.active
+                              ? 'admin-status-toggle--active'
+                              : 'admin-status-toggle--inactive'
+                          }`}
+                          onClick={(e) => !isConfirming && !isLoading && toggleActive(c, e)}
+                          disabled={isConfirming || isLoading}
+                          title={
+                            c.active
+                              ? t.establishmentAdmin.forms.active
+                              : t.establishmentAdmin.forms.inactive
+                          }
+                          aria-label={
+                            c.active
+                              ? t.establishmentAdmin.forms.active
+                              : t.establishmentAdmin.forms.inactive
+                          }
+                          style={{ marginRight: 2 }}
+                        >
+                          {isLoading ? '⏳' : c.active ? '🟢' : '🔴'}
+                        </button>
+                        {/* Eliminar */}
+                        <div className="admin-menu__row-actions" style={{ gap: 0 }}>
+                          {isConfirming ? (
+                            <div className="admin-menu__confirm-overlay" ref={confirmRef}>
+                              <div className="admin-menu__confirm-content">
+                                <button
+                                  className="admin-menu__confirm-btn admin-menu__confirm-btn--delete"
+                                  onClick={() => confirmDelete(c.id)}
+                                  disabled={isDeleting}
+                                  title={
+                                    t.establishmentAdmin.menuManagement.categories.confirmDelete
+                                  }
+                                >
+                                  {isDeleting ? '⏳' : '✓'}
+                                </button>
+                                <button
+                                  className="admin-menu__confirm-btn admin-menu__confirm-btn--cancel"
+                                  onClick={cancelDelete}
+                                  disabled={isDeleting}
+                                  title={t.establishmentAdmin.forms.cancel}
+                                >
+                                  ✕
+                                </button>
+                              </div>
                             </div>
-                            <div className="admin-menu__confirm-hint">
-                              {/* Puedes añadir una clave en tus traducciones si quieres un texto aquí */}
-                            </div>
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            className="admin-icon-btn admin-icon-btn--delete"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              startDeleteConfirmation(c.id, e)
-                            }}
-                            aria-label={t.establishmentAdmin.menuManagement.categories.delete}
-                            title={t.establishmentAdmin.menuManagement.categories.delete}
-                            disabled={isEdit || isLoading}
-                          >
-                            🗑️
-                          </button>
-                        )}
+                          ) : (
+                            <button
+                              type="button"
+                              className="admin-icon-btn admin-icon-btn--delete"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                startDeleteConfirmation(c.id, e)
+                              }}
+                              aria-label={t.establishmentAdmin.menuManagement.categories.delete}
+                              title={t.establishmentAdmin.menuManagement.categories.delete}
+                              disabled={isEdit || isLoading}
+                              style={{ marginLeft: 2 }}
+                            >
+                              🗑️
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </td>
+                    {/* Acciones (vacío, solo para estructura) */}
+                    <td
+                      style={{
+                        width: 60,
+                        minWidth: 40,
+                        maxWidth: 80,
+                        textAlign: 'right',
+                        padding: 0,
+                      }}
+                    />
                   </tr>
                 )
               })}
