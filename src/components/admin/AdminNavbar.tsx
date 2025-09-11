@@ -38,7 +38,7 @@ export default function AdminNavbar({
 
   const menuItems: MenuItem[] = [
     {
-      href: `/${languageCode}/admin/${establishmentId}/menu`,
+      href: `/${languageCode}/admin/${establishmentId}/categories`,
       label: t.establishmentAdmin.navigation.menuManagement,
       roles: [UserRole.establishment_admin],
     },
